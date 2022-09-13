@@ -3,13 +3,13 @@ use super::{
     InputItem,
 };
 use crate::{
-    home::{
+    input::component::Verification,
+    text,
+    {
         home_context, CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind,
         InputEssential, InputNic, InputType, Item, Radio, SelectSearchable, SelectSearchableKind,
         Tag, ViewString,
     },
-    input::component::Verification,
-    text,
 };
 use gloo_file::File;
 use json_gettext::get_text;

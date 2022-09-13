@@ -1,8 +1,4 @@
-use crate::{
-    home::{home_context, ViewString},
-    language::Language,
-    text,
-};
+use crate::{home_context, language::Language, text, ViewString};
 use json_gettext::get_text;
 use std::cell::RefCell;
 use std::rc::Rc;

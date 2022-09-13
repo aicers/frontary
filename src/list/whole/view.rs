@@ -3,12 +3,12 @@ use super::{
     DEFAULT_NUM_PAGES,
 };
 use crate::{
-    home::{
+    list::{Column, DataType, Kind, ListItem},
+    text, NBSP,
+    {
         home_context, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini,
         SelectMiniKind, Sort, SortStatus, ViewString, WholeList,
     },
-    list::{Column, DataType, Kind, ListItem},
-    text, NBSP,
 };
 use htmlescape::decode_html;
 use json_gettext::get_text;

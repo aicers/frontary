@@ -1,8 +1,4 @@
-use crate::{
-    home::{gen_notifications, home_context, NotificationType},
-    language::Language,
-    text,
-};
+use crate::{home_context, language::Language, text};
 use json_gettext::get_text;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -153,14 +149,7 @@ where
                     }
                 }
                 Message::InputError => {
-                    home_context(ctx)
-                        .link
-                        .send_message(crate::home::Message::Notify(gen_notifications(
-                            NotificationType::ErrorList(
-                                "Unknown input error".to_string(),
-                                Vec::new(),
-                            ),
-                        )));
+                    //TODO: issue #5
                 }
             }
             if let Some(parent) = ctx.link().get_parent() {

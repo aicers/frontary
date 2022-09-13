@@ -1,4 +1,20 @@
-mod component;
+#![allow(clippy::non_ascii_literal)]
+
+mod checkbox;
+mod input;
+mod language;
+mod list;
+mod modal;
+mod notification;
+mod pages;
+mod radio;
+mod radio_separate;
+mod select;
+mod sort;
+mod tab_menu;
+
+use num_traits::ToPrimitive;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
@@ -11,8 +27,8 @@ pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
 };
 pub use crate::notification::{
-    gen_notifications, Category as NotificationCategory, Model as Notification, NotificationItem,
-    NotificationType, TIMEOUT_SECS,
+    Category as NotificationCategory, Model as Notification, NotificationItem, NotificationType,
+    TIMEOUT_SECS,
 };
 pub use crate::pages::{Info as PagesInfo, Model as Pages};
 pub use crate::radio::Model as Radio;
@@ -26,19 +42,22 @@ pub use crate::tab_menu::Model as TabMenu;
 use crate::language::Language;
 use ipnet::Ipv4Net;
 use json_gettext::{get_text, JSONGetText};
-use num_traits::ToPrimitive;
 use std::net::Ipv4Addr;
 use std::rc::Rc;
 use std::str::FromStr;
 use wasm_bindgen::JsCast;
 
 use anyhow::Result;
-pub use component::{Message, Model};
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::cmp::{Ord, Ordering};
 use std::collections::HashMap;
-use yew::{html::Scope, Callback, Component, Context, NodeRef, Properties};
+use yew::{Callback, Component, Context, Properties};
+
+#[allow(dead_code)]
+pub enum Message {
+    Notify(NotificationItem),
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {
@@ -69,6 +88,7 @@ pub enum HostNetwork {
     Range(IpRange),
 }
 
+#[must_use]
 pub fn parse_host_network(input: &str) -> Option<HostNetwork> {
     if Ipv4Addr::from_str(input).is_ok() {
         return Some(HostNetwork::Host(input.to_string()));
@@ -91,6 +111,7 @@ pub fn parse_host_network(input: &str) -> Option<HostNetwork> {
     None
 }
 
+#[must_use]
 pub fn validate_host_network(input: &str) -> (bool, Option<String>) {
     if Ipv4Addr::from_str(input).is_ok() {
         return (true, None);
@@ -169,7 +190,6 @@ pub(crate) fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) 
         item_org.to_string()
     }
 }
-//////////////////////
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum EndpointKind {
@@ -200,6 +220,7 @@ pub struct ComplexSelection {
 }
 
 impl ComplexSelection {
+    #[must_use]
     pub fn len(&self) -> (Option<usize>, usize) {
         if let (Ok(predefined), Ok(custom)) =
             (self.predefined.try_borrow(), self.custom.try_borrow())
@@ -213,6 +234,7 @@ impl ComplexSelection {
         }
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == (Some(0), 0)
     }
@@ -360,24 +382,20 @@ pub fn sort_networks(networks: &mut Vec<String>) {
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum Item {
-    // Network(Network),
-    //Customer(Customer),
     KeyString(String, ViewString),
 }
 
 impl Item {
+    #[must_use]
     pub fn key(&self) -> &String {
         match self {
-            // Item::Customer(item) => &item.id,
-            // Item::Network(item) => &item.id,
             Item::KeyString(key, _) => key,
         }
     }
 
+    #[must_use]
     pub fn value(&self, txt: Option<(Rc<JSONGetText<'static>>, Language)>) -> String {
         match self {
-            // Item::Customer(item) => item.name.clone(),
-            // Item::Network(item) => item.name.clone(),
             Item::KeyString(_, ViewString::Raw(value)) => value.clone(),
             Item::KeyString(_, ViewString::Key(key)) => {
                 txt.map_or_else(String::new, |(t, language)| {
@@ -387,7 +405,6 @@ impl Item {
         }
     }
 }
-
 #[derive(Clone, Properties)]
 pub struct Props {}
 
@@ -402,9 +419,6 @@ impl PartialEq for Props {
 pub struct HomeContext {
     pub token: Rc<String>,
     pub txt: Rc<JSONGetText<'static>>,
-    pub link: Rc<Scope<Model>>,
-    pub div: Rc<NodeRef>,
-    //pub base_info: Rc<BaseInfo>,
 }
 
 impl PartialEq for HomeContext {
@@ -414,6 +428,7 @@ impl PartialEq for HomeContext {
 }
 
 #[allow(clippy::module_name_repetitions)]
+#[must_use]
 pub fn home_context<T>(ctx: &Context<T>) -> HomeContext
 where
     T: Component,
@@ -424,4 +439,40 @@ where
         .expect("home context should exist");
 
     home_ctx
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub enum CommonError {
+    SendGraphQLQueryError,
+    HttpStatusNoSuccess(u16),
+    GraphQLResponseError,
+    GraphQLParseError,
+    UnknownError,
+}
+
+const NBSP: &str = "&nbsp;";
+
+#[wasm_bindgen(module = "/js/custom-select.js")]
+extern "C" {
+    fn toggle_visibility(id: &str);
+    fn toggle_visibility_complex(id: &str);
+    fn visibile_tag_select(id: &str);
+}
+
+fn window_inner_height() -> u32 {
+    web_sys::window()
+        .expect("Window should exist")
+        .inner_height()
+        .expect("should have height")
+        .as_f64()
+        .expect("should be a number")
+        .to_u32()
+        .unwrap_or(u32::MAX)
+}
+
+trait Rerender {
+    fn rerender_serial(&mut self) -> &mut u64;
+    fn increase_rerender_serial(&mut self) {
+        *self.rerender_serial() = self.rerender_serial().wrapping_add(1);
+    }
 }
