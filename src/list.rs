@@ -6,7 +6,7 @@ pub use whole::Model as WholeList;
 pub use whole::SortColumn;
 
 //use crate::html_element::ViewString;
-use crate::home::ViewString;
+use crate::ViewString;
 use chrono::{DateTime, Utc};
 use std::collections::{HashMap, HashSet};
 

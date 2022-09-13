@@ -1,13 +1,13 @@
 use super::{MessageType, DEFAULT_NUM_PAGES, DEFAULT_NUM_PER_PAGE};
 use crate::{
-    home::{
-        home_context, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo,
-        SelectMini, SelectMiniKind, SortStatus, ViewString,
-    },
     input::InputSecondId,
     language::Language,
     list::{DataType, DisplayInfo, Kind, ListItem},
     text,
+    {
+        home_context, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo,
+        SelectMini, SelectMiniKind, SortStatus, ViewString,
+    },
 };
 use json_gettext::get_text;
 use std::cell::RefCell;

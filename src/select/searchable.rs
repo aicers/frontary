@@ -1,10 +1,6 @@
 use crate::{
-    home::{
-        gen_notifications, home_context, shorten_text, text_width, CheckBox, CheckStatus, Item,
-        NotificationType,
-    },
     language::Language,
-    text, toggle_visibility,
+    text, toggle_visibility, {home_context, shorten_text, text_width, CheckBox, CheckStatus, Item},
 };
 use json_gettext::get_text;
 use num_traits::ToPrimitive;
@@ -251,11 +247,7 @@ where
                 }
             }
             Message::InputError => {
-                home_context(ctx)
-                    .link
-                    .send_message(crate::home::Message::Notify(gen_notifications(
-                        NotificationType::ErrorList("Unknown input error".to_string(), Vec::new()),
-                    )));
+                //TODO: issue #5
                 false
             }
         };

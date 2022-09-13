@@ -1,12 +1,12 @@
 use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
-    home::{
-        home_context, CheckBox, CheckStatus, EndpointKind, SelectComplexKind, SelectMini,
-        SelectMiniKind, SelectionExtraInfo, ViewString,
-    }, //Network
     text,
     window_inner_height,
     NBSP,
+    {
+        home_context, CheckBox, CheckStatus, EndpointKind, SelectComplexKind, SelectMini,
+        SelectMiniKind, SelectionExtraInfo, ViewString,
+    }, //Network
 };
 use htmlescape::decode_html;
 use json_gettext::get_text;
