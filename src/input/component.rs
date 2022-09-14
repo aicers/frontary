@@ -1,15 +1,10 @@
 use super::{
     user_input::MAX_PER_LAYER, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, InputType,
 };
-
 use crate::{
-    home::{
-        gen_notifications, home_context, sort_hosts, sort_networks, InputNic, MessageType,
-        NotificationType, ViewString,
-    },
     language::Language,
     list::{Column, ListItem},
-    text, Rerender,
+    text, Rerender, {home_context, sort_hosts, sort_networks, InputNic, MessageType, ViewString},
 };
 use base64::encode;
 use gloo_file::{
@@ -638,11 +633,7 @@ where
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
             Message::InputError => {
-                home_context(ctx)
-                    .link
-                    .send_message(crate::home::Message::Notify(gen_notifications(
-                        NotificationType::ErrorList("Unknown input error".to_string(), Vec::new()),
-                    )));
+                //TODO: issue #5
             }
             Message::ChooseFile(data_id, files, input_data) => {
                 for file in files {

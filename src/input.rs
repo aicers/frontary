@@ -10,10 +10,10 @@ pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
 pub use tag::Model as Tag;
 
-use crate::home::{
+use crate::list::Column;
+use crate::{
     parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange, ViewString,
 };
-use crate::list::Column;
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
@@ -24,8 +24,8 @@ pub struct InputHostNetworkGroup {
     pub networks: Vec<String>,
     pub ranges: Vec<IpRange>,
 }
-
 impl InputHostNetworkGroup {
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.hosts.is_empty() && self.networks.is_empty() && self.ranges.is_empty()
     }
@@ -104,6 +104,7 @@ pub enum InputType {
 }
 
 impl InputType {
+    #[must_use]
     pub fn required(&self) -> bool {
         match self {
             Self::Text(ess, _, _)
@@ -120,6 +121,7 @@ impl InputType {
         }
     }
 
+    #[must_use]
     pub fn unique(&self) -> bool {
         match self {
             Self::Text(ess, _, _)

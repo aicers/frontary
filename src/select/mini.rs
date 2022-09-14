@@ -1,7 +1,6 @@
 use crate::{
-    home::{home_context, ViewString},
     language::Language,
-    text, toggle_visibility,
+    text, toggle_visibility, {home_context, ViewString},
 };
 use gloo_events::EventListener;
 use json_gettext::get_text;

@@ -1,12 +1,12 @@
 use super::DEFAULT_POP_WIDTH;
 use crate::{
-    home::{
-        gen_notifications, home_context, validate_host_network, CheckStatus, ComplexSelection,
-        EndpointKind, Item, NotificationType, SelectionExtraInfo,
-    }, //Network
     language::Language,
     text,
     toggle_visibility_complex,
+    {
+        home_context, validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item,
+        SelectionExtraInfo,
+    }, //Network
 };
 use json_gettext::get_text;
 use std::cell::RefCell;
@@ -324,11 +324,7 @@ impl Component for Model {
                 }
             }
             Message::InputError => {
-                home_context(ctx)
-                    .link
-                    .send_message(crate::home::Message::Notify(gen_notifications(
-                        NotificationType::ErrorList("Unknown input error".to_string(), Vec::new()),
-                    )));
+                //TODO: issue #5
             }
         }
         true

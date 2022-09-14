@@ -1,10 +1,6 @@
 use crate::{
-    home::{
-        gen_notifications, home_context, parse_host_network, HostNetwork, InputHostNetworkGroup,
-        NotificationType,
-    },
     language::Language,
-    text,
+    text, {home_context, parse_host_network, HostNetwork, InputHostNetworkGroup},
 };
 use json_gettext::get_text;
 use std::cell::RefCell;
@@ -272,11 +268,7 @@ where
                 }
             }
             Message::InputError => {
-                home_context(ctx)
-                    .link
-                    .send_message(crate::home::Message::Notify(gen_notifications(
-                        NotificationType::ErrorList("Unknown input error".to_string(), Vec::new()),
-                    )));
+                //TODO: issue #5
             }
         }
         true

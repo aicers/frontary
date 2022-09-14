@@ -3,7 +3,7 @@ use super::{
     user_input::MAX_PER_LAYER,
     InputItem, InputType,
 };
-use crate::home::CheckStatus;
+use crate::CheckStatus;
 use passwords::analyzer;
 use std::cell::RefCell;
 use std::collections::HashSet;

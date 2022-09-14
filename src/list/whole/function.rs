@@ -1,7 +1,7 @@
 use super::{component::SortListKind, Message, Model, SortColumn, ViewInputStatus};
 use crate::{
-    home::{CheckStatus, PagesInfo, SortStatus},
     list::{DataType, Kind},
+    {CheckStatus, PagesInfo, SortStatus},
 };
 use chrono::{DateTime, Utc};
 use std::cell::RefCell;
