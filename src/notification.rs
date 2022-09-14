@@ -6,6 +6,7 @@ use json_gettext::get_text;
 use num_traits::ToPrimitive;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::fmt::Write;
 use std::rc::Rc;
 use std::time::Duration;
 use yew::{html, Component, Context, Html, Properties};
@@ -201,4 +202,69 @@ impl Model {
 pub enum NotificationType {
     CommonError(CommonError),
     ErrorList(String, Vec<String>),
+}
+
+#[must_use]
+pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
+    match noti {
+        NotificationType::CommonError(msg) => match msg {
+            CommonError::GraphQLResponseError => NotificationItem {
+                message: "Invalid GraphQL response".to_string(),
+                sub_message: String::new(),
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            },
+            CommonError::SendGraphQLQueryError => NotificationItem {
+                message: "Invalid GraphQL query".to_string(),
+                sub_message: String::new(),
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            },
+            CommonError::HttpStatusNoSuccess(status) => NotificationItem {
+                message: "No success HTTPS status code".to_string(),
+                sub_message: status.to_string(),
+                status_code: Some(status),
+                time: None,
+                category: Category::Fail,
+            },
+            CommonError::UnknownError => NotificationItem {
+                message: "Unknown error".to_string(),
+                sub_message: String::new(),
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            },
+            CommonError::GraphQLParseError => NotificationItem {
+                message: "GraphQL parse error".to_string(),
+                sub_message: String::new(),
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            },
+        },
+        NotificationType::ErrorList(message, errors) => {
+            let mut sub_message = String::new();
+            let last = errors.len() - 1;
+            for (index, error) in errors.into_iter().enumerate() {
+                if index == last {
+                    if error.ends_with("Forbidden") {
+                        sub_message += "Unauthorized";
+                    } else {
+                        sub_message += &error;
+                    }
+                } else {
+                    write!(sub_message, "{} & ", error).expect("in-memory operation");
+                }
+            }
+            NotificationItem {
+                message,
+                sub_message,
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            }
+        }
+    }
 }

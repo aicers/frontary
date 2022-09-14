@@ -22,13 +22,15 @@ pub use crate::input::{
     InputHostNetworkGroup, InputItem, InputNic, InputTag, InputTagGroup, InputType, Model as Input,
     Tag,
 };
-pub use crate::list::{Column, ListItem, MessageType, WholeList}; //Column, ListItem 추가
+pub use crate::list::{
+    Column, DataType, DisplayInfo, Kind, ListItem, MessageType, SortColumn, WholeList,
+}; //Column, ListItem 추가
 pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
 };
 pub use crate::notification::{
-    Category as NotificationCategory, Model as Notification, NotificationItem, NotificationType,
-    TIMEOUT_SECS,
+    gen_notifications, Category as NotificationCategory, Model as Notification, NotificationItem,
+    NotificationType, TIMEOUT_SECS,
 };
 pub use crate::pages::{Info as PagesInfo, Model as Pages};
 pub use crate::radio::Model as Radio;
@@ -39,7 +41,7 @@ pub use crate::select::searchable::{Kind as SelectSearchableKind, Model as Selec
 pub use crate::sort::{Model as Sort, Status as SortStatus};
 pub use crate::tab_menu::Model as TabMenu;
 
-use crate::language::Language;
+pub use crate::language::{get, set, Language};
 use ipnet::Ipv4Net;
 use json_gettext::{get_text, JSONGetText};
 use std::net::Ipv4Addr;
@@ -54,10 +56,10 @@ use std::cmp::{Ord, Ordering};
 use std::collections::HashMap;
 use yew::{Callback, Component, Context, Properties};
 
-#[allow(dead_code)]
-pub enum Message {
-    Notify(NotificationItem),
-}
+// #[allow(dead_code)]
+// pub enum Message {
+//     Notify(NotificationItem),
+// }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {

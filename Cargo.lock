@@ -197,6 +197,7 @@ dependencies = [
  "getrandom",
  "gloo-events",
  "gloo-file",
+ "gloo-storage",
  "gloo-timers",
  "htmlescape",
  "ipnet",

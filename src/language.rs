@@ -1,4 +1,4 @@
-//use gloo_storage::{LocalStorage, Result as GlooResult, Storage};
+use gloo_storage::{LocalStorage, Result as GlooResult, Storage};
 use serde::{Deserialize, Serialize};
 
 type Text = Result<String, anyhow::Error>;
@@ -37,6 +37,7 @@ impl From<Language> for Text {
 
 impl Language {
     /// Returns the language subtag.
+    #[must_use]
     pub fn language_subtag(self) -> &'static str {
         match self {
             Language::English => "en",
@@ -45,12 +46,26 @@ impl Language {
     }
 
     /// Returns the BCP 47 tag.
+    #[must_use]
     pub fn tag(self) -> &'static str {
         match self {
             Language::English => "en-US",
             Language::Korean => "ko-KR",
         }
     }
+}
+
+#[must_use]
+pub fn get() -> Language {
+    const DEFAULT_LANGUAGE: Language = Language::English;
+
+    let lang: GlooResult<Language> = LocalStorage::get(STORAGE_KEY);
+    lang.unwrap_or(DEFAULT_LANGUAGE)
+}
+
+#[allow(dead_code)]
+pub fn set(lang: Language) {
+    let _rtn = LocalStorage::set(STORAGE_KEY, lang);
 }
 
 #[macro_export]
