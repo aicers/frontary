@@ -5,7 +5,6 @@ pub use whole::MessageType;
 pub use whole::Model as WholeList;
 pub use whole::SortColumn;
 
-//use crate::html_element::ViewString;
 use crate::ViewString;
 use chrono::{DateTime, Utc};
 use std::collections::{HashMap, HashSet};
@@ -64,6 +63,7 @@ pub enum Kind {
 pub enum DataType {
     Customer,
     Network,
+    TrustedDomain,
 }
 
 #[derive(Clone, Default, PartialEq, Eq)]

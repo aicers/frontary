@@ -1,15 +1,14 @@
 use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
-    text,
-    window_inner_height,
-    NBSP,
+    window_inner_height, NBSP,
     {
         home_context, CheckBox, CheckStatus, EndpointKind, SelectComplexKind, SelectMini,
         SelectMiniKind, SelectionExtraInfo, ViewString,
-    }, //Network
+    },
 };
 use htmlescape::decode_html;
 use json_gettext::get_text;
+use language::text;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};

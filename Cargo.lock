@@ -197,11 +197,13 @@ dependencies = [
  "getrandom",
  "gloo-events",
  "gloo-file",
+ "gloo-storage",
  "gloo-timers",
  "htmlescape",
  "ipnet",
  "js-sys",
  "json-gettext",
+ "language",
  "num-traits",
  "passwords",
  "serde",
@@ -443,6 +445,17 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "language"
+version = "0.1.0"
+source = "git+https://github.com/aicers/language.git?rev=85a23dca#85a23dca43f58fe4451887c622c25ab0529adb4a"
+dependencies = [
+ "anyhow",
+ "gloo-storage",
+ "serde",
+ "web-sys",
 ]
 
 [[package]]

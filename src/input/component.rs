@@ -2,9 +2,8 @@ use super::{
     user_input::MAX_PER_LAYER, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, InputType,
 };
 use crate::{
-    language::Language,
     list::{Column, ListItem},
-    text, Rerender, {home_context, sort_hosts, sort_networks, InputNic, MessageType, ViewString},
+    Rerender, {home_context, sort_hosts, sort_networks, InputNic, MessageType, ViewString},
 };
 use base64::encode;
 use gloo_file::{
@@ -12,6 +11,7 @@ use gloo_file::{
     File,
 };
 use json_gettext::get_text;
+use language::{text, Language};
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
