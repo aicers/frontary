@@ -1,9 +1,9 @@
 use crate::{
-    language::Language,
-    text, toggle_visibility, {home_context, ViewString},
+    toggle_visibility, {home_context, ViewString},
 };
 use gloo_events::EventListener;
 use json_gettext::get_text;
+use language::{text, Language};
 use std::cell::RefCell;
 use std::rc::Rc;
 use web_sys::{Event, HtmlElement};

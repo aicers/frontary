@@ -11,11 +11,13 @@ chrono = { version = "0.4", features = ["serde", "wasmbind"] }
 getrandom = { version = "0.2", features = ["js"] }
 gloo-events = "0.1"
 gloo-file = "0.2"
+gloo-storage = "0.2"
 gloo-timers = "0.2"
 htmlescape = "0.3"
 ipnet = { version = "2", features = ["serde"] }
 js-sys = "0.3"
 json-gettext = "4"
+language = { git = "https://github.com/aicers/language.git", rev = "85a23dca" }
 num-traits = "0.2"
 passwords = { version = "3.1", features = ["common-password"] }
 serde = { version = "1",  features = ["derive"] }

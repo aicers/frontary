@@ -1,8 +1,8 @@
 use crate::{
-    language::Language,
-    text, toggle_visibility, {home_context, shorten_text, text_width, CheckBox, CheckStatus, Item},
+    toggle_visibility, {home_context, shorten_text, text_width, CheckBox, CheckStatus, Item},
 };
 use json_gettext::get_text;
+use language::{text, Language};
 use num_traits::ToPrimitive;
 use std::cell::RefCell;
 use std::collections::HashSet;
