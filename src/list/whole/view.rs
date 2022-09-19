@@ -6,8 +6,8 @@ use crate::{
     list::{Column, DataType, Kind, ListItem},
     NBSP,
     {
-        home_context, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini,
-        SelectMiniKind, Sort, SortStatus, ViewString, WholeList,
+        texts, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind,
+        Sort, SortStatus, ViewString, WholeList,
     },
 };
 use htmlescape::decode_html;
@@ -24,7 +24,8 @@ where
 {
     #[allow(clippy::too_many_lines)]
     pub(super) fn view_head(&self, ctx: &Context<Self>) -> Html {
-        let txt = home_context(ctx).txt;
+        //let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let varied_width: u32 = ctx.props().display_info.width_full
             - ctx
                 .props()
@@ -154,6 +155,7 @@ where
                             MoreAction::Edit,
                             MoreAction::Delete,
                         ]);
+                        //let txt=texts(ctx).txt;
 
                         html! {
                             <>
@@ -192,6 +194,7 @@ where
                                                     <td class="list-whole-list-first-layer-more-action">
                                                         <div class="list-whole-list-flat-more-action">
                                                             <SelectMini::<MoreAction, Self>
+                                                                txt={ctx.props().txt.clone()}
                                                                 language={ctx.props().language}
                                                                 parent_message={Message::DoMoreAction(key.clone())}
                                                                 id={format!("more-action-alpha-{}", key)}
@@ -242,6 +245,7 @@ where
                                                 <td class="list-whole-list-flat-more-action">
                                                     <div class="list-whole-list-flat-more-action">
                                                         <SelectMini::<MoreAction, Self>
+                                                            txt={ctx.props().txt.clone()}
                                                             language={ctx.props().language}
                                                             parent_message={Message::DoMoreAction(key.clone())}
                                                             id={format!("more-action-beta-{}", key)}
@@ -298,6 +302,7 @@ where
                                         ) {
                                             html! {
                                                 <WholeList::<T>
+                                                    txt={ctx.props().txt.clone()}
                                                     language={ctx.props().language}
                                                     id={id}
                                                     title={""}
@@ -346,7 +351,8 @@ where
 
     pub(super) fn view_pages(&self, ctx: &Context<Self>, out_table: bool) -> Html {
         let cols = ctx.props().display_info.titles.len();
-        let txt = home_context(ctx).txt;
+        //let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
 
         if out_table {
             let msg = format!(
@@ -364,6 +370,7 @@ where
                     <td colspan={(cols + 3).to_string()} class="list-whole-list-pages">
                         <div class="list-whole-list-pages-inner">
                             <Pages::<Self>
+                                txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
                                 parent_message={Message::MovePage}
                                 pages_info={Rc::clone(&ctx.props().pages_info)}
@@ -414,6 +421,7 @@ where
                     <td colspan={cols.to_string()} class="list-whole-list-second-pages">
                         <div class="list-whole-list-pages-inner">
                             <Pages::<Self>
+                                txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
                                 parent_message={Message::MovePage}
                                 pages_info={Rc::clone(&ctx.props().pages_info)}
@@ -432,7 +440,8 @@ where
     }
 
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
-        let txt = home_context(ctx).txt;
+        //let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         match col {
             Column::Text(elem) => match elem {
                 ViewString::Key(key) => {

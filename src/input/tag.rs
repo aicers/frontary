@@ -1,5 +1,5 @@
 use crate::{
-    toggle_visibility, visibile_tag_select, {home_context, InputTagGroup},
+    texts, toggle_visibility, visibile_tag_select, {InputTagGroup, Texts},
 };
 use json_gettext::get_text;
 use language::{text, Language};
@@ -54,6 +54,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
     #[prop_or(None)]
     pub parent_message: Option<T::Message>,
@@ -338,7 +339,7 @@ where
     }
 
     fn view_input(&self, ctx: &Context<Self>) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
 
         let placeholder = if let (Ok(data), Some(notice)) = (
             ctx.props().input_data.try_borrow(),
@@ -431,7 +432,7 @@ where
                                 </div>
                                 {
                                     if let Some(msg) = self.edit_message {
-                                        let txt = home_context(ctx).txt;
+                                        let txt = texts(ctx).txt;
                                         html! {
                                             <div class="tag-edit-message">
                                                 { text!(txt, ctx.props().language, msg) }
@@ -481,7 +482,7 @@ where
     }
 
     fn view_message(&self, ctx: &Context<Self>) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         if let Some(message) = self.message {
             html! {
                 <div class="tag-group-message-text">

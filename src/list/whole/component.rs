@@ -3,8 +3,8 @@ use crate::{
     input::InputSecondId,
     list::{DataType, DisplayInfo, Kind, ListItem},
     {
-        home_context, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo,
-        SelectMini, SelectMiniKind, SortStatus, ViewString,
+        texts, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo,
+        SelectMini, SelectMiniKind, SortStatus, Texts, ViewString,
     },
 };
 use json_gettext::get_text;
@@ -100,6 +100,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
 
     // id:: 1st layer: customer/network, 2nd layer: customer-{item's id}
@@ -712,7 +713,8 @@ where
     #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
         let style = format!("width: {}px;", ctx.props().display_info.width_full);
-        let txt = home_context(ctx).txt;
+        //let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let onclick_add = ctx.link().callback(|_| Message::InputAdd);
         let input_id = ctx
             .props()
@@ -762,6 +764,7 @@ where
                         </div>
                         <div class="list-sort-recently">
                             <SelectMini::<SortListKind, Self>
+                                txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
                                 parent_message={Message::SortList}
                                 id={"sort-list".to_string()}
@@ -804,6 +807,7 @@ where
                                 let tag = ctx.props().input_data_tag.as_ref().map(Rc::clone);
                                 html! {
                                     <Input<Self>
+                                        txt={ctx.props().txt.clone()}
                                         language={ctx.props().language}
                                         data={Rc::clone(&ctx.props().data)}
                                         title={title}
@@ -849,6 +853,7 @@ where
                                 let tag = ctx.props().input_data_tag.as_ref().map(Rc::clone);
                                 html! {
                                     <Input<Self>
+                                        txt={ctx.props().txt.clone()}
                                         language={ctx.props().language}
                                         data={Rc::clone(&ctx.props().data)}
                                         title={title}

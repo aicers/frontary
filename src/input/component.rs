@@ -3,7 +3,7 @@ use super::{
 };
 use crate::{
     list::{Column, ListItem},
-    Rerender, {home_context, sort_hosts, sort_networks, InputNic, MessageType, ViewString},
+    Rerender, {sort_hosts, sort_networks, texts, InputNic, MessageType, Texts, ViewString},
 };
 use base64::encode;
 use gloo_file::{
@@ -262,6 +262,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
 
     pub data: Rc<HashMap<String, ListItem>>,
@@ -681,7 +682,7 @@ where
             ctx.props().height
         );
         let style_input = format!("height: {}px;", ctx.props().height - 166);
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let onclick_escape = ctx.link().callback(|_| Message::Escape);
         let onclick_save = ctx.link().callback(|_| Message::TrySave);
 

@@ -28,8 +28,8 @@ pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
 };
 pub use crate::notification::{
-    gen_notifications, Category as NotificationCategory, Model as Notification, NotificationItem,
-    NotificationType, TIMEOUT_SECS,
+    gen_notifications, Category as NotificationCategory, CommonError, Model as Notification,
+    NotificationItem, NotificationType, TIMEOUT_SECS,
 };
 pub use crate::pages::{Info as PagesInfo, Model as Pages};
 pub use crate::radio::Model as Radio;
@@ -55,11 +55,6 @@ use std::cmp::{Ord, Ordering};
 use std::collections::HashMap;
 use yew::{Callback, Component, Context, Properties};
 
-// #[allow(dead_code)]
-// pub enum Message {
-//     Notify(NotificationItem),
-// }
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {
     Edit,
@@ -81,7 +76,17 @@ impl ToString for ViewString {
     }
 }
 
-impl ViewString {}
+impl ViewString {
+    #[must_use]
+    pub fn to_string_txt(&self, txt: &Rc<JSONGetText<'static>>, language: Language) -> String {
+        match self {
+            Self::Key(key) => {
+                get_text!(txt, language.tag(), key).map_or_else(String::new, |t| t.to_string())
+            }
+            Self::Raw(raw) => raw.clone(),
+        }
+    }
+}
 
 pub enum HostNetwork {
     Host(String),
@@ -172,7 +177,8 @@ pub(crate) fn text_width(text: &str, font: &str) -> Result<u32, ()> {
     }
 }
 
-pub(crate) fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> String {
+#[must_use]
+pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> String {
     if item_org.len() > 4 {
         let mut sized_item = item_org.to_string();
         let item = item_org.as_bytes();
@@ -359,6 +365,42 @@ pub trait HostNetworkGroupTrait {
     fn ranges(&self) -> Vec<IpRange>;
 }
 
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
+pub enum NetworkType {
+    Intranet,
+    Extranet,
+    Gateway,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Eq)]
+pub struct CustomerNetwork {
+    pub name: String,
+    pub description: String,
+    pub network_type: NetworkType,
+    pub network_group: HostNetworkGroup,
+}
+
+#[derive(Deserialize, Serialize, Eq, PartialEq, Default)]
+pub struct HostNetworkGroup {
+    pub hosts: Vec<String>,
+    pub networks: Vec<String>,
+    pub ranges: Vec<IpRange>,
+}
+
+impl HostNetworkGroupTrait for HostNetworkGroup {
+    fn hosts(&self) -> &[String] {
+        &self.hosts
+    }
+
+    fn networks(&self) -> &[String] {
+        &self.networks
+    }
+
+    fn ranges(&self) -> Vec<IpRange> {
+        self.ranges.clone()
+    }
+}
+
 pub fn sort_hosts(hosts: &mut Vec<String>) {
     hosts.sort_unstable_by_key(|h| {
         if let Ok(addr) = Ipv4Addr::from_str(h) {
@@ -414,41 +456,31 @@ impl PartialEq for Props {
         true
     }
 }
-
-#[allow(clippy::module_name_repetitions)]
 #[derive(Clone)]
-pub struct HomeContext {
-    pub token: Rc<String>,
+pub struct Texts {
     pub txt: Rc<JSONGetText<'static>>,
 }
 
-impl PartialEq for HomeContext {
-    fn eq(&self, other: &Self) -> bool {
-        self.token == other.token
+impl PartialEq for Texts {
+    fn eq(&self, _other: &Self) -> bool {
+        true
     }
 }
 
+impl Eq for Texts {}
+
 #[allow(clippy::module_name_repetitions)]
 #[must_use]
-pub fn home_context<T>(ctx: &Context<T>) -> HomeContext
+pub fn texts<T>(ctx: &Context<T>) -> Texts
 where
     T: Component,
 {
-    let (home_ctx, _) = ctx
+    let (texts, _) = ctx
         .link()
-        .context::<HomeContext>(Callback::noop())
+        .context::<Texts>(Callback::noop())
         .expect("home context should exist");
 
-    home_ctx
-}
-
-#[derive(Clone, PartialEq, Eq)]
-pub enum CommonError {
-    SendGraphQLQueryError,
-    HttpStatusNoSuccess(u16),
-    GraphQLResponseError,
-    GraphQLParseError,
-    UnknownError,
+    texts
 }
 
 const NBSP: &str = "&nbsp;";

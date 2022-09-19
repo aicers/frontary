@@ -2,9 +2,9 @@ use super::DEFAULT_POP_WIDTH;
 use crate::{
     toggle_visibility_complex,
     {
-        home_context, validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item,
-        SelectionExtraInfo,
-    }, //Network
+        texts, validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item,
+        SelectionExtraInfo, Texts,
+    },
 };
 use json_gettext::get_text;
 use language::{text, Language};
@@ -60,6 +60,7 @@ pub enum Message {
 
 #[derive(Clone, PartialEq, Eq, Properties)]
 pub struct Props {
+    pub txt: Texts,
     pub language: Language,
     #[prop_or(Kind::Basic)]
     pub kind: Kind,
@@ -333,7 +334,8 @@ impl Component for Model {
         let style = format!("width: {}px;", ctx.props().top_width);
         let onclick = ctx.link().callback(|_| Message::Click);
         let mut class_input = "complex-select-input";
-        let txt = home_context(ctx).txt;
+        //let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let check_status = self.check_status(ctx, false);
         let value = if let Ok(list) = ctx.props().list.try_borrow() {
             if list.is_empty() {
@@ -523,70 +525,3 @@ impl Model {
         len.0.unwrap_or(list_len) + len.1
     }
 }
-
-// #[inline]
-// fn check_item_as_both(
-//     item: &Network,
-//     selected: &mut HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>,
-// ) {
-//     if let Some(value) = selected.get(&item.id) {
-//         if let Ok(mut value) = value.try_borrow_mut() {
-//             *value = Some(SelectionExtraInfo::Network(EndpointKind::Both));
-//         }
-//     } else {
-//         selected.insert(
-//             item.id.clone(),
-//             Rc::new(RefCell::new(Some(SelectionExtraInfo::Network(
-//                 EndpointKind::Both,
-//             )))),
-//         );
-//     }
-// }
-
-// #[inline]
-// fn check_network(
-//     item: &Network,
-//     selected: &HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>,
-// ) -> CheckStatus {
-//     selected
-//         .get(&item.id)
-//         .map_or(CheckStatus::Unchecked, |direction| {
-//             if let Ok(direction) = direction.try_borrow() {
-//                 direction.map_or(CheckStatus::Unchecked, |direction| {
-//                     if direction == SelectionExtraInfo::Network(EndpointKind::Both) {
-//                         CheckStatus::Checked
-//                     } else {
-//                         CheckStatus::Indeterminate
-//                     }
-//                 })
-//             } else {
-//                 CheckStatus::Unchecked
-//             }
-//         })
-// }
-
-// #[inline]
-// fn search_network_ip_item(item: &Network, text: &str) -> bool {
-//     if item.name.to_lowercase().contains(text) {
-//         return true;
-//     }
-//     for host in &item.networks.hosts {
-//         if host.contains(text) {
-//             return true;
-//         }
-//     }
-//     for n in &item.networks.networks {
-//         if n.contains(text) {
-//             return true;
-//         }
-//     }
-//     for r in &item.networks.ranges {
-//         if r.start.contains(text) {
-//             return true;
-//         }
-//         if r.end.contains(text) {
-//             return true;
-//         }
-//     }
-//     false
-// }

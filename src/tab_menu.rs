@@ -1,4 +1,4 @@
-use crate::home_context;
+use crate::{texts, Texts};
 use json_gettext::get_text;
 use language::{text, Language};
 use std::rc::Rc;
@@ -28,6 +28,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
     pub menu_titles: Rc<Vec<&'static str>>,
     pub parent_messages: Vec<T::Message>,
@@ -72,6 +73,7 @@ where
             ctx.props().item_width,
             MAX_ITEM_WIDTH
         );
+
         html! {
             <div class="tab-menu" style={style.clone()}>
                 <table class="tab-menu" style={style}>
@@ -79,7 +81,7 @@ where
                     {
                         for ctx.props().menu_titles.iter().enumerate().map(|(index, title)| {
                             if let (Some(selected), Some(menu)) = (ctx.props().selected_menu.as_ref(), ctx.props().parent_messages.get(index)) {
-                                let txt = home_context(ctx).txt;
+                                let txt = texts(ctx).txt;
                                 let class_last = if index + 1 == ctx.props().menu_titles.len() {
                                     "tab-menu-last"
                                 } else {

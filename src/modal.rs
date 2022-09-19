@@ -1,4 +1,4 @@
-use crate::home_context;
+use crate::{texts, Texts};
 use json_gettext::get_text;
 use language::{text, Language};
 use std::rc::Rc;
@@ -48,6 +48,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
     #[prop_or(DEFAULT_WIDTH)]
     pub width: u32,
@@ -129,7 +130,7 @@ where
             ctx.props().max_option_width
         );
         let onclick_close = ctx.link().callback(|_| Message::Close);
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
 
         html! {
             <div class="modal-outer">

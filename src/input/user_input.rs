@@ -5,7 +5,7 @@ use super::{
 use crate::{
     input::component::Verification,
     {
-        home_context, CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind,
+        texts, CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind,
         InputEssential, InputNic, InputType, Item, Radio, SelectSearchable, SelectSearchableKind,
         Tag, ViewString,
     },
@@ -64,7 +64,7 @@ where
         base_index: usize,
         autofocus: bool,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let input_data_clone = input_data.clone();
 
         let oninput = ctx.link().callback(move |e: InputEvent| {
@@ -169,7 +169,7 @@ where
         base_index: usize,
         autofocus: bool,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
@@ -298,7 +298,7 @@ where
         base_index: usize,
         autofocus: bool,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
@@ -426,7 +426,7 @@ where
                 .map(ToString::to_string)
                 .collect::<Vec<String>>(),
         );
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         if let Some(buffer) = self.radio_buffer.get(&(base_index + layer_index)) {
             html! {
                 <div class="input-radio-outer">
@@ -436,6 +436,7 @@ where
                         </div>
                         <div class="input-radio-radio">
                             <Radio::<Self>
+                                txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
                                 parent_message={Some(Message::InputRadio(base_index + layer_index, input_data.clone()))}
                                 list={Rc::clone(&list)}
@@ -466,7 +467,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         if let Some(buffer) = self.host_network_buffer.get(&(base_index + layer_index)) {
             html! {
                 <div class="input-host-network-group">
@@ -474,6 +475,7 @@ where
                         { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
                     </div>
                     <HostNetworkHtml<Self>
+                        txt={ctx.props().txt.clone()}
                         language={ctx.props().language}
                         rerender_serial={self.rerender_serial_host_network}
                         kind={kind}
@@ -506,7 +508,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let list_clone = Rc::new(list.to_vec());
         let mut list = list
             .iter()
@@ -533,6 +535,7 @@ where
                     if multiple {
                         html! {
                             <SelectSearchable<Self>
+                                txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
                                 id={format!("select-searchable-{}-{}", base_index, layer_index)}
                                 kind={SelectSearchableKind::Multi}
@@ -550,6 +553,7 @@ where
                     } else {
                         html! {
                             <SelectSearchable<Self>
+                                txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
                                 id={format!("select-searchable-{}-{}", base_index, layer_index)}
                                 kind={SelectSearchableKind::Single}
@@ -582,7 +586,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         if let Some(buffer) = self.tag_buffer.get(&(base_index + layer_index)) {
             let prev_list = Rc::new(prev_list.clone());
             html! {
@@ -591,6 +595,7 @@ where
                         { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
                     </div>
                     <Tag<Self>
+                        txt={ctx.props().txt.clone()}
                         language={ctx.props().language}
                         prev_list={Rc::clone(&prev_list)}
                         input_data={Rc::clone(buffer)}
@@ -618,7 +623,7 @@ where
         base_index: usize,
         both_border: Option<bool>,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let input_data_msg = input_data.clone();
         let onclick = ctx
             .link()
@@ -769,7 +774,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let input_data_clone = input_data.clone();
 
         if let Ok(input_data) = input_data.try_borrow() {
@@ -877,7 +882,7 @@ where
         let onclick_add = ctx.link().callback(move |_| {
             Message::InputNicAdd(base_index, layer_index, input_data_clone_5.clone())
         });
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let name_holder = nic
             .name
             .is_empty()
@@ -1054,7 +1059,7 @@ where
             }
             Message::ChooseFile(base_index + layer_index, result, input_data_clone.clone())
         });
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::File(name, _) = &(*input_data) {
                 name.clone()
@@ -1090,7 +1095,7 @@ where
     }
 
     fn view_required_msg(&self, ctx: &Context<Self>, id: usize) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = texts(ctx).txt;
         if self.required_msg.contains(&id) {
             html! {
                 <div class="input-required-message">
