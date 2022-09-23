@@ -3,7 +3,7 @@ use crate::{
     toggle_visibility_complex,
     {
         texts, validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item,
-        SelectionExtraInfo, Texts,
+        NetworkGroup, SelectionExtraInfo, Texts,
     },
 };
 use json_gettext::get_text;
@@ -107,7 +107,7 @@ impl Component for Model {
             ctx.props().list.try_borrow(),
         ) {
             if let Some(predefined) = sel.as_mut() {
-                let list_tmp = list.iter().map(Item::key).collect::<HashSet<&String>>();
+                let list_tmp = list.iter().map(Item::id).collect::<HashSet<&String>>();
                 predefined.retain(|k, _| list_tmp.get(k).is_some());
                 if self.check_status(ctx, false) == CheckStatus::Checked {
                     *sel = None;
@@ -141,6 +141,28 @@ impl Component for Model {
                 self.search_text = text.clone();
                 if text.is_empty() {
                     self.search_result = None;
+                } else if let Ok(list) = ctx.props().list.try_borrow() {
+                    let text = text.to_lowercase();
+                    self.search_result = Some(
+                        list.iter()
+                            .enumerate()
+                            .filter_map(|(i, item)| {
+                                if let Some(networks) = item.networks() {
+                                    if search_network_ip_item(
+                                        &item.value.to_string(),
+                                        networks,
+                                        &text,
+                                    ) {
+                                        Some(i)
+                                    } else {
+                                        None
+                                    }
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect(),
+                    );
                 }
             }
             Message::InputInput(text) => {
@@ -202,7 +224,7 @@ impl Component for Model {
                             Kind::Basic => None,
                         };
                         for list in list.iter() {
-                            s.insert(list.key().clone(), Rc::new(RefCell::new(extra)));
+                            s.insert(list.id().clone(), Rc::new(RefCell::new(extra)));
                         }
                         s.remove(&key);
                         *sel = Some(s);
@@ -242,24 +264,40 @@ impl Component for Model {
                         ctx.props().selected.predefined.try_borrow_mut(),
                         ctx.props().list.try_borrow(),
                     ) {
-                        if let Some(_predefined) = sel.as_mut() {
-                            // match check_status {
-                            //     CheckStatus::Checked => {}
-                            //     CheckStatus::Unchecked | CheckStatus::Indeterminate => {}
-                            // }
+                        if let Some(predefined) = sel.as_mut() {
+                            match check_status {
+                                CheckStatus::Checked => {
+                                    for &index in search {
+                                        if let Some(item) = list.get(index) {
+                                            if item.networks().is_some() {
+                                                predefined.remove(item.id());
+                                            }
+                                        }
+                                    }
+                                }
+                                CheckStatus::Unchecked | CheckStatus::Indeterminate => {
+                                    for &index in search {
+                                        if let Some(item) = list.get(index) {
+                                            if item.networks().is_some() {
+                                                check_item_as_both(item.id(), predefined);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         } else {
                             let mut s =
                                 HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new();
                             for item in list.iter() {
-                                if let Some(dir) = self.direction_items.get(item.key()) {
+                                if let Some(dir) = self.direction_items.get(item.id()) {
                                     if let Ok(dir) = dir.try_borrow() {
-                                        s.insert(item.key().clone(), Rc::new(RefCell::new(*dir)));
+                                        s.insert(item.id().clone(), Rc::new(RefCell::new(*dir)));
                                     }
                                 }
                             }
                             for &index in search {
                                 if let Some(item) = list.get(index) {
-                                    s.remove(item.key());
+                                    s.remove(item.id());
                                 }
                             }
                             *sel = Some(s);
@@ -334,7 +372,6 @@ impl Component for Model {
         let style = format!("width: {}px;", ctx.props().top_width);
         let onclick = ctx.link().callback(|_| Message::Click);
         let mut class_input = "complex-select-input";
-        //let txt = home_context(ctx).txt;
         let txt = texts(ctx).txt;
         let check_status = self.check_status(ctx, false);
         let value = if let Ok(list) = ctx.props().list.try_borrow() {
@@ -390,14 +427,53 @@ impl Model {
                             }
                         })
                 },
-                |_selected| {
-                    let indeterminate = false;
+                |selected| {
+                    let mut indeterminate = false;
                     let (all_len, match_len) = if search {
-                        self.search_result
-                            .as_ref()
-                            .map_or((0, 0), |search| (search.len(), search.len()))
+                        self.search_result.as_ref().map_or((0, 0), |search| {
+                            (
+                                search.len(),
+                                search
+                                    .iter()
+                                    .filter_map(|&index| {
+                                        list.get(index).and_then(|item| {
+                                            if item.networks().is_some() {
+                                                match check_network(item.id(), selected) {
+                                                    CheckStatus::Checked => Some(true),
+                                                    CheckStatus::Indeterminate => {
+                                                        indeterminate = true;
+                                                        None
+                                                    }
+                                                    CheckStatus::Unchecked => None,
+                                                }
+                                            } else {
+                                                None
+                                            }
+                                        })
+                                    })
+                                    .count(),
+                            )
+                        })
                     } else {
-                        (list.len(), list.iter().count())
+                        (
+                            list.len(),
+                            list.iter()
+                                .filter_map(|item| {
+                                    if item.networks().is_some() {
+                                        match check_network(item.id(), selected) {
+                                            CheckStatus::Checked => Some(true),
+                                            CheckStatus::Indeterminate => {
+                                                indeterminate = true;
+                                                None
+                                            }
+                                            CheckStatus::Unchecked => None,
+                                        }
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .count(),
+                        )
                     };
 
                     if match_len == 0 && indeterminate {
@@ -422,9 +498,24 @@ impl Model {
         }
         if let Ok(direction) = self.direction.try_borrow() {
             if let Some(direction) = direction.as_ref() {
-                if let (Some(_search), Ok(_list)) =
+                if let (Some(search), Ok(list)) =
                     (self.search_result.as_ref(), ctx.props().list.try_borrow())
                 {
+                    for &index in search {
+                        if let Some(item) = list.get(index) {
+                            if item.networks().is_some() {
+                                let value = self.direction_items.get(&item.id);
+                                if let Some(value) = value {
+                                    if let Ok(mut value) = value.try_borrow_mut() {
+                                        if let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
+                                        {
+                                            *value = Some(SelectionExtraInfo::Network(*direction));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 } else {
                     for value in self.direction_items.values() {
                         if let Ok(mut value) = value.try_borrow_mut() {
@@ -446,7 +537,7 @@ impl Model {
             if ctx.props().kind == Kind::NetworkIp {
                 list.iter()
                     .map(|item| {
-                        (item.key().clone(), {
+                        (item.id().clone(), {
                             predefined.as_ref().map_or_else(
                                 || {
                                     Rc::new(RefCell::new(Some(SelectionExtraInfo::Network(
@@ -454,7 +545,7 @@ impl Model {
                                     ))))
                                 },
                                 |predefined| {
-                                    predefined.get(item.key()).map_or(
+                                    predefined.get(item.id()).map_or(
                                         Rc::new(RefCell::new(None)),
                                         |d| {
                                             if let Ok(d) = d.try_borrow() {
@@ -524,4 +615,71 @@ impl Model {
         };
         len.0.unwrap_or(list_len) + len.1
     }
+}
+
+#[inline]
+fn check_item_as_both(
+    id: &String,
+    selected: &mut HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>,
+) {
+    if let Some(value) = selected.get(id) {
+        if let Ok(mut value) = value.try_borrow_mut() {
+            *value = Some(SelectionExtraInfo::Network(EndpointKind::Both));
+        }
+    } else {
+        selected.insert(
+            id.clone(),
+            Rc::new(RefCell::new(Some(SelectionExtraInfo::Network(
+                EndpointKind::Both,
+            )))),
+        );
+    }
+}
+
+#[inline]
+fn check_network(
+    id: &String,
+    selected: &HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>,
+) -> CheckStatus {
+    selected
+        .get(id)
+        .map_or(CheckStatus::Unchecked, |direction| {
+            if let Ok(direction) = direction.try_borrow() {
+                direction.map_or(CheckStatus::Unchecked, |direction| {
+                    if direction == SelectionExtraInfo::Network(EndpointKind::Both) {
+                        CheckStatus::Checked
+                    } else {
+                        CheckStatus::Indeterminate
+                    }
+                })
+            } else {
+                CheckStatus::Unchecked
+            }
+        })
+}
+
+#[inline]
+fn search_network_ip_item(name: &str, networks: &NetworkGroup, text: &str) -> bool {
+    if name.to_lowercase().contains(text) {
+        return true;
+    }
+    for host in &networks.hosts {
+        if host.contains(text) {
+            return true;
+        }
+    }
+    for n in &networks.networks {
+        if n.contains(text) {
+            return true;
+        }
+    }
+    for r in &networks.ranges {
+        if r.start.contains(text) {
+            return true;
+        }
+        if r.end.contains(text) {
+            return true;
+        }
+    }
+    false
 }

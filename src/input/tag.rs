@@ -361,7 +361,7 @@ where
         });
         let onkeyup = ctx
             .link()
-            .batch_callback(move |e: KeyboardEvent| (e.key() == "Enter").then(|| Message::Enter));
+            .batch_callback(move |e: KeyboardEvent| (e.key() == "Enter").then_some(Message::Enter));
         let onkeydown = ctx.link().batch_callback(move |e: KeyboardEvent| {
             (e.key() == "Backspace"
                 || e.key() == "Tab"
@@ -405,7 +405,7 @@ where
                         });
                         let onkeyup = ctx
                             .link()
-                            .batch_callback(move |e: KeyboardEvent| (e.key() == "Enter").then(|| Message::EditDone));
+                            .batch_callback(move |e: KeyboardEvent| (e.key() == "Enter").then_some(Message::EditDone));
                         let onclick_cancel_edit = ctx.link().callback(|_| Message::CancelEdit);
                         let onclick_edit_done = ctx.link().callback(move |_| Message::EditDone);
                         let done_img = if self.input_edit.is_empty() {

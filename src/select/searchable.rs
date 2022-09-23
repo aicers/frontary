@@ -94,7 +94,7 @@ where
             ) {
                 // if threre is any deleted item that belongs to the list of the selected
                 if let Some(selected) = sel.as_mut() {
-                    let list_tmp = list.iter().map(Item::key).collect::<HashSet<&String>>();
+                    let list_tmp = list.iter().map(Item::id).collect::<HashSet<&String>>();
                     selected.retain(|k| list_tmp.get(k).is_some());
                     if !list.is_empty() && selected.len() == list.len() {
                         *sel = None;
@@ -125,7 +125,7 @@ where
                             .enumerate()
                             .filter_map(|(i, item)| {
                                 if item
-                                    .value(Some((txt.clone(), ctx.props().language)))
+                                    .value_txt(&txt, ctx.props().language)
                                     .to_lowercase()
                                     .contains(&input)
                                 {
@@ -168,7 +168,7 @@ where
                             Kind::Multi => {
                                 let mut s = list
                                     .iter()
-                                    .map(|i| i.key().clone())
+                                    .map(|i| i.id().clone())
                                     .collect::<HashSet<String>>();
                                 s.remove(&key);
                                 *sel = Some(s);
@@ -194,7 +194,7 @@ where
                                 if sel.is_none() {
                                     *sel = Some(
                                         list.iter()
-                                            .map(|x| x.key().clone())
+                                            .map(|x| x.id().clone())
                                             .collect::<HashSet<String>>(),
                                     );
                                 }
@@ -203,7 +203,7 @@ where
                                     .iter()
                                     .filter_map(|&r| {
                                         if selected
-                                            .contains(list.get(r).expect("should exist").key())
+                                            .contains(list.get(r).expect("should exist").id())
                                         {
                                             Some(true)
                                         } else {
@@ -214,11 +214,11 @@ where
                                     == search_result.len()
                                 {
                                     for &r in search_result {
-                                        selected.remove(list.get(r).expect("shoud exist").key());
+                                        selected.remove(list.get(r).expect("shoud exist").id());
                                     }
                                 } else {
                                     for &r in search_result {
-                                        let key = list.get(r).expect("should exist").key();
+                                        let key = list.get(r).expect("should exist").id();
                                         if !selected.contains(key) {
                                             selected.insert(key.clone());
                                         }
@@ -301,8 +301,8 @@ where
                             {
                                 let mut value = String::new();
                                 for l in list.iter() {
-                                    if l.key() == key {
-                                        value = l.value(Some((txt, ctx.props().language)));
+                                    if l.id() == key {
+                                        value = l.value_txt(&txt, ctx.props().language);
                                         break;
                                     }
                                 }
@@ -345,8 +345,7 @@ where
                 list.iter()
                     .map(|item| {
                         text_width(
-                            item.value(Some((txt.clone(), ctx.props().language)))
-                                .as_str(),
+                            item.value_txt(&txt, ctx.props().language).as_str(),
                             &ctx.props().font,
                         )
                         .unwrap_or(0)
@@ -435,7 +434,7 @@ where
                             let s_len = search_result
                                 .iter()
                                 .filter_map(|&r| {
-                                    if selected.contains(list.get(r).expect("should exist").key()) {
+                                    if selected.contains(list.get(r).expect("should exist").id()) {
                                         Some(true)
                                     } else {
                                         None
@@ -511,7 +510,7 @@ where
                                             let item = list.get(index).expect("should exist");
                                             let check_status = if let Ok(selected) = ctx.props().selected.try_borrow() {
                                                 selected.as_ref().map_or(CheckStatus::Checked, |selected|
-                                                    if selected.contains(item.key()) {
+                                                    if selected.contains(item.id()) {
                                                         CheckStatus::Checked
                                                     } else {
                                                         CheckStatus::Unchecked
@@ -520,11 +519,11 @@ where
                                             } else {
                                                 CheckStatus::Unchecked
                                             };
-                                            let sized_item_value = shorten_text(item.value(Some((txt.clone(), ctx.props().language))).as_str(), width, &ctx.props().font, 5);
+                                            let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
                                             html! {
                                                 <tr>
                                                     <td class="searchable-select-list-checkbox">
-                                                        <div onclick={onclick_item(item.key().clone())}>
+                                                        <div onclick={onclick_item(item.id().clone())}>
                                                             <CheckBox status={check_status} />
                                                         </div>
                                                     </td>
@@ -540,7 +539,7 @@ where
                                         for list.iter().map(|item| {
                                             let check_status = if let Ok(selected) = ctx.props().selected.try_borrow() {
                                                 selected.as_ref().map_or(CheckStatus::Checked, |selected|
-                                                    if selected.contains(item.key()) {
+                                                    if selected.contains(item.id()) {
                                                         CheckStatus::Checked
                                                     } else {
                                                     CheckStatus::Unchecked
@@ -548,12 +547,12 @@ where
                                             } else {
                                                 CheckStatus::Unchecked
                                             };
-                                            let sized_item_value = shorten_text(item.value(Some((txt.clone(), ctx.props().language))).as_str(), width, &ctx.props().font, 5);
+                                            let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
                                             if ctx.props().kind == Kind::Multi {
                                                 html! {
                                                     <tr>
                                                         <td class="searchable-select-list-checkbox">
-                                                            <div onclick={onclick_item(item.key().clone())}>
+                                                            <div onclick={onclick_item(item.id().clone())}>
                                                                 <CheckBox status={check_status} />
                                                             </div>
                                                         </td>
@@ -564,7 +563,7 @@ where
                                                 }
                                             } else {
                                                 html! {
-                                                    <tr class="searchable-select-list-item-single" onclick={onclick_item(item.key().clone())}>
+                                                    <tr class="searchable-select-list-item-single" onclick={onclick_item(item.id().clone())}>
                                                         <td class="searchable-select-list-item-single">
                                                             { sized_item_value }
                                                         </td>

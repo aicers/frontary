@@ -4,6 +4,7 @@ use super::{
 };
 use crate::{
     input::component::Verification,
+    //FrontIpRange,
     {
         texts, CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind,
         InputEssential, InputNic, InputType, Item, Radio, SelectSearchable, SelectSearchableKind,
@@ -14,7 +15,6 @@ use gloo_file::File;
 use json_gettext::get_text;
 use language::text;
 use std::cell::RefCell;
-use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -503,24 +503,32 @@ where
         ctx: &Context<Self>,
         multiple: bool,
         ess: &InputEssential,
-        list: &[(String, ViewString)],
+        list: &[(String, ViewString)], //&[(String, ViewString)],&Rc<RefCell<Vec<Item>>>
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
     ) -> Html {
         let txt = texts(ctx).txt;
         let list_clone = Rc::new(list.to_vec());
-        let mut list = list
+        let list = list
             .iter()
-            .map(|(key, value)| Item::KeyString(key.clone(), value.clone()))
+            .map(|(id, value)| Item {
+                id: id.clone(),
+                value: value.clone(),
+                networks: None,
+            })
             .collect::<Vec<Item>>();
-        list.sort_unstable_by(|a, b| {
-            if let (Item::KeyString(_, a_v), Item::KeyString(_, b_v)) = (a, b) {
-                a_v.cmp(b_v)
-            } else {
-                Ordering::Equal
-            }
-        });
+        // list.sort_unstable_by(|a, b| {
+        //     if let (Item::KeyString(_, a_v), Item::KeyString(_, b_v)) = (a, b) {
+        //         a_v.cmp(b_v)
+        //     } else {
+        //         Ordering::Equal
+        //     }
+        // });
+        // let list = list
+        //     .iter()
+        //     .map(std::convert::Into::into)
+        //     .collect::<Vec<Item>>(); //|i| i.id().clone()
         let list = Rc::new(RefCell::new(list));
         if let Some(selected) = self
             .select_searchable_buffer
@@ -887,8 +895,8 @@ where
             .name
             .is_empty()
             .then(|| text!(txt, ctx.props().language, "Name").to_string());
-        let interface_holder = nic.name.is_empty().then(|| "x.x.x.x");
-        let gateway_holder = nic.name.is_empty().then(|| "x.x.x.x");
+        let interface_holder = nic.name.is_empty().then_some("x.x.x.x");
+        let gateway_holder = nic.name.is_empty().then_some("x.x.x.x");
 
         let (name_msg, interface_msg, gateway_msg) = (
             self.verification_nic

@@ -270,7 +270,7 @@ where
                             });
                             let onclick_page = ctx.link().callback(|_| Message::GoToPage);
                             let onkeyup_page = ctx.link().batch_callback(move |e: KeyboardEvent| {
-                                (e.key() == "Enter").then(|| Message::GoToPage)
+                                (e.key() == "Enter").then_some(Message::GoToPage)
                             });
 
                             html! {

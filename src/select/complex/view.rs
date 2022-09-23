@@ -266,7 +266,7 @@ impl Model {
         });
         let onclick_add = ctx.link().callback(|_| Message::ClickAddInput);
         let onkeyup = ctx.link().batch_callback(move |e: KeyboardEvent| {
-            (e.key() == "Enter").then(|| Message::ClickAddInput)
+            (e.key() == "Enter").then_some(Message::ClickAddInput)
         });
 
         html! {

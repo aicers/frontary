@@ -198,7 +198,7 @@ pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> Stri
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub enum EndpointKind {
     Source,
     Destination,
@@ -218,7 +218,7 @@ pub enum SelectionExtraInfo {
     Basic, // dead code
 }
 
-type RefSelectionExtraInfo = Rc<RefCell<Option<SelectionExtraInfo>>>;
+pub type RefSelectionExtraInfo = Rc<RefCell<Option<SelectionExtraInfo>>>;
 
 #[derive(Default, Clone, PartialEq, Eq, Debug)]
 pub struct ComplexSelection {
@@ -423,29 +423,54 @@ pub fn sort_networks(networks: &mut Vec<String>) {
     networks.dedup();
 }
 
-#[derive(Clone, PartialEq, Eq)]
-pub enum Item {
-    KeyString(String, ViewString),
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct FrontIpRange {
+    pub start: String,
+    pub end: String,
+}
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct NetworkGroup {
+    pub hosts: Vec<String>,
+    pub networks: Vec<String>,
+    pub ranges: Vec<FrontIpRange>,
+}
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Item {
+    id: String,
+    value: ViewString,
+    networks: Option<NetworkGroup>,
 }
 
 impl Item {
     #[must_use]
-    pub fn key(&self) -> &String {
-        match self {
-            Item::KeyString(key, _) => key,
+    pub fn new(id: String, value: ViewString, networks: Option<NetworkGroup>) -> Self {
+        Self {
+            id,
+            value,
+            networks,
         }
     }
 
     #[must_use]
-    pub fn value(&self, txt: Option<(Rc<JSONGetText<'static>>, Language)>) -> String {
-        match self {
-            Item::KeyString(_, ViewString::Raw(value)) => value.clone(),
-            Item::KeyString(_, ViewString::Key(key)) => {
-                txt.map_or_else(String::new, |(t, language)| {
-                    get_text!(t, language.tag(), key).map_or_else(String::new, |t| t.to_string())
-                })
-            }
-        }
+    pub fn id(&self) -> &String {
+        &self.id
+    }
+
+    #[must_use]
+    pub fn value(&self) -> String {
+        self.value.to_string()
+    }
+
+    #[must_use]
+    pub fn value_txt(&self, txt: &Rc<JSONGetText<'static>>, language: Language) -> String {
+        self.value.to_string_txt(txt, language)
+    }
+
+    #[must_use]
+    pub fn networks(&self) -> Option<&NetworkGroup> {
+        self.networks.as_ref()
     }
 }
 #[derive(Clone, Properties)]
