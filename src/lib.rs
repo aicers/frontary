@@ -9,6 +9,8 @@ mod radio;
 mod radio_separate;
 mod select;
 mod sort;
+#[cfg(feature = "static-files")]
+pub mod static_files;
 mod tab_menu;
 
 use num_traits::ToPrimitive;
