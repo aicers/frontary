@@ -1,4 +1,4 @@
-use crate::{texts, Texts, ViewString};
+use crate::{Texts, ViewString};
 use json_gettext::get_text;
 use language::{text, Language};
 use std::cell::RefCell;
@@ -88,7 +88,7 @@ where
                     } else {
                         "/img/radio-unchecked.png"
                     };
-                    let txt = texts(ctx).txt;
+                    let txt = ctx.props().txt.txt.clone();
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
                     let style = ctx.props().width_item.map_or_else(String::new, |w| format!("width: {}px;", w));
 

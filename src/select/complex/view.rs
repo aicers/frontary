@@ -2,7 +2,7 @@ use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
     window_inner_height, NBSP,
     {
-        texts, CheckBox, CheckStatus, EndpointKind, SelectComplexKind, SelectMini, SelectMiniKind,
+        CheckBox, CheckStatus, EndpointKind, SelectComplexKind, SelectMini, SelectMiniKind,
         SelectionExtraInfo, ViewString,
     },
 };
@@ -16,7 +16,7 @@ use yew::{events::InputEvent, html, Context, Html};
 
 impl Model {
     pub(super) fn view_pop(&self, ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let style_all = match self.check_status(ctx, false) {
             CheckStatus::Checked => "background-image: url('/img/radio-opener-checked.png');",
             _ => "background-image: url('/img/radio-opener-unchecked.png');",
@@ -134,7 +134,7 @@ impl Model {
             ctx.props().pop_width,
             std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 286
         );
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let search_notice = text!(txt, ctx.props().language, "Search").to_string();
         let oninput_search = ctx.link().callback(|e: InputEvent| {
             e.target()
@@ -255,7 +255,7 @@ impl Model {
                 15
             }
         });
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_notice = text!(txt, ctx.props().language, "Network/IP Details").to_string();
         let oninput_input = ctx.link().callback(|e: InputEvent| {
             e.target()
@@ -301,7 +301,6 @@ impl Model {
     }
 
     fn view_input_list(ctx: &Context<Self>) -> Html {
-        let _txt = texts(ctx).txt;
         if let Ok(custom) = ctx.props().selected.custom.try_borrow_mut() {
             let mut keys = custom.keys().collect::<Vec<&String>>();
             keys.sort_unstable();

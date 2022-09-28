@@ -1,6 +1,6 @@
 #![allow(clippy::derive_partial_eq_without_eq)] // GraphQLQuery implements PartialEq but not Eq
 
-use crate::{texts, window_inner_height, Texts};
+use crate::{window_inner_height, Texts};
 use gloo_timers::callback::Timeout;
 use json_gettext::get_text;
 use language::{text, Language};
@@ -143,7 +143,7 @@ impl Model {
         };
         let style_contents = format!("width: {}px;", ctx.props().width - 4);
         let style_label = format!("background-color: {};", color);
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let msg = get_text!(txt, ctx.props().language.tag(), &noti.message)
             .map_or(noti.message.clone(), |text| text.to_string());
         let msg = if noti.sub_message.is_empty() {

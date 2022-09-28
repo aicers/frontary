@@ -6,8 +6,8 @@ use crate::{
     list::{Column, DataType, Kind, ListItem},
     NBSP,
     {
-        texts, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind,
-        Sort, SortStatus, ViewString, WholeList,
+        CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
+        SortStatus, ViewString, WholeList,
     },
 };
 use htmlescape::decode_html;
@@ -24,8 +24,7 @@ where
 {
     #[allow(clippy::too_many_lines)]
     pub(super) fn view_head(&self, ctx: &Context<Self>) -> Html {
-        //let txt = home_context(ctx).txt;
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let varied_width: u32 = ctx.props().display_info.width_full
             - ctx
                 .props()
@@ -351,8 +350,7 @@ where
 
     pub(super) fn view_pages(&self, ctx: &Context<Self>, out_table: bool) -> Html {
         let cols = ctx.props().display_info.titles.len();
-        //let txt = home_context(ctx).txt;
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         if out_table {
             let msg = format!(
@@ -440,8 +438,7 @@ where
     }
 
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
-        //let txt = home_context(ctx).txt;
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         match col {
             Column::Text(elem) => match elem {
                 ViewString::Key(key) => {

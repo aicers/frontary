@@ -1,5 +1,5 @@
 use crate::{
-    texts, toggle_visibility, {shorten_text, text_width, CheckBox, CheckStatus, Item, Texts},
+    toggle_visibility, {shorten_text, text_width, CheckBox, CheckStatus, Item, Texts},
 };
 use json_gettext::get_text;
 use language::{text, Language};
@@ -108,7 +108,7 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let send_msg = match msg {
             Message::Click => {
                 toggle_visibility(&ctx.props().id);
@@ -266,7 +266,7 @@ where
     fn view(&self, ctx: &Context<Self>) -> Html {
         let style = format!("width: {}px;", ctx.props().top_width);
         let onclick = ctx.link().callback(|_| Message::Click);
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let mut class_input = "searchable-select-input";
         let value = if let (Ok(selected), Ok(list)) = (
             ctx.props().selected.try_borrow(),
@@ -338,7 +338,7 @@ where
     <T as Component>::Message: Clone + PartialEq,
 {
     fn caculate_width(ctx: &Context<Self>) -> u32 {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let sizes: Vec<u32> = ctx.props().list.try_borrow().map_or_else(
             |_| Vec::new(),
             |list| {
@@ -405,7 +405,7 @@ where
                 .callback(move |_| Message::ClickItem(key.clone()))
         };
 
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let search_notice = text!(txt, ctx.props().language, "Search").to_string();
         let check_status = if let (Ok(selected), Ok(list)) = (
             ctx.props().selected.try_borrow(),

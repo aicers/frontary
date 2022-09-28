@@ -1,4 +1,4 @@
-use crate::{texts, Texts};
+use crate::Texts;
 use json_gettext::get_text;
 use language::{text, Language};
 use std::rc::Rc;
@@ -130,7 +130,7 @@ where
             ctx.props().max_option_width
         );
         let onclick_close = ctx.link().callback(|_| Message::Close);
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         html! {
             <div class="modal-outer">

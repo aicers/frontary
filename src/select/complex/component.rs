@@ -2,8 +2,8 @@ use super::DEFAULT_POP_WIDTH;
 use crate::{
     toggle_visibility_complex,
     {
-        texts, validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item,
-        NetworkGroup, SelectionExtraInfo, Texts,
+        validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item, NetworkGroup,
+        SelectionExtraInfo, Texts,
     },
 };
 use json_gettext::get_text;
@@ -372,7 +372,7 @@ impl Component for Model {
         let style = format!("width: {}px;", ctx.props().top_width);
         let onclick = ctx.link().callback(|_| Message::Click);
         let mut class_input = "complex-select-input";
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let check_status = self.check_status(ctx, false);
         let value = if let Ok(list) = ctx.props().list.try_borrow() {
             if list.is_empty() {

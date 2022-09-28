@@ -1,4 +1,4 @@
-use crate::{parse_host_network, texts, HostNetwork, InputHostNetworkGroup, Texts};
+use crate::{parse_host_network, HostNetwork, InputHostNetworkGroup, Texts};
 use json_gettext::get_text;
 use language::{text, Language};
 use std::cell::RefCell;
@@ -344,7 +344,7 @@ where
     }
 
     fn view_input(&self, ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         let placeholder = if let (Ok(data), Some(notice)) = (
             ctx.props().input_data.try_borrow(),
@@ -395,7 +395,7 @@ where
     }
 
     fn view_message(&self, ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         let notice = match ctx.props().kind {
             Kind::All => Some(INPUT_ALL_NOTICE),

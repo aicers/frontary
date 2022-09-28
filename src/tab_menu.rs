@@ -1,4 +1,4 @@
-use crate::{texts, Texts};
+use crate::Texts;
 use json_gettext::get_text;
 use language::{text, Language};
 use std::rc::Rc;
@@ -81,7 +81,7 @@ where
                     {
                         for ctx.props().menu_titles.iter().enumerate().map(|(index, title)| {
                             if let (Some(selected), Some(menu)) = (ctx.props().selected_menu.as_ref(), ctx.props().parent_messages.get(index)) {
-                                let txt = texts(ctx).txt;
+                                let txt = ctx.props().txt.txt.clone();
                                 let class_last = if index + 1 == ctx.props().menu_titles.len() {
                                     "tab-menu-last"
                                 } else {

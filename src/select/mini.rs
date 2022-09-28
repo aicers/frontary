@@ -1,4 +1,4 @@
-use crate::{texts, toggle_visibility, Texts, ViewString};
+use crate::{toggle_visibility, Texts, ViewString};
 use gloo_events::EventListener;
 use json_gettext::get_text;
 use language::{text, Language};
@@ -215,7 +215,7 @@ where
         } else {
             "mini-select-list-down-item-more-action-text-left"
         };
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         html! {
             <div id={ctx.props().id.clone()} class={classes!("mini-select-list-down", class)} style={style}>
                 <table class="mini-select-list-down-table">
@@ -262,7 +262,7 @@ where
     }
 
     fn view_basic(ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let msg = text!(txt, ctx.props().language, "Select one").to_string();
         let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
             selected.map_or(msg.clone(), |value| {
@@ -339,7 +339,7 @@ where
             format!("mini-select-top-direction-text{}", suffix),
             format!("mini-select-top-direction-icon{}", suffix),
         );
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
         html! {
@@ -354,7 +354,7 @@ where
     }
 
     fn view_direction_item(ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
             selected.map_or_else(String::new, |value| {
                 ctx.props()
@@ -404,7 +404,7 @@ where
     }
 
     fn view_sort_list(ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
             selected.map(|value| {
                 ctx.props()

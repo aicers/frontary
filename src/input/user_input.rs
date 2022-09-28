@@ -4,11 +4,9 @@ use super::{
 };
 use crate::{
     input::component::Verification,
-    //FrontIpRange,
     {
-        texts, CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind,
-        InputEssential, InputNic, InputType, Item, Radio, SelectSearchable, SelectSearchableKind,
-        Tag, ViewString,
+        CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind, InputEssential,
+        InputNic, InputType, Item, Radio, SelectSearchable, SelectSearchableKind, Tag, ViewString,
     },
 };
 use gloo_file::File;
@@ -64,7 +62,7 @@ where
         base_index: usize,
         autofocus: bool,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
 
         let oninput = ctx.link().callback(move |e: InputEvent| {
@@ -169,7 +167,7 @@ where
         base_index: usize,
         autofocus: bool,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
@@ -298,7 +296,7 @@ where
         base_index: usize,
         autofocus: bool,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
@@ -426,7 +424,7 @@ where
                 .map(ToString::to_string)
                 .collect::<Vec<String>>(),
         );
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         if let Some(buffer) = self.radio_buffer.get(&(base_index + layer_index)) {
             html! {
                 <div class="input-radio-outer">
@@ -467,7 +465,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         if let Some(buffer) = self.host_network_buffer.get(&(base_index + layer_index)) {
             html! {
                 <div class="input-host-network-group">
@@ -508,7 +506,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let list_clone = Rc::new(list.to_vec());
         let list = list
             .iter()
@@ -594,7 +592,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         if let Some(buffer) = self.tag_buffer.get(&(base_index + layer_index)) {
             let prev_list = Rc::new(prev_list.clone());
             html! {
@@ -631,7 +629,7 @@ where
         base_index: usize,
         both_border: Option<bool>,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_data_msg = input_data.clone();
         let onclick = ctx
             .link()
@@ -782,7 +780,7 @@ where
         layer_index: usize,
         base_index: usize,
     ) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
 
         if let Ok(input_data) = input_data.try_borrow() {
@@ -890,7 +888,7 @@ where
         let onclick_add = ctx.link().callback(move |_| {
             Message::InputNicAdd(base_index, layer_index, input_data_clone_5.clone())
         });
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let name_holder = nic
             .name
             .is_empty()
@@ -1067,7 +1065,7 @@ where
             }
             Message::ChooseFile(base_index + layer_index, result, input_data_clone.clone())
         });
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::File(name, _) = &(*input_data) {
                 name.clone()
@@ -1103,7 +1101,7 @@ where
     }
 
     fn view_required_msg(&self, ctx: &Context<Self>, id: usize) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         if self.required_msg.contains(&id) {
             html! {
                 <div class="input-required-message">

@@ -1,4 +1,4 @@
-use crate::{texts, Texts};
+use crate::Texts;
 use json_gettext::get_text;
 use language::{text, Language};
 use std::cell::RefCell;
@@ -259,7 +259,7 @@ where
                     </div>
                     {
                         if ctx.props().input {
-                            let txt = texts(ctx).txt;
+                            let txt = ctx.props().txt.txt.clone();
                             let placeholder = text!(txt, ctx.props().language, "Page").to_string();
                             let oninput_page = ctx.link().callback(|e: InputEvent| {
                                 e.target()

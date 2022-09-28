@@ -1,5 +1,5 @@
 use crate::{
-    texts, toggle_visibility, visibile_tag_select, {InputTagGroup, Texts},
+    toggle_visibility, visibile_tag_select, {InputTagGroup, Texts},
 };
 use json_gettext::get_text;
 use language::{text, Language};
@@ -339,7 +339,7 @@ where
     }
 
     fn view_input(&self, ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         let placeholder = if let (Ok(data), Some(notice)) = (
             ctx.props().input_data.try_borrow(),
@@ -432,7 +432,7 @@ where
                                 </div>
                                 {
                                     if let Some(msg) = self.edit_message {
-                                        let txt = texts(ctx).txt;
+                                        let txt = ctx.props().txt.txt.clone();
                                         html! {
                                             <div class="tag-edit-message">
                                                 { text!(txt, ctx.props().language, msg) }
@@ -482,7 +482,7 @@ where
     }
 
     fn view_message(&self, ctx: &Context<Self>) -> Html {
-        let txt = texts(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         if let Some(message) = self.message {
             html! {
                 <div class="tag-group-message-text">

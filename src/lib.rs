@@ -53,7 +53,7 @@ use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::cmp::{Ord, Ordering};
 use std::collections::HashMap;
-use yew::{Callback, Component, Context, Properties};
+use yew::Properties;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {
@@ -493,20 +493,6 @@ impl PartialEq for Texts {
 }
 
 impl Eq for Texts {}
-
-#[allow(clippy::module_name_repetitions)]
-#[must_use]
-pub fn texts<T>(ctx: &Context<T>) -> Texts
-where
-    T: Component,
-{
-    let (texts, _) = ctx
-        .link()
-        .context::<Texts>(Callback::noop())
-        .expect("home context should exist");
-
-    texts
-}
 
 const NBSP: &str = "&nbsp;";
 
