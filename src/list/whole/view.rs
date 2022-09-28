@@ -154,7 +154,6 @@ where
                             MoreAction::Edit,
                             MoreAction::Delete,
                         ]);
-                        //let txt=texts(ctx).txt;
 
                         html! {
                             <>

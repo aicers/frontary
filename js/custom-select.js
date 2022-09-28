@@ -42,7 +42,7 @@ export function toggle_visibility_complex(id) {
     }
 }
 
-export function visibile_tag_select(id) {
+export function visible_tag_select(id) {
     var elem = document.getElementById(id);
     if (elem != null) {
         elem.style.visibility = "visible";

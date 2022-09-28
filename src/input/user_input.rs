@@ -13,6 +13,7 @@ use gloo_file::File;
 use json_gettext::get_text;
 use language::text;
 use std::cell::RefCell;
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -508,7 +509,7 @@ where
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let list_clone = Rc::new(list.to_vec());
-        let list = list
+        let mut list = list
             .iter()
             .map(|(id, value)| Item {
                 id: id.clone(),
@@ -516,17 +517,15 @@ where
                 networks: None,
             })
             .collect::<Vec<Item>>();
-        // list.sort_unstable_by(|a, b| {
-        //     if let (Item::KeyString(_, a_v), Item::KeyString(_, b_v)) = (a, b) {
-        //         a_v.cmp(b_v)
-        //     } else {
-        //         Ordering::Equal
-        //     }
-        // });
-        // let list = list
-        //     .iter()
-        //     .map(std::convert::Into::into)
-        //     .collect::<Vec<Item>>(); //|i| i.id().clone()
+        list.sort_unstable_by(|a, b| {
+            let a_v = a.value.to_string();
+            let b_v = b.value.to_string();
+            if a_v == b_v {
+                a_v.cmp(&b_v)
+            } else {
+                Ordering::Equal
+            }
+        });
         let list = Rc::new(RefCell::new(list));
         if let Some(selected) = self
             .select_searchable_buffer

@@ -1,5 +1,5 @@
 use crate::{
-    toggle_visibility, visibile_tag_select, {InputTagGroup, Texts},
+    toggle_visibility, visible_tag_select, {InputTagGroup, Texts},
 };
 use json_gettext::get_text;
 use language::{text, Language};
@@ -116,7 +116,7 @@ where
     #[allow(clippy::too_many_lines)]
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Message::Focus => visibile_tag_select(ID),
+            Message::Focus => visible_tag_select(ID),
             Message::Input(input) => {
                 self.input = input;
                 self.reset_search_list(ctx);

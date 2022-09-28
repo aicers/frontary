@@ -713,7 +713,6 @@ where
     #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
         let style = format!("width: {}px;", ctx.props().display_info.width_full);
-        //let txt = home_context(ctx).txt;
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(|_| Message::InputAdd);
         let input_id = ctx

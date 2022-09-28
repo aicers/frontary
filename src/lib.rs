@@ -211,7 +211,6 @@ impl Default for EndpointKind {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum SelectionExtraInfo {
     Network(EndpointKind),
@@ -365,42 +364,6 @@ pub trait HostNetworkGroupTrait {
     fn ranges(&self) -> Vec<IpRange>;
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
-pub enum NetworkType {
-    Intranet,
-    Extranet,
-    Gateway,
-}
-
-#[derive(Deserialize, Serialize, PartialEq, Eq)]
-pub struct CustomerNetwork {
-    pub name: String,
-    pub description: String,
-    pub network_type: NetworkType,
-    pub network_group: HostNetworkGroup,
-}
-
-#[derive(Deserialize, Serialize, Eq, PartialEq, Default)]
-pub struct HostNetworkGroup {
-    pub hosts: Vec<String>,
-    pub networks: Vec<String>,
-    pub ranges: Vec<IpRange>,
-}
-
-impl HostNetworkGroupTrait for HostNetworkGroup {
-    fn hosts(&self) -> &[String] {
-        &self.hosts
-    }
-
-    fn networks(&self) -> &[String] {
-        &self.networks
-    }
-
-    fn ranges(&self) -> Vec<IpRange> {
-        self.ranges.clone()
-    }
-}
-
 pub fn sort_hosts(hosts: &mut Vec<String>) {
     hosts.sort_unstable_by_key(|h| {
         if let Ok(addr) = Ipv4Addr::from_str(h) {
@@ -424,16 +387,10 @@ pub fn sort_networks(networks: &mut Vec<String>) {
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct FrontIpRange {
-    pub start: String,
-    pub end: String,
-}
-
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct NetworkGroup {
     pub hosts: Vec<String>,
     pub networks: Vec<String>,
-    pub ranges: Vec<FrontIpRange>,
+    pub ranges: Vec<IpRange>,
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -442,7 +399,6 @@ pub struct Item {
     value: ViewString,
     networks: Option<NetworkGroup>,
 }
-
 impl Item {
     #[must_use]
     pub fn new(id: String, value: ViewString, networks: Option<NetworkGroup>) -> Self {
@@ -500,7 +456,7 @@ const NBSP: &str = "&nbsp;";
 extern "C" {
     fn toggle_visibility(id: &str);
     fn toggle_visibility_complex(id: &str);
-    fn visibile_tag_select(id: &str);
+    fn visible_tag_select(id: &str);
 }
 
 fn window_inner_height() -> u32 {
