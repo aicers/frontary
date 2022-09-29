@@ -4,15 +4,11 @@ use super::{
 };
 use crate::{
     list::{Column, DataType, Kind, ListItem},
-    NBSP,
-    {
-        CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
-        SortStatus, ViewString, WholeList,
-    },
+    text, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
+    SortStatus, ViewString, WholeList, NBSP,
 };
 use htmlescape::decode_html;
 use json_gettext::get_text;
-use language::text;
 use std::collections::HashMap;
 use std::rc::Rc;
 use yew::{html, Component, Context, Html};

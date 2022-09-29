@@ -1,6 +1,7 @@
-use crate::{parse_host_network, HostNetwork, InputHostNetworkGroup, Texts};
+use crate::{
+    language::Language, parse_host_network, text, HostNetwork, InputHostNetworkGroup, Texts,
+};
 use json_gettext::get_text;
-use language::{text, Language};
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;

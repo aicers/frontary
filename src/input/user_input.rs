@@ -3,15 +3,12 @@ use super::{
     InputItem,
 };
 use crate::{
-    input::component::Verification,
-    {
-        CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml, HostNetworkKind, InputEssential,
-        InputNic, InputType, Item, Radio, SelectSearchable, SelectSearchableKind, Tag, ViewString,
-    },
+    input::component::Verification, text, CheckBox, CheckStatus, ChildrenPosition, HostNetworkHtml,
+    HostNetworkKind, InputEssential, InputNic, InputType, Item, Radio, SelectSearchable,
+    SelectSearchableKind, Tag, ViewString,
 };
 use gloo_file::File;
 use json_gettext::get_text;
-use language::text;
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::HashMap;
