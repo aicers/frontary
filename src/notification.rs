@@ -1,6 +1,6 @@
 #![allow(clippy::derive_partial_eq_without_eq)] // GraphQLQuery implements PartialEq but not Eq
 
-use crate::{home_context, window_inner_height, CommonError};
+use crate::{window_inner_height, Texts};
 use gloo_timers::callback::Timeout;
 use json_gettext::get_text;
 use language::{text, Language};
@@ -49,6 +49,7 @@ pub struct Model {
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props {
+    pub txt: Texts,
     pub language: Language,
     pub list: Rc<RefCell<Vec<(usize, NotificationItem)>>>,
     pub serial: usize,
@@ -142,7 +143,7 @@ impl Model {
         };
         let style_contents = format!("width: {}px;", ctx.props().width - 4);
         let style_label = format!("background-color: {};", color);
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let msg = get_text!(txt, ctx.props().language.tag(), &noti.message)
             .map_or(noti.message.clone(), |text| text.to_string());
         let msg = if noti.sub_message.is_empty() {
@@ -195,6 +196,15 @@ impl Model {
             </table>
         }
     }
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub enum CommonError {
+    SendGraphQLQueryError,
+    HttpStatusNoSuccess(u16),
+    GraphQLResponseError,
+    GraphQLParseError,
+    UnknownError,
 }
 
 #[allow(dead_code)]

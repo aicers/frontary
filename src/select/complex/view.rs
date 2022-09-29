@@ -2,8 +2,8 @@ use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
     window_inner_height, NBSP,
     {
-        home_context, CheckBox, CheckStatus, EndpointKind, SelectComplexKind, SelectMini,
-        SelectMiniKind, SelectionExtraInfo, ViewString,
+        CheckBox, CheckStatus, EndpointKind, Item, SelectComplexKind, SelectMini, SelectMiniKind,
+        SelectionExtraInfo, ViewString,
     },
 };
 use htmlescape::decode_html;
@@ -16,7 +16,7 @@ use yew::{events::InputEvent, html, Context, Html};
 
 impl Model {
     pub(super) fn view_pop(&self, ctx: &Context<Self>) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let style_all = match self.check_status(ctx, false) {
             CheckStatus::Checked => "background-image: url('/img/radio-opener-checked.png');",
             _ => "background-image: url('/img/radio-opener-unchecked.png');",
@@ -134,7 +134,7 @@ impl Model {
             ctx.props().pop_width,
             std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 286
         );
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let search_notice = text!(txt, ctx.props().language, "Search").to_string();
         let oninput_search = ctx.link().callback(|e: InputEvent| {
             e.target()
@@ -189,27 +189,27 @@ impl Model {
                     }
                 }
                     <div class="complex-select-pop-list-list-items" style={style_pop_list_list_items}>
-                    // {
-                    //     if let Ok(list) = ctx.props().list.try_borrow() {
-                    //         if let Some(search) = self.search_result.as_ref() {
-                    //             html! {
-                    //                 for search.iter().map(|&index| {
-                    //                     if let Some(item) = list.get(index) {
-                    //                         self.view_list_item(ctx, item)
-                    //                     } else {
-                    //                         html! {}
-                    //                     }
-                    //                 })
-                    //             }
-                    //         } else {
-                    //             html! {
-                    //                 for list.iter().map(|item| self.view_list_item(ctx, item))
-                    //             }
-                    //         }
-                    //     } else {
-                    //         html! {}
-                    //     }
-                    // }
+                    {
+                        if let Ok(list) = ctx.props().list.try_borrow() {
+                            if let Some(search) = self.search_result.as_ref() {
+                                html! {
+                                    for search.iter().map(|&index| {
+                                        if let Some(item) = list.get(index) {
+                                            self.view_list_item(ctx, item)
+                                        } else {
+                                            html! {}
+                                        }
+                                    })
+                                }
+                            } else {
+                                html! {
+                                    for list.iter().map(|item| self.view_list_item(ctx, item))
+                                }
+                            }
+                        } else {
+                            html! {}
+                        }
+                    }
                     </div>
                 </div>
             </div>
@@ -238,6 +238,7 @@ impl Model {
         };
         html! {
             <SelectMini::<EndpointKind, Self>
+                txt={ctx.props().txt.clone()}
                 language={ctx.props().language}
                 parent_message={Message::SetDirection}
                 active={active}
@@ -254,141 +255,140 @@ impl Model {
         }
     }
 
-    // fn view_list_item(&self, ctx: &Context<Self>, item: &Item) -> Html {
-    //     let (key, checked) = match item {
-    //         Item::Network(n) => (
-    //             n.id.clone(),
-    //             self.direction_items
-    //                 .get(&n.id)
-    //                 .map_or(CheckStatus::Unchecked, |extra| {
-    //                     if let Ok(extra) = extra.try_borrow() {
-    //                         match *extra {
-    //                             Some(SelectionExtraInfo::Network(EndpointKind::Both)) => {
-    //                                 CheckStatus::Checked
-    //                             }
-    //                             None => CheckStatus::Unchecked,
-    //                             _ => CheckStatus::Indeterminate,
-    //                         }
-    //                     } else {
-    //                         CheckStatus::Unchecked
-    //                     }
-    //                 }),
-    //         ),
-    //         Item::Customer(_) | Item::KeyString(_, _) => (String::new(), CheckStatus::Unchecked), // Item::KeyString -> unreachable
-    //     };
-    //     let onclick_item = |key: String| {
-    //         ctx.link()
-    //             .callback(move |_| Message::ClickItem(key.clone()))
-    //     };
-    //     let style_item_width = match ctx.props().kind {
-    //         SelectComplexKind::NetworkIp => "width: 209px;",
-    //         SelectComplexKind::Basic => "width: 279px",
-    //     };
+    fn view_list_item(&self, ctx: &Context<Self>, item: &Item) -> Html {
+        let (key, checked) = if item.networks().is_some() {
+            (
+                item.id.clone(),
+                self.direction_items
+                    .get(&item.id)
+                    .map_or(CheckStatus::Unchecked, |extra| {
+                        if let Ok(extra) = extra.try_borrow() {
+                            match *extra {
+                                Some(SelectionExtraInfo::Network(EndpointKind::Both)) => {
+                                    CheckStatus::Checked
+                                }
+                                None => CheckStatus::Unchecked,
+                                _ => CheckStatus::Indeterminate,
+                            }
+                        } else {
+                            CheckStatus::Unchecked
+                        }
+                    }),
+            )
+        } else {
+            (String::new(), CheckStatus::Unchecked) // Item::KeyString -> unreachable
+        };
+        let onclick_item = |key: String| {
+            ctx.link()
+                .callback(move |_| Message::ClickItem(key.clone()))
+        };
+        let style_item_width = match ctx.props().kind {
+            SelectComplexKind::NetworkIp => "width: 209px;",
+            SelectComplexKind::Basic => "width: 279px",
+        };
 
-    //     html! {
-    //         <table>
-    //             <tr>
-    //                 <td class="complex-select-pop-list-list-items-checkbox">
-    //                     <div onclick={onclick_item(key)}>
-    //                         <CheckBox status={checked} />
-    //                     </div>
-    //                 </td>
-    //                 <td class="complex-select-pop-list-list-items-item" style={style_item_width}>
-    //                 {
-    //                     match item {
-    //                         Item::Network(n) => {
-    //                             html! {
-    //                                 <>
-    //                                     { n.name.clone() } <br/>
-    //                                     <div class="complex-select-pop-list-networks">
-    //                                     {
-    //                                         for n.networks.hosts.iter().map(|host| html! {
-    //                                             <>
-    //                                                 { host } <br/>
-    //                                             </>
-    //                                         })
-    //                                     }
-    //                                     {
-    //                                         for n.networks.networks.iter().map(|nt| html! {
-    //                                             <>
-    //                                                 { nt } <br/>
-    //                                             </>
-    //                                         })
-    //                                     }
-    //                                     {
-    //                                         for n.networks.ranges.iter().map(|r| html! {
-    //                                             <>
-    //                                                 { r.start.clone() } { " ~ " } { r.end.clone() } <br/>
-    //                                             </>
-    //                                         })
-    //                                     }
-    //                                     </div>
-    //                                 </>
-    //                             }
-    //                         },
-    //                         Item::Customer(_) | Item::KeyString(_, _) => html! {},
+        html! {
+            <table>
+                <tr>
+                    <td class="complex-select-pop-list-list-items-checkbox">
+                        <div onclick={onclick_item(key)}>
+                            <CheckBox status={checked} />
+                        </div>
+                    </td>
+                    <td class="complex-select-pop-list-list-items-item" style={style_item_width}>
+                    {
+                        if let Some(networks)=item.networks() {
+                                html! {
+                                    <>
+                                        { item.value().to_string() } <br/>
+                                        <div class="complex-select-pop-list-networks">
+                                        {
+                                            for networks.hosts.iter().map(|host| html! {
+                                                <>
+                                                    { host } <br/>
+                                                </>
+                                            })
+                                        }
+                                        {
+                                            for networks.networks.iter().map(|nt| html! {
+                                                <>
+                                                    { nt } <br/>
+                                                </>
+                                            })
+                                        }
+                                        {
+                                            for networks.ranges.iter().map(|r| html! {
+                                                <>
+                                                    { r.start.clone() } { " ~ " } { r.end.clone() } <br/>
+                                                </>
+                                            })
+                                        }
+                                        </div>
+                                    </>
+                                }
+                        } else {
+                            html!{}
+                        }
+                    }
+                    </td>
+                    {
+                            if item.networks.is_some(){
+                                html! {
+                                    <td class="complex-select-pop-list-list-items-direction">
+                                        { self.view_network_ip_item_direction(ctx, item.id(), checked == CheckStatus::Checked || checked == CheckStatus::Indeterminate) }
+                                    </td>
+                                }
+                            } else {
+                                html! {}
+                            }
+                    }
+                </tr>
+            </table>
+        }
+    }
 
-    //                     }
-    //                 }
-    //                 </td>
-    //                 {
-    //                     match item {
-    //                         Item::Network(n) => {
-    //                             html! {
-    //                                 <td class="complex-select-pop-list-list-items-direction">
-    //                                     { self.view_network_ip_item_direction(ctx, n, checked == CheckStatus::Checked || checked == CheckStatus::Indeterminate) }
-    //                                 </td>
-    //                             }
-    //                         },
-    //                         Item::Customer(_) | Item::KeyString(_, _) => html! {},
-    //                     }
-    //                 }
-    //             </tr>
-    //         </table>
-    //     }
-    // }
-
-    // fn view_network_ip_item_direction(
-    //     &self,
-    //     ctx: &Context<Self>,
-    //     //item: &Network,
-    //     checked: bool,
-    // ) -> Html {
-    //     if checked {
-    //         let src_dst_list = Rc::new(vec![
-    //             ViewString::Key("Both (Directions)".to_string()),
-    //             ViewString::Key("SRC".to_string()),
-    //             ViewString::Key("DST".to_string()),
-    //         ]);
-    //         let value_candidates = Rc::new(vec![
-    //             SelectionExtraInfo::Network(EndpointKind::Both),
-    //             SelectionExtraInfo::Network(EndpointKind::Source),
-    //             SelectionExtraInfo::Network(EndpointKind::Destination),
-    //         ]);
-    //         if let Some(selected) = self.direction_items.get(&item.id) {
-    //             html! {
-    //                 <SelectMini::<SelectionExtraInfo, Self>
-    //                     language={ctx.props().language}
-    //                     parent_message={Message::SetDirectionItem}
-    //                     id={format!("assign-item-direction-{}", item.id.clone())}
-    //                     list={Rc::clone(&src_dst_list)}
-    //                     candidate_values={Rc::clone(&value_candidates)}
-    //                     selected_value={Rc::clone(selected)}
-    //                     selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
-    //                     align_left={false}
-    //                     list_top={28}
-    //                     top_width={Some(70)}
-    //                     list_min_width={Some(70)}
-    //                     kind={SelectMiniKind::DirectionItem}
-    //                 />
-    //             }
-    //         } else {
-    //             html! {}
-    //         }
-    //     } else {
-    //         html! {}
-    //     }
-    // }
+    fn view_network_ip_item_direction(
+        &self,
+        ctx: &Context<Self>,
+        id: &String,
+        checked: bool,
+    ) -> Html {
+        if checked {
+            let src_dst_list = Rc::new(vec![
+                ViewString::Key("Both (Directions)".to_string()),
+                ViewString::Key("SRC".to_string()),
+                ViewString::Key("DST".to_string()),
+            ]);
+            let value_candidates = Rc::new(vec![
+                SelectionExtraInfo::Network(EndpointKind::Both),
+                SelectionExtraInfo::Network(EndpointKind::Source),
+                SelectionExtraInfo::Network(EndpointKind::Destination),
+            ]);
+            if let Some(selected) = self.direction_items.get(id) {
+                html! {
+                    <SelectMini::<SelectionExtraInfo, Self>
+                        txt={ctx.props().txt.clone()}
+                        language={ctx.props().language}
+                        parent_message={Message::SetDirectionItem}
+                        id={format!("assign-item-direction-{}", id.clone())}
+                        list={Rc::clone(&src_dst_list)}
+                        candidate_values={Rc::clone(&value_candidates)}
+                        selected_value={Rc::clone(selected)}
+                        selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
+                        align_left={false}
+                        list_top={28}
+                        top_width={Some(70)}
+                        list_min_width={Some(70)}
+                        kind={SelectMiniKind::DirectionItem}
+                    />
+                }
+            } else {
+                html! {}
+            }
+        } else {
+            html! {}
+        }
+    }
 
     fn view_input(&self, ctx: &Context<Self>) -> Html {
         let style_pop_input = format!(
@@ -411,7 +411,7 @@ impl Model {
                 15
             }
         });
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let input_notice = text!(txt, ctx.props().language, "Network/IP Details").to_string();
         let oninput_input = ctx.link().callback(|e: InputEvent| {
             e.target()
@@ -422,7 +422,7 @@ impl Model {
         });
         let onclick_add = ctx.link().callback(|_| Message::ClickAddInput);
         let onkeyup = ctx.link().batch_callback(move |e: KeyboardEvent| {
-            (e.key() == "Enter").then(|| Message::ClickAddInput)
+            (e.key() == "Enter").then_some(Message::ClickAddInput)
         });
 
         html! {
@@ -483,6 +483,7 @@ impl Model {
                                                 SelectionExtraInfo::Network(EndpointKind::Destination),
                                             ]);
                                             let onclick_del = |key: String| ctx.link().callback(move |_| Message::DeleteInputItem(key.clone()));
+
                                             html! {
                                                 <>
                                                     <tr>
@@ -495,6 +496,7 @@ impl Model {
                                                         </td>
                                                         <td class="complex-select-pop-input-list-direction">
                                                             <SelectMini::<SelectionExtraInfo, Self>
+                                                                txt={ctx.props().txt.clone()}
                                                                 language={ctx.props().language}
                                                                 parent_message={Message::Render}
                                                                 id={format!("assign-input-direction-{}", key.clone())}

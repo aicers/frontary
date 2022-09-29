@@ -1,4 +1,4 @@
-use crate::{home_context, ViewString};
+use crate::{Texts, ViewString};
 use json_gettext::get_text;
 use language::{text, Language};
 use std::cell::RefCell;
@@ -24,6 +24,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
     pub parent_message: T::Message,
     #[prop_or(None)]
@@ -87,7 +88,7 @@ where
             "/img/radio-unchecked.png"
         };
 
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(move |_| Message::ClickItem);
 
         html! {

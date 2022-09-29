@@ -1,4 +1,4 @@
-use crate::home_context;
+use crate::Texts;
 use json_gettext::get_text;
 use language::{text, Language};
 use std::cell::RefCell;
@@ -48,6 +48,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
     pub parent_message: T::Message,
     pub pages_info: Rc<RefCell<Info>>,
@@ -258,7 +259,7 @@ where
                     </div>
                     {
                         if ctx.props().input {
-                            let txt = home_context(ctx).txt;
+                            let txt = ctx.props().txt.txt.clone();
                             let placeholder = text!(txt, ctx.props().language, "Page").to_string();
                             let oninput_page = ctx.link().callback(|e: InputEvent| {
                                 e.target()
@@ -269,7 +270,7 @@ where
                             });
                             let onclick_page = ctx.link().callback(|_| Message::GoToPage);
                             let onkeyup_page = ctx.link().batch_callback(move |e: KeyboardEvent| {
-                                (e.key() == "Enter").then(|| Message::GoToPage)
+                                (e.key() == "Enter").then_some(Message::GoToPage)
                             });
 
                             html! {

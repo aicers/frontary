@@ -252,7 +252,11 @@ where
                     index: 0,
                     status: SortStatus::Ascending,
                 }),
-                DataType::Network | DataType::TrustedDomain => None,
+                DataType::Network
+                | DataType::Account
+                | DataType::Node
+                | DataType::TrustedDomain
+                | DataType::TiDb => None,
             };
         }
     }

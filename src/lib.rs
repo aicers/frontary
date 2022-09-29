@@ -28,8 +28,8 @@ pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
 };
 pub use crate::notification::{
-    gen_notifications, Category as NotificationCategory, Model as Notification, NotificationItem,
-    NotificationType, TIMEOUT_SECS,
+    gen_notifications, Category as NotificationCategory, CommonError, Model as Notification,
+    NotificationItem, NotificationType, TIMEOUT_SECS,
 };
 pub use crate::pages::{Info as PagesInfo, Model as Pages};
 pub use crate::radio::Model as Radio;
@@ -53,12 +53,7 @@ use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::cmp::{Ord, Ordering};
 use std::collections::HashMap;
-use yew::{Callback, Component, Context, Properties};
-
-// #[allow(dead_code)]
-// pub enum Message {
-//     Notify(NotificationItem),
-// }
+use yew::Properties;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {
@@ -81,7 +76,17 @@ impl ToString for ViewString {
     }
 }
 
-impl ViewString {}
+impl ViewString {
+    #[must_use]
+    pub fn to_string_txt(&self, txt: &Rc<JSONGetText<'static>>, language: Language) -> String {
+        match self {
+            Self::Key(key) => {
+                get_text!(txt, language.tag(), key).map_or_else(String::new, |t| t.to_string())
+            }
+            Self::Raw(raw) => raw.clone(),
+        }
+    }
+}
 
 pub enum HostNetwork {
     Host(String),
@@ -172,7 +177,8 @@ pub(crate) fn text_width(text: &str, font: &str) -> Result<u32, ()> {
     }
 }
 
-pub(crate) fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> String {
+#[must_use]
+pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> String {
     if item_org.len() > 4 {
         let mut sized_item = item_org.to_string();
         let item = item_org.as_bytes();
@@ -192,7 +198,7 @@ pub(crate) fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) 
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub enum EndpointKind {
     Source,
     Destination,
@@ -205,14 +211,13 @@ impl Default for EndpointKind {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum SelectionExtraInfo {
     Network(EndpointKind),
     Basic, // dead code
 }
 
-type RefSelectionExtraInfo = Rc<RefCell<Option<SelectionExtraInfo>>>;
+pub type RefSelectionExtraInfo = Rc<RefCell<Option<SelectionExtraInfo>>>;
 
 #[derive(Default, Clone, PartialEq, Eq, Debug)]
 pub struct ComplexSelection {
@@ -381,29 +386,47 @@ pub fn sort_networks(networks: &mut Vec<String>) {
     networks.dedup();
 }
 
-#[derive(Clone, PartialEq, Eq)]
-pub enum Item {
-    KeyString(String, ViewString),
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct NetworkGroup {
+    pub hosts: Vec<String>,
+    pub networks: Vec<String>,
+    pub ranges: Vec<IpRange>,
 }
 
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Item {
+    id: String,
+    value: ViewString,
+    networks: Option<NetworkGroup>,
+}
 impl Item {
     #[must_use]
-    pub fn key(&self) -> &String {
-        match self {
-            Item::KeyString(key, _) => key,
+    pub fn new(id: String, value: ViewString, networks: Option<NetworkGroup>) -> Self {
+        Self {
+            id,
+            value,
+            networks,
         }
     }
 
     #[must_use]
-    pub fn value(&self, txt: Option<(Rc<JSONGetText<'static>>, Language)>) -> String {
-        match self {
-            Item::KeyString(_, ViewString::Raw(value)) => value.clone(),
-            Item::KeyString(_, ViewString::Key(key)) => {
-                txt.map_or_else(String::new, |(t, language)| {
-                    get_text!(t, language.tag(), key).map_or_else(String::new, |t| t.to_string())
-                })
-            }
-        }
+    pub fn id(&self) -> &String {
+        &self.id
+    }
+
+    #[must_use]
+    pub fn value(&self) -> String {
+        self.value.to_string()
+    }
+
+    #[must_use]
+    pub fn value_txt(&self, txt: &Rc<JSONGetText<'static>>, language: Language) -> String {
+        self.value.to_string_txt(txt, language)
+    }
+
+    #[must_use]
+    pub fn networks(&self) -> Option<&NetworkGroup> {
+        self.networks.as_ref()
     }
 }
 #[derive(Clone, Properties)]
@@ -414,42 +437,18 @@ impl PartialEq for Props {
         true
     }
 }
-
-#[allow(clippy::module_name_repetitions)]
 #[derive(Clone)]
-pub struct HomeContext {
-    pub token: Rc<String>,
+pub struct Texts {
     pub txt: Rc<JSONGetText<'static>>,
 }
 
-impl PartialEq for HomeContext {
-    fn eq(&self, other: &Self) -> bool {
-        self.token == other.token
+impl PartialEq for Texts {
+    fn eq(&self, _other: &Self) -> bool {
+        true
     }
 }
 
-#[allow(clippy::module_name_repetitions)]
-#[must_use]
-pub fn home_context<T>(ctx: &Context<T>) -> HomeContext
-where
-    T: Component,
-{
-    let (home_ctx, _) = ctx
-        .link()
-        .context::<HomeContext>(Callback::noop())
-        .expect("home context should exist");
-
-    home_ctx
-}
-
-#[derive(Clone, PartialEq, Eq)]
-pub enum CommonError {
-    SendGraphQLQueryError,
-    HttpStatusNoSuccess(u16),
-    GraphQLResponseError,
-    GraphQLParseError,
-    UnknownError,
-}
+impl Eq for Texts {}
 
 const NBSP: &str = "&nbsp;";
 
@@ -457,7 +456,7 @@ const NBSP: &str = "&nbsp;";
 extern "C" {
     fn toggle_visibility(id: &str);
     fn toggle_visibility_complex(id: &str);
-    fn visibile_tag_select(id: &str);
+    fn visible_tag_select(id: &str);
 }
 
 fn window_inner_height() -> u32 {

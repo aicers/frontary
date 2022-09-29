@@ -1,4 +1,4 @@
-use crate::{home_context, parse_host_network, HostNetwork, InputHostNetworkGroup};
+use crate::{parse_host_network, HostNetwork, InputHostNetworkGroup, Texts};
 use json_gettext::get_text;
 use language::{text, Language};
 use std::cell::RefCell;
@@ -66,6 +66,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub txt: Texts,
     pub language: Language,
     pub rerender_serial: u64,
     #[prop_or(Kind::All)]
@@ -343,7 +344,7 @@ where
     }
 
     fn view_input(&self, ctx: &Context<Self>) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         let placeholder = if let (Ok(data), Some(notice)) = (
             ctx.props().input_data.try_borrow(),
@@ -394,7 +395,7 @@ where
     }
 
     fn view_message(&self, ctx: &Context<Self>) -> Html {
-        let txt = home_context(ctx).txt;
+        let txt = ctx.props().txt.txt.clone();
 
         let notice = match ctx.props().kind {
             Kind::All => Some(INPUT_ALL_NOTICE),
