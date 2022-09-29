@@ -54,7 +54,7 @@ impl Language {
     }
 }
 
-#[allow(dead_code)]
+#[must_use]
 pub fn get() -> Language {
     const DEFAULT_LANGUAGE: Language = Language::English;
 
@@ -62,7 +62,6 @@ pub fn get() -> Language {
     lang.unwrap_or(DEFAULT_LANGUAGE)
 }
 
-#[allow(dead_code)]
 pub fn set(lang: Language) {
     let _rtn = LocalStorage::set(STORAGE_KEY, lang);
 }
