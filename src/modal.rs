@@ -1,6 +1,5 @@
-use crate::Texts;
+use crate::{language::Language, text, Texts};
 use json_gettext::get_text;
-use language::{text, Language};
 use std::rc::Rc;
 use yew::{classes, html, Component, Context, Html, Properties};
 

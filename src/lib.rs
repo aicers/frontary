@@ -2,6 +2,7 @@
 
 mod checkbox;
 mod input;
+mod language;
 mod list;
 mod modal;
 mod notification;
@@ -21,6 +22,7 @@ pub use crate::input::{
     InputHostNetworkGroup, InputItem, InputNic, InputTag, InputTagGroup, InputType, Model as Input,
     Tag,
 };
+pub use crate::language::Language;
 pub use crate::list::{
     Column, DataType, DisplayInfo, Kind, ListItem, MessageType, SortColumn, WholeList,
 };
@@ -42,7 +44,6 @@ pub use crate::tab_menu::Model as TabMenu;
 
 use ipnet::Ipv4Net;
 use json_gettext::{get_text, JSONGetText};
-use language::Language;
 use std::net::Ipv4Addr;
 use std::rc::Rc;
 use std::str::FromStr;

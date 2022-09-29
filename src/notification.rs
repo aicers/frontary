@@ -1,9 +1,8 @@
 #![allow(clippy::derive_partial_eq_without_eq)] // GraphQLQuery implements PartialEq but not Eq
 
-use crate::{window_inner_height, Texts};
+use crate::{language::Language, text, window_inner_height, Texts};
 use gloo_timers::callback::Timeout;
 use json_gettext::get_text;
-use language::{text, Language};
 use num_traits::ToPrimitive;
 use std::cell::RefCell;
 use std::collections::HashMap;

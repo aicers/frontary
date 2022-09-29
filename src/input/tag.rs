@@ -1,8 +1,7 @@
 use crate::{
-    toggle_visibility, visible_tag_select, {InputTagGroup, Texts},
+    language::Language, text, toggle_visibility, visible_tag_select, InputTagGroup, Texts,
 };
 use json_gettext::get_text;
-use language::{text, Language};
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::HashMap;

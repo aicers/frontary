@@ -1,6 +1,5 @@
-use crate::{Texts, ViewString};
+use crate::{language::Language, text, Texts, ViewString};
 use json_gettext::get_text;
-use language::{text, Language};
 use std::cell::RefCell;
 use std::rc::Rc;
 use yew::{html, Component, Context, Html, Properties};

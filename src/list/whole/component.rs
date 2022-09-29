@@ -1,14 +1,12 @@
 use super::{MessageType, DEFAULT_NUM_PAGES, DEFAULT_NUM_PER_PAGE};
 use crate::{
     input::InputSecondId,
+    language::Language,
     list::{DataType, DisplayInfo, Kind, ListItem},
-    {
-        CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo, SelectMini,
-        SelectMiniKind, SortStatus, Texts, ViewString,
-    },
+    text, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo, SelectMini,
+    SelectMiniKind, SortStatus, Texts, ViewString,
 };
 use json_gettext::get_text;
-use language::{text, Language};
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
