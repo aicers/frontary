@@ -1,17 +1,13 @@
 use super::DEFAULT_POP_WIDTH;
 use crate::{
-    toggle_visibility_complex,
-    {
-        validate_host_network, CheckStatus, ComplexSelection, EndpointKind, Item, NetworkGroup,
-        SelectionExtraInfo, Texts,
-    },
+    language::Language, text, toggle_visibility_complex, validate_host_network, CheckStatus,
+    ComplexSelection, EndpointKind, Item, NetworkGroup, SelectionExtraInfo, Texts,
 };
 use json_gettext::get_text;
-use language::{text, Language};
 use std::cell::RefCell;
 use std::collections::{
     hash_map::Entry::{Occupied, Vacant},
-    {HashMap, HashSet},
+    HashMap, HashSet,
 };
 use std::rc::Rc;
 use yew::{html, Component, Context, Html, Properties};
