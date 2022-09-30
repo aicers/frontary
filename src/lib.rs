@@ -22,7 +22,7 @@ pub use crate::input::{
     InputHostNetworkGroup, InputItem, InputNic, InputTag, InputTagGroup, InputType, Model as Input,
     Tag,
 };
-pub use crate::language::Language;
+pub use crate::language::{get, set, Language};
 pub use crate::list::{
     Column, DataType, DisplayInfo, Kind, ListItem, MessageType, SortColumn, WholeList,
 };
