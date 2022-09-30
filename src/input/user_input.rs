@@ -499,7 +499,7 @@ where
         ctx: &Context<Self>,
         multiple: bool,
         ess: &InputEssential,
-        list: &[(String, ViewString)], //&[(String, ViewString)],&Rc<RefCell<Vec<Item>>>
+        list: &[(String, ViewString)],
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
