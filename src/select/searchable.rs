@@ -286,11 +286,15 @@ where
                 } else {
                     match ctx.props().kind {
                         Kind::Multi => {
-                            format!(
-                                "({}) {}",
-                                selected.len(),
-                                text!(txt, ctx.props().language, &ctx.props().title)
-                            )
+                            if selected.len() == list.len() {
+                                text!(txt, ctx.props().language, "All").to_string()
+                            } else {
+                                format!(
+                                    "({}) {}",
+                                    selected.len(),
+                                    text!(txt, ctx.props().language, &ctx.props().title)
+                                )
+                            }
                         }
                         Kind::Single => {
                             let key = selected.iter().map(Clone::clone).collect::<Vec<String>>();
@@ -416,6 +420,8 @@ where
                     selected.as_ref().map_or(CheckStatus::Checked, |selected| {
                         if selected.is_empty() {
                             CheckStatus::Unchecked
+                        } else if selected.len() == list.len() {
+                            CheckStatus::Checked
                         } else {
                             CheckStatus::Indeterminate
                         }
