@@ -1,5 +1,3 @@
-#![allow(clippy::non_ascii_literal)]
-
 mod checkbox;
 mod input;
 mod language;
