@@ -103,8 +103,8 @@ where
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let (icon, icon_class) = match ctx.props().kind {
-            MsgType::Info => ("/img/modal-info.png", "modal-info"),
-            MsgType::Alert => ("/img/modal-alert.png", "modal-alert"),
+            MsgType::Info => ("/frontary/modal-info.png", "modal-info"),
+            MsgType::Alert => ("/frontary/modal-alert.png", "modal-alert"),
         };
         let (align_class, button_class) = match ctx.props().align_button {
             AlignButton::Row => ("modal-buttons-row", "modal-button-item-row"),
@@ -128,7 +128,7 @@ where
             <div class="modal-outer">
                 <div class="modal-contents" style={style}>
                     <div class="modal-close">
-                        <img src="/img/modal-close.png" class="modal-close" onclick={onclick_close} />
+                        <img src="/frontary/modal-close.png" class="modal-close" onclick={onclick_close} />
                     </div>
                     <div class="modal-icon">
                         <img src={icon} class={icon_class} />

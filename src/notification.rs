@@ -167,7 +167,7 @@ impl Model {
                                         { msg }
                                     </td>
                                     <td class="notification-contents-text-close">
-                                        <img src="/img/notification-close.png" class="notification-close" onclick={onclick_close} />
+                                        <img src="/frontary/notification-close.png" class="notification-close" onclick={onclick_close} />
                                     </td>
                                 </tr>
                             </table>

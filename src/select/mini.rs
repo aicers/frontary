@@ -233,9 +233,9 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 let icon = if key == "Edit" {
-                                                    "/img/edit.png"
+                                                    "/frontary/edit.png"
                                                 } else if key == "Delete" {
-                                                    "/img/delete-trash.png"
+                                                    "/frontary/delete-trash.png"
                                                 } else {
                                                     ""
                                                 };

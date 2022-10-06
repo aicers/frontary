@@ -14,8 +14,8 @@ impl Model {
     pub(super) fn view_pop(&self, ctx: &Context<Self>) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let style_all = match self.check_status(ctx, false) {
-            CheckStatus::Checked => "background-image: url('/img/radio-opener-checked.png');",
-            _ => "background-image: url('/img/radio-opener-unchecked.png');",
+            CheckStatus::Checked => "background-image: url('/frontary/radio-opener-checked.png');",
+            _ => "background-image: url('/frontary/radio-opener-unchecked.png');",
         };
         let style = format!("width: {}px;", ctx.props().pop_width);
         let style_pop = format!(
@@ -25,14 +25,14 @@ impl Model {
         );
         let style_head_title = format!("width: {}px;", ctx.props().pop_width - 34);
         let style_list = if self.view_list {
-            "background-image: url('/img/collapse-contents.png');"
+            "background-image: url('/frontary/collapse-contents.png');"
         } else {
-            "background-image: url('/img/expand-contents.png');"
+            "background-image: url('/frontary/expand-contents.png');"
         };
         let style_input = if self.view_input {
-            "background-image: url('/img/collapse-contents.png');"
+            "background-image: url('/frontary/collapse-contents.png');"
         } else {
-            "background-image: url('/img/expand-contents.png');"
+            "background-image: url('/frontary/expand-contents.png');"
         };
         let class_input_head = if self.view_list {
             "complex-select-pop-input-head-bottom"

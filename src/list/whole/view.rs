@@ -159,9 +159,9 @@ where
                                         if ctx.props().data_type == DataType::Customer {
                                             let cols = ctx.props().display_info.titles.len().to_string();
                                             let style = if self.expand_list.contains(key) {
-                                                "background-image: url('/img/collapse-list.png');"
+                                                "background-image: url('/frontary/collapse-list.png');"
                                             } else {
-                                                "background-image: url('/img/expand-list.png');"
+                                                "background-image: url('/frontary/expand-list.png');"
                                             };
                                             let onclick_expandible = |key: String| ctx.link().callback(move |_| Message::ClickExpandible(key.clone()));
 
@@ -506,12 +506,12 @@ where
                         <tr>
                             <td class="list-whole-delete-checked-trash">
                                 <div class="list-whole-delete-checked-trash" onclick={onclick_delete}>
-                                    <img src="/img/delete-trash-white.png" class="list-whole-delete-trash-white" />
+                                    <img src="/frontary/delete-trash-white.png" class="list-whole-delete-trash-white" />
                                 </div>
                             </td>
                             <td class="list-whole-delete-checked-close">
                                 <div class="list-whole-delete-checked-close" onclick={onclick_cancel}>
-                                    <img src="/img/close-white.png" class="list-whole-close-white" />
+                                    <img src="/frontary/close-white.png" class="list-whole-close-white" />
                                 </div>
                             </td>
                         </tr>

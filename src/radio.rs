@@ -83,9 +83,9 @@ where
                         false
                     };
                     let img = if checked {
-                        "/img/radio-checked.png"
+                        "/frontary/radio-checked.png"
                     } else {
-                        "/img/radio-unchecked.png"
+                        "/frontary/radio-unchecked.png"
                     };
                     let txt = ctx.props().txt.txt.clone();
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
