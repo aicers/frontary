@@ -332,7 +332,7 @@ where
         html! {
             <div class="tag-group-input-item">
                 { tag }
-                <img src="/img/tag-input-close.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
+                <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
             </div>
         }
     }
@@ -408,9 +408,9 @@ where
                         let onclick_cancel_edit = ctx.link().callback(|_| Message::CancelEdit);
                         let onclick_edit_done = ctx.link().callback(move |_| Message::EditDone);
                         let done_img = if self.input_edit.is_empty() {
-                            "/img/tag-select-edit-done-dim.png"
+                            "/frontary/tag-select-edit-done-dim.png"
                         } else {
-                            "/img/tag-select-edit-done.png"
+                            "/frontary/tag-select-edit-done.png"
                         };
                         html! {
                             <div class="tag-group-input-select-item-outer-edit">
@@ -424,9 +424,9 @@ where
                                         />
                                     </div>
                                     <div class="tag-group-input-select-item-edit-img">
-                                        <img src="/img/tag-select-bar.png" class="tag-select-bar" />
+                                        <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
                                         <img src={done_img} class="tag-select-edit-done" onclick={onclick_edit_done} />
-                                        <img src="/img/tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
+                                        <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
                                     </div>
                                 </div>
                                 {
@@ -467,9 +467,9 @@ where
                                     <div class="tag-group-input-select-item-text" onclick={ onclick_item(k.clone()) }>
                                     { v.clone() }
                                     </div>
-                                    <img src="/img/tag-select-bar.png" class="tag-select-bar" />
-                                    <img src="/img/tag-select-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
-                                    <img src="/img/tag-select-trash.png" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
+                                    <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
+                                    <img src="/frontary/tag-select-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
+                                    <img src="/frontary/tag-select-trash.png" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
                                 </div>
                             </div>
                         }

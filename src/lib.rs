@@ -9,7 +9,6 @@ mod radio;
 mod radio_separate;
 mod select;
 mod sort;
-#[cfg(feature = "static-files")]
 pub mod static_files;
 mod tab_menu;
 
@@ -452,7 +451,7 @@ impl Eq for Texts {}
 
 const NBSP: &str = "&nbsp;";
 
-#[wasm_bindgen(module = "/js/custom-select.js")]
+#[wasm_bindgen(module = "/static/frontary/custom-select.js")]
 extern "C" {
     fn toggle_visibility(id: &str);
     fn toggle_visibility_complex(id: &str);

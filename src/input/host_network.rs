@@ -338,7 +338,7 @@ where
         html! {
             <div class="host-network-group-input-item">
                 { item }
-                <img src="/img/host-network-close.png" class="host-network-group-close" onclick={onclick_delete(index)} />
+                <img src="/frontary/host-network-close.png" class="host-network-group-close" onclick={onclick_delete(index)} />
             </div>
         }
     }

@@ -756,7 +756,7 @@ where
                             { text!(txt, ctx.props().language, &ctx.props().title) }
                         </div>
                         <div class="list-add" onclick={onclick_add}>
-                            <img src="/img/list-add.png" class="list-add" />
+                            <img src="/frontary/list-add.png" class="list-add" />
                             { text!(txt, ctx.props().language, "Add") }
                         </div>
                         <div class="list-sort-recently">

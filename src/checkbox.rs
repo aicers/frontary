@@ -16,12 +16,12 @@ pub struct Props {
     pub always: Option<CheckStatus>,
 }
 
-const CHECKED_URL: &str = "/img/checkbox-checked.png";
-const INDETERMINATE_URL: &str = "/img/checkbox-indeterminate.png";
-const UNCHECKED_URL: &str = "/img/checkbox-unchecked.png";
-const ALWAYS_CHECKED_URL: &str = "/img/checkbox-checked-always.png";
-const ALWAYS_INDETERMINATE_URL: &str = "/img/checkbox-indeterminate-always.png";
-const ALWAYS_UNCHECKED_URL: &str = "/img/checkbox-unchecked-always.png";
+const CHECKED_URL: &str = "/frontary/checkbox-checked.png";
+const INDETERMINATE_URL: &str = "/frontary/checkbox-indeterminate.png";
+const UNCHECKED_URL: &str = "/frontary/checkbox-unchecked.png";
+const ALWAYS_CHECKED_URL: &str = "/frontary/checkbox-checked-always.png";
+const ALWAYS_INDETERMINATE_URL: &str = "/frontary/checkbox-indeterminate-always.png";
+const ALWAYS_UNCHECKED_URL: &str = "/frontary/checkbox-unchecked-always.png";
 
 #[function_component(Model)]
 pub fn model(props: &Props) -> Html {
