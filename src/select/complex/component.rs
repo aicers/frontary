@@ -12,14 +12,12 @@ use std::collections::{
 use std::rc::Rc;
 use yew::{html, Component, Context, Html, Properties};
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Kind {
     Basic,
     NetworkIp,
 }
 
-#[allow(dead_code)]
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, PartialEq, Eq)]
 pub struct Model {
@@ -34,7 +32,6 @@ pub struct Model {
     pub(super) view_input: bool,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, PartialEq, Eq)]
 pub enum Message {
     Click,

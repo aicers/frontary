@@ -17,7 +17,6 @@ where
     click_count: usize,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     DirectionAll,

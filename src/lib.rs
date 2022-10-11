@@ -307,7 +307,6 @@ impl ToString for IpRange {
 }
 
 impl IpRange {
-    #[allow(dead_code)]
     #[must_use]
     pub fn is_valid(&self) -> bool {
         if let (Ok(start), Ok(end)) = (

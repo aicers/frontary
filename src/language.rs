@@ -2,7 +2,7 @@ use gloo_storage::{LocalStorage, Result as GlooResult, Storage};
 use serde::{Deserialize, Serialize};
 
 type Text = Result<String, anyhow::Error>;
-#[allow(dead_code)]
+
 const STORAGE_KEY: &str = "aice.language";
 
 /// Supported languages.

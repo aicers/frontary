@@ -8,7 +8,6 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{events::InputEvent, html, Component, Context, Html, Properties, TargetCast};
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     HostOnly,
