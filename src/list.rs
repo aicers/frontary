@@ -16,7 +16,6 @@ pub struct ListItem {
     pub creation_time: Option<DateTime<Utc>>,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, PartialEq, Eq)]
 pub enum Column {
     Text(ViewString),

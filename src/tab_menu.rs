@@ -7,9 +7,7 @@ pub enum Message {
     ClickMenu(usize),
 }
 
-#[allow(dead_code)]
 const DEFAULT_FULL_WIDTH: u32 = 1080;
-#[allow(dead_code)]
 const DEFAULT_ITEM_WIDTH: u32 = 120;
 const MAX_ITEM_WIDTH: u32 = 240;
 

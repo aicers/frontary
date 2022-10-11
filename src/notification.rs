@@ -11,14 +11,12 @@ use std::rc::Rc;
 use std::time::Duration;
 use yew::{html, Component, Context, Html, Properties};
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Category {
     Fail,
     Success,
 }
 
-#[allow(dead_code)]
 const DEFAULT_WIDTH: u32 = 252;
 const SUCCESS_COLOR: &str = "#83CA29";
 const FAIL_COLOR: &str = "#B5131A";
@@ -39,7 +37,6 @@ pub struct NotificationItem {
     pub category: Category, // color differs according to Category
 }
 
-#[allow(dead_code)]
 pub const TIMEOUT_SECS: Duration = Duration::from_secs(10);
 
 pub struct Model {
@@ -206,7 +203,6 @@ pub enum CommonError {
     UnknownError,
 }
 
-#[allow(dead_code)]
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, PartialEq, Eq)]
 pub enum NotificationType {

@@ -75,14 +75,12 @@ pub struct Essential {
                                     // e.g. `default: Some(InputItem::CheckBox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum ChildrenPosition {
     NextLine,
     Right,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, PartialEq)]
 pub enum InputType {
     Text(Essential, Option<usize>, Option<u32>), // (length, width)
@@ -139,7 +137,6 @@ impl InputType {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Clone, PartialEq)]
 pub enum InputItem {
     Text(String), // includes InputType::Radio

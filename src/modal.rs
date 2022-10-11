@@ -4,30 +4,23 @@ use std::rc::Rc;
 use yew::{classes, html, Component, Context, Html, Properties};
 
 const MAX_HEIGHT: u32 = 700;
-#[allow(dead_code)]
 const DEFAULT_MIN_HEIGHT: u32 = 306;
-#[allow(dead_code)]
 const DEFAULT_WIDTH: u32 = 714;
-#[allow(dead_code)]
 const DEFAULT_MIN_OPTION_WIDTH: u32 = 220;
-#[allow(dead_code)]
 const DEFAULT_MAX_OPTION_WIDTH: u32 = 440;
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum MsgType {
     Alert,
     Info,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum AlignButton {
     Row,
     Column,
 }
 
-#[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum TextStyle {
     Key,
