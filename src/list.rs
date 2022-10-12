@@ -29,26 +29,20 @@ impl ToString for Column {
     fn to_string(&self) -> String {
         match self {
             Self::Text(d) => d.to_string(),
-            Self::HostNetworkGroup(d) => concat(d),
-            Self::KeyValueList(d) => {
-                concat(&(d.values().map(Clone::clone).collect::<Vec<String>>()))
-            }
-            Self::Tag(d) => concat(&(d.iter().map(Clone::clone).collect::<Vec<String>>())),
+            Self::HostNetworkGroup(d) => d.join(","),
+            Self::KeyValueList(d) => d
+                .values()
+                .map(Clone::clone)
+                .collect::<Vec<String>>()
+                .join(","),
+            Self::Tag(d) => d
+                .iter()
+                .map(Clone::clone)
+                .collect::<Vec<String>>()
+                .join(","),
             Self::Unsigned32(d) => d.map_or_else(String::new, |d| d.to_string()),
         }
     }
-}
-
-#[inline]
-fn concat(list: &[String]) -> String {
-    let mut conc = String::new();
-    for (index, el) in list.iter().enumerate() {
-        conc += el;
-        if index < list.len() - 1 {
-            conc += ",";
-        }
-    }
-    conc
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
