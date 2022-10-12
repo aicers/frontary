@@ -36,6 +36,8 @@ pub enum Message {
 }
 
 const DEFAULT_BG_COLOR: &str = "#EAEAEA";
+const DEFAULT_VALUE_TEXT_COLOR: &str = "#363636";
+const DEFAULT_LIST_TEXT_COLOR: &str = "#363636";
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props<T, U>
@@ -80,6 +82,10 @@ where
     pub kind: Kind,
     #[prop_or(DEFAULT_BG_COLOR.to_string())]
     pub top_bg_color: String,
+    #[prop_or(DEFAULT_VALUE_TEXT_COLOR.to_string())]
+    pub value_text_color: String,
+    #[prop_or(DEFAULT_LIST_TEXT_COLOR.to_string())]
+    pub list_text_color: String,
 }
 
 impl<T, U> Component for Model<T, U>
@@ -194,10 +200,11 @@ where
             "right"
         };
         let style = format!(
-            "{}: 0px; top: {}px; {}",
+            "{}: 0px; top: {}px; {}; color: {};",
             align,
             ctx.props().list_top,
-            &style_width
+            &style_width,
+            ctx.props().list_text_color,
         );
         let class = if ctx.props().kind == Kind::MoreActionNoImage {
             "mini-select-list-down-visible"
@@ -295,10 +302,11 @@ where
             .map_or_else(String::new, |h| format!("height: {}px;", h));
         let style = if ctx.props().kind == Kind::Round {
             format!(
-                "{} {} background-color: {};",
+                "{} {} background-color: {}; color: {};",
                 style_width,
                 style_height,
-                &ctx.props().top_bg_color
+                &ctx.props().top_bg_color,
+                &ctx.props().value_text_color,
             )
         } else {
             // `Kind::Soft` only
