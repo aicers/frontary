@@ -505,7 +505,6 @@ where
                 }
             }
             Message::InputTagGroup(id, input_data) => {
-                #[allow(clippy::option_if_let_else)]
                 let (new, edit, delete) = if let Some(buffer) = self.tag_buffer.get(&id) {
                     let (empty, new, edit, delete) = if let Ok(buffer) = buffer.try_borrow_mut() {
                         if let Ok(mut item) = input_data.try_borrow_mut() {
