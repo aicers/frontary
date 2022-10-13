@@ -144,8 +144,6 @@ where
                     ctx.props().selected.try_borrow_mut(),
                     ctx.props().list.try_borrow(),
                 ) {
-                    #[allow(clippy::option_if_let_else)]
-                    // can't use `map_or_else` since `*sel` is used in the closure
                     if let Some(selected) = sel.as_mut() {
                         match ctx.props().kind {
                             Kind::Multi => {
