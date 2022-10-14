@@ -443,9 +443,21 @@ where
                     html! { raw }
                 }
             },
-            Column::Unsigned32(elem) => {
+            Column::Unsigned32(_)
+            | Column::SelectSingle(_)
+            | Column::Percentage(_, _)
+            | Column::CheckBox(_, _, _) => {
                 html! {
-                    { elem.map_or_else(String::new, |v| v.to_string()) }
+                    col.to_string()
+                }
+            }
+            Column::Nic(nics) => {
+                html! {
+                    for nics.iter().map(|n| html! {
+                        <>
+                            { n.name.clone() } {": "} { n.interface_ip.clone() } { "/" } { n.gateway_ip.clone() } <br/>
+                        </>
+                    })
                 }
             }
             Column::HostNetworkGroup(elem) => {
@@ -457,7 +469,7 @@ where
                     })
                 }
             }
-            Column::KeyValueList(list) => {
+            Column::SelectMultiple(list) => {
                 let mut list = list.values().map(Clone::clone).collect::<Vec<String>>();
                 list.sort_unstable();
                 view_list_sep_dot(&list)

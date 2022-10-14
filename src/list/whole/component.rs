@@ -707,7 +707,8 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = format!("width: {}px;", ctx.props().display_info.width_full);
+        let style_full = format!("width: {}px;", ctx.props().display_info.width_full);
+        let style_view = format!("width: {}px;", ctx.props().display_info.width_view);
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(|_| Message::InputAdd);
         let input_id = ctx
@@ -772,8 +773,8 @@ where
                                 kind={SelectMiniKind::SortList}
                             />
                         </div>
-                        <div>
-                            <table style={style}>
+                        <div class="list-table" style={style_view}>
+                            <table class="list-table" style={style_full}>
                                 { self.view_head(ctx) }
                                 { self.view_list(ctx) }
                                 { self.view_pages(ctx, true) }

@@ -407,6 +407,147 @@ where
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_lines)]
+    pub(super) fn view_percentage(
+        &self,
+        ctx: &Context<Self>,
+        ess: &InputEssential,
+        min: Option<f32>,
+        max: Option<f32>,
+        decimals: Option<usize>,
+        width: Option<u32>,
+        input_data: &Rc<RefCell<InputItem>>,
+        layer_index: usize,
+        base_index: usize,
+        autofocus: bool,
+    ) -> Html {
+        let txt = ctx.props().txt.txt.clone();
+        let input_data_clone = input_data.clone();
+        let oninput = ctx.link().callback(move |e: InputEvent| {
+            e.target()
+                .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
+                .map_or(Message::InputError, |input| {
+                    if let Ok(value) = input.value().parse::<f32>() {
+                        Message::InputPercentage(
+                            base_index + layer_index,
+                            value / 100.0,
+                            input_data_clone.clone(),
+                        )
+                    } else {
+                        Message::InvalidInputPercentage
+                    }
+                })
+        });
+        let placeholder = if let Ok(data) = input_data.try_borrow() {
+            if let InputItem::Text(item) = &(*data) {
+                if item.is_empty() {
+                    text!(txt, ctx.props().language, ess.notice).to_string()
+                } else {
+                    String::new()
+                }
+            } else {
+                String::new()
+            }
+        } else {
+            String::new()
+        };
+
+        let value = if let Ok(input_data) = input_data.try_borrow() {
+            if let InputItem::Percentage(value) = *input_data {
+                value.map(|v| v * 100.0)
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+            "input-number-alert"
+        } else {
+            "input-number"
+        };
+        let style = format!(
+            "width: {};",
+            width.map_or("100%".to_string(), |w| format!("{}px", w))
+        );
+
+        let min = min.map_or(0.0, |v| v * 100.0);
+        let max = max.map_or(100.0, |v| v * 100.0);
+        let decimals = decimals.map_or("0.1".to_string(), |d| {
+            let mut r = "0.".to_string();
+            if d > 0 {
+                r.push_str(&"0".repeat(d - 1));
+            }
+            r.push('1');
+            r
+        });
+
+        html! {
+            <div class="input-item">
+                <div class="input-contents-item-title">
+                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                </div>
+                <div class="input-contents-item-input">
+                {
+                    if let Some(value) = value {
+                        html! {
+                            <input type="number" class={class} style={style}
+                                value={value.to_string()}
+                                placeholder={placeholder}
+                                autofocus={autofocus}
+                                oninput={oninput}
+                                min={min.to_string()}
+                                max={max.to_string()}
+                                step={decimals}
+                            />
+                        }
+                    } else {
+                        html! {
+                            <input type="number" class={class} style={style}
+                                placeholder={placeholder}
+                                autofocus={autofocus}
+                                oninput={oninput}
+                                min={min.to_string()}
+                                max={max.to_string()}
+                                step={decimals}
+                            />
+                        }
+                    }
+                }
+                </div>
+                <div class="input-text-message">
+                    { self.view_required_msg(ctx, base_index + layer_index) }
+                </div>
+                {
+                    if self.unique_msg.contains(&(base_index + layer_index)) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                                { text!(txt, ctx.props().language, EXISTING_MSG) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(base_index + layer_index)) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                               { text!(txt, ctx.props().language, INVALID_MSG) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                <div class="input-contents-item-space">
+                </div>
+            </div>
+        }
+    }
+
     pub(super) fn view_radio(
         &self,
         ctx: &Context<Self>,

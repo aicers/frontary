@@ -110,49 +110,33 @@ where
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     match (&mut *item, &**input_type) {
                         (
-                            InputItem::Text(value) | InputItem::Password(value),
+                            InputItem::Text(_) | InputItem::Password(_),
                             InputType::Text(ess, _, _),
-                        ) => {
-                            if let Some(default) = &ess.default {
-                                if parent_checked && value.is_empty() {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Unsigned32(value), InputType::Unsigned32(ess, _, _, _)) => {
-                            if let Some(default) = &ess.default {
-                                if parent_checked && value.is_none() {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (
-                            InputItem::HostNetworkGroup(value),
+                        )
+                        | (InputItem::Unsigned32(_), InputType::Unsigned32(ess, _, _, _))
+                        | (InputItem::Percentage(_), InputType::Percentage(ess, _, _, _, _))
+                        | (
+                            InputItem::HostNetworkGroup(_),
                             InputType::HostNetworkGroup(ess, _, _, _),
-                        ) => {
+                        )
+                        | (InputItem::Tag(_), InputType::Tag(ess, _)) => {
                             if let Some(default) = &ess.default {
-                                if parent_checked && value.is_empty() {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Tag(value), InputType::Tag(ess, _)) => {
-                            if let Some(default) = &ess.default {
-                                if parent_checked && value.old.is_empty() {
+                                if parent_checked {
                                     *item = default.clone();
                                 }
                             }
                         }
                         (
                             InputItem::CheckBox(checked, data_children),
-                            InputType::CheckBox(ess, _, Some(children)),
+                            InputType::CheckBox(ess, _, children),
                         ) => {
                             if let Some(InputItem::CheckBox(c, _)) = &ess.default {
                                 if parent_checked {
                                     *checked = *c;
                                 }
                             }
-                            if let Some(data_children) = data_children {
+                            if let (Some(data_children), Some(children)) = (data_children, children)
+                            {
                                 if *checked != CheckStatus::Unchecked {
                                     self.prepare_default_recursive(
                                         ctx,
@@ -200,6 +184,7 @@ where
                             InputItem::Text(txt) => txt.is_empty(),
                             InputItem::HostNetworkGroup(n) => n.is_empty(),
                             InputItem::Unsigned32(v) => v.is_none(),
+                            InputItem::Percentage(v) => v.is_none(),
                             InputItem::Password(pw) => {
                                 // HIGHLIGHT: In case of Edit, empty means no change of passwords
                                 ctx.props().input_id.is_none() && pw.is_empty()
@@ -268,6 +253,25 @@ where
                         ) => {
                             if parent_checked {
                                 if *value >= *min && *value <= *max {
+                                    self.verification
+                                        .insert(base_index + index, Verification::Valid);
+                                } else {
+                                    self.verification.insert(
+                                        base_index + index,
+                                        Verification::Invalid(InvalidMessage::InvalidInput),
+                                    );
+                                    rtn = false;
+                                }
+                            }
+                        }
+                        (
+                            InputItem::Percentage(Some(value)),
+                            InputType::Percentage(_, min, max, _, _),
+                        ) => {
+                            if parent_checked {
+                                if *value >= (*min).unwrap_or(0.0)
+                                    && *value <= (*max).unwrap_or(1.0)
+                                {
                                     self.verification
                                         .insert(base_index + index, Verification::Valid);
                                 } else {
