@@ -1,7 +1,7 @@
 use crate::{language::Language, text, Texts, ViewString};
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(PartialEq, Eq)]
@@ -9,12 +9,8 @@ pub enum Message {
     ClickItem(usize),
 }
 
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
+    phantom: PhantomData<T>,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -47,7 +43,9 @@ where
     type Properties = Props<T>;
 
     fn create(ctx: &Context<Self>) -> Self {
-        let s = Self { _dummy: None };
+        let s = Self {
+            phantom: PhantomData,
+        };
         if let Some(value) = ctx.props().default_value.as_ref() {
             if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
                 *selected = value.clone();

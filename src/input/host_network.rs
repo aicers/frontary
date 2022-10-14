@@ -2,8 +2,8 @@ use crate::{
     language::Language, parse_host_network, text, HostNetwork, InputHostNetworkGroup, Texts,
 };
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{events::InputEvent, html, Component, Context, Html, Properties, TargetCast};
@@ -22,15 +22,11 @@ enum ItemType {
 }
 
 #[derive(PartialEq)]
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
     input: String,
     message: Option<&'static str>,
     view_order: Vec<ItemType>,
+    phantom: PhantomData<T>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -100,10 +96,10 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let mut s = Self {
-            _dummy: None,
             input: String::new(),
             message: None,
             view_order: Vec::new(),
+            phantom: PhantomData,
         };
         s.init_view_order(ctx);
         s

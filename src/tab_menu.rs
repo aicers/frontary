@@ -1,6 +1,6 @@
 use crate::{language::Language, text, Texts};
 use json_gettext::get_text;
-use std::rc::Rc;
+use std::{marker::PhantomData, rc::Rc};
 use yew::{classes, html, Component, Context, Html, Properties};
 
 pub enum Message {
@@ -11,12 +11,8 @@ const DEFAULT_FULL_WIDTH: u32 = 1080;
 const DEFAULT_ITEM_WIDTH: u32 = 120;
 const MAX_ITEM_WIDTH: u32 = 240;
 
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
+    phantom: PhantomData<T>,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -46,7 +42,9 @@ where
     type Properties = Props<T>;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { _dummy: None }
+        Self {
+            phantom: PhantomData,
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {

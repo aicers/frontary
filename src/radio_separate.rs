@@ -1,7 +1,7 @@
 use crate::{language::Language, text, Texts, ViewString};
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(Copy, Clone, PartialEq, Eq)]
@@ -9,12 +9,8 @@ pub enum Message {
     ClickItem,
 }
 
-pub struct Model<T>
-where
-    T: Clone + Component,
-    <T as Component>::Message: Clone,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
+    phantom: PhantomData<T>,
 }
 
 #[derive(Clone, Properties)]
@@ -51,7 +47,9 @@ where
     type Properties = Props<T>;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { _dummy: None }
+        Self {
+            phantom: PhantomData,
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
