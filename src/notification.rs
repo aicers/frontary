@@ -1,5 +1,3 @@
-#![allow(clippy::derive_partial_eq_without_eq)] // GraphQLQuery implements PartialEq but not Eq
-
 use crate::{language::Language, text, window_inner_height, Texts};
 use gloo_timers::callback::Timeout;
 use json_gettext::get_text;
@@ -43,7 +41,7 @@ pub struct Model {
     timeouts: HashMap<usize, Timeout>,
 }
 
-#[derive(Clone, PartialEq, Properties)]
+#[derive(Clone, Eq, PartialEq, Properties)]
 pub struct Props {
     pub txt: Texts,
     pub language: Language,
