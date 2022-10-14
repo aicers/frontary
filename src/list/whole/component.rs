@@ -7,9 +7,9 @@ use crate::{
     SelectMiniKind, SortStatus, Texts, ViewString,
 };
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -26,13 +26,7 @@ pub(super) enum ViewInputStatus {
 }
 
 #[derive(Clone, PartialEq)]
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
-
+pub struct Model<T> {
     data_cache: HashMap<String, ListItem>, // to check `data` being changed
     id_cache: String,                      // to check `id` being changed
     // `pages_info` is not just a cache. This is altered by this `Model`.
@@ -51,6 +45,8 @@ where
     pub(super) view_input_status: ViewInputStatus,
     pub(super) more_action: Rc<RefCell<Option<MoreAction>>>,
     pub(super) sort_list_kind: Rc<RefCell<Option<SortListKind>>>,
+
+    phantom: PhantomData<T>,
 }
 
 #[allow(clippy::enum_variant_names)]
@@ -164,7 +160,6 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let mut s = Self {
-            _dummy: None,
             data_cache: (*ctx.props().data).clone(),
             id_cache: ctx.props().id.clone(),
             pages_info: ctx.props().pages_info.try_borrow().ok().map(|info| *info),
@@ -181,6 +176,8 @@ where
             view_input_status: ViewInputStatus::None,
             more_action: Rc::new(RefCell::new(None)),
             sort_list_kind: Rc::new(RefCell::new(None)),
+
+            phantom: PhantomData,
         };
         s.initiate_pages_info(ctx);
         s.reset_sort_second_layer(ctx);

@@ -12,9 +12,9 @@ use gloo_file::{
     File,
 };
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq)]
@@ -49,13 +49,7 @@ pub enum InputSecondId {
     Edit(String),
 }
 
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
-
+pub struct Model<T> {
     pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
@@ -76,6 +70,8 @@ where
     file_reader: Option<FileReader>,
 
     pub(super) rerender_serial_host_network: u64,
+
+    phantom: PhantomData<T>,
 }
 
 impl<T> PartialEq for Model<T>
@@ -102,14 +98,9 @@ where
     }
 }
 
-impl<T> Clone for Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
+impl<T> Clone for Model<T> {
     fn clone(&self) -> Self {
         Self {
-            _dummy: None,
             radio_buffer: self.radio_buffer.clone(),
             host_network_buffer: self.host_network_buffer.clone(),
             select_searchable_buffer: self.select_searchable_buffer.clone(),
@@ -126,6 +117,7 @@ where
             file_content: self.file_content.clone(),
             file_reader: None,
             rerender_serial_host_network: self.rerender_serial_host_network,
+            phantom: PhantomData,
         }
     }
 }
@@ -295,7 +287,6 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let mut s = Self {
-            _dummy: None,
             radio_buffer: HashMap::new(),
             host_network_buffer: HashMap::new(),
             select_searchable_buffer: HashMap::new(),
@@ -316,6 +307,8 @@ where
             file_reader: None,
 
             rerender_serial_host_network: 0,
+
+            phantom: PhantomData,
         };
         Self::prepare_nic(ctx);
         s.prepare_buffer(ctx);

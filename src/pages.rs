@@ -1,8 +1,8 @@
 use crate::{language::Language, text, Texts};
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::rc::Rc;
 use std::str::FromStr;
+use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{events::InputEvent, html, Component, Context, Html, Properties};
@@ -59,13 +59,9 @@ where
     pub input: bool,
 }
 
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
     go_to_page: usize,
+    phantom: PhantomData<T>,
 }
 
 impl<T> Component for Model<T>
@@ -78,8 +74,8 @@ where
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            _dummy: None,
             go_to_page: 0,
+            phantom: PhantomData,
         }
     }
 

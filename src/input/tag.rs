@@ -2,20 +2,15 @@ use crate::{
     language::Language, text, toggle_visibility, visible_tag_select, InputTagGroup, Texts,
 };
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{events::InputEvent, html, Component, Context, Html, Properties, TargetCast};
 
-pub struct Model<T>
-where
-    T: Clone + Component + PartialEq,
-    <T as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
     prev_list: Rc<HashMap<String, String>>,
     input: String,
     message: Option<&'static str>,
@@ -25,6 +20,7 @@ where
     edit: Option<String>, // String = key of tag
     edit_message: Option<&'static str>,
     input_edit: String,
+    phantom: PhantomData<T>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -77,7 +73,6 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let mut s = Self {
-            _dummy: None,
             prev_list: ctx.props().prev_list.clone(),
             input: String::new(),
             message: None,
@@ -87,6 +82,7 @@ where
             edit: None,
             edit_message: None,
             input_edit: String::new(),
+            phantom: PhantomData,
         };
         s.init_view_order(ctx);
         s.reset_search_list(ctx);

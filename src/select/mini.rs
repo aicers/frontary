@@ -1,20 +1,15 @@
 use crate::{language::Language, text, toggle_visibility, Texts, ViewString};
 use gloo_events::EventListener;
 use json_gettext::get_text;
-use std::cell::RefCell;
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use web_sys::{Event, HtmlElement};
 use yew::{classes, html, Component, Context, Html, NodeRef, Properties};
 
-pub struct Model<T, U>
-where
-    T: Copy + Clone + PartialEq + 'static,
-    U: Clone + Component + PartialEq,
-    <U as Component>::Message: Clone + PartialEq,
-{
-    _dummy: Option<(T, U)>,
+pub struct Model<T, U> {
     click_listener: Option<EventListener>,
     click_count: usize,
+    phantom: PhantomData<(T, U)>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -98,9 +93,9 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let s = Self {
-            _dummy: None,
             click_listener: None,
             click_count: 0,
+            phantom: PhantomData,
         };
         if let Some(value) = ctx.props().default_value {
             if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {

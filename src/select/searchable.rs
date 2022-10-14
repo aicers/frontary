@@ -4,9 +4,9 @@ use crate::{
 };
 use json_gettext::get_text;
 use num_traits::ToPrimitive;
-use std::cell::RefCell;
 use std::collections::HashSet;
 use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{events::InputEvent, html, Component, Context, Html, Properties};
@@ -18,14 +18,10 @@ pub enum Kind {
 }
 
 #[derive(Clone)]
-pub struct Model<T>
-where
-    T: Clone + Component,
-    <T as Component>::Message: Clone,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
     search_result: Option<Vec<usize>>,
     search_text: String,
+    phantom: PhantomData<T>,
 }
 
 #[derive(Clone)]
@@ -80,9 +76,9 @@ where
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            _dummy: None,
             search_result: None,
             search_text: String::new(),
+            phantom: PhantomData,
         }
     }
 

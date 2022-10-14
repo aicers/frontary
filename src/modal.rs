@@ -1,6 +1,6 @@
 use crate::{language::Language, text, Texts};
 use json_gettext::get_text;
-use std::rc::Rc;
+use std::{marker::PhantomData, rc::Rc};
 use yew::{classes, html, Component, Context, Html, Properties};
 
 const MAX_HEIGHT: u32 = 700;
@@ -58,12 +58,8 @@ where
     pub parent_cancel_message: T::Message,
 }
 
-pub struct Model<T>
-where
-    T: Clone + Component,
-    <T as Component>::Message: Clone,
-{
-    _dummy: Option<T>,
+pub struct Model<T> {
+    phantom: PhantomData<T>,
 }
 
 impl<T> Component for Model<T>
@@ -75,7 +71,9 @@ where
     type Properties = Props<T>;
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self { _dummy: None }
+        Self {
+            phantom: PhantomData,
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
