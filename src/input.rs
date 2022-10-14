@@ -91,6 +91,13 @@ pub enum InputType {
     SelectMultiple(Essential, Vec<(String, ViewString)>, bool), // (String, ViewString) = (key, display), bool = all selected by default
     Tag(Essential, HashMap<String, String>), // (String, String) = (key, tag value(name))
     Unsigned32(Essential, u32, u32, Option<u32>), // (u32, u32, Option<u32>) = (min, max, width)
+    Percentage(
+        Essential,
+        Option<f32>,
+        Option<f32>,
+        Option<usize>,
+        Option<u32>,
+    ), // (Option<f32>, Option<f32>, Option<usize>, Option<u32>) = (min, max, # of decimals, width)
     CheckBox(
         Essential,
         Option<CheckStatus>, // if whether always checked/unchecked/indeterminate, Some(CheckStatus::*)
@@ -113,6 +120,7 @@ impl InputType {
             | Self::SelectMultiple(ess, _, _)
             | Self::Tag(ess, _)
             | Self::Unsigned32(ess, _, _, _)
+            | Self::Percentage(ess, _, _, _, _)
             | Self::CheckBox(ess, _, _)
             | Self::Nic(ess)
             | Self::File(ess) => ess.required,
@@ -130,6 +138,7 @@ impl InputType {
             | Self::SelectMultiple(ess, _, _)
             | Self::Tag(ess, _)
             | Self::Unsigned32(ess, _, _, _)
+            | Self::Percentage(ess, _, _, _, _)
             | Self::CheckBox(ess, _, _)
             | Self::Nic(ess)
             | Self::File(ess) => ess.unique,
@@ -146,6 +155,7 @@ pub enum InputItem {
     SelectMultiple(HashSet<String>), // key
     Tag(InputTagGroup),
     Unsigned32(Option<u32>),
+    Percentage(Option<f32>),
     CheckBox(CheckStatus, Option<Vec<Rc<RefCell<InputItem>>>>),
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
@@ -161,6 +171,7 @@ impl InputItem {
             InputItem::SelectMultiple(list) => list.clear(),
             InputItem::Tag(group) => *group = InputTagGroup::default(),
             InputItem::Unsigned32(value) => *value = None,
+            InputItem::Percentage(value) => *value = None,
             InputItem::CheckBox(value, _) => *value = CheckStatus::Unchecked,
             InputItem::Nic(value) => value.clear(),
             InputItem::File(name, content) => {
@@ -187,7 +198,8 @@ impl From<&Column> for InputItem {
                 }
                 Self::HostNetworkGroup(input)
             }
-            Column::KeyValueList(list) => {
+            Column::SelectSingle(value) => Self::SelectSingle(value.as_ref().map(|d| d.0.clone())),
+            Column::SelectMultiple(list) => {
                 Self::SelectMultiple(list.keys().map(Clone::clone).collect::<HashSet<String>>())
             }
             Column::Tag(tags) => Self::Tag(InputTagGroup {
@@ -197,6 +209,17 @@ impl From<&Column> for InputItem {
                 delete: None,
             }),
             Column::Unsigned32(value) => Self::Unsigned32(*value),
+            Column::Percentage(f, _) => Self::Percentage(*f),
+            Column::Nic(nics) => Self::Nic(nics.clone()),
+            Column::CheckBox(status, children, _) => Self::CheckBox(
+                *status,
+                children.as_ref().map(|children| {
+                    children
+                        .iter()
+                        .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
+                        .collect::<Vec<Rc<RefCell<InputItem>>>>()
+                }),
+            ),
         }
     }
 }

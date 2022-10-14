@@ -149,6 +149,8 @@ pub enum Message {
     InputConfirmPassword(usize, String),
     InputUnsigned32(usize, u32, Rc<RefCell<InputItem>>),
     InvalidInputUnsigned32,
+    InputPercentage(usize, f32, Rc<RefCell<InputItem>>),
+    InvalidInputPercentage,
     InputRadio(usize, Rc<RefCell<InputItem>>),
     InputHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
     InputMultipleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
@@ -180,6 +182,8 @@ impl Clone for Message {
             Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(*a, b.clone()),
             Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(*a, *b, c.clone()),
             Self::InvalidInputUnsigned32 => Self::InvalidInputUnsigned32,
+            Self::InputPercentage(a, b, c) => Self::InputPercentage(*a, *b, c.clone()),
+            Self::InvalidInputPercentage => Self::InvalidInputPercentage,
             Self::InputRadio(a, b) => Self::InputRadio(*a, b.clone()),
             Self::InputHostNetworkGroup(a, b) => Self::InputHostNetworkGroup(*a, b.clone()),
             Self::InputMultipleSelect(a, b, c) => {
@@ -319,7 +323,9 @@ where
         };
         Self::prepare_nic(ctx);
         s.prepare_buffer(ctx);
-        s.prepare_default(ctx);
+        if ctx.props().input_id.is_none() {
+            s.prepare_default(ctx);
+        }
         s
     }
 
@@ -442,7 +448,14 @@ where
                 self.clear_required_msg(id, false);
                 self.unique_msg.remove(&id);
             }
-            Message::InvalidInputUnsigned32 => return false, // unreachable
+            Message::InvalidInputUnsigned32 | Message::InvalidInputPercentage => return false,
+            Message::InputPercentage(id, value, input_data) => {
+                if let Ok(mut item) = input_data.try_borrow_mut() {
+                    *item = InputItem::Percentage(Some(value));
+                }
+                self.clear_required_msg(id, false);
+                self.unique_msg.remove(&id);
+            }
             Message::InputRadio(id, input_data) => {
                 if let Some(buffer) = self.radio_buffer.get(&id) {
                     let empty = if let Ok(buffer) = buffer.try_borrow_mut() {
@@ -735,6 +748,7 @@ where
                     InputType::SelectSingle(ess, list) => self.view_select_searchable(ctx, false, ess, list, input_data, index, 1),
                     InputType::Tag(ess, list) => self.view_tag_group(ctx, ess, list, input_data, index, 1),
                     InputType::Unsigned32(ess, min, max, width) => self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, index, 1, index == 0),
+                    InputType::Percentage(ess, min, max, decimals, width) => self.view_percentage(ctx, ess, *min, *max, *decimals, *width, input_data, index, 1, index == 0),
                     InputType::CheckBox(ess, always, children) => {
                         let both = ctx.props().input_type.get(index + 1).map_or(Some(false),|next| {
                             if let InputType::CheckBox(_, _, _) = &**next {
