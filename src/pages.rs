@@ -20,7 +20,7 @@ impl Default for Info {
     fn default() -> Self {
         Self {
             current: 1,
-            total: 1,
+            total: 0,
             start: 1,
             end: 1,
         }
@@ -41,7 +41,7 @@ pub enum Message {
 
 const NUM_PAGES: usize = 10;
 
-#[derive(Clone, PartialEq, Properties)]
+#[derive(Clone, Properties, PartialEq)]
 pub struct Props<T>
 where
     T: Clone + Component + PartialEq,
@@ -51,6 +51,7 @@ where
     pub language: Language,
     pub parent_message: T::Message,
     pub pages_info: Rc<RefCell<Info>>,
+    pub pages_info_cache: Option<Info>,
     #[prop_or(NUM_PAGES)]
     pub num_pages: usize, // # of pages that shows at the same time
     #[prop_or(true)]
@@ -82,11 +83,11 @@ where
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
         let num_pages = ctx.props().num_pages;
         if let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() {
-            if info.end - info.start + 1 < num_pages {
+            if info.end + 1 - info.start < num_pages {
                 if info.start + num_pages - 1 < info.total {
                     info.end = info.start + num_pages - 1;
                 } else if info.end > num_pages && info.end + 1 - num_pages > 0 {
-                    info.start = info.end - num_pages + 1;
+                    info.start = info.end + 1 - num_pages;
                 }
             }
         }
@@ -118,7 +119,7 @@ where
                 }
                 Message::Last => {
                     info.start = if info.total > num_pages {
-                        info.total - num_pages + 1
+                        info.total + 1 - num_pages
                     } else {
                         1
                     };
@@ -136,7 +137,7 @@ where
                             if info.total <= num_pages {
                                 info.start = 1;
                             } else {
-                                info.start = info.total - num_pages + 1;
+                                info.start = info.total + 1 - num_pages;
                             }
                             info.end = info.total;
                         } else {

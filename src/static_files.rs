@@ -70,6 +70,9 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
     let expand_list = include_bytes!("../static/frontary/expand-list.png");
     rtn.push(("expand-list.png", expand_list));
 
+    let host_network_close = include_bytes!("../static/frontary/host-network-close.png");
+    rtn.push(("host-network-close.png", host_network_close));
+
     let list_add = include_bytes!("../static/frontary/list-add.png");
     rtn.push(("list-add.png", list_add));
 

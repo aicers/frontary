@@ -62,7 +62,6 @@ where
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
-
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
@@ -74,19 +73,7 @@ where
                     )
                 })
         });
-        let placeholder = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Text(item) = &(*input_data) {
-                if item.is_empty() {
-                    text!(txt, ctx.props().language, ess.notice).to_string()
-                } else {
-                    String::new()
-                }
-            } else {
-                String::new()
-            }
-        } else {
-            String::new()
-        };
+        let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::Text(txt) = &(*input_data) {
                 txt.clone()
@@ -96,6 +83,7 @@ where
         } else {
             String::new()
         };
+
         let class = if self.required_msg.contains(&(base_index + layer_index)) {
             "input-text-alert"
         } else {
@@ -204,6 +192,7 @@ where
         } else {
             String::new()
         };
+
         let class = if self.required_msg.contains(&(base_index + layer_index)) {
             "input-password-alert"
         } else {
@@ -311,20 +300,7 @@ where
                     }
                 })
         });
-        let placeholder = if let Ok(data) = input_data.try_borrow() {
-            if let InputItem::Text(item) = &(*data) {
-                if item.is_empty() {
-                    text!(txt, ctx.props().language, ess.notice).to_string()
-                } else {
-                    String::new()
-                }
-            } else {
-                String::new()
-            }
-        } else {
-            String::new()
-        };
-
+        let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::Unsigned32(value) = *input_data {
                 value
@@ -439,20 +415,7 @@ where
                     }
                 })
         });
-        let placeholder = if let Ok(data) = input_data.try_borrow() {
-            if let InputItem::Text(item) = &(*data) {
-                if item.is_empty() {
-                    text!(txt, ctx.props().language, ess.notice).to_string()
-                } else {
-                    String::new()
-                }
-            } else {
-                String::new()
-            }
-        } else {
-            String::new()
-        };
-
+        let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::Percentage(value) = *input_data {
                 value.map(|v| v * 100.0)
@@ -820,7 +783,7 @@ where
                                         always={always}
                                     />
                                     <div class="input-checkbox-me-title">
-                                        { text!(txt, ctx.props().language, ess.title) }
+                                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
                                     </div>
                                 </div>
                             }
@@ -833,7 +796,7 @@ where
                                         />
                                     </div>
                                     <div class="input-checkbox-me-title">
-                                        { text!(txt, ctx.props().language, ess.title) }
+                                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
                                     </div>
                                 </div>
                             }

@@ -145,11 +145,7 @@ where
                     };
                     self.reset_search_list(ctx);
                     if send_msg {
-                        if let (Some(parent), Some(msg)) =
-                            (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-                        {
-                            parent.clone().downcast::<T>().send_message(msg.clone());
-                        }
+                        Self::buffer_to_input(ctx);
                     }
                 }
             }
@@ -209,11 +205,7 @@ where
                 };
                 self.reset_search_list(ctx);
                 if send_msg {
-                    if let (Some(parent), Some(msg)) =
-                        (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-                    {
-                        parent.clone().downcast::<T>().send_message(msg.clone());
-                    }
+                    Self::buffer_to_input(ctx);
                 }
             }
             Message::UnselectTag(key) => {
@@ -222,6 +214,7 @@ where
                     self.view_order.retain(|k| k != &key);
                 }
                 self.reset_search_list(ctx);
+                Self::buffer_to_input(ctx);
             }
             Message::EditTag(key) => {
                 self.edit = Some(key);
@@ -233,11 +226,7 @@ where
                 }
                 // AICE TODO: revive this if necessary
                 // self.reset_search_list(ctx);
-                if let (Some(parent), Some(msg)) =
-                    (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-                {
-                    parent.clone().downcast::<T>().send_message(msg.clone());
-                }
+                Self::buffer_to_input(ctx);
             }
             Message::InputEdit(input) => {
                 self.input_edit = input;
@@ -265,11 +254,7 @@ where
                     false
                 };
                 if send_msg {
-                    if let (Some(parent), Some(msg)) =
-                        (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-                    {
-                        parent.clone().downcast::<T>().send_message(msg.clone());
-                    }
+                    Self::buffer_to_input(ctx);
                     self.input_edit = String::new();
                     self.edit = None;
                 }
@@ -513,6 +498,14 @@ where
             let mut old = data.old.iter().map(Clone::clone).collect::<Vec<String>>();
             old.sort_unstable();
             self.view_order = old;
+        }
+    }
+
+    fn buffer_to_input(ctx: &Context<Self>) {
+        if let (Some(parent), Some(msg)) =
+            (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
+        {
+            parent.clone().downcast::<T>().send_message(msg.clone());
         }
     }
 }

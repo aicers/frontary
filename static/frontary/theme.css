@@ -60,6 +60,13 @@ input[type=text] {
     outline: none;
 }
 
+input[type=number] {
+    font-family: 'Mada', 'Spoqa Han Sans Neo', 'Sans-serif';
+    font-size: 13px;
+    color: #000000;
+    outline: none;
+}
+
 input[type=password] {
     font-size: 13px;
     color: #000000;
@@ -761,7 +768,6 @@ input[type=text].complex-select-pop-input {
 input[type=text].complex-select-pop-input::placeholder {
     font-size: 13px;
     line-height: 16px;
-    ;
     color: #A9A9A9;
 }
 
@@ -1693,8 +1699,8 @@ div.input-required-asterisk {
 input[type=text].input-text {
     height: 30px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     background-color: #FFFFFF;
     outline: none;
     border: 1px solid #CECECE;
@@ -1708,8 +1714,8 @@ input[type=text].input-text::placeholder {
 input[type=text].input-text-alert {
     height: 30px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     color: #C02E2E;
     background-color: #FFE9E9;
     border: 2px solid #C02E2E;
@@ -1757,8 +1763,8 @@ div.input-reenter-password-title {
 input[type=password].input-password {
     height: 30px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     background-color: #FFFFFF;
     outline: none;
     border: 1px solid #CECECE;
@@ -1772,8 +1778,8 @@ input[type=password].input-password::placeholder {
 input[type=password].input-password-alert {
     height: 30px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     color: #C02E2E;
     background-color: #FFE9E9;
     border: 2px solid #C02E2E;
@@ -1784,8 +1790,8 @@ input[type=password].input-password-alert {
 input[type=number].input-number {
     height: 30px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     background-color: #FFFFFF;
     outline: none;
     border: 1px solid #CECECE;
@@ -1799,8 +1805,8 @@ input[type=number].input-number::placeholder {
 input[type=number].input-number-alert {
     height: 30px;
     width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     color: #C02E2E;
     background-color: #FFE9E9;
     border: 2px solid #C02E2E;
@@ -2431,8 +2437,8 @@ div.input-nic-add-nic:hover {
 input[type=text].input-nic {
     height: 30px;
     font-size: 13px;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
     color: #000000;
     background-color: #FFFFFF;
     border: 1px solid #CECECE;
