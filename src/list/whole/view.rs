@@ -286,6 +286,7 @@ where
                                             Some(height),
                                             Some(input_type),
                                             Some(second_data),
+                                            Ok(check_status_second),
                                         ) = (
                                             ctx.props().input_second_add_title,
                                             ctx.props().input_second_edit_title,
@@ -293,6 +294,7 @@ where
                                             ctx.props().input_second_height,
                                             ctx.props().input_second_type.as_ref(),
                                             ctx.props().input_second_data.as_ref(),
+                                            self.check_status_second.try_borrow(),
                                         ) {
                                             html! {
                                                 <WholeList::<T>
@@ -308,6 +310,7 @@ where
                                                     sort={self.sort_second_layer}
                                                     pages_info={Rc::clone(pages_info)}
                                                     check_status_second={Rc::clone(&self.check_status_second)}
+                                                    check_status_second_cache={Some(*check_status_second)}
 
                                                     input_ids={Rc::clone(&ctx.props().input_ids)}
                                                     input_second_keys={Rc::clone(&ctx.props().input_second_keys)}
@@ -367,6 +370,7 @@ where
                                 language={ctx.props().language}
                                 parent_message={Message::MovePage}
                                 pages_info={Rc::clone(&ctx.props().pages_info)}
+                                pages_info_cache={self.pages_info}
                                 num_pages={DEFAULT_NUM_PAGES}
                             />
                             { self.view_delete_checked(ctx, msg) }
@@ -418,6 +422,7 @@ where
                                 language={ctx.props().language}
                                 parent_message={Message::MovePage}
                                 pages_info={Rc::clone(&ctx.props().pages_info)}
+                                pages_info_cache={self.pages_info}
                                 num_pages={DEFAULT_NUM_PAGES}
                             />
                             <div class="list-whole-list-second-add" onclick={onclick_add_second}>

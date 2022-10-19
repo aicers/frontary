@@ -44,14 +44,14 @@ where
         if ctx.props().kind != Kind::LayeredSecond {
             if let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() {
                 let total = if ctx.props().data.is_empty() {
-                    0 // HIGHLIGHT: end and total have 0 with no data
+                    0 // HIGHLIGHT: total has 0 with no data, but start and end have 1 with no data
                 } else {
                     (ctx.props().data.len() - 1) / ctx.props().num_per_page + 1
                 };
                 *info = PagesInfo {
                     current: 1,
                     start: 1,
-                    end: std::cmp::min(ctx.props().num_pages, total),
+                    end: std::cmp::min(ctx.props().num_pages, std::cmp::max(1, total)),
                     total,
                 };
                 self.pages_info = Some(*info);
@@ -69,7 +69,7 @@ where
                         Rc::new(RefCell::new(PagesInfo {
                             current: 1,
                             start: 1,
-                            end: std::cmp::min(ctx.props().num_pages, total),
+                            end: std::cmp::min(ctx.props().num_pages, std::cmp::max(1, total)),
                             total,
                         })),
                     );
@@ -81,29 +81,21 @@ where
     pub(super) fn update_pages_info(&mut self, ctx: &Context<Self>) {
         if let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() {
             if ctx.props().data.is_empty() {
-                *info = PagesInfo {
-                    // HIGHLIGHT: this represents no data
-                    current: 1,
-                    start: 1,
-                    end: 0,
-                    total: 0,
-                };
+                *info = PagesInfo::default();
             } else {
                 let total = (ctx.props().data.len() - 1) / ctx.props().num_per_page + 1;
                 // Add the first item in both first and second layers
                 if info.total == 0 && total == 1 {
-                    *info = PagesInfo {
-                        current: 1,
-                        total: 1,
-                        start: 1,
-                        end: 1,
-                    };
+                    *info = PagesInfo::default();
                 } else {
                     let current =
                         std::cmp::min(self.pages_info.map_or(info.current, |p| p.current), total);
                     let start =
                         std::cmp::min(self.pages_info.map_or(info.start, |p| p.start), total);
-                    let end = std::cmp::min(self.pages_info.map_or(info.end, |p| p.end), total);
+                    let end = std::cmp::min(
+                        self.pages_info.map_or(info.end, |p| p.end),
+                        std::cmp::max(1, total),
+                    );
 
                     *info = PagesInfo {
                         current,
@@ -121,12 +113,7 @@ where
             // in case an item in first layer added
             for key in ctx.props().data.keys() {
                 if let Vacant(entry) = self.pages_info_second.entry(key.clone()) {
-                    entry.insert(Rc::new(RefCell::new(PagesInfo {
-                        current: 1,
-                        start: 1,
-                        end: 0,
-                        total: 0,
-                    })));
+                    entry.insert(Rc::new(RefCell::new(PagesInfo::default())));
                 }
             }
             // in case an item in first layer deleted
@@ -325,6 +312,22 @@ where
                     }
                 } else {
                     *kind = Some(SortListKind::LatestFirst);
+                }
+            }
+        }
+    }
+
+    pub(super) fn set_first_layer_input_id(&mut self, ctx: &Context<Self>) {
+        let (start, end) = self.item_range(ctx);
+        if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
+            *id = Vec::new();
+        }
+        for index in start..=end {
+            if let Some(key) = self.sorted_keys.get(index - 1) {
+                if self.expand_list.contains(key) {
+                    if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
+                        *id = vec![key.clone()];
+                    }
                 }
             }
         }

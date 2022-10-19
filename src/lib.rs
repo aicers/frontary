@@ -55,6 +55,14 @@ use std::cmp::{Ord, Ordering};
 use std::collections::HashMap;
 use yew::Properties;
 
+#[cfg(feature = "test")]
+pub fn alert(msg: &str) {
+    web_sys::window()
+        .expect("Window should exist")
+        .alert_with_message(msg)
+        .expect("Alert should show up");
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {
     Edit,

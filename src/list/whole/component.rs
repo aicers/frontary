@@ -79,6 +79,7 @@ pub enum Message {
 
     DoMoreAction(String),
     SortList,
+    SetSecondSortDefault,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -118,6 +119,8 @@ where
     pub pages_info: Rc<RefCell<PagesInfo>>,
     #[prop_or(Rc::new(RefCell::new(CheckStatus::Unchecked)))]
     pub check_status_second: Rc<RefCell<CheckStatus>>, // check status of the second layer
+    #[prop_or(None)]
+    pub check_status_second_cache: Option<CheckStatus>,
 
     // for add/edit/delete
     pub input_ids: Rc<RefCell<Vec<String>>>, // Vec for deleting multiple items
@@ -192,13 +195,6 @@ where
         // even if the page or sort changes in Flat or LayeredFirst, this `change` is not called. Instead `update` is called.
         let data_changed = self.data_cache != *ctx.props().data;
         let id_changed = self.id_cache != ctx.props().id;
-        let page_changed = if let (Some(prev), Ok(info)) =
-            (self.pages_info, ctx.props().pages_info.try_borrow())
-        {
-            prev != *info
-        } else {
-            false
-        };
 
         let sort_changed = self.sort != ctx.props().sort;
         if self.data_cache.len() < ctx.props().data.len() {
@@ -223,6 +219,10 @@ where
                     if !added.is_empty() || !deleted.is_empty() {
                         self.update_checked(ctx, &added);
                     }
+                } else if let (Ok(mut pages_info), Some(pre_pages_info)) =
+                    (ctx.props().pages_info.try_borrow_mut(), self.pages_info)
+                {
+                    *pages_info = pre_pages_info;
                 }
             }
             Kind::LayeredFirst => {
@@ -239,23 +239,39 @@ where
                         self.update_checked(ctx, &added);
                     }
                 }
+                self.set_first_layer_input_id(ctx);
             }
             Kind::LayeredSecond => {
                 // In Flat or LayeredFirst, `pages_info` is not changed but updated by a user's click.
                 // In LayerdSecond, `pages_info` can be changed when its parent page changes as well as updated.
-                if id_changed || sort_changed {
-                    // HIGHLIGHT: Clicking sort buttons calls `update` NOT `change` in Flat and LayeredFirst, which doesn't need to update `self.sort` in both.
-                    // On the other hand, self.sort should be updated since `LayeredFirst` calls `LayeredSecond`'s `change`.
+                let page_changed = if let (Some(prev), Ok(info)) =
+                    (self.pages_info, ctx.props().pages_info.try_borrow())
+                {
+                    prev != *info
+                } else {
+                    false
+                };
+
+                if id_changed {
                     self.sort = ctx.props().sort;
                     self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
                     self.sort_keys(ctx);
                     self.checked.clear();
-                } else if page_changed {
-                    self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
-                    self.checked.clear();
                 } else if data_changed {
+                    self.sort = Some(SortColumn {
+                        index: 0,
+                        status: SortStatus::Ascending,
+                    });
+                    if let Some(parent) = ctx.link().get_parent() {
+                        parent
+                            .clone()
+                            .downcast::<Self>()
+                            .send_message(Message::SetSecondSortDefault);
+                    }
+
                     let (added, deleted) = self.sort_keys(ctx);
                     self.update_pages_info(ctx);
+                    self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
 
                     if added.is_empty() && deleted.is_empty() {
                         self.check_status_second = ctx.props().check_status_second.clone();
@@ -277,6 +293,28 @@ where
                         self.update_checked(ctx, &added);
                         self.update_parent_check_status(ctx);
                     }
+                } else if page_changed {
+                    self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
+                    self.checked.clear();
+                } else if sort_changed {
+                    // HIGHLIGHT: Clicking sort buttons calls `update` NOT `change` in Flat and LayeredFirst, which doesn't need to update `self.sort` in both.
+                    // On the other hand, self.sort should be updated since `LayeredFirst` calls `LayeredSecond`'s `change`.
+                    self.sort = ctx.props().sort;
+                    self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
+                    self.sort_keys(ctx);
+                    self.checked.clear();
+                }
+
+                if let Some(CheckStatus::Checked) = ctx.props().check_status_second_cache {
+                    if let Ok(info) = ctx.props().pages_info.try_borrow() {
+                        if info.total == 0 {
+                            self.update_parent_check_status(ctx);
+                        } else {
+                            self.check_all(ctx, true);
+                        }
+                    }
+                } else if let Some(CheckStatus::Unchecked) = ctx.props().check_status_second_cache {
+                    self.check_all(ctx, false);
                 }
             }
         }
@@ -286,9 +324,6 @@ where
         }
         if data_changed {
             self.data_cache = (*ctx.props().data).clone();
-        }
-        if page_changed {
-            self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
         }
 
         true
@@ -300,6 +335,9 @@ where
             Message::ClickExpandible(key) => {
                 if self.expand_list.contains(&key) {
                     self.expand_list.remove(&key);
+                    if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
+                        *id = Vec::new();
+                    }
                 } else {
                     let (start, end) = self.item_range(ctx);
                     for index in start..=end {
@@ -346,6 +384,9 @@ where
                 if sort {
                     self.checked.clear();
                     self.sort_keys(ctx);
+                    if ctx.props().kind == Kind::LayeredFirst {
+                        self.set_first_layer_input_id(ctx);
+                    }
                 }
             }
             Message::ClickSort(index) => {
@@ -400,7 +441,7 @@ where
                 }
                 if ctx.props().kind == Kind::LayeredSecond {
                     self.update_parent_check_status(ctx);
-                    return false;
+                    // HIGHLIGHT: should return true
                 }
             }
             Message::CheckAll => {
@@ -425,7 +466,7 @@ where
                 }
             }
             Message::CheckAllSecond => {
-                // This can occur except in LayeredFirst only
+                // This can occur in LayeredFirst only
                 let (start, end) = self.item_range(ctx);
                 if (start..=end)
                     .filter_map(|index| {
@@ -471,6 +512,7 @@ where
                 self.pages_info = ctx.props().pages_info.try_borrow().ok().map(|info| *info);
                 ctx.link().send_message(Message::ClearChecked);
                 if ctx.props().kind == Kind::LayeredFirst {
+                    self.set_first_layer_input_id(ctx);
                     ctx.link().send_message(Message::ResetCheckSecond);
                 }
                 return false;
@@ -539,7 +581,10 @@ where
                 ) {
                     parent.clone().downcast::<T>().send_message(msg.clone());
                 }
-                return false;
+                // HIGHLIGHT: If a tag is modified, input_data is modified at the same time.
+                // After that, users click "Save". Therefore input_data doesn't seem changed
+                // from the point of WholeList, which doesn't rerender itself as a result.
+                // In order to avoid this, rerender whenever Edit happens.
             }
             Message::Delete(key) => {
                 if let (Some(parent), Some(msg), Ok(mut ids)) = (
@@ -701,6 +746,9 @@ where
                     return false;
                 }
             },
+            Message::SetSecondSortDefault => {
+                self.reset_sort_second_layer(ctx);
+            }
         }
         true
     }

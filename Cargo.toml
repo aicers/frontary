@@ -4,6 +4,10 @@ version = "0.1.1"
 edition = "2021"
 publish = false
 
+[features]
+default = []
+test = []
+
 [dependencies]
 anyhow = "1"
 base64 = "0.13"
