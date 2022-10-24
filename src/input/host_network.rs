@@ -75,6 +75,8 @@ where
     pub parent_message_save: Option<T::Message>,
     #[prop_or(None)]
     pub parent_message_no_save: Option<T::Message>,
+    #[prop_or(None)]
+    pub parent_message_user_input: Option<T::Message>,
     pub input_data: Rc<RefCell<InputHostNetworkGroup>>,
     #[prop_or(None)]
     pub input_notice: Option<&'static str>,
@@ -120,6 +122,12 @@ where
             Message::Input(input) => {
                 self.input = input;
                 self.message = None;
+                if let (Some(parent), Some(msg)) = (
+                    ctx.link().get_parent(),
+                    ctx.props().parent_message_user_input.as_ref(),
+                ) {
+                    parent.clone().downcast::<T>().send_message(msg.clone());
+                }
             }
             Message::InputHostNetwork(last) => {
                 match last.as_str() {
@@ -263,7 +271,7 @@ where
                 }
             }
             Message::InputError => {
-                //TODO: issue #5
+                // TODO: issue #5
             }
         }
         true
@@ -342,15 +350,11 @@ where
     fn view_input(&self, ctx: &Context<Self>) -> Html {
         let txt = ctx.props().txt.txt.clone();
 
-        let placeholder = if let (Ok(data), Some(notice)) = (
+        let placeholder = if let (Ok(_), Some(notice)) = (
             ctx.props().input_data.try_borrow(),
             ctx.props().input_notice,
         ) {
-            if data.is_empty() {
-                text!(txt, ctx.props().language, notice).to_string()
-            } else {
-                String::new()
-            }
+            text!(txt, ctx.props().language, notice).to_string()
         } else {
             String::new()
         };

@@ -355,7 +355,7 @@ impl Component for Model {
                 }
             }
             Message::InputError => {
-                //TODO: issue #5
+                // TODO: issue #5
             }
         }
         true

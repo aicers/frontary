@@ -55,8 +55,8 @@ impl ToString for Column {
                 let mut display = String::new();
                 for n in nics {
                     display.push_str(&format!(
-                        "{{{}: {}(ip) {}(gw)}} ",
-                        n.name, n.interface_ip, n.gateway_ip
+                        "{{{}: {}(interface) {}(gateway)}} ",
+                        n.name, n.interface, n.gateway
                     ));
                 }
                 display
@@ -85,11 +85,32 @@ pub enum DataType {
     TrustedDomain,
 }
 
+#[derive(Clone, PartialEq, Eq)]
+pub enum ColWidths {
+    Pixel(Vec<Option<u32>>), // None means need to calculate: full width - sum of widths of the other Some(width)
+    Ratio(Vec<Option<f32>>), // None means no need to specify
+}
+
+impl Default for ColWidths {
+    fn default() -> Self {
+        Self::Ratio(Vec::new())
+    }
+}
+
+impl ColWidths {
+    fn len(&self) -> usize {
+        match self {
+            Self::Pixel(v) => v.len(),
+            Self::Ratio(v) => v.len(),
+        }
+    }
+}
+
 #[derive(Clone, Default, PartialEq, Eq)]
 pub struct DisplayInfo {
-    pub width_cols: Vec<Option<u32>>,
-    pub height_cols: Vec<Option<u32>>,
-    pub width_full: u32, // sum of column widths
+    pub widths: Vec<ColWidths>, // The first row, widths[0] should be ColWidths::Pixel
+    pub width_full: u32,        // sum of column widths
     pub width_view: u32, // width for display. if width_full > width_view, x scroll bar shows up.
+    pub height: u32,
     pub titles: Vec<&'static str>,
 }

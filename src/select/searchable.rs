@@ -242,7 +242,7 @@ where
                 }
             }
             Message::InputError => {
-                //TODO: issue #5
+                // TODO: issue #5
                 false
             }
         };

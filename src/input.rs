@@ -54,8 +54,8 @@ pub struct InputTagGroup {
 #[derive(Clone, PartialEq, Eq, Default)]
 pub struct InputNic {
     pub name: String,
-    pub interface_ip: String,
-    pub gateway_ip: String,
+    pub interface: String,
+    pub gateway: String,
 }
 
 #[derive(Clone, PartialEq, Eq, Default)]
@@ -88,7 +88,12 @@ pub enum InputType {
     Radio(Essential, Vec<ViewString>),
     HostNetworkGroup(Essential, HostNetworkKind, Option<usize>, Option<u32>), // (usize, u32) = (# of input, width)
     SelectSingle(Essential, Vec<(String, ViewString)>), // (String, ViewString) = (key, display)
-    SelectMultiple(Essential, Vec<(String, ViewString)>, bool), // (String, ViewString) = (key, display), bool = all selected by default
+    SelectMultiple(
+        Essential,
+        Option<Vec<(String, ViewString)>>, // (String, ViewString) = (key, display)
+        Option<usize>,                     // in case of using the NIC list, the index of data's NIC
+        bool,                              // bool = whether all selected by default
+    ),
     Tag(Essential, HashMap<String, String>), // (String, String) = (key, tag value(name))
     Unsigned32(Essential, u32, u32, Option<u32>), // (u32, u32, Option<u32>) = (min, max, width)
     Percentage(
@@ -117,7 +122,7 @@ impl InputType {
             | Self::Radio(ess, _)
             | Self::HostNetworkGroup(ess, _, _, _)
             | Self::SelectSingle(ess, _)
-            | Self::SelectMultiple(ess, _, _)
+            | Self::SelectMultiple(ess, _, _, _)
             | Self::Tag(ess, _)
             | Self::Unsigned32(ess, _, _, _)
             | Self::Percentage(ess, _, _, _, _)
@@ -135,7 +140,7 @@ impl InputType {
             | Self::Radio(ess, _)
             | Self::HostNetworkGroup(ess, _, _, _)
             | Self::SelectSingle(ess, _)
-            | Self::SelectMultiple(ess, _, _)
+            | Self::SelectMultiple(ess, _, _, _)
             | Self::Tag(ess, _)
             | Self::Unsigned32(ess, _, _, _)
             | Self::Percentage(ess, _, _, _, _)
@@ -172,7 +177,16 @@ impl InputItem {
             InputItem::Tag(group) => *group = InputTagGroup::default(),
             InputItem::Unsigned32(value) => *value = None,
             InputItem::Percentage(value) => *value = None,
-            InputItem::CheckBox(value, _) => *value = CheckStatus::Unchecked,
+            InputItem::CheckBox(value, children) => {
+                *value = CheckStatus::Unchecked;
+                if let Some(children) = children {
+                    for child in children {
+                        if let Ok(mut child) = child.try_borrow_mut() {
+                            child.clear();
+                        }
+                    }
+                }
+            }
             InputItem::Nic(value) => value.clear(),
             InputItem::File(name, content) => {
                 *name = String::new();
