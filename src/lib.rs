@@ -23,7 +23,7 @@ pub use crate::input::{
 };
 pub use crate::language::Language;
 pub use crate::list::{
-    Column, DataType, DisplayInfo, Kind, ListItem, MessageType, SortColumn, WholeList,
+    ColWidths, Column, DataType, DisplayInfo, Kind, ListItem, MessageType, SortColumn, WholeList,
 };
 pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
@@ -222,7 +222,7 @@ impl Default for EndpointKind {
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum SelectionExtraInfo {
     Network(EndpointKind),
-    Basic, // dead code
+    Basic,
 }
 
 pub type RefSelectionExtraInfo = Rc<RefCell<Option<SelectionExtraInfo>>>;

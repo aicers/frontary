@@ -1,9 +1,10 @@
 use super::{
+    super::CheckStatus,
     component::{InvalidMessage, Model, Verification},
     user_input::MAX_PER_LAYER,
     InputItem, InputType,
 };
-use crate::CheckStatus;
+use ipnet::Ipv4Net;
 use passwords::analyzer;
 use std::cell::RefCell;
 use std::collections::HashSet;
@@ -50,7 +51,10 @@ where
                             self.host_network_buffer
                                 .insert(this_index, Rc::new(RefCell::new(data.clone())));
                         }
-                        (InputItem::SelectMultiple(data), InputType::SelectMultiple(_, _, all)) => {
+                        (
+                            InputItem::SelectMultiple(data),
+                            InputType::SelectMultiple(_, _, _, all),
+                        ) => {
                             if *all {
                                 self.select_searchable_buffer
                                     .insert(this_index, Rc::new(RefCell::new(None)));
@@ -84,7 +88,7 @@ where
                                 );
                             }
                         }
-                        // AICE TODO: implement if necessary
+                        // TODO: implement if necessary
                         (_, _) => (),
                     }
                 }
@@ -92,7 +96,13 @@ where
     }
 
     pub(super) fn prepare_default(&mut self, ctx: &Context<Self>) {
-        self.prepare_default_recursive(ctx, &ctx.props().input_data, &ctx.props().input_type, true);
+        self.prepare_default_recursive(
+            ctx,
+            &ctx.props().input_data,
+            &ctx.props().input_type,
+            true,
+            1,
+        );
     }
 
     pub(super) fn prepare_default_recursive(
@@ -101,25 +111,28 @@ where
         input_data: &[Rc<RefCell<InputItem>>],
         input_type: &[Rc<InputType>],
         parent_checked: bool,
+        base_index: usize,
     ) {
         input_data
             .iter()
             .enumerate()
             .zip(input_type.iter())
-            .for_each(|((_index, input_data), input_type)| {
+            .for_each(|((index, input_data), input_type)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     match (&mut *item, &**input_type) {
                         (
                             InputItem::Text(_) | InputItem::Password(_),
-                            InputType::Text(ess, _, _),
+                            InputType::Text(ess, _, _) | InputType::Radio(ess, _),
                         )
-                        | (InputItem::Unsigned32(_), InputType::Unsigned32(ess, _, _, _))
-                        | (InputItem::Percentage(_), InputType::Percentage(ess, _, _, _, _))
                         | (
                             InputItem::HostNetworkGroup(_),
                             InputType::HostNetworkGroup(ess, _, _, _),
                         )
-                        | (InputItem::Tag(_), InputType::Tag(ess, _)) => {
+                        | (InputItem::Tag(_), InputType::Tag(ess, _))
+                        | (InputItem::Unsigned32(_), InputType::Unsigned32(ess, _, _, _))
+                        | (InputItem::Percentage(_), InputType::Percentage(ess, _, _, _, _))
+                        | (InputItem::Nic(_), InputType::Nic(ess))
+                        | (InputItem::File(_, _), InputType::File(ess)) => {
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     *item = default.clone();
@@ -143,7 +156,26 @@ where
                                         data_children,
                                         &children.1,
                                         *checked == CheckStatus::Checked,
+                                        (base_index + index) * MAX_PER_LAYER,
                                     );
+                                }
+                            }
+                        }
+                        (InputItem::SelectSingle(_), InputType::SelectSingle(ess, _)) => {
+                            if let Some(default) = &ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                    let id = base_index + index;
+                                    self.default_to_buffer_select_single(id, default);
+                                }
+                            }
+                        }
+                        (InputItem::SelectMultiple(_), InputType::SelectMultiple(ess, _, _, _)) => {
+                            if let Some(default) = &ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                    let id = base_index + index;
+                                    self.default_to_buffer_select_multiple(id, default);
                                 }
                             }
                         }
@@ -151,6 +183,32 @@ where
                     }
                 }
             });
+    }
+
+    pub(super) fn default_to_buffer_select_single(&mut self, id: usize, default: &InputItem) {
+        if let (InputItem::SelectSingle(Some(default)), Some(buffer)) =
+            (default, self.select_searchable_buffer.get(&id))
+        {
+            if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                if !default.is_empty() {
+                    let mut value: HashSet<String> = HashSet::new();
+                    value.insert(default.clone());
+                    *buffer = Some(value);
+                }
+            }
+        }
+    }
+
+    pub(super) fn default_to_buffer_select_multiple(&mut self, id: usize, default: &InputItem) {
+        if let (InputItem::SelectMultiple(default), Some(buffer)) =
+            (default, self.select_searchable_buffer.get(&id))
+        {
+            if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                if !default.is_empty() {
+                    *buffer = Some(default.clone());
+                }
+            }
+        }
     }
 
     pub(super) fn decide_required_all(&mut self, ctx: &Context<Self>) -> bool {
@@ -182,15 +240,38 @@ where
                     if parent_checked && (*input_type).required() {
                         let empty = match &(*item) {
                             InputItem::Text(txt) => txt.is_empty(),
-                            InputItem::HostNetworkGroup(n) => n.is_empty(),
-                            InputItem::Unsigned32(v) => v.is_none(),
-                            InputItem::Percentage(v) => v.is_none(),
                             InputItem::Password(pw) => {
                                 // HIGHLIGHT: In case of Edit, empty means no change of passwords
                                 ctx.props().input_id.is_none() && pw.is_empty()
                             }
+                            InputItem::HostNetworkGroup(n) => {
+                                // HIGHTLIGHT: if empty, HostNetworkHtml may return Message::RightHostNetworkGroup
+                                n.is_empty()
+                                    && self
+                                        .verification_host_network
+                                        .get(&(base_index + index))
+                                        .map_or(false, |v| v.map_or(true, |v| v))
+                            }
+                            InputItem::SelectSingle(s) => s.is_none(),
+                            InputItem::SelectMultiple(s) => s.is_empty(),
+                            InputItem::Unsigned32(v) => v.is_none(),
+                            InputItem::Percentage(v) => v.is_none(),
+                            InputItem::CheckBox(s, _) => *s == CheckStatus::Unchecked,
+                            InputItem::Nic(n) => n
+                                .iter()
+                                .find_map(|n| {
+                                    if !n.name.is_empty()
+                                        || !n.interface.is_empty()
+                                        || !n.gateway.is_empty()
+                                    {
+                                        Some(true)
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .is_none(),
                             InputItem::File(_, content) => content.is_empty(),
-                            _ => false,
+                            InputItem::Tag(_) => false,
                         };
                         if empty {
                             self.required_msg.insert(base_index + index);
@@ -246,6 +327,8 @@ where
             .zip(input_type.iter())
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(input_data) = input_data.try_borrow() {
+                    // HIGHTLIGHT: All kinds are not necessarily to be verified.
+                    // HIGHTLIGHT: Since HostNetworkGroup items were verified yet, they don't need to be verified here.
                     match (&*input_data, &**input_type) {
                         (
                             InputItem::Unsigned32(Some(value)),
@@ -312,7 +395,7 @@ where
                         (InputItem::Nic(nics), InputType::Nic(_)) => {
                             if parent_checked {
                                 for (i, nic) in nics.iter().enumerate() {
-                                    if !nic.interface_ip.is_empty() || !nic.gateway_ip.is_empty() {
+                                    if !nic.interface.is_empty() || !nic.gateway.is_empty() {
                                         if nic.name.is_empty() {
                                             self.verification_nic.insert(
                                                 ((base_index + index) * MAX_PER_LAYER + i, 0),
@@ -322,37 +405,35 @@ where
                                             );
                                             rtn = false;
                                         }
-                                        if nic.interface_ip.is_empty() {
+                                        if nic.interface.is_empty() {
                                             self.verification_nic.insert(
                                                 ((base_index + index) * MAX_PER_LAYER + i, 1),
                                                 Verification::Invalid(
-                                                    InvalidMessage::InterfaceIpRequired,
+                                                    InvalidMessage::InterfaceRequired,
                                                 ),
                                             );
                                             rtn = false;
-                                        } else if Ipv4Addr::from_str(&nic.interface_ip).is_err() {
+                                        } else if Ipv4Net::from_str(&nic.interface).is_err() {
                                             self.verification_nic.insert(
                                                 ((base_index + index) * MAX_PER_LAYER + i, 1),
                                                 Verification::Invalid(
-                                                    InvalidMessage::WrongInterfaceIp,
+                                                    InvalidMessage::WrongInterface,
                                                 ),
                                             );
                                             rtn = false;
                                         }
-                                        if nic.gateway_ip.is_empty() {
+                                        if nic.gateway.is_empty() {
                                             self.verification_nic.insert(
                                                 ((base_index + index) * MAX_PER_LAYER + i, 2),
                                                 Verification::Invalid(
-                                                    InvalidMessage::GatewayIpRequired,
+                                                    InvalidMessage::GatewayRequired,
                                                 ),
                                             );
                                             rtn = false;
-                                        } else if Ipv4Addr::from_str(&nic.gateway_ip).is_err() {
+                                        } else if Ipv4Addr::from_str(&nic.gateway).is_err() {
                                             self.verification_nic.insert(
                                                 ((base_index + index) * MAX_PER_LAYER + i, 2),
-                                                Verification::Invalid(
-                                                    InvalidMessage::WrongGatewayIp,
-                                                ),
+                                                Verification::Invalid(InvalidMessage::WrongGateway),
                                             );
                                             rtn = false;
                                         }
@@ -360,14 +441,12 @@ where
                                         self.verification_nic.insert(
                                             ((base_index + index) * MAX_PER_LAYER + i, 1),
                                             Verification::Invalid(
-                                                InvalidMessage::InterfaceIpRequired,
+                                                InvalidMessage::InterfaceRequired,
                                             ),
                                         );
                                         self.verification_nic.insert(
                                             ((base_index + index) * MAX_PER_LAYER + i, 2),
-                                            Verification::Invalid(
-                                                InvalidMessage::GatewayIpRequired,
-                                            ),
+                                            Verification::Invalid(InvalidMessage::GatewayRequired),
                                         );
                                         rtn = false;
                                     }
@@ -378,14 +457,16 @@ where
                             InputItem::CheckBox(checked, Some(data_children)),
                             InputType::CheckBox(_, _, Some(type_children)),
                         ) => {
-                            if *checked != CheckStatus::Unchecked {
-                                rtn = self.verify_recursive(
+                            if *checked != CheckStatus::Unchecked
+                                && !self.verify_recursive(
                                     ctx,
                                     data_children,
                                     &type_children.1,
                                     (base_index + index) * MAX_PER_LAYER,
                                     *checked == CheckStatus::Checked,
-                                );
+                                )
+                            {
+                                rtn = false;
                             }
                         }
                         (_, _) => (),
@@ -394,6 +475,48 @@ where
             });
 
         rtn
+    }
+
+    pub(super) fn trim_nic(&mut self, ctx: &Context<Self>) {
+        self.trim_nic_recursive(ctx, &ctx.props().input_data, &ctx.props().input_type, 1);
+    }
+
+    pub(super) fn trim_nic_recursive(
+        &mut self,
+        ctx: &Context<Self>,
+        input_data: &[Rc<RefCell<InputItem>>],
+        input_type: &[Rc<InputType>],
+        base_index: usize,
+    ) {
+        input_data
+            .iter()
+            .enumerate()
+            .zip(input_type.iter())
+            .for_each(|((index, input_data), input_type)| {
+                if let Ok(mut input_data) = input_data.try_borrow_mut() {
+                    if let InputItem::Nic(nics) = &mut *input_data {
+                        nics.retain(|n| {
+                            !n.name.is_empty() && !n.interface.is_empty() && !n.gateway.is_empty()
+                        });
+                    }
+                }
+                if let Ok(input_data) = input_data.try_borrow() {
+                    if let (
+                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputType::CheckBox(_, _, Some(type_children)),
+                    ) = (&*input_data, &**input_type)
+                    {
+                        if *checked != CheckStatus::Unchecked {
+                            self.trim_nic_recursive(
+                                ctx,
+                                data_children,
+                                &type_children.1,
+                                (base_index + index) * MAX_PER_LAYER,
+                            );
+                        }
+                    }
+                }
+            });
     }
 
     pub(super) fn propagate_checkbox(
@@ -488,13 +611,38 @@ where
             {
                 if let (Some(children), Some(type_children)) = (children, type_children) {
                     for (index, child) in children.iter().enumerate() {
-                        if let (Ok(c), Some(t)) =
+                        if let (Ok(mut c), Some(t)) =
                             (child.try_borrow_mut(), type_children.1.get(index))
                         {
-                            if let (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) =
-                                (&(*c), &**t)
-                            {
-                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                            match (&(*c), &**t) {
+                                (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) => {
+                                    propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                                }
+                                (
+                                    InputItem::Text(_),
+                                    InputType::Text(ess, _, _) | InputType::Radio(ess, _),
+                                )
+                                | (
+                                    InputItem::HostNetworkGroup(_),
+                                    InputType::HostNetworkGroup(ess, _, _, _),
+                                )
+                                | (InputItem::SelectSingle(_), InputType::SelectSingle(ess, _))
+                                | (
+                                    InputItem::SelectMultiple(_),
+                                    InputType::SelectMultiple(ess, _, _, _),
+                                )
+                                | (InputItem::Tag(_), InputType::Tag(ess, _))
+                                | (InputItem::Unsigned32(_), InputType::Unsigned32(ess, _, _, _))
+                                | (
+                                    InputItem::Percentage(_),
+                                    InputType::Percentage(ess, _, _, _, _),
+                                )
+                                | (InputItem::Nic(_), InputType::Nic(ess)) => {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                                (_, _) => (),
                             }
                         }
                     }
@@ -570,6 +718,62 @@ where
         }
 
         final_checked
+    }
+
+    pub(super) fn reset_veri_host_network(&mut self, ctx: &Context<Self>) {
+        self.verification_host_network.clear();
+
+        self.reset_veri_host_network_recursive(
+            ctx,
+            &ctx.props().input_data,
+            &ctx.props().input_type,
+            1,
+            true,
+        );
+    }
+
+    pub(super) fn reset_veri_host_network_recursive(
+        &mut self,
+        ctx: &Context<Self>,
+        input_data: &[Rc<RefCell<InputItem>>],
+        input_type: &[Rc<InputType>],
+        base_index: usize,
+        parent_checked: bool,
+    ) {
+        input_data
+            .iter()
+            .enumerate()
+            .zip(input_type.iter())
+            .for_each(|((index, input_data), input_type)| {
+                if let Ok(input_data) = input_data.try_borrow() {
+                    if parent_checked {
+                        if let (
+                            InputItem::HostNetworkGroup(_),
+                            InputType::HostNetworkGroup(_, _, _, _),
+                        ) = (&*input_data, &**input_type)
+                        {
+                            self.verification_host_network
+                                .insert(base_index + index, None);
+                        }
+                    }
+
+                    if let (
+                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputType::CheckBox(_, _, Some(type_children)),
+                    ) = (&*input_data, &**input_type)
+                    {
+                        if *checked != CheckStatus::Unchecked {
+                            self.reset_veri_host_network_recursive(
+                                ctx,
+                                data_children,
+                                &type_children.1,
+                                (base_index + index) * MAX_PER_LAYER,
+                                *checked == CheckStatus::Checked,
+                            );
+                        }
+                    }
+                }
+            });
     }
 }
 

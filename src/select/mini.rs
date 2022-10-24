@@ -20,7 +20,7 @@ pub enum Kind {
     MoreActionNoImage,
     SortList,
     Round,
-    Soft, // dead code if ai-model is not included
+    Soft,
 }
 
 pub enum Message {

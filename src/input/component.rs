@@ -31,10 +31,10 @@ pub(super) enum InvalidMessage {
     PasswordHasConsecutiveLetters,
     PasswordHasAdjacentLetters,
     InterfaceNameRequired,
-    InterfaceIpRequired,
-    GatewayIpRequired,
-    WrongInterfaceIp,
-    WrongGatewayIp,
+    InterfaceRequired,
+    GatewayRequired,
+    WrongInterface,
+    WrongGateway,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -61,6 +61,7 @@ pub struct Model<T> {
 
     pub(super) verification: HashMap<usize, Verification>,
     pub(super) verification_nic: HashMap<(usize, usize), Verification>, // 2nd usize: 0 -> name, 1 -> interface ip, 2 -> gateway ip
+    pub(super) verification_host_network: HashMap<usize, Option<bool>>, // None means no checking done yet, Some(true) valid Some(false) invalid
     pub(super) verify_host_network_group: bool,
 
     file_data_id: Option<usize>,
@@ -89,6 +90,7 @@ where
             && self.required_msg == other.required_msg
             && self.verification == other.verification
             && self.verification_nic == other.verification_nic
+            && self.verification_host_network == other.verification_host_network
             && self.verify_host_network_group == other.verify_host_network_group
             && self.file_data_id == other.file_data_id
             && self.file_input_data == other.file_input_data
@@ -110,6 +112,7 @@ impl<T> Clone for Model<T> {
             required_msg: self.required_msg.clone(),
             verification: self.verification.clone(),
             verification_nic: self.verification_nic.clone(),
+            verification_host_network: self.verification_host_network.clone(),
             verify_host_network_group: self.verify_host_network_group,
             file_data_id: self.file_data_id,
             file_input_data: self.file_input_data.clone(),
@@ -148,15 +151,16 @@ pub enum Message {
     InputMultipleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
     InputSingleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
     InputTagGroup(usize, Rc<RefCell<InputItem>>),
-    WrongHostNetworkGroup,
+    UserInputHostNetworkGroup(usize),
+    WrongHostNetworkGroup(usize),
     RightHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
     ClickCheckBox(Rc<RefCell<InputItem>>),
     InputNicName(usize, usize, String, Rc<RefCell<InputItem>>),
-    InputNicInterfaceIp(usize, usize, String, Rc<RefCell<InputItem>>),
-    InputNicGatewayIp(usize, usize, String, Rc<RefCell<InputItem>>),
+    InputNicInterface(usize, usize, String, Rc<RefCell<InputItem>>),
+    InputNicGateway(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicAdd(usize, usize, Rc<RefCell<InputItem>>),
     InputNicDelete(usize, usize, Rc<RefCell<InputItem>>),
-    // AICE TODO: extend multiple files
+    // TODO: extend multiple files
     ChooseFile(usize, Vec<File>, Rc<RefCell<InputItem>>),
     FileLoaded(String, Vec<u8>),
     FailLoadFile,
@@ -183,15 +187,16 @@ impl Clone for Message {
             }
             Self::InputSingleSelect(a, b, c) => Self::InputSingleSelect(*a, b.clone(), c.clone()),
             Self::InputTagGroup(a, b) => Self::InputTagGroup(*a, b.clone()),
-            Self::WrongHostNetworkGroup => Self::WrongHostNetworkGroup,
+            Self::UserInputHostNetworkGroup(a) => Self::UserInputHostNetworkGroup(*a),
             Self::RightHostNetworkGroup(a, b) => Self::RightHostNetworkGroup(*a, b.clone()),
+            Self::WrongHostNetworkGroup(a) => Self::WrongHostNetworkGroup(*a),
             Self::ClickCheckBox(a) => Self::ClickCheckBox(a.clone()),
             Self::InputNicName(a, b, c, d) => Self::InputNicName(*a, *b, c.clone(), d.clone()),
-            Self::InputNicInterfaceIp(a, b, c, d) => {
-                Self::InputNicInterfaceIp(*a, *b, c.clone(), d.clone())
+            Self::InputNicInterface(a, b, c, d) => {
+                Self::InputNicInterface(*a, *b, c.clone(), d.clone())
             }
-            Self::InputNicGatewayIp(a, b, c, d) => {
-                Self::InputNicGatewayIp(*a, *b, c.clone(), d.clone())
+            Self::InputNicGateway(a, b, c, d) => {
+                Self::InputNicGateway(*a, *b, c.clone(), d.clone())
             }
             Self::InputNicAdd(a, b, c) => Self::InputNicAdd(*a, *b, c.clone()),
             Self::InputNicDelete(a, b, c) => Self::InputNicDelete(*a, *b, c.clone()),
@@ -210,9 +215,10 @@ impl PartialEq for Message {
             | (Self::Save, Self::Save)
             | (Self::TrySave, Self::TrySave)
             | (Self::InvalidInputUnsigned32, Self::InvalidInputUnsigned32)
-            | (Self::WrongHostNetworkGroup, Self::WrongHostNetworkGroup)
             | (Self::FailLoadFile, Self::FailLoadFile)
             | (Self::InputError, Self::InputError) => true,
+            (Self::UserInputHostNetworkGroup(s1), Self::UserInputHostNetworkGroup(o1))
+            | (Self::WrongHostNetworkGroup(s1), Self::WrongHostNetworkGroup(o1)) => s1 == o1,
             (Self::InputText(s1, s2, s3), Self::InputText(o1, o2, o3))
             | (Self::InputPassword(s1, s2, s3), Self::InputPassword(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
@@ -235,13 +241,10 @@ impl PartialEq for Message {
             }
             (Self::ClickCheckBox(s), Self::ClickCheckBox(o)) => s == o,
             (Self::InputNicName(s1, s2, s3, s4), Self::InputNicName(o1, o2, o3, o4))
-            | (Self::InputNicGatewayIp(s1, s2, s3, s4), Self::InputNicGatewayIp(o1, o2, o3, o4)) => {
+            | (Self::InputNicGateway(s1, s2, s3, s4), Self::InputNicGateway(o1, o2, o3, o4))
+            | (Self::InputNicInterface(s1, s2, s3, s4), Self::InputNicInterface(o1, o2, o3, o4)) => {
                 s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4
             }
-            (
-                Self::InputNicInterfaceIp(s1, s2, s3, s4),
-                Self::InputNicInterfaceIp(o1, o2, o3, o4),
-            ) => s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4,
             (Self::InputNicAdd(s1, s2, s3), Self::InputNicAdd(o1, o2, o3))
             | (Self::InputNicDelete(s1, s2, s3), Self::InputNicDelete(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
@@ -302,6 +305,7 @@ where
 
             verification: HashMap::new(),
             verification_nic: HashMap::new(),
+            verification_host_network: HashMap::new(),
             verify_host_network_group: false,
 
             file_data_id: None,
@@ -384,31 +388,40 @@ where
             }
             Message::TrySave => {
                 self.increase_rerender_serial();
-                ctx.props().input_type.iter().for_each(|input_type| {
-                    if let InputType::HostNetworkGroup(_, _, _, _) = **input_type {
-                        self.verify_host_network_group = true;
-                    }
-                });
+                self.reset_veri_host_network(ctx);
+                self.verify_host_network_group = !self.verification_host_network.is_empty();
+
                 if !self.verify_host_network_group {
                     ctx.link().send_message(Message::Save);
                     return false;
                 }
             }
-            Message::WrongHostNetworkGroup => {
-                self.verify_host_network_group = false;
+            Message::WrongHostNetworkGroup(id) => {
+                self.verification_host_network.insert(id, Some(false));
+                self.clear_required_msg(id, false);
                 self.decide_required_all(ctx);
                 self.decide_unique_all(ctx);
             }
             Message::RightHostNetworkGroup(id, input_data) => {
-                self.verify_host_network_group = false;
+                self.verification_host_network.insert(id, Some(true));
                 self.input_host_network_group(id, &input_data);
-                ctx.link().send_message(Message::Save);
+                if !self
+                    .verification_host_network
+                    .values()
+                    .any(|v| (*v).map_or(true, |v| !v))
+                {
+                    // HIGHLIGHT: Only if all of the HostNetworkGroup items are valid, proceed to save the user input
+                    self.verify_host_network_group = false;
+                    ctx.link().send_message(Message::Save);
+                }
             }
             Message::Save => {
                 let required = self.decide_required_all(ctx);
                 let unique = self.decide_unique_all(ctx);
                 let verify = self.verify(ctx);
+
                 if !required && !unique && verify {
+                    self.trim_nic(ctx);
                     if let Some(parent) = ctx.link().get_parent() {
                         parent
                             .clone()
@@ -464,6 +477,9 @@ where
             }
             Message::InputHostNetworkGroup(id, input_data) => {
                 self.input_host_network_group(id, &input_data);
+            }
+            Message::UserInputHostNetworkGroup(id) => {
+                self.clear_required_msg(id, false);
             }
             Message::InputMultipleSelect(id, input_data, list) => {
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
@@ -593,30 +609,33 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            (*nic).name = name;
+                            (*nic).name = name.clone();
                         }
                     }
                 }
+                self.clear_required_msg(data_id, name.is_empty());
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
-            Message::InputNicInterfaceIp(data_id, nic_id, ip, input_data) => {
+            Message::InputNicInterface(data_id, nic_id, interface, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            (*nic).interface_ip = ip;
+                            (*nic).interface = interface.clone();
                         }
                     }
                 }
+                self.clear_required_msg(data_id, interface.is_empty());
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
-            Message::InputNicGatewayIp(data_id, nic_id, ip, input_data) => {
+            Message::InputNicGateway(data_id, nic_id, gateway, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            (*nic).gateway_ip = ip;
+                            (*nic).gateway = gateway.clone();
                         }
                     }
                 }
+                self.clear_required_msg(data_id, gateway.is_empty());
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
             Message::InputNicAdd(data_id, nic_id, input_data) => {
@@ -639,7 +658,7 @@ where
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
             Message::InputError => {
-                //TODO: issue #5
+                // TODO: issue #5
             }
             Message::ChooseFile(data_id, files, input_data) => {
                 for file in files {
@@ -673,7 +692,7 @@ where
                 self.file_reader = None;
             }
             Message::FailLoadFile => {
-                // AICE TODO: show a message for users
+                // TODO: show a message for users
                 return false;
             }
         }
@@ -737,8 +756,8 @@ where
                     InputType::Password(ess,width) => self.view_password(ctx, ess, *width, input_data, index, 1, index == 0),
                     InputType::Radio(ess, options) => self.view_radio(ctx, ess, options, input_data, index, 1),
                     InputType::HostNetworkGroup(ess, kind, num, width) => self.view_host_network_group(ctx, ess, *kind, *num, *width, input_data, index, 1),
-                    InputType::SelectMultiple(ess, list, _) => self.view_select_searchable(ctx, true, ess, list, input_data, index, 1),
-                    InputType::SelectSingle(ess, list) => self.view_select_searchable(ctx, false, ess, list, input_data, index, 1),
+                    InputType::SelectMultiple(ess, list, nics, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
+                    InputType::SelectSingle(ess, list) => self.view_select_searchable(ctx, false, ess, list, input_data, index, 1, 0),
                     InputType::Tag(ess, list) => self.view_tag_group(ctx, ess, list, input_data, index, 1),
                     InputType::Unsigned32(ess, min, max, width) => self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, index, 1, index == 0),
                     InputType::Percentage(ess, min, max, decimals, width) => self.view_percentage(ctx, ess, *min, *max, *decimals, *width, input_data, index, 1, index == 0),
@@ -750,7 +769,7 @@ where
                                 Some(true)
                             }
                         });
-                        self.view_checkbox(ctx, ess, *always, children, input_data, index, 1, both)
+                        self.view_checkbox(ctx, ess, *always, children, input_data, index, 1, both, 1)
                     }
                     InputType::Nic(ess) => self.view_nic(ctx, ess, input_data, index, 1),
                     InputType::File(ess) => self.view_file(ctx, ess, input_data, index, 1),

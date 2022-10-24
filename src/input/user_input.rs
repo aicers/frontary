@@ -40,7 +40,9 @@ const PASSWD_REQUIREMENT: &str = if cfg!(feature = "cc-password") {
 } else {
     "no spaces, more than 7 characters, at least one number/uppercase/lowercase/special characters"
 };
-
+const INTERFACE_NOTICE: &str = "x.x.x.x/x";
+const GATEWAY_NOTICE: &str = "x.x.x.x";
+const SELECT_NIC_WIDTH: u32 = 130;
 pub(super) const MAX_PER_LAYER: usize = 20;
 
 impl<T> Model<T>
@@ -85,9 +87,9 @@ where
         };
 
         let class = if self.required_msg.contains(&(base_index + layer_index)) {
-            "input-text-alert"
+            "frontary-input-text-alert"
         } else {
-            "input-text"
+            "frontary-input-text"
         };
         let style = format!(
             "width: {};",
@@ -585,7 +587,8 @@ where
                         input_notice={Some(ess.notice)}
                         parent_message={Some(Message::InputHostNetworkGroup(base_index + layer_index, input_data.clone()))}
                         parent_message_save={Some(Message::RightHostNetworkGroup(base_index + layer_index, input_data.clone()))}
-                        parent_message_no_save={Some(Message::WrongHostNetworkGroup)}
+                        parent_message_no_save={Some(Message::WrongHostNetworkGroup(base_index + layer_index))}
+                        parent_message_user_input={Some(Message::UserInputHostNetworkGroup(base_index + layer_index))}
                         verify_to_save={self.verify_host_network_group}
                     />
                     { self.view_required_msg(ctx, base_index + layer_index) }
@@ -607,6 +610,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
+        depth: u32,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let list_clone = Rc::new(list.to_vec());
@@ -628,6 +632,11 @@ where
             }
         });
         let list = Rc::new(RefCell::new(list));
+        let top_width = if depth > 0 {
+            SELECT_NIC_WIDTH
+        } else {
+            ctx.props().width - PADDING_SUM
+        };
         if let Some(selected) = self
             .select_searchable_buffer
             .get(&(base_index + layer_index))
@@ -637,45 +646,46 @@ where
                     <div class="input-contents-item-general-title">
                         { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
                     </div>
-                {
-                    if multiple {
-                        html! {
-                            <SelectSearchable<Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                id={format!("select-searchable-{}-{}", base_index, layer_index)}
-                                kind={SelectSearchableKind::Multi}
-                                title={ess.title}
-                                empty_msg={ess.notice}
-                                top_width={ctx.props().width - PADDING_SUM}
-                                max_height={200}
-                                font="13px 'Spoqa Han Sans Neo'"
-                                list={Rc::clone(&list)}
-                                selected={Rc::clone(selected)}
-                                allow_empty={!ess.required}
-                                parent_message={Some(Message::InputMultipleSelect(base_index + layer_index, input_data.clone(), Rc::clone(&list_clone)))}
-                            />
-                        }
-                    } else {
-                        html! {
-                            <SelectSearchable<Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                id={format!("select-searchable-{}-{}", base_index, layer_index)}
-                                kind={SelectSearchableKind::Single}
-                                title={ess.title}
-                                empty_msg={ess.notice}
-                                top_width={ctx.props().width - PADDING_SUM}
-                                max_height={200}
-                                font="13px 'Spoqa Han Sans Neo'"
-                                list={Rc::clone(&list)}
-                                selected={Rc::clone(selected)}
-                                allow_empty={!ess.required}
-                                parent_message={Some(Message::InputSingleSelect(base_index + layer_index, input_data.clone(), Rc::clone(&list_clone)))}
-                            />
+                    {
+                        if multiple {
+                            html! {
+                                <SelectSearchable<Self>
+                                    txt={ctx.props().txt.clone()}
+                                    language={ctx.props().language}
+                                    id={format!("select-searchable-{}-{}", base_index, layer_index)}
+                                    kind={SelectSearchableKind::Multi}
+                                    title={ess.title}
+                                    empty_msg={ess.notice}
+                                    top_width={top_width}
+                                    max_height={200}
+                                    font="13px 'Spoqa Han Sans Neo'"
+                                    list={Rc::clone(&list)}
+                                    selected={Rc::clone(selected)}
+                                    allow_empty={!ess.required}
+                                    parent_message={Some(Message::InputMultipleSelect(base_index + layer_index, input_data.clone(), Rc::clone(&list_clone)))}
+                                />
+                            }
+                        } else {
+                            html! {
+                                <SelectSearchable<Self>
+                                    txt={ctx.props().txt.clone()}
+                                    language={ctx.props().language}
+                                    id={format!("select-searchable-{}-{}", base_index, layer_index)}
+                                    kind={SelectSearchableKind::Single}
+                                    title={ess.title}
+                                    empty_msg={ess.notice}
+                                    top_width={top_width}
+                                    max_height={200}
+                                    font="13px 'Spoqa Han Sans Neo'"
+                                    list={Rc::clone(&list)}
+                                    selected={Rc::clone(selected)}
+                                    allow_empty={!ess.required}
+                                    parent_message={Some(Message::InputSingleSelect(base_index + layer_index, input_data.clone(), Rc::clone(&list_clone)))}
+                                />
+                            }
                         }
                     }
-                }
+                    { self.view_required_msg(ctx, base_index + layer_index) }
                 </div>
             }
         } else {
@@ -728,6 +738,7 @@ where
         layer_index: usize,
         base_index: usize,
         both_border: Option<bool>,
+        depth: u32,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let input_data_msg = input_data.clone();
@@ -830,7 +841,7 @@ where
                                                         <div class={class_child}>
                                                             <div class={class_line}>
                                                             </div>
-                                                            { self.view_checkbox(ctx, ess, *always, children, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None) }
+                                                            { self.view_checkbox(ctx, ess, *always, children, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
                                                         </div>
                                                     }
                                                 }
@@ -849,6 +860,15 @@ where
                                                             <div class={class_line}>
                                                             </div>
                                                             { self.view_unsigned_32(ctx, ess, *min, *max, *width, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false) }
+                                                        </div>
+                                                    }
+                                                }
+                                                InputType::SelectMultiple(ess, list, nics, _) => {
+                                                    html! {
+                                                        <div class={class_child}>
+                                                            <div class={class_line}>
+                                                            </div>
+                                                            { self.view_select_nic_or(ctx, list, *nics, ess, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
                                                         </div>
                                                     }
                                                 }
@@ -914,6 +934,7 @@ where
                             })
                         }
                         </table>
+                        { self.view_required_msg(ctx, base_index + layer_index) }
                     </div>
                 }
             } else {
@@ -921,6 +942,75 @@ where
             }
         } else {
             html! {}
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn view_select_nic_or(
+        &self,
+        ctx: &Context<Self>,
+        list: &Option<Vec<(String, ViewString)>>,
+        nics: Option<usize>,
+        ess: &InputEssential,
+        input_data: &Rc<RefCell<InputItem>>,
+        layer_index: usize,
+        base_index: usize,
+        depth: u32,
+    ) -> Html {
+        match (list, nics) {
+            (Some(list), None) => self.view_select_searchable(
+                ctx,
+                true,
+                ess,
+                list,
+                input_data,
+                layer_index,
+                base_index,
+                depth,
+            ),
+            (None, Some(nics)) => {
+                let list = if let Some(nics) = ctx.props().input_data.get(nics) {
+                    if let Ok(nics) = nics.try_borrow() {
+                        if let InputItem::Nic(nics) = &*nics {
+                            Some(
+                                nics.iter()
+                                    .filter_map(|nics| {
+                                        if nics.name.is_empty() {
+                                            None
+                                        } else {
+                                            Some((
+                                                nics.name.clone(),
+                                                ViewString::Raw(nics.name.clone()),
+                                            ))
+                                        }
+                                    })
+                                    .collect::<Vec<(String, ViewString)>>(),
+                            )
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+                if let Some(list) = list {
+                    self.view_select_searchable(
+                        ctx,
+                        true,
+                        ess,
+                        &list,
+                        input_data,
+                        layer_index,
+                        base_index,
+                        depth,
+                    )
+                } else {
+                    html! {}
+                }
+            }
+            _ => html! {},
         }
     }
 
@@ -958,7 +1048,7 @@ where
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    Message::InputNicInterfaceIp(
+                    Message::InputNicInterface(
                         base_index + layer_index,
                         nic_index,
                         input.value(),
@@ -970,7 +1060,7 @@ where
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    Message::InputNicGatewayIp(
+                    Message::InputNicGateway(
                         base_index + layer_index,
                         nic_index,
                         input.value(),
@@ -989,12 +1079,7 @@ where
             Message::InputNicAdd(base_index, layer_index, input_data_clone_5.clone())
         });
         let txt = ctx.props().txt.txt.clone();
-        let name_holder = nic
-            .name
-            .is_empty()
-            .then(|| text!(txt, ctx.props().language, "Name").to_string());
-        let interface_holder = nic.name.is_empty().then_some("x.x.x.x");
-        let gateway_holder = nic.name.is_empty().then_some("x.x.x.x");
+        let name_holder = text!(txt, ctx.props().language, "Name").to_string();
 
         let (name_msg, interface_msg, gateway_msg) = (
             self.verification_nic
@@ -1010,26 +1095,23 @@ where
             } else {
                 None
             };
-        let interface_msg =
-            if let Some(Verification::Invalid(InvalidMessage::InterfaceIpRequired)) = interface_msg
-            {
-                Some("Required")
-            } else if let Some(Verification::Invalid(InvalidMessage::WrongInterfaceIp)) =
-                interface_msg
-            {
-                Some("Wrong input")
-            } else {
-                None
-            };
-        let gateway_msg = if let Some(Verification::Invalid(InvalidMessage::GatewayIpRequired)) =
-            gateway_msg
+        let interface_msg = if let Some(Verification::Invalid(InvalidMessage::InterfaceRequired)) =
+            interface_msg
         {
             Some("Required")
-        } else if let Some(Verification::Invalid(InvalidMessage::WrongGatewayIp)) = gateway_msg {
+        } else if let Some(Verification::Invalid(InvalidMessage::WrongInterface)) = interface_msg {
             Some("Wrong input")
         } else {
             None
         };
+        let gateway_msg =
+            if let Some(Verification::Invalid(InvalidMessage::GatewayRequired)) = gateway_msg {
+                Some("Required")
+            } else if let Some(Verification::Invalid(InvalidMessage::WrongGateway)) = gateway_msg {
+                Some("Wrong input")
+            } else {
+                None
+            };
         let msg = name_msg.is_some() || interface_msg.is_some() || gateway_msg.is_some();
         let (class, class_delete) = if is_last {
             ("input-nic-input-last", "input-nic-delete-last")
@@ -1046,7 +1128,7 @@ where
                                 <input type="text"
                                     class={classes!("input-nic", "input-nic-name")}
                                     value={nic.name.clone()}
-                                    placeholder={name_holder.unwrap_or_default()}
+                                    placeholder={name_holder}
                                     oninput={oninput_name}
                                 />
                             {
@@ -1068,8 +1150,8 @@ where
                             <div class="input-nic-input-interface">
                                 <input type="text"
                                     class={classes!("input-nic", "input-nic-interface")}
-                                    value={nic.interface_ip.clone()}
-                                    placeholder={interface_holder.unwrap_or("")}
+                                    value={nic.interface.clone()}
+                                    placeholder={INTERFACE_NOTICE}
                                     oninput={oninput_interface}
                                 />
                             {
@@ -1091,8 +1173,8 @@ where
                             <div class="input-nic-input-gateway">
                                 <input type="text"
                                     class={classes!("input-nic", "input-nic-gateway")}
-                                    placeholder={gateway_holder.unwrap_or("")}
-                                    value={nic.gateway_ip.clone()}
+                                    placeholder={GATEWAY_NOTICE}
+                                    value={nic.gateway.clone()}
                                     oninput={oninput_gateway}
                                 />
                                 {
@@ -1145,7 +1227,7 @@ where
         let onchange = ctx.link().callback(move |e: Event| {
             let mut result = Vec::new();
             let input: HtmlInputElement = e.target_unchecked_into();
-            // AICE TODO: the below `expect` is inevitable? Refer the below example code.
+            // TODO: the below `expect` is inevitable? Refer the below example code.
             // if let Some(files) = input.files() {
             //     let files = js_sys::try_iter(&files)
             //         .unwrap()

@@ -224,7 +224,7 @@ where
                 if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
                     data.delete = Some(key);
                 }
-                // AICE TODO: revive this if necessary
+                // TODO: revive this if necessary
                 // self.reset_search_list(ctx);
                 Self::buffer_to_input(ctx);
             }
@@ -264,7 +264,7 @@ where
                 self.edit = None;
             }
             Message::InputError => {
-                //TODO: issue #5
+                // TODO: issue #5
             }
         }
         true
