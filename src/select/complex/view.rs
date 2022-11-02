@@ -53,9 +53,9 @@ impl Model {
                             <td class="complex-select-pop-head-text" style={style_head_title}>
                                 { text!(txt, ctx.props().language, &ctx.props().title) }
                                 { decode_html(NBSP).expect("safely-selected character") }
-                                <font style="color: #B5131A;">
+                                <span class="complex-select-pop-head-color">
                                     { "(" } { Self::selected_len(ctx) } { ")" }
-                                </font>
+                                </span>
                             </td>
                             <td class="complex-select-pop-head-close" onclick={onclick_close}>
                                 <div class="complex-select-pop-head-close-icon">

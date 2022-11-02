@@ -235,9 +235,9 @@ where
                                                     <td colspan={cols} class="list-whole-list-first-layer">
                                                         { item.columns.first().map_or_else(|| html! {}, |n| Self::view_column(ctx, index, n)) }
                                                         { decode_html(NBSP.repeat(3).as_str()).expect("safely-selected character") }
-                                                        <font class="list-whole-list-first-layer-light">
+                                                        <span class="list-whole-list-first-layer-light">
                                                             { item.columns.get(1).map_or_else(|| html! {}, |d| Self::view_column(ctx, index, d)) }
-                                                        </font>
+                                                        </span>
                                                     </td>
                                                     <td class="list-whole-list-first-layer-more-action">
                                                         <div class="list-whole-list-flat-more-action">
@@ -748,9 +748,9 @@ fn view_list_sep_dot(list: &[String], br: bool) -> Html {
                     if index < list.len() - 1 {
                         html! {
                             <>
-                                <font class="list-whole-list-multiple-sep">
+                                <span class="list-whole-list-multiple-sep">
                                     { " • " }
-                                </font>
+                                </span>
                                 {
                                     if br {
                                         html! {

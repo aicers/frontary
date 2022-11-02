@@ -549,6 +549,10 @@ td.complex-select-pop-head-text {
     color: #000000;
 }
 
+span.complex-select-pop-head-color {
+    color: #B5131A;
+}
+
 td.complex-select-pop-head-close {
     height: 70px;
     width: 34px;
@@ -1320,7 +1324,7 @@ td.list-whole-list-first-layer {
     color: #000000;
 }
 
-font.list-whole-list-first-layer-light {
+span.list-whole-list-first-layer-light {
     color: #707070;
 }
 
@@ -1393,7 +1397,7 @@ div.list-whole-list-pages-inner {
     position: relative;
 }
 
-font.list-whole-list-multiple-sep {
+span.list-whole-list-multiple-sep {
     color: #B5131A;
 }
 
