@@ -12,7 +12,6 @@ test = []
 anyhow = "1"
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde", "wasmbind"] }
-getrandom = { version = "0.2", features = ["js"] }
 gloo-events = "0.1"
 gloo-file = "0.2"
 gloo-storage = "0.2"
@@ -24,8 +23,7 @@ json-gettext = "4"
 num-traits = "0.2"
 passwords = { version = "3.1", features = ["common-password"] }
 serde = { version = "1",  features = ["derive"] }
-structured = "0.8"
 strum_macros = "0.24"
-wasm-bindgen = { version = ">=0.2.82", features = ["serde-serialize"] }
+wasm-bindgen = { version = ">=0.2.83", features = ["serde-serialize"] }
 web-sys = { version = "0.3", features = ["CanvasRenderingContext2d", "CssStyleDeclaration", "HtmlCanvasElement", "Navigator", "TextMetrics"] }
 yew = "0.19"
