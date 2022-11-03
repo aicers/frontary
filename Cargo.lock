@@ -370,9 +370,9 @@ dependencies = [
 
 [[package]]
 name = "json-gettext"
-version = "4.0.3"
+version = "4.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89152eacc36cc7db9986219c233b233b85f80f63bf21908eaa981a67a9800aee"
+checksum = "66896a8d212e6f18e96dcabd99f29bd39787e0ef9cf9351e919e577d23efa579"
 dependencies = [
  "manifest-dir-macros",
  "regex",
@@ -455,9 +455,9 @@ checksum = "86f0b0d4bf799edbc74508c1e8bf170ff5f41238e5f8225603ca7caaae2b7860"
 
 [[package]]
 name = "passwords"
-version = "3.1.9"
+version = "3.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5dee744d341c868910c3f97727c610c9ef781fde5a5621f238163dccb7dee5c"
+checksum = "3d5e617847054b49f5b1ce93cea78a88fc269ef9210afdbca660c1e5c973212f"
 dependencies = [
  "random-pick",
 ]
@@ -548,9 +548,9 @@ dependencies = [
 
 [[package]]
 name = "random-number"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb9c434a752bd6bde0199f771763c89e4870c2cb159ddafacd19948588477379"
+checksum = "3a3da5cbb4c27c5150c03a54a7e4745437cd90f9e329ae657c0b889a144bb7be"
 dependencies = [
  "proc-macro-hack",
  "rand",

@@ -11,14 +11,14 @@ use std::collections::{HashMap, HashSet};
 
 const NUM_OF_DECIMALS_DEFAULT: usize = 2;
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq)]
 pub struct ListItem {
     pub columns: Vec<Column>,
     pub sub_items: Vec<Vec<Column>>,
     pub creation_time: Option<DateTime<Utc>>,
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq)]
 pub enum Column {
     Text(ViewString),
     HostNetworkGroup(Vec<String>),
@@ -85,7 +85,7 @@ pub enum DataType {
     TrustedDomain,
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq)]
 pub enum ColWidths {
     Pixel(Vec<Option<u32>>), // None means need to calculate: full width - sum of widths of the other Some(width)
     Ratio(Vec<Option<f32>>), // None means no need to specify
@@ -106,7 +106,7 @@ impl ColWidths {
     }
 }
 
-#[derive(Clone, Default, PartialEq, Eq)]
+#[derive(Clone, Default, PartialEq)]
 pub struct DisplayInfo {
     pub widths: Vec<ColWidths>, // The first row, widths[0] should be ColWidths::Pixel
     pub width_full: u32,        // sum of column widths
