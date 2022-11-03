@@ -421,7 +421,7 @@ where
                 let verify = self.verify(ctx);
 
                 if !required && !unique && verify {
-                    self.trim_nic(ctx);
+                    Self::trim_nic(ctx);
                     if let Some(parent) = ctx.link().get_parent() {
                         parent
                             .clone()

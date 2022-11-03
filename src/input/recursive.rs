@@ -22,12 +22,11 @@ where
     <T as Component>::Message: Clone + PartialEq,
 {
     pub(super) fn prepare_buffer(&mut self, ctx: &Context<Self>) {
-        self.prepare_buffer_recursive(ctx, &ctx.props().input_data, &ctx.props().input_type, 1);
+        self.prepare_buffer_recursive(&ctx.props().input_data, &ctx.props().input_type, 1);
     }
 
     pub(super) fn prepare_buffer_recursive(
         &mut self,
-        ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_type: &[Rc<InputType>],
         base_index: usize,
@@ -81,7 +80,6 @@ where
                         ) => {
                             if let Some(data_children) = data_children {
                                 self.prepare_buffer_recursive(
-                                    ctx,
                                     data_children,
                                     &children.1,
                                     this_index * MAX_PER_LAYER,
@@ -96,18 +94,11 @@ where
     }
 
     pub(super) fn prepare_default(&mut self, ctx: &Context<Self>) {
-        self.prepare_default_recursive(
-            ctx,
-            &ctx.props().input_data,
-            &ctx.props().input_type,
-            true,
-            1,
-        );
+        self.prepare_default_recursive(&ctx.props().input_data, &ctx.props().input_type, true, 1);
     }
 
     pub(super) fn prepare_default_recursive(
         &mut self,
-        ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_type: &[Rc<InputType>],
         parent_checked: bool,
@@ -152,7 +143,6 @@ where
                             {
                                 if *checked != CheckStatus::Unchecked {
                                     self.prepare_default_recursive(
-                                        ctx,
                                         data_children,
                                         &children.1,
                                         *checked == CheckStatus::Checked,
@@ -301,19 +291,12 @@ where
     }
 
     pub(super) fn verify(&mut self, ctx: &Context<Self>) -> bool {
-        self.verify_recursive(
-            ctx,
-            &ctx.props().input_data,
-            &ctx.props().input_type,
-            1,
-            true,
-        )
+        self.verify_recursive(&ctx.props().input_data, &ctx.props().input_type, 1, true)
     }
 
     #[allow(clippy::too_many_lines)]
     pub(super) fn verify_recursive(
         &mut self,
-        ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_type: &[Rc<InputType>],
         base_index: usize,
@@ -459,7 +442,6 @@ where
                         ) => {
                             if *checked != CheckStatus::Unchecked
                                 && !self.verify_recursive(
-                                    ctx,
                                     data_children,
                                     &type_children.1,
                                     (base_index + index) * MAX_PER_LAYER,
@@ -477,22 +459,18 @@ where
         rtn
     }
 
-    pub(super) fn trim_nic(&mut self, ctx: &Context<Self>) {
-        self.trim_nic_recursive(ctx, &ctx.props().input_data, &ctx.props().input_type, 1);
+    pub(super) fn trim_nic(ctx: &Context<Self>) {
+        Self::trim_nic_recursive(&ctx.props().input_data, &ctx.props().input_type);
     }
 
     pub(super) fn trim_nic_recursive(
-        &mut self,
-        ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_type: &[Rc<InputType>],
-        base_index: usize,
     ) {
         input_data
             .iter()
-            .enumerate()
             .zip(input_type.iter())
-            .for_each(|((index, input_data), input_type)| {
+            .for_each(|(input_data, input_type)| {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(nics) = &mut *input_data {
                         nics.retain(|n| {
@@ -507,12 +485,7 @@ where
                     ) = (&*input_data, &**input_type)
                     {
                         if *checked != CheckStatus::Unchecked {
-                            self.trim_nic_recursive(
-                                ctx,
-                                data_children,
-                                &type_children.1,
-                                (base_index + index) * MAX_PER_LAYER,
-                            );
+                            Self::trim_nic_recursive(data_children, &type_children.1);
                         }
                     }
                 }
@@ -542,7 +515,7 @@ where
             });
 
         for (index, p, t) in &propagate {
-            self.propagate_checkbox_recursive(ctx, click, p, t, None, *index, 1);
+            self.propagate_checkbox_recursive(click, p, t, None, *index, 1);
         }
 
         true
@@ -552,7 +525,6 @@ where
     #[allow(clippy::too_many_lines)]
     pub(super) fn propagate_checkbox_recursive(
         &mut self,
-        ctx: &Context<Self>,
         click: &Rc<RefCell<InputItem>>,
         pos: &Rc<RefCell<InputItem>>,
         input_type: &Rc<InputType>,
@@ -653,7 +625,6 @@ where
 
         for (index, child, type_child) in &propa_children {
             rtn_checked.push(self.propagate_checkbox_recursive(
-                ctx,
                 click,
                 child,
                 type_child,
@@ -724,7 +695,6 @@ where
         self.verification_host_network.clear();
 
         self.reset_veri_host_network_recursive(
-            ctx,
             &ctx.props().input_data,
             &ctx.props().input_type,
             1,
@@ -734,7 +704,6 @@ where
 
     pub(super) fn reset_veri_host_network_recursive(
         &mut self,
-        ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_type: &[Rc<InputType>],
         base_index: usize,
@@ -764,7 +733,6 @@ where
                     {
                         if *checked != CheckStatus::Unchecked {
                             self.reset_veri_host_network_recursive(
-                                ctx,
                                 data_children,
                                 &type_children.1,
                                 (base_index + index) * MAX_PER_LAYER,
