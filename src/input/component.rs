@@ -609,7 +609,7 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            (*nic).name = name.clone();
+                            nic.name = name.clone();
                         }
                     }
                 }
@@ -620,7 +620,7 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            (*nic).interface = interface.clone();
+                            nic.interface = interface.clone();
                         }
                     }
                 }
@@ -631,7 +631,7 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            (*nic).gateway = gateway.clone();
+                            nic.gateway = gateway.clone();
                         }
                     }
                 }
