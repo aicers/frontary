@@ -24,11 +24,12 @@ where
         let onclick_all_second = ctx.link().callback(|_| Message::CheckAllSecond);
         let check_status = self.check_status(ctx);
         let mut colspan = 0;
+        let rowspan = ctx.props().display_info.widths.len().to_string();
 
         html! {
             <>
                 <tr class="list-whole-head">
-                    <td class="list-whole-head-check">
+                    <td class="list-whole-head-check" rowspan={rowspan.clone()}>
                         <div onclick={onclick_all}>
                             <CheckBox
                                 status={check_status}
@@ -66,7 +67,7 @@ where
                             html! {}
                         }
                     }
-                    <td class="list-whole-head-last-column">
+                    <td class="list-whole-head-last-column" rowspan={rowspan}>
                     </td>
                 </tr>
                 {
@@ -93,7 +94,6 @@ where
                                 } else {
                                     html! {
                                         <tr class={class} >
-                                            <td></td>
                                             <td colspan={colspan.to_string()} class="list-whole-head-colspan">
                                                 <div class="list-whole-head-next-lines">
                                                     <table style={style}>
@@ -102,8 +102,6 @@ where
                                                         </tr>
                                                     </table>
                                                 </div>
-                                            </td>
-                                            <td class="list-whole-head-last-column">
                                             </td>
                                         </tr>
                                     }
@@ -271,6 +269,7 @@ where
                                         } else {
                                             "list-whole-list-flat"
                                         };
+                                        let rowspan = ctx.props().display_info.widths.len().to_string();
 
                                         html! {
                                             <>
@@ -284,7 +283,7 @@ where
                                                             html! {}
                                                         }
                                                     }
-                                                    <td class="list-whole-list-flat-check">
+                                                    <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
                                                         <div onclick={onclick_item(key.clone())}>
                                                             <CheckBox
                                                                 status={check_status}
@@ -304,7 +303,7 @@ where
                                                             html! {}
                                                         }
                                                     }
-                                                    <td class="list-whole-list-flat-more-action">
+                                                    <td class="list-whole-list-flat-more-action" rowspan={rowspan}>
                                                         <div class="list-whole-list-flat-more-action">
                                                             <SelectMini::<MoreAction, Self>
                                                                 txt={ctx.props().txt.clone()}
@@ -344,7 +343,6 @@ where
 
                                                                     html! {
                                                                         <tr>
-                                                                            <td></td>
                                                                             <td colspan={colspan.to_string()} class="list-whole-list-colspan">
                                                                                 <div class="list-whole-column-next-lines">
                                                                                     <table style={style}>
@@ -353,8 +351,6 @@ where
                                                                                         </tr>
                                                                                     </table>
                                                                                 </div>
-                                                                            </td>
-                                                                            <td>
                                                                             </td>
                                                                         </tr>
                                                                     }
