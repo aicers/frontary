@@ -357,6 +357,12 @@ where
     pub escape_message: T::Message,
     #[prop_or(None)]
     pub extra_messages: Option<HashMap<MessageType, T::Message>>,
+
+    #[prop_or(true)]
+    pub enable_pop_up: bool,
+
+    #[prop_or(None)]
+    pub example_message: Option<String>,
 }
 
 impl<T> Component for Model<T>
@@ -955,36 +961,41 @@ where
         let txt = ctx.props().txt.txt.clone();
         let onclick_escape = ctx.link().callback(|_| Message::Escape);
         let onclick_save = ctx.link().callback(|_| Message::TrySave);
-
-        html! {
-            <div class="input-outer">
-                <div class="input-inner" style={style}> // padding-top: 20, padding-bottom: 32
-                    <table class="input-head"> // margin-bottom: 24
-                        <tr>
-                            <td class="input-title"> // height: 24
-                                { text!(txt, ctx.props().language, &ctx.props().title) }
-                            </td>
-                            <td class="input-close-x" onclick={onclick_escape.clone()}>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="input-head-space"> // height: 20
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="input-contents" style={style_input}>
-                        { self.view_input(ctx) }
-                    </div>
-                    <div class="input-cancel-save"> // margin-top: 16, height: 30
-                        <div class="input-cancel" onclick={onclick_escape}>
-                            { text!(txt, ctx.props().language, "Cancel") }
+        if ctx.props().enable_pop_up {
+            html! {
+                <div class="input-outer">
+                    <div class="input-inner" style={style}> // padding-top: 20, padding-bottom: 32
+                        <table class="input-head"> // margin-bottom: 24
+                            <tr>
+                                <td class="input-title"> // height: 24
+                                    { text!(txt, ctx.props().language, &ctx.props().title) }
+                                </td>
+                                <td class="input-close-x" onclick={onclick_escape.clone()}>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="input-head-space"> // height: 20
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="input-contents" style={style_input}>
+                            { self.view_input(ctx) }
                         </div>
-                        <div class="input-save" onclick={onclick_save}>
-                            { text!(txt, ctx.props().language, "Save") }
+                        <div class="input-cancel-save"> // margin-top: 16, height: 30
+                            <div class="input-cancel" onclick={onclick_escape}>
+                                { text!(txt, ctx.props().language, "Cancel") }
+                            </div>
+                            <div class="input-save" onclick={onclick_save}>
+                                { text!(txt, ctx.props().language, "Save") }
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
+        } else {
+            html! {
+                    { self.view_input(ctx) }
+            }
         }
     }
 }
