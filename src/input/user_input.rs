@@ -45,6 +45,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
     pub(super) fn view_text(
         &self,
@@ -96,6 +97,15 @@ where
             "width: {};",
             width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
+        let explanation_message_buffer = if let Some(example_message) = &ctx.props().example_message
+        {
+            example_message.to_string()
+        } else {
+            String::new()
+        };
+        let explanation_message =
+            get_text!(txt, ctx.props().language.tag(), &explanation_message_buffer)
+                .map_or(explanation_message_buffer.clone(), |text| text.to_string());
 
         html! {
             <div class={class_item}>
@@ -113,24 +123,30 @@ where
                 {
                     if let Some(length) = length {
                         html! {
-                            <input type="text" class={class} style={style}
-                                value={value}
-                                placeholder={placeholder}
-                                autofocus={autofocus}
-                                autocomplete="off"
-                                oninput={oninput}
-                                maxlength={length.to_string()}
-                            />
+                            <>
+                                <input type="text" class={class} style={style}
+                                    value={value}
+                                    placeholder={placeholder}
+                                    autofocus={autofocus}
+                                    autocomplete="off"
+                                    oninput={oninput}
+                                    maxlength={length.to_string()}
+                                />
+                                { view_explanation_msg(explanation_message)}
+                            </>
                         }
                     } else {
                         html! {
-                            <input type="text" class={class} style={style}
-                                value={value}
-                                placeholder={placeholder}
-                                autofocus={autofocus}
-                                autocomplete="off"
-                                oninput={oninput}
-                            />
+                            <>
+                                <input type="text" class={class} style={style}
+                                    value={value}
+                                    placeholder={placeholder}
+                                    autofocus={autofocus}
+                                    autocomplete="off"
+                                    oninput={oninput}
+                                />
+                                { view_explanation_msg(explanation_message)}
+                            </>
                         }
                     }
                 }
@@ -880,5 +896,16 @@ pub(super) fn view_asterisk(required: bool) -> Html {
         }
     } else {
         html! {}
+    }
+}
+
+pub(super) fn view_explanation_msg(explanation_message: String) -> Html {
+    if explanation_message == String::new() {
+        html! {}
+    } else {
+        html! {
+        <div class="host-network-group-input-input-notice">
+            { explanation_message }
+        </div>}
     }
 }
