@@ -18,6 +18,7 @@ pub enum Kind {
     DirectionItem,
     MoreAction,
     MoreActionNoImage,
+    OnOffAction,
     SortList,
     Round,
     Soft,
@@ -166,6 +167,7 @@ where
                     Kind::SortList => Self::view_sort_list(ctx),
                     Kind::MoreAction => Self::view_more_action(ctx),
                     Kind::MoreActionNoImage => html! {},
+                    Kind::OnOffAction => Self::view_on_off_action(ctx),
                     Kind::Round | Kind::Soft => Self::view_basic(ctx),
                 }
             }
@@ -231,6 +233,27 @@ where
                                                     "/frontary/edit.png"
                                                 } else if key == "Delete" {
                                                     "/frontary/delete-trash.png"
+                                                } else {
+                                                    ""
+                                                };
+                                                html! {
+                                                    <div class="mini-select-list-down-item-more-action">
+                                                        <img src={icon} class="mini-select-list-down-item-more-action" />
+                                                        <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
+                                                        { text!(txt, ctx.props().language, key) }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            ViewString::Raw(_) => html! {}
+                                        }
+                                    } else if ctx.props().kind == Kind::OnOffAction {
+                                        match item {
+                                            ViewString::Key(key) => {
+                                                let icon = if key == "On" {
+                                                    "/frontary/on.png"
+                                                } else if key == "Off" {
+                                                    "/frontary/off.png"
                                                 } else {
                                                     ""
                                                 };
@@ -449,6 +472,14 @@ where
     }
 
     fn view_more_action(ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| Message::ClickTop);
+        html! {
+            <div onclick={onclick} class="mini-select-more-action">
+            </div>
+        }
+    }
+
+    fn view_on_off_action(ctx: &Context<Self>) -> Html {
         let onclick = ctx.link().callback(|_| Message::ClickTop);
         html! {
             <div onclick={onclick} class="mini-select-more-action">
