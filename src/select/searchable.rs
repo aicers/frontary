@@ -136,107 +136,103 @@ where
                 false
             }
             Message::ClickItem(key) => {
-                if let (Ok(mut sel), Ok(list)) = (
+                let (Ok(mut sel), Ok(list)) = (
                     ctx.props().selected.try_borrow_mut(),
                     ctx.props().list.try_borrow(),
-                ) {
-                    if let Some(selected) = sel.as_mut() {
-                        match ctx.props().kind {
-                            Kind::Multi => {
-                                if selected.contains(&key) {
-                                    selected.remove(&key);
-                                } else {
-                                    selected.insert(key);
-                                }
-                            }
-                            Kind::Single => {
-                                if !selected.is_empty() {
-                                    selected.clear();
-                                }
+                ) else {
+                    return false;
+                };
+                if let Some(selected) = sel.as_mut() {
+                    match ctx.props().kind {
+                        Kind::Multi => {
+                            if selected.contains(&key) {
+                                selected.remove(&key);
+                            } else {
                                 selected.insert(key);
-                                ctx.link().send_message(Message::Click);
                             }
                         }
-                    } else {
-                        match ctx.props().kind {
-                            Kind::Multi => {
-                                let mut s = list
-                                    .iter()
-                                    .map(|i| i.id().clone())
-                                    .collect::<HashSet<String>>();
-                                s.remove(&key);
-                                *sel = Some(s);
+                        Kind::Single => {
+                            if !selected.is_empty() {
+                                selected.clear();
                             }
-                            Kind::Single => {
-                                *sel = None;
-                            }
+                            selected.insert(key);
+                            ctx.link().send_message(Message::Click);
                         }
                     }
-                    true
                 } else {
-                    false
+                    match ctx.props().kind {
+                        Kind::Multi => {
+                            let mut s = list
+                                .iter()
+                                .map(|i| i.id().clone())
+                                .collect::<HashSet<String>>();
+                            s.remove(&key);
+                            *sel = Some(s);
+                        }
+                        Kind::Single => {
+                            *sel = None;
+                        }
+                    }
                 }
+                true
             }
             Message::ClickAll => {
                 if ctx.props().kind == Kind::Multi {
-                    if let (Ok(mut sel), Ok(list)) = (
+                    let (Ok(mut sel), Ok(list)) = (
                         ctx.props().selected.try_borrow_mut(),
                         ctx.props().list.try_borrow(),
-                    ) {
-                        if let Some(search_result) = self.search_result.as_ref() {
-                            if !search_result.is_empty() {
-                                if sel.is_none() {
-                                    *sel = Some(
-                                        list.iter()
-                                            .map(|x| x.id().clone())
-                                            .collect::<HashSet<String>>(),
-                                    );
-                                }
-                                let selected = sel.as_mut().expect("ensured Some");
-                                if search_result
-                                    .iter()
-                                    .filter_map(|&r| {
-                                        if selected
-                                            .contains(list.get(r).expect("should exist").id())
-                                        {
-                                            Some(true)
-                                        } else {
-                                            None
-                                        }
-                                    })
-                                    .count()
-                                    == search_result.len()
-                                {
-                                    for &r in search_result {
-                                        selected.remove(list.get(r).expect("shoud exist").id());
-                                    }
-                                } else {
-                                    for &r in search_result {
-                                        let key = list.get(r).expect("should exist").id();
-                                        if !selected.contains(key) {
-                                            selected.insert(key.clone());
-                                        }
-                                    }
-                                    if selected.len() == list.len() {
-                                        *sel = None;
-                                    }
-                                }
+                    ) else {
+                        return false;
+                    };
+                    if let Some(search_result) = self.search_result.as_ref() {
+                        if !search_result.is_empty() {
+                            if sel.is_none() {
+                                *sel = Some(
+                                    list.iter()
+                                        .map(|x| x.id().clone())
+                                        .collect::<HashSet<String>>(),
+                                );
                             }
-                        } else if !list.is_empty() {
-                            if let Some(selected) = sel.as_mut() {
-                                if list.len() == selected.len() {
-                                    selected.clear();
-                                } else {
-                                    *sel = None;
+                            let selected = sel.as_mut().expect("ensured Some");
+                            if search_result
+                                .iter()
+                                .filter_map(|&r| {
+                                    if selected.contains(list.get(r).expect("should exist").id()) {
+                                        Some(true)
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .count()
+                                == search_result.len()
+                            {
+                                for &r in search_result {
+                                    selected.remove(list.get(r).expect("shoud exist").id());
                                 }
                             } else {
-                                *sel = Some(HashSet::<String>::new());
+                                for &r in search_result {
+                                    let key = list.get(r).expect("should exist").id();
+                                    if !selected.contains(key) {
+                                        selected.insert(key.clone());
+                                    }
+                                }
+                                if selected.len() == list.len() {
+                                    *sel = None;
+                                }
                             }
                         }
-                        true
-                    } else {
-                        false
+                    } else if !list.is_empty() {
+                        if let Some(selected) = sel.as_mut() {
+                            if list.len() == selected.len() {
+                                selected.clear();
+                            } else {
+                                *sel = None;
+                            }
+                        } else {
+                            *sel = Some(HashSet::<String>::new());
+                        }
                     }
+                    true
                 } else {
                     false
                 }
@@ -456,131 +452,128 @@ where
             CheckStatus::Unchecked
         };
 
-        if let Ok(list) = ctx.props().list.try_borrow() {
-            if list.is_empty() {
-                html! {}
-            } else {
-                html! {
-                    <div id={ctx.props().id.clone()} class="searchable-select-list-down" style={style}>
-                        <div style ={style_inner}>
-                            <div class="searchable-select-list-search" style={style_inner_width.clone()}>
-                                <input type="text" class="searchable-select-search"
-                                    value={self.search_text.clone()}
-                                    placeholder={search_notice}
-                                    style={style_inner_width_search}
-                                    oninput={oninput_search}
-                                />
-                            </div>
-                            <div class="searchable-select-list-search-space" style={style_inner_width.clone()}>
-                            </div>
-                        {
-                            if ctx.props().kind == Kind::Multi {
-                                html! {
-                                    <div class="searchable-select-list-search-all" style={style_inner_width.clone()}>
-                                        <table>
+        let Ok(list) = ctx.props().list.try_borrow() else {
+            return html! {};
+        };
+        if list.is_empty() {
+            return html! {};
+        }
+        html! {
+            <div id={ctx.props().id.clone()} class="searchable-select-list-down" style={style}>
+                <div style ={style_inner}>
+                    <div class="searchable-select-list-search" style={style_inner_width.clone()}>
+                        <input type="text" class="searchable-select-search"
+                            value={self.search_text.clone()}
+                            placeholder={search_notice}
+                            style={style_inner_width_search}
+                            oninput={oninput_search}
+                        />
+                    </div>
+                    <div class="searchable-select-list-search-space" style={style_inner_width.clone()}>
+                    </div>
+                    {
+                        if ctx.props().kind == Kind::Multi {
+                            html! {
+                                <div class="searchable-select-list-search-all" style={style_inner_width.clone()}>
+                                    <table>
+                                        <tr>
+                                            <td class="searchable-select-list-checkbox">
+                                                <div onclick={onclick_all}>
+                                                    <CheckBox status={check_status} />
+                                                </div>
+                                            </td>
+                                            <td class="searchable-select-list-item">
+                                            {
+                                                if self.search_result.is_none() {
+                                                    html! { text!(txt, ctx.props().language, "All") }
+                                                } else {
+                                                    html! { text!(txt, ctx.props().language, "All Search Results") }
+                                                }
+                                            }
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            }
+                        } else {
+                            html! {}
+                        }
+                    }
+                    <table style={style_inner_width}>
+                    {
+                        if let Some(search_result) = self.search_result.as_ref() {
+                            html! {
+                                for search_result.iter().map(|&index| {
+                                    let item = list.get(index).expect("should exist");
+                                    let check_status = if let Ok(selected) = ctx.props().selected.try_borrow() {
+                                        selected.as_ref().map_or(CheckStatus::Checked, |selected|
+                                            if selected.contains(item.id()) {
+                                                CheckStatus::Checked
+                                            } else {
+                                                CheckStatus::Unchecked
+                                            }
+                                        )
+                                    } else {
+                                        CheckStatus::Unchecked
+                                    };
+                                    let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
+                                    html! {
+                                        <tr>
+                                            <td class="searchable-select-list-checkbox">
+                                                <div onclick={onclick_item(item.id().clone())}>
+                                                    <CheckBox status={check_status} />
+                                                </div>
+                                            </td>
+                                            <td class="searchable-select-list-item">
+                                                { sized_item_value }
+                                            </td>
+                                        </tr>
+                                    }
+                                })
+                            }
+                        } else {
+                            html! {
+                                for list.iter().map(|item| {
+                                    let check_status = if let Ok(selected) = ctx.props().selected.try_borrow() {
+                                        selected.as_ref().map_or(CheckStatus::Checked, |selected|
+                                            if selected.contains(item.id()) {
+                                                CheckStatus::Checked
+                                            } else {
+                                            CheckStatus::Unchecked
+                                        })
+                                    } else {
+                                        CheckStatus::Unchecked
+                                    };
+                                    let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
+                                    if ctx.props().kind == Kind::Multi {
+                                        html! {
                                             <tr>
                                                 <td class="searchable-select-list-checkbox">
-                                                    <div onclick={onclick_all}>
+                                                    <div onclick={onclick_item(item.id().clone())}>
                                                         <CheckBox status={check_status} />
                                                     </div>
                                                 </td>
                                                 <td class="searchable-select-list-item">
-                                                {
-                                                    if self.search_result.is_none() {
-                                                        html! { text!(txt, ctx.props().language, "All") }
-                                                    } else {
-                                                        html! { text!(txt, ctx.props().language, "All Search Results") }
-                                                    }
-                                                }
+                                                    { sized_item_value }
                                                 </td>
                                             </tr>
-                                        </table>
-                                    </div>
-                                }
-
-                            } else {
-                                html! {}
+                                        }
+                                    } else {
+                                        html! {
+                                            <tr class="searchable-select-list-item-single" onclick={onclick_item(item.id().clone())}>
+                                                <td class="searchable-select-list-item-single">
+                                                    { sized_item_value }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                })
                             }
                         }
-                            <table style={style_inner_width}>
-                            {
-                                if let Some(search_result) = self.search_result.as_ref() {
-                                    html! {
-                                        for search_result.iter().map(|&index| {
-                                            let item = list.get(index).expect("should exist");
-                                            let check_status = if let Ok(selected) = ctx.props().selected.try_borrow() {
-                                                selected.as_ref().map_or(CheckStatus::Checked, |selected|
-                                                    if selected.contains(item.id()) {
-                                                        CheckStatus::Checked
-                                                    } else {
-                                                        CheckStatus::Unchecked
-                                                    }
-                                                )
-                                            } else {
-                                                CheckStatus::Unchecked
-                                            };
-                                            let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
-                                            html! {
-                                                <tr>
-                                                    <td class="searchable-select-list-checkbox">
-                                                        <div onclick={onclick_item(item.id().clone())}>
-                                                            <CheckBox status={check_status} />
-                                                        </div>
-                                                    </td>
-                                                    <td class="searchable-select-list-item">
-                                                        { sized_item_value }
-                                                    </td>
-                                                </tr>
-                                            }
-                                        })
-                                    }
-                                } else {
-                                    html! {
-                                        for list.iter().map(|item| {
-                                            let check_status = if let Ok(selected) = ctx.props().selected.try_borrow() {
-                                                selected.as_ref().map_or(CheckStatus::Checked, |selected|
-                                                    if selected.contains(item.id()) {
-                                                        CheckStatus::Checked
-                                                    } else {
-                                                    CheckStatus::Unchecked
-                                                })
-                                            } else {
-                                                CheckStatus::Unchecked
-                                            };
-                                            let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
-                                            if ctx.props().kind == Kind::Multi {
-                                                html! {
-                                                    <tr>
-                                                        <td class="searchable-select-list-checkbox">
-                                                            <div onclick={onclick_item(item.id().clone())}>
-                                                                <CheckBox status={check_status} />
-                                                            </div>
-                                                        </td>
-                                                        <td class="searchable-select-list-item">
-                                                            { sized_item_value }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            } else {
-                                                html! {
-                                                    <tr class="searchable-select-list-item-single" onclick={onclick_item(item.id().clone())}>
-                                                        <td class="searchable-select-list-item-single">
-                                                            { sized_item_value }
-                                                        </td>
-                                                    </tr>
-                                                }
-                                            }
-                                        })
-                                    }
-                                }
-                            }
-                            </table>
-                        </div>
-                    </div>
-                }
-            }
-        } else {
-            html! {}
+                    }
+                    </table>
+                </div>
+            </div>
         }
     }
 }

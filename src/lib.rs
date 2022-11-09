@@ -170,19 +170,18 @@ pub(crate) fn text_width(text: &str, font: &str) -> Result<u32, ()> {
         .dyn_into::<web_sys::HtmlCanvasElement>()
         .map_err(|_| ())?;
 
-    if let Some(ctx) = canvas.get_context("2d").map_err(|_| ())? {
-        let ctx = ctx
-            .dyn_into::<web_sys::CanvasRenderingContext2d>()
-            .map_err(|_| ())?;
-        ctx.set_font(font);
-        ctx.measure_text(text)
-            .map_err(|_| ())?
-            .width()
-            .to_u32()
-            .ok_or(())
-    } else {
-        Err(())
-    }
+    let Some(ctx) = canvas.get_context("2d").map_err(|_| ())? else {
+        return Err(());
+    };
+    let ctx = ctx
+        .dyn_into::<web_sys::CanvasRenderingContext2d>()
+        .map_err(|_| ())?;
+    ctx.set_font(font);
+    ctx.measure_text(text)
+        .map_err(|_| ())?
+        .width()
+        .to_u32()
+        .ok_or(())
 }
 
 #[must_use]

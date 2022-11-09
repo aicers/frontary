@@ -75,29 +75,28 @@ where
                     <tr>
                     {
                         for ctx.props().menu_titles.iter().enumerate().map(|(index, title)| {
-                            if let (Some(selected), Some(menu)) = (ctx.props().selected_menu.as_ref(), ctx.props().parent_messages.get(index)) {
-                                let txt = ctx.props().txt.txt.clone();
-                                let class_last = if index + 1 == ctx.props().menu_titles.len() {
-                                    "tab-menu-last"
-                                } else {
-                                    "tab-menu-before-last"
-                                };
-                                if selected == menu {
-                                    html! {
-                                        <td class={classes!("tab-menu-selected", class_last)} style={style_menu.clone()}>
-                                            { text!(txt, ctx.props().language, title) }
-                                        </td>
-                                    }
-                                } else {
-                                    let onclick = ctx.link().callback(move |_| Message::ClickMenu(index));
-                                    html! {
-                                        <td class={classes!("tab-menu-unselected", class_last)} style={style_menu.clone()} onclick={onclick}>
-                                            { text!(txt, ctx.props().language, title) }
-                                        </td>
-                                    }
+                            let (Some(selected), Some(menu)) = (ctx.props().selected_menu.as_ref(), ctx.props().parent_messages.get(index)) else {
+                                return html! {};
+                            };
+                            let txt = ctx.props().txt.txt.clone();
+                            let class_last = if index + 1 == ctx.props().menu_titles.len() {
+                                "tab-menu-last"
+                            } else {
+                                "tab-menu-before-last"
+                            };
+                            if selected == menu {
+                                html! {
+                                    <td class={classes!("tab-menu-selected", class_last)} style={style_menu.clone()}>
+                                        { text!(txt, ctx.props().language, title) }
+                                    </td>
                                 }
                             } else {
-                                html! {}
+                                let onclick = ctx.link().callback(move |_| Message::ClickMenu(index));
+                                html! {
+                                    <td class={classes!("tab-menu-unselected", class_last)} style={style_menu.clone()} onclick={onclick}>
+                                        { text!(txt, ctx.props().language, title) }
+                                    </td>
+                                }
                             }
                         })
                     }
