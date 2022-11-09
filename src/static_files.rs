@@ -117,6 +117,12 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
     let notification_close = include_bytes!("../static/frontary/notification-close.png");
     rtn.push(("notification-close.png", notification_close));
 
+    let off = include_bytes!("../static/frontary/off.png");
+    rtn.push(("off.png", off));
+
+    let on = include_bytes!("../static/frontary/on.png");
+    rtn.push(("on.png", on));
+
     let page_go = include_bytes!("../static/frontary/page-go.png");
     rtn.push(("page-go.png", page_go));
 

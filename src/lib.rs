@@ -69,6 +69,12 @@ pub enum MoreAction {
     Delete,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OnOffAction {
+    On,
+    Off,
+}
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ViewString {
     Key(String),
