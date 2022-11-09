@@ -96,70 +96,69 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let num_pages = ctx.props().num_pages;
-        if let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() {
-            match msg {
-                Message::Next => {
-                    info.start += num_pages;
-                    info.end = std::cmp::min(info.end + num_pages, info.total);
-                    info.current = info.start;
-                }
-                Message::Previous => {
-                    info.start = if info.start > num_pages + 1 {
-                        info.start - num_pages
-                    } else {
-                        1
-                    };
-                    info.end -= num_pages;
-                    info.current = info.end;
-                }
-                Message::First => {
-                    info.start = 1;
-                    info.current = 1;
-                    info.end = std::cmp::min(num_pages, info.total);
-                }
-                Message::Last => {
-                    info.start = if info.total > num_pages {
-                        info.total + 1 - num_pages
-                    } else {
-                        1
-                    };
-                    info.current = info.total;
-                    info.end = info.total;
-                }
-                Message::Page(page) => {
-                    info.current = page;
-                }
-                Message::InputPage(text) => self.go_to_page = usize::from_str(&text).unwrap_or(0),
-                Message::GoToPage => {
-                    if self.go_to_page >= 1 && self.go_to_page <= info.total {
-                        info.current = self.go_to_page;
-                        if info.total - info.current < num_pages - 1 {
-                            if info.total <= num_pages {
-                                info.start = 1;
-                            } else {
-                                info.start = info.total + 1 - num_pages;
-                            }
-                            info.end = info.total;
+        let Ok(mut info) = ctx.props().pages_info.try_borrow_mut()  else {
+            return false;
+        };
+        match msg {
+            Message::Next => {
+                info.start += num_pages;
+                info.end = std::cmp::min(info.end + num_pages, info.total);
+                info.current = info.start;
+            }
+            Message::Previous => {
+                info.start = if info.start > num_pages + 1 {
+                    info.start - num_pages
+                } else {
+                    1
+                };
+                info.end -= num_pages;
+                info.current = info.end;
+            }
+            Message::First => {
+                info.start = 1;
+                info.current = 1;
+                info.end = std::cmp::min(num_pages, info.total);
+            }
+            Message::Last => {
+                info.start = if info.total > num_pages {
+                    info.total + 1 - num_pages
+                } else {
+                    1
+                };
+                info.current = info.total;
+                info.end = info.total;
+            }
+            Message::Page(page) => {
+                info.current = page;
+            }
+            Message::InputPage(text) => self.go_to_page = usize::from_str(&text).unwrap_or(0),
+            Message::GoToPage => {
+                if self.go_to_page >= 1 && self.go_to_page <= info.total {
+                    info.current = self.go_to_page;
+                    if info.total - info.current < num_pages - 1 {
+                        if info.total <= num_pages {
+                            info.start = 1;
                         } else {
-                            info.start = info.current;
-                            info.end = std::cmp::min(info.start + num_pages - 1, info.total);
+                            info.start = info.total + 1 - num_pages;
                         }
+                        info.end = info.total;
+                    } else {
+                        info.start = info.current;
+                        info.end = std::cmp::min(info.start + num_pages - 1, info.total);
                     }
                 }
-                Message::InputError => {
-                    // TODO: issue #5
-                }
             }
-            if let Some(parent) = ctx.link().get_parent() {
-                parent
-                    .clone()
-                    .downcast::<T>()
-                    .send_message(ctx.props().parent_message.clone());
+            Message::InputError => {
+                // TODO: issue #5
             }
-            true
-        } else {
-            false
         }
+        if let Some(parent) = ctx.link().get_parent() {
+            parent
+                .clone()
+                .downcast::<T>()
+                .send_message(ctx.props().parent_message.clone());
+        }
+        true
     }
 
     #[allow(clippy::too_many_lines)]

@@ -62,35 +62,26 @@ impl Component for Model {
     }
 
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
-        let changed = if let Ok(list) = ctx.props().list.try_borrow() {
-            if list.is_empty() {
-                None
-            } else if let Some((serial, item)) = list.last() {
-                Some((*serial, item.time))
-            } else {
-                None
-            }
+        let Ok(list) = ctx.props().list.try_borrow() else { return false };
+        let (serial, time) = if let Some((serial, item)) = list.last() {
+            (*serial, item.time)
         } else {
-            None
+            return false;
         };
 
-        if let Some((serial, time)) = changed {
-            if let Some(time) = time {
-                let handle = {
-                    let link = ctx.link().clone();
-                    Timeout::new(
-                        time.as_millis()
-                            .to_u32()
-                            .expect("timeout should be u32 size"),
-                        move || link.send_message(Message::Timeout(serial)),
-                    )
-                };
-                self.timeouts.insert(serial, handle);
-            }
-            true
-        } else {
-            false
+        if let Some(time) = time {
+            let handle = {
+                let link = ctx.link().clone();
+                Timeout::new(
+                    time.as_millis()
+                        .to_u32()
+                        .expect("timeout should be u32 size"),
+                    move || link.send_message(Message::Timeout(serial)),
+                )
+            };
+            self.timeouts.insert(serial, handle);
         }
+        true
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -110,21 +101,20 @@ impl Component for Model {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if let Ok(list) = ctx.props().list.try_borrow() {
-            let style = format!(
-                "width: {}px; max-height: {}px;",
-                ctx.props().width,
-                window_inner_height() - 60
-            );
-            html! {
-                <>
-                    <div id="notification" class="notification" style={style}>
-                    { for list.iter().rev().map(|l| Self::view_item(ctx, l.0, &l.1)) }
-                    </div>
-                </>
-            }
-        } else {
-            html! {}
+        let Ok(list) = ctx.props().list.try_borrow() else {
+            return html! {};
+        };
+        let style = format!(
+            "width: {}px; max-height: {}px;",
+            ctx.props().width,
+            window_inner_height() - 60
+        );
+        html! {
+            <>
+                <div id="notification" class="notification" style={style}>
+                { for list.iter().rev().map(|l| Self::view_item(ctx, l.0, &l.1)) }
+                </div>
+            </>
         }
     }
 }
