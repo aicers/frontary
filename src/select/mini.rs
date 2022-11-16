@@ -482,7 +482,7 @@ where
     fn view_on_off_action(ctx: &Context<Self>) -> Html {
         let onclick = ctx.link().callback(|_| Message::ClickTop);
         html! {
-            <div onclick={onclick} class="mini-select-more-action">
+            <div onclick={onclick} class="mini-select-on-off-action">
             </div>
         }
     }

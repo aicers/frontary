@@ -1135,6 +1135,26 @@ div.mini-select-more-action:hover {
     cursor: pointer;
 }
 
+div.mini-select-on-off-action {
+    width: 28px;
+    height: 28px;
+    background-image: url('/frontary/more-action-dots.png');
+    background-size: 13px 13px;
+    background-position: 7.5px 7.5px;
+    background-repeat: no-repeat;
+    float: right;
+}
+
+div.mini-select-on-off-action:hover {
+    width: 28px;
+    height: 28px;
+    background-image: url('/frontary/more-action-dots-hover.png');
+    background-size: 21px 21px;
+    background-position: 3.5px 3.5px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
 div.list-title {
     float: left;
     color: #B5131A;
