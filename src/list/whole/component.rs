@@ -104,7 +104,8 @@ where
     #[prop_or(None)]
     pub title_second: Option<&'static str>,
     pub kind: Kind,
-    pub data_type: DataType,
+    #[prop_or(None)]
+    pub data_type: Option<DataType>, // None means default
     pub data: Rc<HashMap<String, ListItem>>, // (key of a row, item of the row)
     #[prop_or(None)]
     pub sort: Option<SortColumn>,
@@ -841,7 +842,7 @@ where
                                     ViewInputStatus::Edit => (Message::Edit, ctx.props().input_edit_title),
                                     ViewInputStatus::None => unreachable!(),
                                 };
-                                let messages = if ctx.props().data_type == DataType::Network {
+                                let messages = if ctx.props().data_type == Some(DataType::Network) {
                                     let mut messages: HashMap<MessageType, Message> = HashMap::new();
                                     messages.insert(MessageType::AddTag, Message::ExtraMessage(MessageType::AddTag));
                                     messages.insert(MessageType::EditTag, Message::ExtraMessage(MessageType::EditTag));
