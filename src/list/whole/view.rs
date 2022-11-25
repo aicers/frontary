@@ -208,7 +208,7 @@ where
                             {
                                 match ctx.props().kind {
                                     Kind::LayeredFirst => {
-                                        if ctx.props().data_type == DataType::Customer {
+                                        if ctx.props().data_type == Some(DataType::Customer) {
                                             let cols = ctx.props().display_info.titles.len().to_string();
                                             let style = if self.expand_list.contains(key) {
                                                 "background-image: url('/frontary/collapse-list.png');"
@@ -367,7 +367,7 @@ where
                                 }
                             }
                             {
-                                if ctx.props().kind == Kind::LayeredFirst && ctx.props().data_type == DataType::Customer && self.expand_list.contains(key) {
+                                if ctx.props().kind == Kind::LayeredFirst && ctx.props().data_type == Some(DataType::Customer) && self.expand_list.contains(key) {
                                     if let Some(pages_info) = self.pages_info_second.get(key) {
                                         let data = Rc::new(item.sub_items.iter().enumerate().map(|(index, item)| {
                                             // HIGHLIGHT: use the first item as the key
@@ -568,7 +568,7 @@ where
             let add_text = match ctx.props().kind {
                 Kind::LayeredSecond => {
                     if let Some(title) = ctx.props().title_second {
-                        let text_key = if ctx.props().data_type == DataType::Customer {
+                        let text_key = if ctx.props().data_type == Some(DataType::Customer) {
                             "Add a network".to_string()
                         } else {
                             format!("Add a(n) {}", title.to_lowercase())

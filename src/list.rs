@@ -79,10 +79,7 @@ pub enum Kind {
 pub enum DataType {
     Customer,
     Network,
-    Account,
-    Node,
-    TiDb,
-    TrustedDomain,
+    Other,
 }
 
 #[derive(Clone, PartialEq)]

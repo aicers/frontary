@@ -235,15 +235,11 @@ where
     pub(super) fn reset_sort_second_layer(&mut self, ctx: &Context<Self>) {
         if ctx.props().kind == Kind::LayeredFirst {
             self.sort_second_layer = match ctx.props().data_type {
-                DataType::Customer => Some(SortColumn {
+                Some(DataType::Customer) => Some(SortColumn {
                     index: 0,
                     status: SortStatus::Ascending,
                 }),
-                DataType::Network
-                | DataType::Account
-                | DataType::Node
-                | DataType::TrustedDomain
-                | DataType::TiDb => None,
+                _ => None,
             };
         }
     }
