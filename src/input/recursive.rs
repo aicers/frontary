@@ -127,6 +127,8 @@ where
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     *item = default.clone();
+                                    let id = base_index + index;
+                                    self.default_to_buffer_radio(id, default);
                                 }
                             }
                         }
@@ -173,6 +175,16 @@ where
                     }
                 }
             });
+    }
+
+    pub(super) fn default_to_buffer_radio(&mut self, id: usize, default: &InputItem) {
+        if let (InputItem::Text(default), Some(buffer)) = (default, self.radio_buffer.get(&id)) {
+            if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                if !default.is_empty() {
+                    *buffer = default.clone();
+                }
+            }
+        }
     }
 
     pub(super) fn default_to_buffer_select_single(&mut self, id: usize, default: &InputItem) {
