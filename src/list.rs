@@ -79,7 +79,6 @@ pub enum Kind {
 pub enum DataType {
     Customer,
     Network,
-    Other,
 }
 
 #[derive(Clone, PartialEq)]
