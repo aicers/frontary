@@ -545,6 +545,17 @@ where
                                 candidate_values={Rc::clone(&candidates)}
                                 selected_value={Rc::clone(buffer)}
                             />
+                            {
+                                if ess.notice.is_empty() {
+                                    html! {}
+                                } else {
+                                    html! {
+                                        <div class="input-radio-notice">
+                                            { text!(txt, ctx.props().language, ess.notice) }
+                                        </div>
+                                    }
+                                }
+                            }
                         </div>
                     </div>
                     <div class="input-radio-message">
