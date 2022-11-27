@@ -105,7 +105,7 @@ pub enum InputType {
     ), // (Option<f32>, Option<f32>, Option<usize>, Option<u32>) = (min, max, # of decimals, width)
     CheckBox(
         Essential,
-        Option<CheckStatus>, // if whether always checked/unchecked/indeterminate, Some(CheckStatus::*)
+        Option<CheckStatus>, // if always checked/unchecked/indeterminate, Some(CheckStatus::*)
         Option<(ChildrenPosition, Vec<Rc<InputType>>)>, // children
     ),
     // HIGHLIGHT: If an item is set to always something, all of its children should be set to the same.

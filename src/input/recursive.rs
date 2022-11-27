@@ -147,7 +147,8 @@ where
                                     self.prepare_default_recursive(
                                         data_children,
                                         &children.1,
-                                        *checked == CheckStatus::Checked,
+                                        *checked == CheckStatus::Checked
+                                            || *checked == CheckStatus::Indeterminate,
                                         (base_index + index) * MAX_PER_LAYER,
                                     );
                                 }
@@ -603,27 +604,96 @@ where
                                     propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                                 }
                                 (
-                                    InputItem::Text(_),
+                                    InputItem::Text(user),
                                     InputType::Text(ess, _, _) | InputType::Radio(ess, _),
-                                )
-                                | (
-                                    InputItem::HostNetworkGroup(_),
+                                ) => {
+                                    if user.is_empty()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (
+                                    InputItem::HostNetworkGroup(user),
                                     InputType::HostNetworkGroup(ess, _, _, _),
-                                )
-                                | (InputItem::SelectSingle(_), InputType::SelectSingle(ess, _))
-                                | (
-                                    InputItem::SelectMultiple(_),
+                                ) => {
+                                    if user.is_empty()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (
+                                    InputItem::SelectSingle(user),
+                                    InputType::SelectSingle(ess, _),
+                                ) => {
+                                    if user.is_none()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (
+                                    InputItem::SelectMultiple(user),
                                     InputType::SelectMultiple(ess, _, _, _),
-                                )
-                                | (InputItem::Tag(_), InputType::Tag(ess, _))
-                                | (InputItem::Unsigned32(_), InputType::Unsigned32(ess, _, _, _))
-                                | (
-                                    InputItem::Percentage(_),
+                                ) => {
+                                    if user.is_empty()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (InputItem::Tag(user), InputType::Tag(ess, _)) => {
+                                    if (user.old.is_empty()
+                                        && user.new.is_none()
+                                        && user.edit.is_none()
+                                        && user.delete.is_none())
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (
+                                    InputItem::Unsigned32(user),
+                                    InputType::Unsigned32(ess, _, _, _),
+                                ) => {
+                                    if user.is_none()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (
+                                    InputItem::Percentage(user),
                                     InputType::Percentage(ess, _, _, _, _),
-                                )
-                                | (InputItem::Nic(_), InputType::Nic(ess)) => {
-                                    if let Some(value) = &ess.default {
-                                        *c = value.clone();
+                                ) => {
+                                    if user.is_none()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
+                                    }
+                                }
+                                (InputItem::Nic(user), InputType::Nic(ess)) => {
+                                    if user.is_empty()
+                                        || this_checked == Some(CheckStatus::Unchecked)
+                                    {
+                                        if let Some(value) = &ess.default {
+                                            *c = value.clone();
+                                        }
                                     }
                                 }
                                 (_, _) => (),
