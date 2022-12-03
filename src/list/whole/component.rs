@@ -190,7 +190,6 @@ where
         s.reset_sort_second_layer(ctx);
         s.set_sort_list_kind(ctx);
         s.sort_keys(ctx);
-
         s
     }
 

@@ -26,9 +26,11 @@ pub enum Column {
     SelectMultiple(HashMap<String, String>), // id, value
     Tag(HashSet<String>),
     Unsigned32(Option<u32>),
+    Float64(Option<f64>),
     Percentage(Option<f32>, Option<usize>), // usize = # of decimals
     Nic(Vec<InputNic>),
     CheckBox(CheckStatus, Option<Vec<Column>>, Option<String>), // String = display
+    Group(Vec<Vec<Column>>),
 }
 
 impl ToString for Column {
@@ -48,6 +50,7 @@ impl ToString for Column {
                 .collect::<Vec<String>>()
                 .join(","),
             Self::Unsigned32(d) => d.map_or_else(String::new, |d| d.to_string()),
+            Self::Float64(d) => d.map_or_else(String::new, |d| d.to_string()),
             Self::Percentage(f, d) => f.map_or_else(String::new, |f| {
                 format!("{0:.1$}%", f * 100.0, d.unwrap_or(NUM_OF_DECIMALS_DEFAULT))
             }),
@@ -64,6 +67,7 @@ impl ToString for Column {
             Self::CheckBox(_, _, display) => {
                 display.as_ref().map_or_else(String::new, Clone::clone)
             }
+            Self::Group(_) => String::new(),
         }
     }
 }

@@ -69,8 +69,8 @@ pub struct InputTag {
 pub struct Essential {
     pub title: &'static str,
     pub notice: &'static str,
-    pub required: bool, // in CheckBox/Radio, this is meaningless so can be an arbitrary value
-    pub unique: bool,   // in CheckBox/Radio, this is meaningless so can be an arbitrary value
+    pub required: bool,
+    pub unique: bool, // for InputType::Text only. In other cases, this is meaningless.
     pub default: Option<InputItem>, // in CheckBox, CheckStatus only should be set properly in hierarchical meaning
                                     // e.g. `default: Some(InputItem::CheckBox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
 }
@@ -87,15 +87,17 @@ pub enum InputType {
     Password(Essential, Option<u32>),
     Radio(Essential, Vec<ViewString>),
     HostNetworkGroup(Essential, HostNetworkKind, Option<usize>, Option<u32>), // (usize, u32) = (# of input, width)
-    SelectSingle(Essential, Vec<(String, ViewString)>), // (String, ViewString) = (key, display)
+    SelectSingle(Essential, Vec<(String, ViewString)>, Option<u32>), // (String, ViewString, Option<u32>) = (key, display, width)
     SelectMultiple(
         Essential,
         Option<Vec<(String, ViewString)>>, // (String, ViewString) = (key, display)
         Option<usize>,                     // in case of using the NIC list, the index of data's NIC
+        Option<u32>,                       // width
         bool,                              // bool = whether all selected by default
     ),
     Tag(Essential, HashMap<String, String>), // (String, String) = (key, tag value(name))
     Unsigned32(Essential, u32, u32, Option<u32>), // (u32, u32, Option<u32>) = (min, max, width)
+    Float64(Essential, Option<f64>, Option<u32>), // (Option<f64>, Option<u32>) = (step, width)
     Percentage(
         Essential,
         Option<f32>,
@@ -111,6 +113,9 @@ pub enum InputType {
     // HIGHLIGHT: If an item is set to always something, all of its children should be set to the same.
     Nic(Essential),
     File(Essential),
+    Group(Essential, bool, Vec<Option<u32>>, Vec<Rc<InputType>>),
+    // bool = true if one row contains all items, false if one row has one item
+    // Option<u32> = Some if width fixed, None if not fixed
 }
 
 impl InputType {
@@ -121,14 +126,16 @@ impl InputType {
             | Self::Password(ess, _)
             | Self::Radio(ess, _)
             | Self::HostNetworkGroup(ess, _, _, _)
-            | Self::SelectSingle(ess, _)
-            | Self::SelectMultiple(ess, _, _, _)
+            | Self::SelectSingle(ess, _, _)
+            | Self::SelectMultiple(ess, _, _, _, _)
             | Self::Tag(ess, _)
             | Self::Unsigned32(ess, _, _, _)
+            | Self::Float64(ess, _, _)
             | Self::Percentage(ess, _, _, _, _)
             | Self::CheckBox(ess, _, _)
             | Self::Nic(ess)
-            | Self::File(ess) => ess.required,
+            | Self::File(ess)
+            | Self::Group(ess, _, _, _) => ess.required,
         }
     }
 
@@ -139,14 +146,36 @@ impl InputType {
             | Self::Password(ess, _)
             | Self::Radio(ess, _)
             | Self::HostNetworkGroup(ess, _, _, _)
-            | Self::SelectSingle(ess, _)
-            | Self::SelectMultiple(ess, _, _, _)
+            | Self::SelectSingle(ess, _, _)
+            | Self::SelectMultiple(ess, _, _, _, _)
             | Self::Tag(ess, _)
             | Self::Unsigned32(ess, _, _, _)
+            | Self::Float64(ess, _, _)
             | Self::Percentage(ess, _, _, _, _)
             | Self::CheckBox(ess, _, _)
             | Self::Nic(ess)
-            | Self::File(ess) => ess.unique,
+            | Self::File(ess)
+            | Self::Group(ess, _, _, _) => ess.unique,
+        }
+    }
+
+    #[must_use]
+    pub fn title(&self) -> &str {
+        match self {
+            Self::Text(ess, _, _)
+            | Self::Password(ess, _)
+            | Self::Radio(ess, _)
+            | Self::HostNetworkGroup(ess, _, _, _)
+            | Self::SelectSingle(ess, _, _)
+            | Self::SelectMultiple(ess, _, _, _, _)
+            | Self::Tag(ess, _)
+            | Self::Unsigned32(ess, _, _, _)
+            | Self::Float64(ess, _, _)
+            | Self::Percentage(ess, _, _, _, _)
+            | Self::CheckBox(ess, _, _)
+            | Self::Nic(ess)
+            | Self::File(ess)
+            | Self::Group(ess, _, _, _) => ess.title,
         }
     }
 }
@@ -160,10 +189,12 @@ pub enum InputItem {
     SelectMultiple(HashSet<String>), // key
     Tag(InputTagGroup),
     Unsigned32(Option<u32>),
+    Float64(Option<f64>),
     Percentage(Option<f32>),
     CheckBox(CheckStatus, Option<Vec<Rc<RefCell<InputItem>>>>),
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
+    Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
 }
 
 impl InputItem {
@@ -176,6 +207,7 @@ impl InputItem {
             InputItem::SelectMultiple(list) => list.clear(),
             InputItem::Tag(group) => *group = InputTagGroup::default(),
             InputItem::Unsigned32(value) => *value = None,
+            InputItem::Float64(value) => *value = None,
             InputItem::Percentage(value) => *value = None,
             InputItem::CheckBox(value, children) => {
                 *value = CheckStatus::Unchecked;
@@ -192,6 +224,7 @@ impl InputItem {
                 *name = String::new();
                 *content = String::new();
             }
+            InputItem::Group(group) => group.clear(),
         }
     }
 }
@@ -223,6 +256,7 @@ impl From<&Column> for InputItem {
                 delete: None,
             }),
             Column::Unsigned32(value) => Self::Unsigned32(*value),
+            Column::Float64(value) => Self::Float64(*value),
             Column::Percentage(f, _) => Self::Percentage(*f),
             Column::Nic(nics) => Self::Nic(nics.clone()),
             Column::CheckBox(status, children, _) => Self::CheckBox(
@@ -234,6 +268,25 @@ impl From<&Column> for InputItem {
                         .collect::<Vec<Rc<RefCell<InputItem>>>>()
                 }),
             ),
+            Column::Group(group) => {
+                let mut input: Vec<Vec<Rc<RefCell<InputItem>>>> = Vec::new();
+                for g in group {
+                    let mut input_row: Vec<Rc<RefCell<InputItem>>> = Vec::new();
+                    for c in g {
+                        match c {
+                            Column::Text(..)
+                            | Column::Unsigned32(..)
+                            | Column::Float64(..)
+                            | Column::SelectSingle(..) => {
+                                input_row.push(Rc::new(RefCell::new(c.into())));
+                            }
+                            _ => {}
+                        }
+                    }
+                    input.push(input_row);
+                }
+                Self::Group(input)
+            }
         }
     }
 }

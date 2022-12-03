@@ -52,7 +52,7 @@ where
                         }
                         (
                             InputItem::SelectMultiple(data),
-                            InputType::SelectMultiple(_, _, _, all),
+                            InputType::SelectMultiple(_, _, _, _, all),
                         ) => {
                             if *all {
                                 self.select_searchable_buffer
@@ -62,7 +62,7 @@ where
                                     .insert(this_index, Rc::new(RefCell::new(Some(data.clone()))));
                             }
                         }
-                        (InputItem::SelectSingle(data), InputType::SelectSingle(_, _)) => {
+                        (InputItem::SelectSingle(data), InputType::SelectSingle(_, _, _)) => {
                             let mut buf = HashSet::new();
                             if let Some(data) = data {
                                 buf.insert(data.clone());
@@ -84,6 +84,29 @@ where
                                     &children.1,
                                     this_index * MAX_PER_LAYER,
                                 );
+                            }
+                        }
+                        (InputItem::Group(data), InputType::Group(_, _, _, group)) => {
+                            for (row, d) in data.iter().enumerate() {
+                                for ((col, d), t) in d.iter().enumerate().zip(group.iter()) {
+                                    if let Ok(d) = d.try_borrow() {
+                                        let sub_base_index = this_index * MAX_PER_LAYER;
+                                        if let (
+                                            InputItem::SelectSingle(data),
+                                            InputType::SelectSingle(..),
+                                        ) = (&*d, &**t)
+                                        {
+                                            let mut buf = HashSet::new();
+                                            if let Some(data) = data {
+                                                buf.insert(data.clone());
+                                            }
+                                            self.select_searchable_buffer.insert(
+                                                col + (row + sub_base_index) * MAX_PER_LAYER,
+                                                Rc::new(RefCell::new(Some(buf))),
+                                            );
+                                        }
+                                    }
+                                }
                             }
                         }
                         // TODO: implement if necessary
@@ -154,7 +177,7 @@ where
                                 }
                             }
                         }
-                        (InputItem::SelectSingle(_), InputType::SelectSingle(ess, _)) => {
+                        (InputItem::SelectSingle(_), InputType::SelectSingle(ess, _, _)) => {
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     *item = default.clone();
@@ -163,7 +186,10 @@ where
                                 }
                             }
                         }
-                        (InputItem::SelectMultiple(_), InputType::SelectMultiple(ess, _, _, _)) => {
+                        (
+                            InputItem::SelectMultiple(_),
+                            InputType::SelectMultiple(ess, _, _, _, _),
+                        ) => {
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     *item = default.clone();
@@ -172,10 +198,43 @@ where
                                 }
                             }
                         }
+                        (InputItem::Group(_), InputType::Group(ess, _, _, _)) => {
+                            if let Some(InputItem::Group(default)) = &ess.default {
+                                if let Some(default) = default.first() {
+                                    if let Some(copy_default) = Self::copy_default(default) {
+                                        if parent_checked {
+                                            *item = InputItem::Group(vec![copy_default]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         (_, _) => (),
                     }
                 }
             });
+    }
+
+    pub(super) fn copy_default(
+        default: &[Rc<RefCell<InputItem>>],
+    ) -> Option<Vec<Rc<RefCell<InputItem>>>> {
+        let copy_default = default
+            .iter()
+            .filter_map(|d| {
+                if let Ok(d) = d.try_borrow() {
+                    Some(d.clone())
+                } else {
+                    None
+                }
+            })
+            .into_iter()
+            .map(|d| Rc::new(RefCell::new(d)))
+            .collect::<Vec<Rc<RefCell<InputItem>>>>();
+        if default.len() == copy_default.len() {
+            Some(copy_default)
+        } else {
+            None
+        }
     }
 
     pub(super) fn default_to_buffer_radio(&mut self, id: usize, default: &InputItem) {
@@ -258,6 +317,7 @@ where
                             InputItem::SelectSingle(s) => s.is_none(),
                             InputItem::SelectMultiple(s) => s.is_empty(),
                             InputItem::Unsigned32(v) => v.is_none(),
+                            InputItem::Float64(v) => v.is_none(),
                             InputItem::Percentage(v) => v.is_none(),
                             InputItem::CheckBox(s, _) => *s == CheckStatus::Unchecked,
                             InputItem::Nic(n) => n
@@ -275,6 +335,7 @@ where
                                 .is_none(),
                             InputItem::File(_, content) => content.is_empty(),
                             InputItem::Tag(_) => false,
+                            InputItem::Group(group) => group.is_empty(),
                         };
                         if empty {
                             self.required_msg.insert(base_index + index);
@@ -629,7 +690,7 @@ where
                                 }
                                 (
                                     InputItem::SelectSingle(user),
-                                    InputType::SelectSingle(ess, _),
+                                    InputType::SelectSingle(ess, _, _),
                                 ) => {
                                     if user.is_none()
                                         || this_checked == Some(CheckStatus::Unchecked)
@@ -641,7 +702,7 @@ where
                                 }
                                 (
                                     InputItem::SelectMultiple(user),
-                                    InputType::SelectMultiple(ess, _, _, _),
+                                    InputType::SelectMultiple(ess, _, _, _, _),
                                 ) => {
                                     if user.is_empty()
                                         || this_checked == Some(CheckStatus::Unchecked)

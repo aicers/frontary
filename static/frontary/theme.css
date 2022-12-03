@@ -1579,6 +1579,28 @@ td.list-whole-head-title:hover div.basic-sort-descending {
     background-image: url('/frontary/sort-to-ascending-from-descending.png');
 }
 
+table.list-whole-group {
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+th.list-whole-group-heading {
+    height: 30px;
+    background-color: #F4F1F1;
+    font-weight: normal;
+    font-size: 11px;
+    color: #000000;
+    border-right: 1px solid #D7D7D7;
+    border-top: 1px solid #D7D7D7;
+    border-bottom: 1px solid #D7D7D7;
+
+}
+
+td.list-whole-group {
+    padding: 4px;
+}
+
 div.page-outer {
     display: inline-block;
     height: 30px;
@@ -1751,6 +1773,12 @@ div.input-item {
     display: flex;
     flex-direction: column;
     margin-bottom: 24px;
+}
+
+div.input-item-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 div.input-contents-item-title {
@@ -1981,7 +2009,7 @@ div.input-radio-message {
     width: 100%;
 }
 
-div.input-select-multiple {
+div.input-select-searchable {
     margin-bottom: 24px;
 }
 
@@ -2496,7 +2524,7 @@ td.input-nic-input-add {
     padding-left: 20px;
 }
 
-div.input-nic-add-nic {
+div.input-add-item {
     width: 60px;
     height: 30px;
     font-weight: normal;
@@ -2509,7 +2537,7 @@ div.input-nic-add-nic {
     border-radius: 2px;
 }
 
-div.input-nic-add-nic:hover {
+div.input-add-item:hover {
     cursor: pointer;
     background-color: #FFFFFF;
 }
@@ -2619,6 +2647,54 @@ label.input-file-choose-file {
 label.input-file-choose-file:hover {
     cursor: pointer;
     background-color: #FFFFFF;
+}
+
+div.input-group {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 80px;
+}
+
+table.input-group {
+    width: 100%;
+}
+
+th.input-group-heading {
+    height: 30px;
+    background-color: #F4F1F1;
+    font-weight: normal;
+    font-size: 11px;
+    color: #000000;
+    border-right: 1px solid #D7D7D7;
+    border-top: 1px solid #D7D7D7;
+    border-bottom: 1px solid #D7D7D7;
+
+}
+
+th.input-group-heading-delete {
+    width: 24px;
+    background-color: #F4F1F1;
+    border-top: 1px solid #D7D7D7;
+    border-bottom: 1px solid #D7D7D7;
+}
+
+td.input-group {
+    padding: 4px;
+}
+
+div.input-group-item-outer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.input-group-add {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-bottom: 4px;
 }
 
 div.notification {

@@ -623,6 +623,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
         let txt = ctx.props().txt.txt.clone();
         match col {
@@ -635,6 +636,7 @@ where
                 }
             },
             Column::Unsigned32(_)
+            | Column::Float64(_)
             | Column::SelectSingle(_)
             | Column::Percentage(_, _)
             | Column::CheckBox(_, _, _) => {
@@ -698,6 +700,52 @@ where
                         })
                     }
                     </div>
+                }
+            }
+            Column::Group(group) => {
+                let Some(input_type) = ctx.props().input_type.get(index) else {
+                    return html! {};
+                };
+                let InputType::Group(_, _, _, col_type) = &**input_type else {
+                    return html! {};
+                };
+
+                html! {
+                    <table class="list-whole-group">
+                        <tr>
+                        {
+                            for col_type.iter().map(|t| html! {
+                                <th class="list-whole-group-heading">
+                                    { t.title() }
+                                </th>
+                            })
+                        }
+                        </tr>
+                        {
+                            for group.iter().map(|g|
+                                html! {
+                                    <tr>
+                                    {
+                                        for g.iter().map(|c|
+                                            match c {
+                                                Column::Text(..)
+                                                | Column::Unsigned32(..)
+                                                | Column::Float64(..)
+                                                | Column::SelectSingle(..) => html! {
+                                                    <td class="list-whole-group">
+                                                        { Self::view_column(ctx, index, c) }
+                                                    </td>
+                                                },
+                                                _ => html! {}
+                                            }
+
+                                        )
+                                    }
+                                    </tr>
+                                }
+                            )
+                        }
+                    </table>
                 }
             }
         }
