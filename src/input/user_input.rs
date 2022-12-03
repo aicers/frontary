@@ -43,6 +43,7 @@ const PASSWD_REQUIREMENT: &str = if cfg!(feature = "cc-password") {
 const INTERFACE_NOTICE: &str = "x.x.x.x/x";
 const GATEWAY_NOTICE: &str = "x.x.x.x";
 const SELECT_NIC_WIDTH: u32 = 130;
+const FLOAT64_STEP_DEFAULT: f64 = 0.1;
 pub(super) const MAX_PER_LAYER: usize = 20;
 
 impl<T> Model<T>
@@ -61,6 +62,7 @@ where
         layer_index: usize,
         base_index: usize,
         autofocus: bool,
+        group: bool,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
@@ -91,16 +93,29 @@ where
         } else {
             "frontary-input-text"
         };
+        let class_item = if group {
+            "input-item-group"
+        } else {
+            "input-item"
+        };
         let style = format!(
             "width: {};",
             width.map_or("100%".to_string(), |w| format!("{}px", w))
         );
 
         html! {
-            <div class="input-item">
-                <div class="input-contents-item-title">
-                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
-                </div>
+            <div class={class_item}>
+                {
+                    if group {
+                        html! {}
+                    } else {
+                        html! {
+                            <div class="input-contents-item-title">
+                                { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                            </div>
+                        }
+                    }
+                }
                 {
                     if let Some(length) = length {
                         html! {
@@ -284,6 +299,7 @@ where
         layer_index: usize,
         base_index: usize,
         autofocus: bool,
+        group: bool,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
@@ -312,11 +328,15 @@ where
         } else {
             None
         };
-
         let class = if self.required_msg.contains(&(base_index + layer_index)) {
             "input-number-alert"
         } else {
             "input-number"
+        };
+        let class_item = if group {
+            "input-item-group"
+        } else {
+            "input-item"
         };
         let style = format!(
             "width: {};",
@@ -324,10 +344,18 @@ where
         );
 
         html! {
-            <div class="input-item">
-                <div class="input-contents-item-title">
-                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
-                </div>
+            <div class={class_item}>
+                {
+                    if group {
+                        html! {}
+                    } else {
+                        html! {
+                            <div class="input-contents-item-title">
+                                { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                            </div>
+                        }
+                    }
+                }
                 <div class="input-contents-item-input">
                 {
                     if let Some(value) = value {
@@ -349,6 +377,131 @@ where
                                 oninput={oninput}
                                 min={min.to_string()}
                                 max={max.to_string()}
+                            />
+                        }
+                    }
+                }
+                </div>
+                <div class="input-text-message">
+                    { self.view_required_msg(ctx, base_index + layer_index) }
+                </div>
+                {
+                    if self.unique_msg.contains(&(base_index + layer_index)) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                                { text!(txt, ctx.props().language, EXISTING_MSG) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(base_index + layer_index)) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                               { text!(txt, ctx.props().language, INVALID_MSG) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                <div class="input-contents-item-space">
+                </div>
+            </div>
+        }
+    }
+
+    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn view_float_64(
+        &self,
+        ctx: &Context<Self>,
+        ess: &InputEssential,
+        step: Option<f64>,
+        width: Option<u32>,
+        input_data: &Rc<RefCell<InputItem>>,
+        layer_index: usize,
+        base_index: usize,
+        autofocus: bool,
+        group: bool,
+    ) -> Html {
+        let txt = ctx.props().txt.txt.clone();
+        let input_data_clone = input_data.clone();
+        let oninput = ctx.link().callback(move |e: InputEvent| {
+            e.target()
+                .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
+                .map_or(Message::InputError, |input| {
+                    if let Ok(value) = input.value().parse::<f64>() {
+                        Message::InputFloat64(
+                            base_index + layer_index,
+                            value,
+                            input_data_clone.clone(),
+                        )
+                    } else {
+                        Message::InvalidInputFloat64
+                    }
+                })
+        });
+        let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
+        let value = if let Ok(input_data) = input_data.try_borrow() {
+            if let InputItem::Float64(value) = *input_data {
+                value
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+            "input-number-alert"
+        } else {
+            "input-number"
+        };
+        let class_item = if group {
+            "input-item-group"
+        } else {
+            "input-item"
+        };
+        let style = format!(
+            "width: {};",
+            width.map_or("100%".to_string(), |w| format!("{}px", w))
+        );
+        let step = step.unwrap_or(FLOAT64_STEP_DEFAULT);
+
+        html! {
+            <div class={class_item}>
+            {
+                if group {
+                    html! {}
+                } else {
+                    html! {
+                        <div class="input-contents-item-title">
+                            { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                        </div>
+                    }
+                }
+            }
+                <div class="input-contents-item-input">
+                {
+                    if let Some(value) = value {
+                        html! {
+                            <input type="number" class={class} style={style}
+                                value={value.to_string()}
+                                step={step.to_string()}
+                                placeholder={placeholder}
+                                autofocus={autofocus}
+                                oninput={oninput}
+                            />
+                        }
+                    } else {
+                        html! {
+                            <input type="number" class={class} style={style}
+                                step={step.to_string()}
+                                placeholder={placeholder}
+                                autofocus={autofocus}
+                                oninput={oninput}
                             />
                         }
                     }
@@ -617,11 +770,13 @@ where
         ctx: &Context<Self>,
         multiple: bool,
         ess: &InputEssential,
+        width: Option<u32>,
         list: &[(String, ViewString)],
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
         depth: u32,
+        group: bool,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let list_clone = Rc::new(list.to_vec());
@@ -643,20 +798,32 @@ where
             }
         });
         let list = Rc::new(RefCell::new(list));
-        let top_width = if depth > 0 {
+
+        let top_width = if let Some(width) = width {
+            width
+        } else if depth > 0 {
             SELECT_NIC_WIDTH
         } else {
             ctx.props().width - PADDING_SUM
         };
+        let class_item = if group { "" } else { "input-select-searchable" };
         if let Some(selected) = self
             .select_searchable_buffer
             .get(&(base_index + layer_index))
         {
             html! {
-                <div class="input-select-multiple">
-                    <div class="input-contents-item-general-title">
-                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
-                    </div>
+                <div class={class_item}>
+                    {
+                        if group {
+                            html! {}
+                        } else {
+                            html! {
+                                <div class="input-contents-item-general-title">
+                                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                </div>
+                            }
+                        }
+                    }
                     {
                         if multiple {
                             html! {
@@ -870,11 +1037,11 @@ where
                                                         <div class={class_child}>
                                                             <div class={class_line}>
                                                             </div>
-                                                            { self.view_unsigned_32(ctx, ess, *min, *max, *width, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false) }
+                                                            { self.view_unsigned_32(ctx, ess, *min, *max, *width, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
                                                         </div>
                                                     }
                                                 }
-                                                InputType::SelectMultiple(ess, list, nics, _) => {
+                                                InputType::SelectMultiple(ess, list, nics, _, _) => {
                                                     html! {
                                                         <div class={class_child}>
                                                             <div class={class_line}>
@@ -973,11 +1140,13 @@ where
                 ctx,
                 true,
                 ess,
+                None,
                 list,
                 input_data,
                 layer_index,
                 base_index,
                 depth,
+                false,
             ),
             (None, Some(nics)) => {
                 let list = if let Some(nics) = ctx.props().input_data.get(nics) {
@@ -1011,11 +1180,13 @@ where
                         ctx,
                         true,
                         ess,
+                        None,
                         &list,
                         input_data,
                         layer_index,
                         base_index,
                         depth,
+                        false,
                     )
                 } else {
                     html! {}
@@ -1212,7 +1383,7 @@ where
                     {
                         if is_last {
                             html! {
-                                <div class="input-nic-add-nic" onclick={onclick_add}>
+                                <div class="input-add-item" onclick={onclick_add}>
                                     { text!(txt, ctx.props().language, "+ Add") }
                                 </div>
                             }
@@ -1288,6 +1459,132 @@ where
                 </div>
                 <div class="input-text-message">
                     { self.view_required_msg(ctx, base_index + layer_index) }
+                </div>
+            </div>
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_lines)]
+    pub(super) fn view_group(
+        &self,
+        ctx: &Context<Self>,
+        ess: &InputEssential,
+        one_row: bool,
+        widths: &[Option<u32>],
+        group_type: &[Rc<InputType>],
+        input_data: &Rc<RefCell<InputItem>>,
+        layer_index: usize,
+        base_index: usize,
+    ) -> Html {
+        let input_data_clone = input_data.clone();
+        let input_data_clone_1 = &(input_data.clone());
+        let Ok(input_data) = input_data.try_borrow() else {
+            return html! {}
+        };
+        let InputItem::Group(input_data) = &*input_data else {
+            return html! {};
+        };
+        let txt = ctx.props().txt.txt.clone();
+        let sub_base_index = (base_index + layer_index) * MAX_PER_LAYER;
+        let default = ess.default.clone();
+        let onclick_add = ctx.link().callback(move |_| {
+            Message::InputGroupAdd(sub_base_index, input_data_clone.clone(), default.clone())
+        });
+
+        html! {
+            <div class="input-item">
+                <div class="input-contents-item-title">
+                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                </div>
+                <div class="input-group">
+                    <div>
+                        <table class="input-group">
+                            <tr>
+                                {
+                                    for group_type.iter().enumerate().map(|(col_index, each)| {
+                                        let style = if let Some(Some(width)) = widths.get(col_index) {
+                                            format!("width: {}px;", *width)
+                                        } else {
+                                            String::new()
+                                        };
+                                        html! {
+                                            <th class="input-group-heading" style={style}>
+                                                { text!(txt, ctx.props().language, each.title()) }{ view_asterisk(each.required()) }
+                                            </th>
+                                        }
+                                    })
+                                }
+                                <th class="input-group-heading-delete">
+                                </th>
+                            </tr>
+                            {
+                                for input_data.iter().enumerate().map(|(row_index, row)| {
+                                    let input_data_clone_1 = input_data_clone_1.clone();
+                                    let default = ess.default.clone();
+                                    let onclick_delete = ctx.link().callback(move |_| {
+                                        Message::InputGroupDelete(
+                                            sub_base_index,
+                                            row_index,
+                                            input_data_clone_1.clone(),
+                                            default.clone(),
+                                        )
+                                    });
+
+                                    if one_row {
+                                        html! {
+                                            <tr>
+                                                {
+                                                    for group_type.iter().enumerate().map(|(col_index, each)| {
+                                                        let Some(input_data) = row.get(col_index) else {
+                                                            return html! {};
+                                                        };
+                                                        let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
+                                                        html! {
+                                                            <td class="input-group">
+                                                                <div class="input-group-item-outer">
+                                                                {
+                                                                    match &**each {
+                                                                        InputType::Text(ess, length, width) =>
+                                                                            self.view_text(ctx, ess, *length, *width, input_data, col_index, base_index, false, true),
+                                                                        InputType::SelectSingle(ess, list, width) => {
+                                                                            self.view_select_searchable(ctx, false, ess, *width, list, input_data, col_index, base_index, 1, true)
+                                                                        }
+                                                                        InputType::Unsigned32(ess, min, max, width) => {
+                                                                            self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, col_index, base_index, false, true)
+                                                                        }
+                                                                        InputType::Float64(ess, step, width) => {
+                                                                            self.view_float_64(ctx, ess, *step, *width, input_data, col_index, base_index, false, true)
+                                                                        }
+                                                                        _ => html! {}
+                                                                    }
+                                                                }
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    })
+                                                }
+                                                <td class="input-group-delete">
+                                                    <div class="input-nic-delete-outer">
+                                                        <div class="input-nic-delete" onclick={onclick_delete}>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    } else {
+                                        // TODO: implement in the case of !one_row
+                                        html! {}
+                                    }
+                                })
+                            }
+                        </table>
+                    </div>
+                    <div class="input-group-add">
+                        <div class="input-add-item" onclick={onclick_add}>
+                            { text!(txt, ctx.props().language, "+ Add") }
+                        </div>
+                    </div>
                 </div>
             </div>
         }

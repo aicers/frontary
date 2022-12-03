@@ -143,7 +143,9 @@ pub enum Message {
     InputPassword(usize, String, Rc<RefCell<InputItem>>),
     InputConfirmPassword(usize, String),
     InputUnsigned32(usize, u32, Rc<RefCell<InputItem>>),
+    InputFloat64(usize, f64, Rc<RefCell<InputItem>>),
     InvalidInputUnsigned32,
+    InvalidInputFloat64,
     InputPercentage(usize, f32, Rc<RefCell<InputItem>>),
     InvalidInputPercentage,
     InputRadio(usize, Rc<RefCell<InputItem>>),
@@ -160,6 +162,8 @@ pub enum Message {
     InputNicGateway(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicAdd(usize, usize, Rc<RefCell<InputItem>>),
     InputNicDelete(usize, usize, Rc<RefCell<InputItem>>),
+    InputGroupAdd(usize, Rc<RefCell<InputItem>>, Option<InputItem>),
+    InputGroupDelete(usize, usize, Rc<RefCell<InputItem>>, Option<InputItem>),
     // TODO: extend multiple files
     ChooseFile(usize, Vec<File>, Rc<RefCell<InputItem>>),
     FileLoaded(String, Vec<u8>),
@@ -177,7 +181,9 @@ impl Clone for Message {
             Self::InputPassword(a, b, c) => Self::InputPassword(*a, b.clone(), c.clone()),
             Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(*a, b.clone()),
             Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(*a, *b, c.clone()),
+            Self::InputFloat64(a, b, c) => Self::InputFloat64(*a, *b, c.clone()),
             Self::InvalidInputUnsigned32 => Self::InvalidInputUnsigned32,
+            Self::InvalidInputFloat64 => Self::InvalidInputFloat64,
             Self::InputPercentage(a, b, c) => Self::InputPercentage(*a, *b, c.clone()),
             Self::InvalidInputPercentage => Self::InvalidInputPercentage,
             Self::InputRadio(a, b) => Self::InputRadio(*a, b.clone()),
@@ -200,6 +206,10 @@ impl Clone for Message {
             }
             Self::InputNicAdd(a, b, c) => Self::InputNicAdd(*a, *b, c.clone()),
             Self::InputNicDelete(a, b, c) => Self::InputNicDelete(*a, *b, c.clone()),
+            Self::InputGroupAdd(a, b, c) => Self::InputGroupAdd(*a, b.clone(), c.clone()),
+            Self::InputGroupDelete(a, b, c, d) => {
+                Self::InputGroupDelete(*a, *b, c.clone(), d.clone())
+            }
             Self::ChooseFile(a, _, c) => Self::ChooseFile(*a, Vec::new(), c.clone()),
             Self::FileLoaded(a, b) => Self::FileLoaded(a.clone(), b.clone()),
             Self::FailLoadFile => Self::FailLoadFile,
@@ -319,10 +329,10 @@ where
             phantom: PhantomData,
         };
         Self::prepare_nic(ctx);
-        s.prepare_buffer(ctx);
         if ctx.props().input_id.is_none() {
             s.prepare_default(ctx);
         }
+        s.prepare_buffer(ctx);
         s
     }
 
@@ -454,7 +464,16 @@ where
                 self.clear_required_msg(id, false);
                 self.unique_msg.remove(&id);
             }
-            Message::InvalidInputUnsigned32 | Message::InvalidInputPercentage => return false,
+            Message::InputFloat64(id, value, input_data) => {
+                if let Ok(mut item) = input_data.try_borrow_mut() {
+                    *item = InputItem::Float64(Some(value));
+                }
+                self.clear_required_msg(id, false);
+                self.unique_msg.remove(&id);
+            }
+            Message::InvalidInputUnsigned32
+            | Message::InvalidInputFloat64
+            | Message::InvalidInputPercentage => return false,
             Message::InputPercentage(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Percentage(Some(value));
@@ -657,6 +676,64 @@ where
                 }
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
+            Message::InputGroupAdd(sub_base_index, input_data, default) => {
+                if let (Ok(mut input_data), Some(InputItem::Group(default))) =
+                    (input_data.try_borrow_mut(), default)
+                {
+                    let Some(default) = default.first() else {
+                        return false;
+                    };
+                    if let (InputItem::Group(data), Some(copy_default)) =
+                        (&mut *input_data, Self::copy_default(default))
+                    {
+                        data.push(copy_default);
+                        if let Some(d) = data.last() {
+                            for (col, d) in d.iter().enumerate() {
+                                if let Ok(d) = d.try_borrow() {
+                                    if let InputItem::SelectSingle(copied_default) = &*d {
+                                        let mut buf = HashSet::new();
+                                        if let Some(copied_default) = copied_default {
+                                            buf.insert(copied_default.clone());
+                                        }
+                                        self.select_searchable_buffer.insert(
+                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            Rc::new(RefCell::new(Some(buf))),
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Message::InputGroupDelete(sub_base_index, row_index, input_data, default) => {
+                if let (Ok(mut input_data), Some(InputItem::Group(default))) =
+                    (input_data.try_borrow_mut(), default)
+                {
+                    let Some(default) = default.first() else {
+                        return false;
+                    };
+                    if let InputItem::Group(data) = &mut *input_data {
+                        if let Some(d) = data.get(row_index) {
+                            for (col, d) in d.iter().enumerate() {
+                                if let Ok(d) = d.try_borrow() {
+                                    if let InputItem::SelectSingle(_) = &*d {
+                                        self.select_searchable_buffer.remove(
+                                            &(col + (row_index + sub_base_index) * MAX_PER_LAYER),
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                        data.remove(row_index);
+                        if data.is_empty() {
+                            if let Some(copy_default) = Self::copy_default(default) {
+                                data.push(copy_default);
+                            }
+                        }
+                    }
+                }
+            }
             Message::InputError => {
                 // TODO: issue #5
             }
@@ -752,14 +829,15 @@ where
         html! {
             for ctx.props().input_data.iter().enumerate().zip(ctx.props().input_type.iter()).map(|((index , input_data), input_type)| {
                 match &**input_type {
-                    InputType::Text(ess, length, width) => self.view_text(ctx, ess, *length, *width, input_data, index, 1 , index == 0),
+                    InputType::Text(ess, length, width) => self.view_text(ctx, ess, *length, *width, input_data, index, 1 , index == 0, false),
                     InputType::Password(ess,width) => self.view_password(ctx, ess, *width, input_data, index, 1, index == 0),
                     InputType::Radio(ess, options) => self.view_radio(ctx, ess, options, input_data, index, 1),
                     InputType::HostNetworkGroup(ess, kind, num, width) => self.view_host_network_group(ctx, ess, *kind, *num, *width, input_data, index, 1),
-                    InputType::SelectMultiple(ess, list, nics, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
-                    InputType::SelectSingle(ess, list) => self.view_select_searchable(ctx, false, ess, list, input_data, index, 1, 0),
+                    InputType::SelectMultiple(ess, list, nics, _, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
+                    InputType::SelectSingle(ess, list, width) => self.view_select_searchable(ctx, false, ess, *width, list, input_data, index, 1, 0, false),
                     InputType::Tag(ess, list) => self.view_tag_group(ctx, ess, list, input_data, index, 1),
-                    InputType::Unsigned32(ess, min, max, width) => self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, index, 1, index == 0),
+                    InputType::Unsigned32(ess, min, max, width) => self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, index, 1, index == 0, false),
+                    InputType::Float64(ess, step, width) => self.view_float_64(ctx, ess, *step, *width, input_data, index, 1, index == 0, false),
                     InputType::Percentage(ess, min, max, decimals, width) => self.view_percentage(ctx, ess, *min, *max, *decimals, *width, input_data, index, 1, index == 0),
                     InputType::CheckBox(ess, always, children) => {
                         let both = ctx.props().input_type.get(index + 1).map_or(Some(false),|next| {
@@ -773,6 +851,7 @@ where
                     }
                     InputType::Nic(ess) => self.view_nic(ctx, ess, input_data, index, 1),
                     InputType::File(ess) => self.view_file(ctx, ess, input_data, index, 1),
+                    InputType::Group(ess, one_row, widths, group_type) => self.view_group(ctx, ess, *one_row, widths, group_type, input_data, index, 1),
                 }
             })
         }
@@ -832,29 +911,31 @@ where
         );
 
         for (index, t) in ctx.props().input_type.iter().enumerate() {
-            if let Some(data) = ctx.props().input_data.get(index) {
-                if let Ok(input) = data.try_borrow() {
-                    if t.unique() {
-                        let mut different = true;
-                        for (key, item) in ctx.props().data.iter() {
-                            if id.as_ref().map_or(true, |id| id != key) {
-                                if let Some(other) = item.columns.get(index) {
-                                    if let (
-                                        Column::Text(ViewString::Raw(other_value)),
-                                        InputItem::Text(value),
-                                    ) = (other, &(*input))
-                                    {
-                                        if other_value == value {
-                                            different = false;
-                                            break;
+            if let InputType::Text(..) = &(**t) {
+                if let Some(data) = ctx.props().input_data.get(index) {
+                    if let Ok(input) = data.try_borrow() {
+                        if t.unique() {
+                            let mut different = true;
+                            for (key, item) in ctx.props().data.iter() {
+                                if id.as_ref().map_or(true, |id| id != key) {
+                                    if let Some(other) = item.columns.get(index) {
+                                        if let (
+                                            Column::Text(ViewString::Raw(other_value)),
+                                            InputItem::Text(value),
+                                        ) = (other, &(*input))
+                                        {
+                                            if other_value == value {
+                                                different = false;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        if !different {
-                            self.unique_msg.insert(index + 1);
-                            unique.push(true);
+                            if !different {
+                                self.unique_msg.insert(index + 1);
+                                unique.push(true);
+                            }
                         }
                     }
                 }
