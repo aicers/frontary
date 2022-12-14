@@ -79,7 +79,7 @@ where
                                 let first = sum_cols;
                                 sum_cols += cols.len();
                                 let style = if let ColWidths::Pixel(cols) = cols {
-                                    format!("width: {}px;", cols.iter().filter_map(Clone::clone).collect::<Vec<u32>>().iter().sum::<u32>())
+                                    format!("width: {}px;", cols.iter().filter_map(Clone::clone).sum::<u32>())
                                 } else {
                                     "width: 100%;".to_string()
                                 };
@@ -331,7 +331,7 @@ where
                                                                 let first = sum_cols;
                                                                 sum_cols += cols.len();
                                                                 let style = if let ColWidths::Pixel(cols) = cols {
-                                                                    format!("width: {}px;", cols.iter().filter_map(Clone::clone).collect::<Vec<u32>>().iter().sum::<u32>())
+                                                                    format!("width: {}px;", cols.iter().filter_map(Clone::clone).sum::<u32>())
                                                                 } else {
                                                                     "width: 100%;".to_string()
                                                                 };
@@ -458,12 +458,7 @@ where
         match widths {
             ColWidths::Pixel(widths) => Some(
                 ctx.props().display_info.width_full
-                    - widths
-                        .iter()
-                        .filter_map(Clone::clone)
-                        .collect::<Vec<u32>>()
-                        .iter()
-                        .sum::<u32>(),
+                    - widths.iter().filter_map(Clone::clone).sum::<u32>(),
             ),
             ColWidths::Ratio(_) => None,
         }

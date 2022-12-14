@@ -347,7 +347,7 @@ pub trait HostNetworkGroupTrait {
                 return false;
             }
         }
-        for r in &self.ranges() {
+        for r in self.ranges() {
             if !r.is_valid() {
                 return false;
             }
@@ -364,8 +364,7 @@ pub trait HostNetworkGroupTrait {
         for network in self.networks() {
             elems.push(network.clone());
         }
-        let ranges: Vec<String> = self.ranges().iter().map(ToString::to_string).collect();
-        for range in &ranges {
+        for range in self.ranges().iter().map(ToString::to_string) {
             elems.push(range.clone());
         }
         elems
@@ -373,7 +372,7 @@ pub trait HostNetworkGroupTrait {
 
     fn hosts(&self) -> &[String];
     fn networks(&self) -> &[String];
-    fn ranges(&self) -> Vec<IpRange>;
+    fn ranges(&self) -> &[IpRange];
 }
 
 pub fn sort_hosts(hosts: &mut Vec<String>) {
