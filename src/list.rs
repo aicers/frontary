@@ -39,16 +39,8 @@ impl ToString for Column {
             Self::Text(d) => d.to_string(),
             Self::HostNetworkGroup(d) => d.join(","),
             Self::SelectSingle(d) => d.as_ref().map_or_else(String::new, |d| d.1.clone()),
-            Self::SelectMultiple(d) => d
-                .values()
-                .map(Clone::clone)
-                .collect::<Vec<String>>()
-                .join(","),
-            Self::Tag(d) => d
-                .iter()
-                .map(Clone::clone)
-                .collect::<Vec<String>>()
-                .join(","),
+            Self::SelectMultiple(d) => d.values().map(String::as_str).collect::<Vec<_>>().join(","),
+            Self::Tag(d) => d.iter().map(String::as_str).collect::<Vec<_>>().join(","),
             Self::Unsigned32(d) => d.map_or_else(String::new, |d| d.to_string()),
             Self::Float64(d) => d.map_or_else(String::new, |d| d.to_string()),
             Self::Percentage(f, d) => f.map_or_else(String::new, |f| {

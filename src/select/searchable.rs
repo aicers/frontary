@@ -287,15 +287,14 @@ where
                             }
                         }
                         Kind::Single => {
-                            let key = selected.iter().map(Clone::clone).collect::<Vec<String>>();
-                            let key = key.first();
+                            let key = selected.iter().map(Clone::clone).next();
 
                             let value = if let (Some(key), Ok(list)) =
                                 (key, ctx.props().list.try_borrow())
                             {
                                 let mut value = String::new();
                                 for l in list.iter() {
-                                    if l.id() == key {
+                                    if l.id() == &key {
                                         value = l.value_txt(&txt, ctx.props().language);
                                         break;
                                     }
@@ -333,33 +332,27 @@ where
 {
     fn caculate_width(ctx: &Context<Self>) -> u32 {
         let txt = ctx.props().txt.txt.clone();
-        let sizes: Vec<u32> = ctx.props().list.try_borrow().map_or_else(
-            |_| Vec::new(),
-            |list| {
-                list.iter()
-                    .map(|item| {
-                        text_width(
-                            item.value_txt(&txt, ctx.props().language).as_str(),
-                            &ctx.props().font,
-                        )
-                        .unwrap_or(0)
-                    })
-                    .collect()
-            },
-        );
+        let max_size = ctx.props().list.try_borrow().ok().and_then(|list| {
+            list.iter()
+                .map(|item| {
+                    text_width(
+                        item.value_txt(&txt, ctx.props().language).as_str(),
+                        &ctx.props().font,
+                    )
+                    .unwrap_or(0)
+                })
+                .max()
+        });
 
-        sizes
-            .iter()
-            .max()
-            .map_or(ctx.props().top_width, |text_size| {
-                let size = text_size + 34;
-                if size <= ctx.props().top_width - 8 {
-                    // 8 = 4(left shadow) + 4(right shadow)
-                    ctx.props().top_width - 8
-                } else {
-                    std::cmp::min(size, ctx.props().max_width - 8)
-                }
-            })
+        max_size.map_or(ctx.props().top_width, |text_size| {
+            let size = text_size + 34;
+            if size <= ctx.props().top_width - 8 {
+                // 8 = 4(left shadow) + 4(right shadow)
+                ctx.props().top_width - 8
+            } else {
+                std::cmp::min(size, ctx.props().max_width - 8)
+            }
+        })
     }
 
     #[allow(clippy::too_many_lines)]

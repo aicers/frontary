@@ -528,9 +528,9 @@ where
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
                     let empty = if let Ok(buffer) = buffer.try_borrow() {
                         if let Some(buffer) = buffer.as_ref() {
-                            let selected = buffer.iter().map(Clone::clone).collect::<Vec<String>>();
+                            let selected = buffer.iter().map(Clone::clone).next();
                             if let Ok(mut item) = input_data.try_borrow_mut() {
-                                *item = InputItem::SelectSingle(selected.first().cloned());
+                                *item = InputItem::SelectSingle(selected);
                             }
                             buffer.is_empty()
                         } else if let Ok(mut item) = input_data.try_borrow_mut() {

@@ -38,8 +38,8 @@ impl HostNetworkGroupTrait for InputHostNetworkGroup {
     fn networks(&self) -> &[String] {
         &self.networks
     }
-    fn ranges(&self) -> Vec<IpRange> {
-        self.ranges.clone()
+    fn ranges(&self) -> &[IpRange] {
+        &self.ranges
     }
 }
 
