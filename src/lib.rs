@@ -160,7 +160,7 @@ fn validate_ip_range(txt: &str, del: char) -> Option<String> {
         let (ip_start, ip_end) = (ip_start.trim(), ip_end.trim());
         if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(ip_start), Ipv4Addr::from_str(ip_end)) {
             if start < end {
-                return Some(format!("{} ~ {}", ip_start, ip_end));
+                return Some(format!("{ip_start} ~ {ip_end}"));
             }
         }
     }
@@ -199,7 +199,7 @@ pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> Stri
             if let Ok(split) = std::str::from_utf8(&item[0..=i]) {
                 if let Ok(w) = text_width(split, font) {
                     if width > (60 + margin) && w > width - (60 + margin) {
-                        sized_item = format!("{}...", split);
+                        sized_item = format!("{split}...");
                         break;
                     }
                 }

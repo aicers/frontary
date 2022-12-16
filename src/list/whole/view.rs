@@ -243,7 +243,7 @@ where
                                                                 txt={ctx.props().txt.clone()}
                                                                 language={ctx.props().language}
                                                                 parent_message={Message::DoMoreAction(key.clone())}
-                                                                id={format!("more-action-alpha-{}", key)}
+                                                                id={format!("more-action-alpha-{key}")}
                                                                 active={true}
                                                                 list={Rc::clone(&more_action_list)}
                                                                 candidate_values={Rc::clone(&value_candidates)}
@@ -309,7 +309,7 @@ where
                                                                 txt={ctx.props().txt.clone()}
                                                                 language={ctx.props().language}
                                                                 parent_message={Message::DoMoreAction(key.clone())}
-                                                                id={format!("more-action-beta-{}", key)}
+                                                                id={format!("more-action-beta-{key}")}
                                                                 active={true}
                                                                 list={Rc::clone(&more_action_list)}
                                                                 candidate_values={Rc::clone(&value_candidates)}
@@ -477,9 +477,9 @@ where
                     || {
                         varied_width
                             .as_ref()
-                            .map_or_else(String::new, |v| format!("width: {}px;", v))
+                            .map_or_else(String::new, |v| format!("width: {v}px;"))
                     },
-                    |w| format!("width: {}px;", w),
+                    |w| format!("width: {w}px;"),
                 )
             }),
             ColWidths::Ratio(ws) => ws.get(index).map_or_else(String::new, |w| {
@@ -489,7 +489,7 @@ where
             }),
         };
         let height = format!("height: {}px;", ctx.props().display_info.height);
-        format!("{} {}", width, height)
+        format!("{width} {height}")
     }
 
     pub(super) fn view_column_row(

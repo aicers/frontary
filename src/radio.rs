@@ -87,7 +87,7 @@ where
                     };
                     let txt = ctx.props().txt.txt.clone();
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
-                    let style = ctx.props().width_item.map_or_else(String::new, |w| format!("width: {}px;", w));
+                    let style = ctx.props().width_item.map_or_else(String::new, |w| format!("width: {w}px;"));
 
                     html! {
                         <>

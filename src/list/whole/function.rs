@@ -51,7 +51,7 @@ where
                 *info = PagesInfo {
                     current: 1,
                     start: 1,
-                    end: std::cmp::min(ctx.props().num_pages, std::cmp::max(1, total)),
+                    end: total.clamp(1, ctx.props().num_pages),
                     total,
                 };
                 self.pages_info = Some(*info);
@@ -69,7 +69,7 @@ where
                         Rc::new(RefCell::new(PagesInfo {
                             current: 1,
                             start: 1,
-                            end: std::cmp::min(ctx.props().num_pages, std::cmp::max(1, total)),
+                            end: total.clamp(1, ctx.props().num_pages),
                             total,
                         })),
                     );
@@ -92,10 +92,7 @@ where
                         std::cmp::min(self.pages_info.map_or(info.current, |p| p.current), total);
                     let start =
                         std::cmp::min(self.pages_info.map_or(info.start, |p| p.start), total);
-                    let end = std::cmp::min(
-                        self.pages_info.map_or(info.end, |p| p.end),
-                        std::cmp::max(1, total),
-                    );
+                    let end = total.clamp(1, self.pages_info.map_or(info.end, |p| p.end));
 
                     *info = PagesInfo {
                         current,

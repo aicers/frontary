@@ -126,7 +126,7 @@ impl Model {
             Category::Success => SUCCESS_COLOR,
         };
         let style_contents = format!("width: {}px;", ctx.props().width - 4);
-        let style_label = format!("background-color: {};", color);
+        let style_label = format!("background-color: {color};");
         let txt = ctx.props().txt.txt.clone();
         let msg = get_text!(txt, ctx.props().language.tag(), &noti.message)
             .map_or(noti.message.clone(), |text| text.to_string());
@@ -249,7 +249,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                         sub_message += &error;
                     }
                 } else {
-                    write!(sub_message, "{} & ", error).expect("in-memory operation");
+                    write!(sub_message, "{error} & ").expect("in-memory operation");
                 }
             }
             NotificationItem {

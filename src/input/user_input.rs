@@ -100,7 +100,7 @@ where
         };
         let style = format!(
             "width: {};",
-            width.map_or("100%".to_string(), |w| format!("{}px", w))
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
 
         html! {
@@ -217,7 +217,7 @@ where
         };
         let style = format!(
             "width: {};",
-            width.map_or("100%".to_string(), |w| format!("{}px", w))
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
 
         html! {
@@ -340,7 +340,7 @@ where
         };
         let style = format!(
             "width: {};",
-            width.map_or("100%".to_string(), |w| format!("{}px", w))
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
 
         html! {
@@ -466,7 +466,7 @@ where
         };
         let style = format!(
             "width: {};",
-            width.map_or("100%".to_string(), |w| format!("{}px", w))
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
         let step = step.unwrap_or(FLOAT64_STEP_DEFAULT);
 
@@ -588,7 +588,7 @@ where
         };
         let style = format!(
             "width: {};",
-            width.map_or("100%".to_string(), |w| format!("{}px", w))
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
 
         let min = min.map_or(0.0, |v| v * 100.0);
@@ -830,7 +830,7 @@ where
                                 <SelectSearchable<Self>
                                     txt={ctx.props().txt.clone()}
                                     language={ctx.props().language}
-                                    id={format!("select-searchable-{}-{}", base_index, layer_index)}
+                                    id={format!("select-searchable-{base_index}-{layer_index}")}
                                     kind={SelectSearchableKind::Multi}
                                     title={ess.title}
                                     empty_msg={ess.notice}
@@ -848,7 +848,7 @@ where
                                 <SelectSearchable<Self>
                                     txt={ctx.props().txt.clone()}
                                     language={ctx.props().language}
-                                    id={format!("select-searchable-{}-{}", base_index, layer_index)}
+                                    id={format!("select-searchable-{base_index}-{layer_index}")}
                                     kind={SelectSearchableKind::Single}
                                     title={ess.title}
                                     empty_msg={ess.notice}

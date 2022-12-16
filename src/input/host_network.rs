@@ -283,7 +283,7 @@ where
             ctx.props().max_height,
             ctx.props()
                 .width
-                .map_or("100%".to_string(), |w| format!("{}px", w))
+                .map_or("100%".to_string(), |w| format!("{w}px"))
         );
         html! {
             <>

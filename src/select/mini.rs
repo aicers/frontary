@@ -189,7 +189,7 @@ where
         let style_width = ctx
             .props()
             .list_min_width
-            .map_or_else(String::new, |w| format!("min-width: {}px;", w));
+            .map_or_else(String::new, |w| format!("min-width: {w}px;"));
         let align = if ctx.props().align_left {
             "left"
         } else {
@@ -312,11 +312,11 @@ where
         let style_width = ctx
             .props()
             .top_width
-            .map_or_else(String::new, |w| format!("width: {}px;", w));
+            .map_or_else(String::new, |w| format!("width: {w}px;"));
         let style_height = ctx
             .props()
             .top_height
-            .map_or_else(String::new, |h| format!("height: {}px;", h));
+            .map_or_else(String::new, |h| format!("height: {h}px;"));
         let style = if ctx.props().kind == Kind::Round {
             format!(
                 "{} {} background-color: {}; color: {};",
@@ -359,9 +359,9 @@ where
             String::new()
         };
         let (class, class_text, class_icon) = (
-            format!("mini-select-top-direction{}", suffix),
-            format!("mini-select-top-direction-text{}", suffix),
-            format!("mini-select-top-direction-icon{}", suffix),
+            format!("mini-select-top-direction{suffix}"),
+            format!("mini-select-top-direction-text{suffix}"),
+            format!("mini-select-top-direction-icon{suffix}"),
         );
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
@@ -404,7 +404,7 @@ where
         let style_width = ctx
             .props()
             .top_width
-            .map_or_else(String::new, |w| format!("width: {}px;", w));
+            .map_or_else(String::new, |w| format!("width: {w}px;"));
         let style = format!(
             "{} background-color: {};",
             style_width,

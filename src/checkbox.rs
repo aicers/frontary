@@ -37,7 +37,7 @@ pub fn model(props: &Props) -> Html {
             CheckStatus::Unchecked => ALWAYS_UNCHECKED_URL,
         },
     );
-    let style = format!("background-image: url({});", url);
+    let style = format!("background-image: url({url});");
 
     html! {
         <div class="basic-checkbox" style={style}>

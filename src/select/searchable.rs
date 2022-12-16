@@ -376,7 +376,7 @@ where
             "width: {}px; height: {}px; left: {}px;",
             width, height, left,
         );
-        let style_inner = format!("width: {}px; height: {}px;", width - 10, height);
+        let style_inner = format!("width: {}px; height: {height}px;", width - 10);
         let style_inner_width = format!("width: {}px;", width - 10);
         let style_inner_width_search = format!("width: {}px", width - 10 - 28);
         let oninput_search = ctx.link().callback(|e: InputEvent| {
