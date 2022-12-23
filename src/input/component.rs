@@ -1,12 +1,13 @@
 use super::{
-    user_input::MAX_PER_LAYER, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, InputType,
+    user_input::MAX_PER_LAYER, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup,
+    InputType, Value as ComparisonValue,
 };
 use crate::{
     language::Language,
     list::{Column, ListItem},
     sort_hosts, sort_networks, text, InputNic, MessageType, Rerender, Texts, ViewString,
 };
-use base64::encode;
+use base64::{engine::general_purpose, Engine as _};
 use gloo_file::{
     callbacks::{read_as_bytes, FileReader},
     File,
@@ -49,11 +50,25 @@ pub enum InputSecondId {
     Edit(String),
 }
 
+type CompValueBuf = HashMap<
+    usize,
+    (
+        Rc<RefCell<Option<ComparisonValue>>>,
+        Rc<RefCell<Option<ComparisonValue>>>,
+    ),
+>;
+
+type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
+
 pub struct Model<T> {
     pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) vec_select_buffer: VecSelectBuf,
     pub(super) tag_buffer: HashMap<usize, Rc<RefCell<InputTagGroup>>>,
+    pub(super) comparison_value_kind_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) comparison_value_cmp_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) comparison_value_buffer: CompValueBuf,
 
     pub(super) confirm_password: HashMap<usize, String>,
     pub(super) unique_msg: HashSet<usize>,
@@ -84,7 +99,11 @@ where
         self.radio_buffer == other.radio_buffer
             && self.host_network_buffer == other.host_network_buffer
             && self.select_searchable_buffer == other.select_searchable_buffer
+            && self.vec_select_buffer == other.vec_select_buffer
             && self.tag_buffer == other.tag_buffer
+            && self.comparison_value_kind_buffer == other.comparison_value_kind_buffer
+            && self.comparison_value_cmp_buffer == other.comparison_value_cmp_buffer
+            && self.comparison_value_buffer == other.comparison_value_buffer
             && self.confirm_password == other.confirm_password
             && self.unique_msg == other.unique_msg
             && self.required_msg == other.required_msg
@@ -106,7 +125,11 @@ impl<T> Clone for Model<T> {
             radio_buffer: self.radio_buffer.clone(),
             host_network_buffer: self.host_network_buffer.clone(),
             select_searchable_buffer: self.select_searchable_buffer.clone(),
+            vec_select_buffer: self.vec_select_buffer.clone(),
             tag_buffer: self.tag_buffer.clone(),
+            comparison_value_kind_buffer: self.comparison_value_kind_buffer.clone(),
+            comparison_value_cmp_buffer: self.comparison_value_cmp_buffer.clone(),
+            comparison_value_buffer: self.comparison_value_buffer.clone(),
             confirm_password: self.confirm_password.clone(),
             unique_msg: self.unique_msg.clone(),
             required_msg: self.required_msg.clone(),
@@ -152,6 +175,11 @@ pub enum Message {
     InputHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
     InputMultipleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
     InputSingleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
+    InputVecSelect(
+        usize, // data_id
+        usize, // col_id
+        Rc<RefCell<InputItem>>,
+    ),
     InputTagGroup(usize, Rc<RefCell<InputItem>>),
     UserInputHostNetworkGroup(usize),
     WrongHostNetworkGroup(usize),
@@ -164,6 +192,10 @@ pub enum Message {
     InputNicDelete(usize, usize, Rc<RefCell<InputItem>>),
     InputGroupAdd(usize, Rc<RefCell<InputItem>>, Option<InputItem>),
     InputGroupDelete(usize, usize, Rc<RefCell<InputItem>>, Option<InputItem>),
+    InputComparisonValueKind(usize, Rc<RefCell<InputItem>>),
+    InputComparisonComparisionKind(usize, Rc<RefCell<InputItem>>),
+    InputComparisonValue(usize, usize, ComparisonValue, Rc<RefCell<InputItem>>),
+    InvalidInputComparisonValue,
     // TODO: extend multiple files
     ChooseFile(usize, Vec<File>, Rc<RefCell<InputItem>>),
     FileLoaded(String, Vec<u8>),
@@ -192,6 +224,7 @@ impl Clone for Message {
                 Self::InputMultipleSelect(*a, b.clone(), c.clone())
             }
             Self::InputSingleSelect(a, b, c) => Self::InputSingleSelect(*a, b.clone(), c.clone()),
+            Self::InputVecSelect(a, b, c) => Self::InputVecSelect(*a, *b, c.clone()),
             Self::InputTagGroup(a, b) => Self::InputTagGroup(*a, b.clone()),
             Self::UserInputHostNetworkGroup(a) => Self::UserInputHostNetworkGroup(*a),
             Self::RightHostNetworkGroup(a, b) => Self::RightHostNetworkGroup(*a, b.clone()),
@@ -210,6 +243,14 @@ impl Clone for Message {
             Self::InputGroupDelete(a, b, c, d) => {
                 Self::InputGroupDelete(*a, *b, c.clone(), d.clone())
             }
+            Self::InputComparisonValueKind(a, b) => Self::InputComparisonValueKind(*a, b.clone()),
+            Self::InputComparisonComparisionKind(a, b) => {
+                Self::InputComparisonComparisionKind(*a, b.clone())
+            }
+            Self::InputComparisonValue(a, b, c, d) => {
+                Self::InputComparisonValue(*a, *b, c.clone(), d.clone())
+            }
+            Self::InvalidInputComparisonValue => Self::InvalidInputComparisonValue,
             Self::ChooseFile(a, _, c) => Self::ChooseFile(*a, Vec::new(), c.clone()),
             Self::FileLoaded(a, b) => Self::FileLoaded(a.clone(), b.clone()),
             Self::FailLoadFile => Self::FailLoadFile,
@@ -225,6 +266,8 @@ impl PartialEq for Message {
             | (Self::Save, Self::Save)
             | (Self::TrySave, Self::TrySave)
             | (Self::InvalidInputUnsigned32, Self::InvalidInputUnsigned32)
+            | (Self::InvalidInputFloat64, Self::InvalidInputFloat64)
+            | (Self::InvalidInputComparisonValue, Self::InvalidInputComparisonValue)
             | (Self::FailLoadFile, Self::FailLoadFile)
             | (Self::InputError, Self::InputError) => true,
             (Self::UserInputHostNetworkGroup(s1), Self::UserInputHostNetworkGroup(o1))
@@ -239,8 +282,23 @@ impl PartialEq for Message {
             (Self::InputUnsigned32(s1, s2, s3), Self::InputUnsigned32(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
+            (Self::InputFloat64(s1, s2, s3), Self::InputFloat64(o1, o2, o3)) => {
+                s1 == o1 && s2 == o2 && s3 == o3
+            }
+            (Self::InputPercentage(s1, s2, s3), Self::InputPercentage(o1, o2, o3)) => {
+                s1 == o1 && s2 == o2 && s3 == o3
+            }
             (Self::InputRadio(s1, s2), Self::InputRadio(o1, o2))
-            | (Self::InputTagGroup(s1, s2), Self::InputTagGroup(o1, o2)) => s1 == o1 && s2 == o2,
+            | (Self::InputTagGroup(s1, s2), Self::InputTagGroup(o1, o2))
+            | (Self::InputComparisonValueKind(s1, s2), Self::InputComparisonValueKind(o1, o2))
+            | (
+                Self::InputComparisonComparisionKind(s1, s2),
+                Self::InputComparisonComparisionKind(o1, o2),
+            ) => s1 == o1 && s2 == o2,
+            (
+                Self::InputComparisonValue(s1, s2, s3, s4),
+                Self::InputComparisonValue(o1, o2, o3, o4),
+            ) => s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4,
             (Self::InputHostNetworkGroup(s1, s2), Self::InputHostNetworkGroup(o1, o2))
             | (Self::RightHostNetworkGroup(s1, s2), Self::RightHostNetworkGroup(o1, o2)) => {
                 s1 == o1 && s2 == o2
@@ -249,17 +307,24 @@ impl PartialEq for Message {
             | (Self::InputMultipleSelect(s1, s2, s3), Self::InputMultipleSelect(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
+            (Self::InputVecSelect(s1, s2, s3), Self::InputVecSelect(o1, o2, o3))
+            | (Self::InputNicAdd(s1, s2, s3), Self::InputNicAdd(o1, o2, o3))
+            | (Self::InputNicDelete(s1, s2, s3), Self::InputNicDelete(o1, o2, o3)) => {
+                s1 == o1 && s2 == o2 && s3 == o3
+            }
             (Self::ClickCheckBox(s), Self::ClickCheckBox(o)) => s == o,
             (Self::InputNicName(s1, s2, s3, s4), Self::InputNicName(o1, o2, o3, o4))
             | (Self::InputNicGateway(s1, s2, s3, s4), Self::InputNicGateway(o1, o2, o3, o4))
             | (Self::InputNicInterface(s1, s2, s3, s4), Self::InputNicInterface(o1, o2, o3, o4)) => {
                 s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4
             }
-            (Self::InputNicAdd(s1, s2, s3), Self::InputNicAdd(o1, o2, o3))
-            | (Self::InputNicDelete(s1, s2, s3), Self::InputNicDelete(o1, o2, o3)) => {
+            (Self::FileLoaded(s1, s2), Self::FileLoaded(o1, o2)) => s1 == o1 && s2 == o2,
+            (Self::InputGroupAdd(s1, s2, s3), Self::InputGroupAdd(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::FileLoaded(s1, s2), Self::FileLoaded(o1, o2)) => s1 == o1 && s2 == o2,
+            (Self::InputGroupDelete(s1, s2, s3, s4), Self::InputGroupDelete(o1, o2, o3, o4)) => {
+                s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4
+            }
             (Self::ChooseFile(_, _, _), Self::ChooseFile(_, _, _)) | (_, _) => false,
         }
     }
@@ -307,7 +372,11 @@ where
             radio_buffer: HashMap::new(),
             host_network_buffer: HashMap::new(),
             select_searchable_buffer: HashMap::new(),
+            vec_select_buffer: HashMap::new(),
             tag_buffer: HashMap::new(),
+            comparison_value_kind_buffer: HashMap::new(),
+            comparison_value_cmp_buffer: HashMap::new(),
+            comparison_value_buffer: HashMap::new(),
 
             confirm_password: HashMap::new(),
             unique_msg: HashSet::new(),
@@ -473,7 +542,8 @@ where
             }
             Message::InvalidInputUnsigned32
             | Message::InvalidInputFloat64
-            | Message::InvalidInputPercentage => return false,
+            | Message::InvalidInputPercentage
+            | Message::InvalidInputComparisonValue => return false,
             Message::InputPercentage(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Percentage(Some(value));
@@ -543,6 +613,27 @@ where
                         false
                     };
                     self.clear_required_msg(id, empty);
+                }
+            }
+            Message::InputVecSelect(data_id, col_id, input_data) => {
+                if let (Some(buffer), Ok(mut input_data)) = (
+                    self.vec_select_buffer.get(&(data_id)),
+                    input_data.try_borrow_mut(),
+                ) {
+                    if let (Some(buffer), InputItem::VecSelect(input_data)) =
+                        (buffer.get(col_id), &mut *input_data)
+                    {
+                        if let (Ok(buffer), Some(input_data)) =
+                            (buffer.try_borrow(), input_data.get_mut(col_id))
+                        {
+                            if let Some(buffer) = &*buffer {
+                                *input_data = buffer.clone();
+                                if !buffer.is_empty() {
+                                    self.required_msg.remove(&data_id);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             Message::InputTagGroup(id, input_data) => {
@@ -699,6 +790,30 @@ where
                                             col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
                                             Rc::new(RefCell::new(Some(buf))),
                                         );
+                                    } else if let InputItem::Comparison(_) = &*d {
+                                        self.comparison_value_kind_buffer.insert(
+                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            Rc::new(RefCell::new(Some(HashSet::new()))),
+                                        );
+                                        self.comparison_value_cmp_buffer.insert(
+                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            Rc::new(RefCell::new(Some(HashSet::new()))),
+                                        );
+                                        self.comparison_value_buffer.insert(
+                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            (
+                                                Rc::new(RefCell::new(None)),
+                                                Rc::new(RefCell::new(None)),
+                                            ),
+                                        );
+                                    } else if let InputItem::VecSelect(copied_default) = &*d {
+                                        self.vec_select_buffer.insert(
+                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            copied_default
+                                                .iter()
+                                                .map(|d| Rc::new(RefCell::new(Some(d.clone()))))
+                                                .collect::<Vec<_>>(),
+                                        );
                                     }
                                 }
                             }
@@ -707,35 +822,88 @@ where
                 }
             }
             Message::InputGroupDelete(sub_base_index, row_index, input_data, default) => {
-                if let (Ok(mut input_data), Some(InputItem::Group(default))) =
-                    (input_data.try_borrow_mut(), default)
-                {
-                    let Some(default) = default.first() else {
-                        return false;
-                    };
+                let empty = if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Group(data) = &mut *input_data {
                         if let Some(d) = data.get(row_index) {
                             for (col, d) in d.iter().enumerate() {
                                 if let Ok(d) = d.try_borrow() {
                                     if let InputItem::SelectSingle(_) = &*d {
-                                        self.select_searchable_buffer.remove(
-                                            &(col + (row_index + sub_base_index) * MAX_PER_LAYER),
+                                        rearrange_buffer(
+                                            &mut self.select_searchable_buffer,
+                                            sub_base_index,
+                                            col,
+                                            row_index,
+                                            data.len(),
                                         );
+                                    } else if let InputItem::Comparison(_) = &*d {
+                                        rearrange_buffer(
+                                            &mut self.comparison_value_kind_buffer,
+                                            sub_base_index,
+                                            col,
+                                            row_index,
+                                            data.len(),
+                                        );
+                                        rearrange_buffer(
+                                            &mut self.comparison_value_cmp_buffer,
+                                            sub_base_index,
+                                            col,
+                                            row_index,
+                                            data.len(),
+                                        );
+                                        rearrange_buffer(
+                                            &mut self.comparison_value_buffer,
+                                            sub_base_index,
+                                            col,
+                                            row_index,
+                                            data.len(),
+                                        );
+                                    } else if let InputItem::VecSelect(_) = &*d {
+                                        rearrange_buffer(
+                                            &mut self.vec_select_buffer,
+                                            sub_base_index,
+                                            col,
+                                            row_index,
+                                            data.len(),
+                                        );
+                                    }
+                                }
+                                self.required_msg
+                                    .remove(&(col + (row_index + sub_base_index) * MAX_PER_LAYER));
+                                for r in row_index + 1..data.len() {
+                                    if self
+                                        .required_msg
+                                        .remove(&(col + (r + sub_base_index) * MAX_PER_LAYER))
+                                    {
+                                        self.required_msg
+                                            .insert(col + (r - 1 + sub_base_index) * MAX_PER_LAYER);
                                     }
                                 }
                             }
                         }
                         data.remove(row_index);
-                        if data.is_empty() {
-                            if let Some(copy_default) = Self::copy_default(default) {
-                                data.push(copy_default);
-                            }
-                        }
+                        data.is_empty()
+                    } else {
+                        false
                     }
+                } else {
+                    false
+                };
+                if empty {
+                    ctx.link().send_message(Message::InputGroupAdd(
+                        sub_base_index,
+                        input_data,
+                        default,
+                    ));
                 }
             }
-            Message::InputError => {
-                // TODO: issue #5
+            Message::InputComparisonValueKind(data_id, input_data) => {
+                self.clear_comparison_value(data_id, &input_data);
+            }
+            Message::InputComparisonComparisionKind(data_id, input_data) => {
+                self.input_comparison_comparison_kind(data_id, &input_data);
+            }
+            Message::InputComparisonValue(data_id, value_index, value, input_data) => {
+                self.input_comparison_value(data_id, value_index, &value, &input_data);
             }
             Message::ChooseFile(data_id, files, input_data) => {
                 for file in files {
@@ -762,7 +930,7 @@ where
             Message::FileLoaded(file_name, file) => {
                 if let Some(input_data) = self.file_input_data.as_ref() {
                     if let Ok(mut item) = input_data.try_borrow_mut() {
-                        let content = encode(file);
+                        let content = general_purpose::STANDARD.encode(file);
                         *item = InputItem::File(file_name, content);
                     }
                 }
@@ -772,6 +940,7 @@ where
                 // TODO: show a message for users
                 return false;
             }
+            Message::InputError => {} // TODO: issue #5 in case of InputError
         }
         true
     }
@@ -836,6 +1005,7 @@ where
                     InputType::SelectMultiple(ess, list, nics, _, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
                     InputType::SelectSingle(ess, list, width) => self.view_select_searchable(ctx, false, ess, *width, list, input_data, index, 1, 0, false),
                     InputType::Tag(ess, list) => self.view_tag_group(ctx, ess, list, input_data, index, 1),
+                    InputType::VecSelect(ess, ess_list, last_multi, list, width, width_list, max_width_list, max_height_list) => self.view_vec_select(ctx, ess, ess_list, *last_multi, *width, width_list, max_width_list, max_height_list, list, input_data, index, 1, false),
                     InputType::Unsigned32(ess, min, max, width) => self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, index, 1, index == 0, false),
                     InputType::Float64(ess, step, width) => self.view_float_64(ctx, ess, *step, *width, input_data, index, 1, index == 0, false),
                     InputType::Percentage(ess, min, max, decimals, width) => self.view_percentage(ctx, ess, *min, *max, *decimals, *width, input_data, index, 1, index == 0),
@@ -852,6 +1022,7 @@ where
                     InputType::Nic(ess) => self.view_nic(ctx, ess, input_data, index, 1),
                     InputType::File(ess) => self.view_file(ctx, ess, input_data, index, 1),
                     InputType::Group(ess, one_row, widths, group_type) => self.view_group(ctx, ess, *one_row, widths, group_type, input_data, index, 1),
+                    InputType::Comparison(ess) => self.view_comparison(ctx, ess, input_data, index, 1, false),
                 }
             })
         }
@@ -942,5 +1113,24 @@ where
             }
         }
         !unique.is_empty()
+    }
+}
+
+fn rearrange_buffer<T>(
+    buffer: &mut HashMap<usize, T>,
+    base: usize,
+    col: usize,
+    row: usize,
+    len: usize,
+) where
+    T: Clone,
+{
+    for index in row + 1..len {
+        let Some(item) = buffer.remove(&(
+            col + (index + base) * MAX_PER_LAYER
+        )) else {
+            continue;
+        };
+        buffer.insert(col + (index - 1 + base) * MAX_PER_LAYER, item.clone());
     }
 }

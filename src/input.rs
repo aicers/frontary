@@ -4,19 +4,29 @@ mod host_network;
 mod recursive;
 mod tag;
 mod user_input;
+mod user_input_comparison;
+mod user_input_composite;
+mod user_input_nic;
+mod user_input_select;
 
 pub use component::{InputSecondId, Model};
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
 pub use tag::Model as Tag;
 
+use self::user_input_select::VecSelectListMap;
 use crate::list::Column;
 use crate::{
     parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange, ViewString,
 };
-use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
+use bincode::Options;
+use std::{
+    cell::RefCell,
+    collections::{HashMap, HashSet},
+    fmt,
+    rc::Rc,
+};
+use strum_macros::{Display, EnumIter, EnumString};
 
 #[derive(Clone, PartialEq, Eq, Default)]
 pub struct InputHostNetworkGroup {
@@ -38,8 +48,9 @@ impl HostNetworkGroupTrait for InputHostNetworkGroup {
     fn networks(&self) -> &[String] {
         &self.networks
     }
-    fn ranges(&self) -> &[IpRange] {
-        &self.ranges
+    fn ranges(&self) -> Vec<IpRange> {
+        // should return Vec because most structs implementing this trait return a converted, i.e. newly created, Vec instead of a Vec field.
+        self.ranges.clone()
     }
 }
 
@@ -73,12 +84,23 @@ pub struct Essential {
     pub unique: bool, // for InputType::Text only. In other cases, this is meaningless.
     pub default: Option<InputItem>, // in CheckBox, CheckStatus only should be set properly in hierarchical meaning
                                     // e.g. `default: Some(InputItem::CheckBox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
+                                    // as for VecSelect, default should be like the below
+                                    // let v = vec![HashSet::new(), HashSet::new()];
+                                    // ess.default = Some(InputItem::VecSelect(v));
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum ChildrenPosition {
     NextLine,
     Right,
+}
+
+#[derive(Clone, Copy, Display, EnumIter, EnumString, Eq, PartialEq)]
+#[strum(serialize_all = "PascalCase")]
+pub enum ValueKind {
+    String,
+    Integer,
+    Float,
 }
 
 #[derive(Clone, PartialEq)]
@@ -95,6 +117,16 @@ pub enum InputType {
         Option<u32>,                       // width
         bool,                              // bool = whether all selected by default
     ),
+    VecSelect(
+        Essential,
+        Vec<Essential>,
+        bool, // whether last is for seleting multiple items
+        Vec<VecSelectListMap>,
+        Option<u32>, // full width
+        Vec<u32>,    // individual width
+        Vec<u32>,    // individual max width
+        Vec<u32>,    // individual max height
+    ),
     Tag(Essential, HashMap<String, String>), // (String, String) = (key, tag value(name))
     Unsigned32(Essential, u32, u32, Option<u32>), // (u32, u32, Option<u32>) = (min, max, width)
     Float64(Essential, Option<f64>, Option<u32>), // (Option<f64>, Option<u32>) = (step, width)
@@ -105,77 +137,390 @@ pub enum InputType {
         Option<usize>,
         Option<u32>,
     ), // (Option<f32>, Option<f32>, Option<usize>, Option<u32>) = (min, max, # of decimals, width)
+    // HIGHLIGHT: If an item is set to always something, all of its children should be set to the same.
     CheckBox(
         Essential,
         Option<CheckStatus>, // if always checked/unchecked/indeterminate, Some(CheckStatus::*)
         Option<(ChildrenPosition, Vec<Rc<InputType>>)>, // children
     ),
-    // HIGHLIGHT: If an item is set to always something, all of its children should be set to the same.
     Nic(Essential),
     File(Essential),
+    // bool = true if one row displays all the items, false if one row displays one item.
+    // Option<u32> = Some if width fixed, None if not fixed.
+    // if Essential::required is set true, Group must have at least one valid row.
+    // if one or more of columns in a given row are not empty, all the columns with Essential::required == true cannot be empty.
     Group(Essential, bool, Vec<Option<u32>>, Vec<Rc<InputType>>),
-    // bool = true if one row contains all items, false if one row has one item
-    // Option<u32> = Some if width fixed, None if not fixed
+    Comparison(Essential),
 }
 
 impl InputType {
     #[must_use]
     pub fn required(&self) -> bool {
         match self {
-            Self::Text(ess, _, _)
-            | Self::Password(ess, _)
-            | Self::Radio(ess, _)
-            | Self::HostNetworkGroup(ess, _, _, _)
-            | Self::SelectSingle(ess, _, _)
-            | Self::SelectMultiple(ess, _, _, _, _)
-            | Self::Tag(ess, _)
-            | Self::Unsigned32(ess, _, _, _)
-            | Self::Float64(ess, _, _)
-            | Self::Percentage(ess, _, _, _, _)
-            | Self::CheckBox(ess, _, _)
-            | Self::Nic(ess)
-            | Self::File(ess)
-            | Self::Group(ess, _, _, _) => ess.required,
+            Self::Text(ess, ..)
+            | Self::Password(ess, ..)
+            | Self::Radio(ess, ..)
+            | Self::HostNetworkGroup(ess, ..)
+            | Self::SelectSingle(ess, ..)
+            | Self::SelectMultiple(ess, ..)
+            | Self::VecSelect(ess, ..)
+            | Self::Tag(ess, ..)
+            | Self::Unsigned32(ess, ..)
+            | Self::Float64(ess, ..)
+            | Self::Percentage(ess, ..)
+            | Self::CheckBox(ess, ..)
+            | Self::Nic(ess, ..)
+            | Self::File(ess, ..)
+            | Self::Group(ess, ..)
+            | Self::Comparison(ess, ..) => ess.required,
         }
     }
 
     #[must_use]
     pub fn unique(&self) -> bool {
         match self {
-            Self::Text(ess, _, _)
-            | Self::Password(ess, _)
-            | Self::Radio(ess, _)
-            | Self::HostNetworkGroup(ess, _, _, _)
-            | Self::SelectSingle(ess, _, _)
-            | Self::SelectMultiple(ess, _, _, _, _)
-            | Self::Tag(ess, _)
-            | Self::Unsigned32(ess, _, _, _)
-            | Self::Float64(ess, _, _)
-            | Self::Percentage(ess, _, _, _, _)
-            | Self::CheckBox(ess, _, _)
-            | Self::Nic(ess)
-            | Self::File(ess)
-            | Self::Group(ess, _, _, _) => ess.unique,
+            Self::Text(ess, ..)
+            | Self::Password(ess, ..)
+            | Self::Radio(ess, ..)
+            | Self::HostNetworkGroup(ess, ..)
+            | Self::SelectSingle(ess, ..)
+            | Self::SelectMultiple(ess, ..)
+            | Self::VecSelect(ess, ..)
+            | Self::Tag(ess, ..)
+            | Self::Unsigned32(ess, ..)
+            | Self::Float64(ess, ..)
+            | Self::Percentage(ess, ..)
+            | Self::CheckBox(ess, ..)
+            | Self::Nic(ess, ..)
+            | Self::File(ess, ..)
+            | Self::Group(ess, ..)
+            | Self::Comparison(ess, ..) => ess.unique,
         }
     }
 
     #[must_use]
     pub fn title(&self) -> &str {
         match self {
-            Self::Text(ess, _, _)
-            | Self::Password(ess, _)
-            | Self::Radio(ess, _)
-            | Self::HostNetworkGroup(ess, _, _, _)
-            | Self::SelectSingle(ess, _, _)
-            | Self::SelectMultiple(ess, _, _, _, _)
-            | Self::Tag(ess, _)
-            | Self::Unsigned32(ess, _, _, _)
-            | Self::Float64(ess, _, _)
-            | Self::Percentage(ess, _, _, _, _)
-            | Self::CheckBox(ess, _, _)
-            | Self::Nic(ess)
-            | Self::File(ess)
-            | Self::Group(ess, _, _, _) => ess.title,
+            Self::Text(ess, ..)
+            | Self::Password(ess, ..)
+            | Self::Radio(ess, ..)
+            | Self::HostNetworkGroup(ess, ..)
+            | Self::SelectSingle(ess, ..)
+            | Self::SelectMultiple(ess, ..)
+            | Self::VecSelect(ess, ..)
+            | Self::Tag(ess, ..)
+            | Self::Unsigned32(ess, ..)
+            | Self::Float64(ess, ..)
+            | Self::Percentage(ess, ..)
+            | Self::CheckBox(ess, ..)
+            | Self::Nic(ess, ..)
+            | Self::File(ess, ..)
+            | Self::Group(ess, ..)
+            | Self::Comparison(ess, ..) => ess.title,
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub enum Value {
+    String(Option<String>),
+    Integer(Option<i64>),
+    Float(Option<f64>),
+}
+
+impl Value {
+    #[must_use]
+    pub fn serialize(&self) -> Option<Vec<u8>> {
+        match self {
+            Self::String(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Integer(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Float(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            _ => None,
+        }
+    }
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::String(Some(v)) => write!(f, "{v}"),
+            Self::Integer(Some(v)) => write!(f, "{v}"),
+            Self::Float(Some(v)) => write!(f, "{v}"),
+            _ => write!(f, ""),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Display, EnumString, Eq, PartialEq)]
+pub enum ComparisonKind {
+    #[strum(serialize = "x < a")]
+    Less,
+    #[strum(serialize = "x = a")]
+    Equal,
+    #[strum(serialize = "x > a")]
+    Greater,
+    #[strum(serialize = "x ≤ a")]
+    LessOrEqual,
+    #[strum(serialize = "x ≥ a")]
+    GreaterOrEqual,
+    #[strum(serialize = "x Contains a")]
+    Contain,
+    #[strum(serialize = "a < x < b")]
+    OpenRange,
+    #[strum(serialize = "a ≤ x ≤ b")]
+    CloseRange,
+    #[strum(serialize = "a < x ≤ b")]
+    LeftOpenRange,
+    #[strum(serialize = "a ≤ x < b")]
+    RightOpenRange,
+    #[strum(serialize = "x != a")]
+    NotEqual,
+    #[strum(serialize = "x !Contains a")]
+    NotContain,
+    #[strum(serialize = "!(a < x < b)")]
+    NotOpenRange,
+    #[strum(serialize = "!(a ≤ x ≤ b)")]
+    NotCloseRange,
+    #[strum(serialize = "!(a < x ≤ b)")]
+    NotLeftOpenRange,
+    #[strum(serialize = "!(a ≤ x < b)")]
+    NotRightOpenRange,
+}
+
+impl ComparisonKind {
+    fn chain_cmp(self) -> bool {
+        !matches!(
+            self,
+            Self::Less
+                | Self::Equal
+                | Self::Greater
+                | Self::LessOrEqual
+                | Self::GreaterOrEqual
+                | Self::Contain
+                | Self::NotEqual
+                | Self::NotContain
+        )
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub enum Comparison {
+    Less(Value),
+    Equal(Value),
+    Greater(Value),
+    LessOrEqual(Value),
+    GreaterOrEqual(Value),
+    Contain(Value),
+    OpenRange(Value, Value),      // a < x < b
+    CloseRange(Value, Value),     // a <= x <= b
+    LeftOpenRange(Value, Value),  // a < x <= b
+    RightOpenRange(Value, Value), // a <= x < b
+    NotEqual(Value),
+    NotContain(Value),
+    NotOpenRange(Value, Value),      // !(a < x < b)
+    NotCloseRange(Value, Value),     // !(a <= x <= b)
+    NotLeftOpenRange(Value, Value),  // !(a < x <= b)
+    NotRightOpenRange(Value, Value), // !(a <= x < b)
+}
+
+impl ToString for Comparison {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Less(v) => format!("x < {v}"),
+            Self::Equal(v) => format!("x = {v}"),
+            Self::Greater(v) => format!("x > {v}"),
+            Self::LessOrEqual(v) => format!("x ≤ {v}"),
+            Self::GreaterOrEqual(v) => format!("x ≥ {v}"),
+            Self::Contain(v) => format!("x Contains {v}"),
+            Self::OpenRange(a, b) => format!("{a} < x < {b}"),
+            Self::CloseRange(a, b) => format!("{a} ≤ x ≤ {b}"),
+            Self::LeftOpenRange(a, b) => format!("{a} < x ≤ {b}"),
+            Self::RightOpenRange(a, b) => format!("{a} ≤ x < {b}"),
+            Self::NotEqual(v) => format!("x != {v}"),
+            Self::NotContain(v) => format!("x !Contains {v}"),
+            Self::NotOpenRange(a, b) => format!("!({a} < x < {b})"),
+            Self::NotCloseRange(a, b) => format!("!({a} ≤ x ≤ {b})"),
+            Self::NotLeftOpenRange(a, b) => format!("!({a} < x ≤ {b})"),
+            Self::NotRightOpenRange(a, b) => format!("!({a} ≤ x < {b})"),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct IncompletePairOfValues;
+
+impl fmt::Display for IncompletePairOfValues {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Incomplete Pair of Values")
+    }
+}
+
+impl std::error::Error for IncompletePairOfValues {}
+
+impl Comparison {
+    #[allow(clippy::missing_errors_doc)] // TODO: document later
+    pub fn try_new(
+        cmp: ComparisonKind,
+        first: Value,
+        second: Option<Value>,
+    ) -> Result<Self, IncompletePairOfValues> {
+        match cmp {
+            ComparisonKind::Less => Ok(Self::Less(first)),
+            ComparisonKind::Equal => Ok(Self::Equal(first)),
+            ComparisonKind::Greater => Ok(Self::Greater(first)),
+            ComparisonKind::LessOrEqual => Ok(Self::LessOrEqual(first)),
+            ComparisonKind::GreaterOrEqual => Ok(Self::GreaterOrEqual(first)),
+            ComparisonKind::Contain => Ok(Self::Contain(first)),
+            ComparisonKind::NotEqual => Ok(Self::NotEqual(first)),
+            ComparisonKind::NotContain => Ok(Self::NotContain(first)),
+            ComparisonKind::OpenRange => {
+                if let Some(second) = second {
+                    Ok(Self::OpenRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::CloseRange => {
+                if let Some(second) = second {
+                    Ok(Self::CloseRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::LeftOpenRange => {
+                if let Some(second) = second {
+                    Ok(Self::LeftOpenRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::RightOpenRange => {
+                if let Some(second) = second {
+                    Ok(Self::RightOpenRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::NotOpenRange => {
+                if let Some(second) = second {
+                    Ok(Self::NotOpenRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::NotCloseRange => {
+                if let Some(second) = second {
+                    Ok(Self::NotCloseRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::NotLeftOpenRange => {
+                if let Some(second) = second {
+                    Ok(Self::NotLeftOpenRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+            ComparisonKind::NotRightOpenRange => {
+                if let Some(second) = second {
+                    Ok(Self::NotRightOpenRange(first, second))
+                } else {
+                    Err(IncompletePairOfValues)
+                }
+            }
+        }
+    }
+
+    #[must_use]
+    pub fn value_kind(&self) -> ValueKind {
+        match self {
+            Self::Less(v)
+            | Self::Equal(v)
+            | Self::Greater(v)
+            | Self::LessOrEqual(v)
+            | Self::GreaterOrEqual(v)
+            | Self::Contain(v)
+            | Self::OpenRange(v, _)
+            | Self::CloseRange(v, _)
+            | Self::LeftOpenRange(v, _)
+            | Self::RightOpenRange(v, _)
+            | Self::NotEqual(v)
+            | Self::NotContain(v)
+            | Self::NotOpenRange(v, _)
+            | Self::NotCloseRange(v, _)
+            | Self::NotLeftOpenRange(v, _)
+            | Self::NotRightOpenRange(v, _) => match v {
+                Value::String(_) => ValueKind::String,
+                Value::Integer(_) => ValueKind::Integer,
+                Value::Float(_) => ValueKind::Float,
+            },
+        }
+    }
+
+    #[must_use]
+    pub fn comparison_kind(&self) -> ComparisonKind {
+        match self {
+            Self::Less(..) => ComparisonKind::Less,
+            Self::Equal(..) => ComparisonKind::Equal,
+            Self::Greater(..) => ComparisonKind::Greater,
+            Self::LessOrEqual(..) => ComparisonKind::LessOrEqual,
+            Self::GreaterOrEqual(..) => ComparisonKind::GreaterOrEqual,
+            Self::Contain(..) => ComparisonKind::Contain,
+            Self::OpenRange(..) => ComparisonKind::OpenRange,
+            Self::CloseRange(..) => ComparisonKind::CloseRange,
+            Self::LeftOpenRange(..) => ComparisonKind::LeftOpenRange,
+            Self::RightOpenRange(..) => ComparisonKind::RightOpenRange,
+            Self::NotEqual(..) => ComparisonKind::NotEqual,
+            Self::NotContain(..) => ComparisonKind::NotContain,
+            Self::NotOpenRange(..) => ComparisonKind::NotOpenRange,
+            Self::NotCloseRange(..) => ComparisonKind::NotCloseRange,
+            Self::NotLeftOpenRange(..) => ComparisonKind::NotLeftOpenRange,
+            Self::NotRightOpenRange(..) => ComparisonKind::NotRightOpenRange,
+        }
+    }
+
+    #[must_use]
+    pub fn first(&self) -> Value {
+        match self {
+            Self::Less(v)
+            | Self::Equal(v)
+            | Self::Greater(v)
+            | Self::LessOrEqual(v)
+            | Self::GreaterOrEqual(v)
+            | Self::Contain(v)
+            | Self::NotEqual(v)
+            | Self::NotContain(v)
+            | Self::OpenRange(v, _)
+            | Self::CloseRange(v, _)
+            | Self::LeftOpenRange(v, _)
+            | Self::RightOpenRange(v, _)
+            | Self::NotOpenRange(v, _)
+            | Self::NotCloseRange(v, _)
+            | Self::NotLeftOpenRange(v, _)
+            | Self::NotRightOpenRange(v, _) => v.clone(),
+        }
+    }
+
+    #[must_use]
+    pub fn second(&self) -> Option<Value> {
+        match self {
+            Self::Less(_)
+            | Self::Equal(_)
+            | Self::Greater(_)
+            | Self::LessOrEqual(_)
+            | Self::GreaterOrEqual(_)
+            | Self::Contain(_)
+            | Self::NotEqual(_)
+            | Self::NotContain(_) => None,
+            Self::OpenRange(_, v)
+            | Self::CloseRange(_, v)
+            | Self::LeftOpenRange(_, v)
+            | Self::RightOpenRange(_, v)
+            | Self::NotOpenRange(_, v)
+            | Self::NotCloseRange(_, v)
+            | Self::NotLeftOpenRange(_, v)
+            | Self::NotRightOpenRange(_, v) => Some(v.clone()),
         }
     }
 }
@@ -187,6 +532,7 @@ pub enum InputItem {
     HostNetworkGroup(InputHostNetworkGroup),
     SelectSingle(Option<String>),    // key
     SelectMultiple(HashSet<String>), // key
+    VecSelect(Vec<HashSet<String>>), // key, this must be initialized as the same number of `HashSet::new()` as the number of `Select`
     Tag(InputTagGroup),
     Unsigned32(Option<u32>),
     Float64(Option<f64>),
@@ -195,6 +541,7 @@ pub enum InputItem {
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
     Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
+    Comparison(Option<Comparison>),
 }
 
 impl InputItem {
@@ -205,6 +552,7 @@ impl InputItem {
             InputItem::HostNetworkGroup(group) => *group = InputHostNetworkGroup::default(),
             InputItem::SelectSingle(item) => *item = None,
             InputItem::SelectMultiple(list) => list.clear(),
+            InputItem::VecSelect(list) => list.clear(),
             InputItem::Tag(group) => *group = InputTagGroup::default(),
             InputItem::Unsigned32(value) => *value = None,
             InputItem::Float64(value) => *value = None,
@@ -225,6 +573,7 @@ impl InputItem {
                 *content = String::new();
             }
             InputItem::Group(group) => group.clear(),
+            InputItem::Comparison(cmp) => *cmp = None,
         }
     }
 }
@@ -248,6 +597,13 @@ impl From<&Column> for InputItem {
             Column::SelectSingle(value) => Self::SelectSingle(value.as_ref().map(|d| d.0.clone())),
             Column::SelectMultiple(list) => {
                 Self::SelectMultiple(list.keys().map(Clone::clone).collect::<HashSet<String>>())
+            }
+            Column::VecSelect(list) => {
+                let list = list
+                    .iter()
+                    .map(|l| l.keys().map(Clone::clone).collect::<HashSet<String>>())
+                    .collect::<Vec<_>>();
+                Self::VecSelect(list)
             }
             Column::Tag(tags) => Self::Tag(InputTagGroup {
                 old: tags.clone(),
@@ -277,7 +633,9 @@ impl From<&Column> for InputItem {
                             Column::Text(..)
                             | Column::Unsigned32(..)
                             | Column::Float64(..)
-                            | Column::SelectSingle(..) => {
+                            | Column::SelectSingle(..)
+                            | Column::VecSelect(..)
+                            | Column::Comparison(..) => {
                                 input_row.push(Rc::new(RefCell::new(c.into())));
                             }
                             _ => {}
@@ -287,6 +645,7 @@ impl From<&Column> for InputItem {
                 }
                 Self::Group(input)
             }
+            Column::Comparison(value) => Self::Comparison(value.clone()),
         }
     }
 }
