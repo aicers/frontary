@@ -622,19 +622,22 @@ where
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
         let txt = ctx.props().txt.txt.clone();
         match col {
-            Column::Text(elem) => match elem {
-                ViewString::Key(key) => {
-                    html! { text!(txt, ctx.props().language, key) }
-                }
-                ViewString::Raw(raw) => {
-                    html! { raw }
-                }
+            Column::Text(elem) => html! {
+                elem.to_string_txt(&txt, ctx.props().language)
             },
             Column::Unsigned32(_)
             | Column::Float64(_)
-            | Column::SelectSingle(_)
             | Column::Percentage(_, _)
-            | Column::CheckBox(_, _, _) => {
+            | Column::Comparison(_) => html! { col.to_string() },
+            Column::SelectSingle(elem) => {
+                let Some((_, elem)) = elem.as_ref() else {
+                    return html! {};
+                };
+                html! {
+                    elem.to_string_txt(&txt, ctx.props().language)
+                }
+            }
+            Column::CheckBox(_, _, _) => {
                 if let Some(sep) = ctx.props().br_separator {
                     let display = col.to_string();
                     let display = display
@@ -667,8 +670,23 @@ where
                 }
             }
             Column::SelectMultiple(list) => {
-                let mut list = list.values().map(Clone::clone).collect::<Vec<String>>();
+                let mut list = list
+                    .values()
+                    .map(|v| v.to_string_txt(&txt, ctx.props().language))
+                    .collect::<Vec<String>>();
                 list.sort_unstable();
+                view_list_sep_dot(&list, false)
+            }
+            Column::VecSelect(list) => {
+                let list = list
+                    .iter()
+                    .map(|s| {
+                        s.values()
+                            .map(|v| v.to_string_txt(&txt, ctx.props().language))
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    })
+                    .collect::<Vec<_>>();
                 view_list_sep_dot(&list, false)
             }
             Column::Tag(tags) => {
@@ -711,7 +729,7 @@ where
                         {
                             for col_type.iter().map(|t| html! {
                                 <th class="list-whole-group-heading">
-                                    { t.title() }
+                                    { text!(txt, ctx.props().language, t.title()) }
                                 </th>
                             })
                         }
@@ -726,7 +744,10 @@ where
                                                 Column::Text(..)
                                                 | Column::Unsigned32(..)
                                                 | Column::Float64(..)
-                                                | Column::SelectSingle(..) => html! {
+                                                | Column::SelectSingle(..)
+                                                | Column::Comparison(..)
+                                                | Column::VecSelect(..)
+                                                => html! {
                                                     <td class="list-whole-group">
                                                         { Self::view_column(ctx, index, c) }
                                                     </td>

@@ -17,9 +17,9 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
-    ChildrenPosition, Essential as InputEssential, HostNetworkHtml, HostNetworkKind,
-    InputHostNetworkGroup, InputItem, InputNic, InputTag, InputTagGroup, InputType, Model as Input,
-    Tag,
+    ChildrenPosition, Comparison, ComparisonKind, Essential as InputEssential, HostNetworkHtml,
+    HostNetworkKind, InputHostNetworkGroup, InputItem, InputNic, InputTag, InputTagGroup,
+    InputType, Model as Input, Tag, Value as ComparisonValue, ValueKind,
 };
 pub use crate::language::Language;
 pub use crate::list::{
@@ -38,6 +38,7 @@ pub use crate::radio_separate::Model as RadioSeparate;
 pub use crate::select::complex::{Kind as SelectComplexKind, Model as SelectComplex};
 pub use crate::select::mini::{Kind as SelectMiniKind, Model as SelectMini};
 pub use crate::select::searchable::{Kind as SelectSearchableKind, Model as SelectSearchable};
+pub use crate::select::vec_searchable::Model as VecSelect;
 pub use crate::sort::{Model as Sort, Status as SortStatus};
 pub use crate::tab_menu::Model as TabMenu;
 
@@ -372,7 +373,8 @@ pub trait HostNetworkGroupTrait {
 
     fn hosts(&self) -> &[String];
     fn networks(&self) -> &[String];
-    fn ranges(&self) -> &[IpRange];
+    // should return Vec because most structs implementing this trait return a converted, i.e. newly created, Vec instead of a Vec field.
+    fn ranges(&self) -> Vec<IpRange>;
 }
 
 pub fn sort_hosts(hosts: &mut Vec<String>) {

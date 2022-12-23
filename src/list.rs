@@ -5,7 +5,11 @@ pub use whole::MessageType;
 pub use whole::Model as WholeList;
 pub use whole::SortColumn;
 
-use crate::{checkbox::CheckStatus, input::InputNic, ViewString};
+use crate::{
+    checkbox::CheckStatus,
+    input::{Comparison, InputNic},
+    ViewString,
+};
 use chrono::{DateTime, Utc};
 use std::collections::{HashMap, HashSet};
 
@@ -22,8 +26,9 @@ pub struct ListItem {
 pub enum Column {
     Text(ViewString),
     HostNetworkGroup(Vec<String>),
-    SelectSingle(Option<(String, String)>),  // (id, value)
-    SelectMultiple(HashMap<String, String>), // id, value
+    SelectSingle(Option<(String, ViewString)>), // id, value
+    SelectMultiple(HashMap<String, ViewString>), // id, value
+    VecSelect(Vec<HashMap<String, ViewString>>), // id, value
     Tag(HashSet<String>),
     Unsigned32(Option<u32>),
     Float64(Option<f64>),
@@ -31,15 +36,33 @@ pub enum Column {
     Nic(Vec<InputNic>),
     CheckBox(CheckStatus, Option<Vec<Column>>, Option<String>), // String = display
     Group(Vec<Vec<Column>>),
+    Comparison(Option<Comparison>),
 }
 
 impl ToString for Column {
+    // HIGHLIGHT:
+    // In the case of ViewString, returns the key of ViewString.
+    // Not all of these are for html output.
     fn to_string(&self) -> String {
         match self {
             Self::Text(d) => d.to_string(),
             Self::HostNetworkGroup(d) => d.join(","),
-            Self::SelectSingle(d) => d.as_ref().map_or_else(String::new, |d| d.1.clone()),
-            Self::SelectMultiple(d) => d.values().map(String::as_str).collect::<Vec<_>>().join(","),
+            Self::SelectSingle(d) => d.as_ref().map_or_else(String::new, |d| d.1.to_string()),
+            Self::SelectMultiple(d) => d
+                .values()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(","),
+            Self::VecSelect(d) => d
+                .iter()
+                .map(|s| {
+                    s.values()
+                        .map(ToString::to_string)
+                        .collect::<Vec<_>>()
+                        .join(",")
+                })
+                .collect::<Vec<_>>()
+                .join(" | "),
             Self::Tag(d) => d.iter().map(String::as_str).collect::<Vec<_>>().join(","),
             Self::Unsigned32(d) => d.map_or_else(String::new, |d| d.to_string()),
             Self::Float64(d) => d.map_or_else(String::new, |d| d.to_string()),
@@ -60,6 +83,7 @@ impl ToString for Column {
                 display.as_ref().map_or_else(String::new, Clone::clone)
             }
             Self::Group(_) => String::new(),
+            Self::Comparison(d) => d.as_ref().map_or_else(String::new, ToString::to_string),
         }
     }
 }

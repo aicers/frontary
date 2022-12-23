@@ -6,11 +6,7 @@ use super::{
 };
 use ipnet::Ipv4Net;
 use passwords::analyzer;
-use std::cell::RefCell;
-use std::collections::HashSet;
-use std::net::Ipv4Addr;
-use std::rc::Rc;
-use std::str::FromStr;
+use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
 use yew::{Component, Context};
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
@@ -25,6 +21,7 @@ where
         self.prepare_buffer_recursive(&ctx.props().input_data, &ctx.props().input_type, 1);
     }
 
+    #[allow(clippy::too_many_lines)]
     pub(super) fn prepare_buffer_recursive(
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
@@ -91,19 +88,64 @@ where
                                 for ((col, d), t) in d.iter().enumerate().zip(group.iter()) {
                                     if let Ok(d) = d.try_borrow() {
                                         let sub_base_index = this_index * MAX_PER_LAYER;
-                                        if let (
-                                            InputItem::SelectSingle(data),
-                                            InputType::SelectSingle(..),
-                                        ) = (&*d, &**t)
-                                        {
-                                            let mut buf = HashSet::new();
-                                            if let Some(data) = data {
-                                                buf.insert(data.clone());
+
+                                        match (&*d, &**t) {
+                                            (
+                                                InputItem::SelectSingle(data),
+                                                InputType::SelectSingle(..),
+                                            ) => {
+                                                let mut buf = HashSet::new();
+                                                if let Some(data) = data {
+                                                    buf.insert(data.clone());
+                                                }
+                                                self.select_searchable_buffer.insert(
+                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
+                                                    Rc::new(RefCell::new(Some(buf))),
+                                                );
                                             }
-                                            self.select_searchable_buffer.insert(
-                                                col + (row + sub_base_index) * MAX_PER_LAYER,
-                                                Rc::new(RefCell::new(Some(buf))),
-                                            );
+                                            (
+                                                InputItem::Comparison(data),
+                                                InputType::Comparison(..),
+                                            ) => {
+                                                let (mut buf, mut kind) =
+                                                    (HashSet::new(), HashSet::new());
+                                                let (first, second) = if let Some(data) = data {
+                                                    buf.insert(data.value_kind().to_string());
+                                                    kind.insert(data.comparison_kind().to_string());
+                                                    (Some(data.first()), data.second())
+                                                } else {
+                                                    (None, None)
+                                                };
+                                                self.comparison_value_kind_buffer.insert(
+                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
+                                                    Rc::new(RefCell::new(Some(buf))),
+                                                );
+                                                self.comparison_value_cmp_buffer.insert(
+                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
+                                                    Rc::new(RefCell::new(Some(kind))),
+                                                );
+                                                self.comparison_value_buffer.insert(
+                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
+                                                    (
+                                                        Rc::new(RefCell::new(first)),
+                                                        Rc::new(RefCell::new(second)),
+                                                    ),
+                                                );
+                                            }
+                                            (
+                                                InputItem::VecSelect(data),
+                                                InputType::VecSelect(..),
+                                            ) => {
+                                                self.vec_select_buffer.insert(
+                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
+                                                    data.iter()
+                                                        .map(|d| {
+                                                            Rc::new(RefCell::new(Some(d.clone())))
+                                                        })
+                                                        .collect::<Vec<_>>(),
+                                                );
+                                            }
+                                            _ => {}
                                         }
                                     }
                                 }
@@ -198,6 +240,15 @@ where
                                 }
                             }
                         }
+                        (InputItem::VecSelect(_), InputType::VecSelect(ess, ..)) => {
+                            if let Some(default) = &ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                    let id = base_index + index;
+                                    self.default_to_buffer_vec_select(id, default);
+                                }
+                            }
+                        }
                         (InputItem::Group(_), InputType::Group(ess, _, _, _)) => {
                             if let Some(InputItem::Group(default)) = &ess.default {
                                 if let Some(default) = default.first() {
@@ -273,6 +324,18 @@ where
         }
     }
 
+    pub(super) fn default_to_buffer_vec_select(&mut self, id: usize, default: &InputItem) {
+        if let (InputItem::VecSelect(default), Some(buffer)) =
+            (default, self.vec_select_buffer.get(&id))
+        {
+            for (b, d) in buffer.iter().zip(default.iter()) {
+                if let Ok(mut b) = b.try_borrow_mut() {
+                    *b = Some(d.clone());
+                }
+            }
+        }
+    }
+
     pub(super) fn decide_required_all(&mut self, ctx: &Context<Self>) -> bool {
         self.decide_required_all_recursive(
             ctx,
@@ -283,6 +346,7 @@ where
         )
     }
 
+    #[allow(clippy::too_many_lines)]
     pub(super) fn decide_required_all_recursive(
         &mut self,
         ctx: &Context<Self>,
@@ -316,6 +380,17 @@ where
                             }
                             InputItem::SelectSingle(s) => s.is_none(),
                             InputItem::SelectMultiple(s) => s.is_empty(),
+                            InputItem::VecSelect(s) => {
+                                s.is_empty()
+                                    || if let InputType::VecSelect(_, ess_list, ..) = &**input_type
+                                    {
+                                        s.iter().zip(ess_list.iter()).any(|(selected, ess)| {
+                                            selected.is_empty() && ess.required
+                                        })
+                                    } else {
+                                        true
+                                    }
+                            }
                             InputItem::Unsigned32(v) => v.is_none(),
                             InputItem::Float64(v) => v.is_none(),
                             InputItem::Percentage(v) => v.is_none(),
@@ -334,16 +409,99 @@ where
                                 })
                                 .is_none(),
                             InputItem::File(_, content) => content.is_empty(),
-                            InputItem::Tag(_) => false,
-                            InputItem::Group(group) => group.is_empty(),
+                            InputItem::Comparison(cmp) => cmp.is_none(),
+                            InputItem::Tag(_) | InputItem::Group(_) => false,
                         };
                         if empty {
                             self.required_msg.insert(base_index + index);
                             required.push(true);
                         }
                     }
-
-                    if let (
+                    if let (InputItem::Group(group), InputType::Group(ess, _, _, col_types)) =
+                        (&(*item), &**input_type)
+                    {
+                        let required = col_types
+                            .iter()
+                            .filter_map(|t| match &(**t) {
+                                InputType::Text(ess, ..)
+                                | InputType::Unsigned32(ess, ..)
+                                | InputType::Float64(ess, ..)
+                                | InputType::SelectSingle(ess, ..)
+                                | InputType::VecSelect(ess, ..)
+                                | InputType::Comparison(ess) => Some(ess.required),
+                                _ => None,
+                            })
+                            .collect::<Vec<bool>>();
+                        // in the case of VecSelect or Comparison
+                        // Some(true) means all of sub elements empty
+                        // Some(false) means all of sub elements not empty
+                        // None means not all of any of sub elements empty but at least one empty
+                        let empty = group
+                            .iter()
+                            .enumerate()
+                            .map(|(row_index, row)| {
+                                row.iter()
+                                    .enumerate()
+                                    .filter_map(|(col_index, col)| {
+                                        if let Ok(col) = col.try_borrow() {
+                                            match &*col {
+                                                InputItem::Text(v) => Some(Some(v.is_empty())),
+                                                InputItem::Unsigned32(v) => Some(Some(v.is_none())),
+                                                InputItem::Float64(v) => Some(Some(v.is_none())),
+                                                InputItem::SelectSingle(v) => {
+                                                    Some(Some(v.is_none()))
+                                                }
+                                                InputItem::VecSelect(v) => {
+                                                    if v.iter().all(HashSet::is_empty) {
+                                                        Some(Some(true))
+                                                    } else if v.iter().all(|d| !d.is_empty()) {
+                                                        Some(Some(false))
+                                                    } else {
+                                                        Some(None)
+                                                    }
+                                                }
+                                                InputItem::Comparison(v) => {
+                                                    if v.is_some() {
+                                                        Some(Some(false))
+                                                    } else if self
+                                                        .comparison_kind(
+                                                            col_index
+                                                                + (row_index
+                                                                    + (base_index + index)
+                                                                        * MAX_PER_LAYER)
+                                                                    * MAX_PER_LAYER,
+                                                        )
+                                                        .is_some()
+                                                    {
+                                                        Some(None)
+                                                    } else {
+                                                        Some(Some(true))
+                                                    }
+                                                }
+                                                _ => None,
+                                            }
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                    .collect::<Vec<Option<bool>>>()
+                            })
+                            .collect::<Vec<Vec<Option<bool>>>>();
+                        let sub_base_index = (base_index + index) * MAX_PER_LAYER;
+                        for (row_index, row) in empty.iter().enumerate() {
+                            let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
+                            if !all_empty || ess.required && row_index == 0 {
+                                let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
+                                for ((col_index, data_empty), data_required) in
+                                    row.iter().enumerate().zip(required.iter())
+                                {
+                                    if data_empty.map_or(true, |x| x) && *data_required {
+                                        self.required_msg.insert(base_index + col_index);
+                                    }
+                                }
+                            }
+                        }
+                    } else if let (
                         InputItem::CheckBox(checked, Some(data_children)),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&(*item), &**input_type)

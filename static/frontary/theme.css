@@ -330,6 +330,15 @@ div.radio-space {
     display: inline-block;
 }
 
+div.searchable-select-vector {
+    display: flex;
+    flex-direction: row;
+}
+
+div.searchable-select-vector-margin {
+    margin-right: 4px;
+}
+
 div.searchable-select {
     height: 30px;
 }
@@ -1779,6 +1788,7 @@ div.input-item-group {
     width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 div.input-contents-item-title {
@@ -2011,6 +2021,24 @@ div.input-radio-message {
 
 div.input-select-searchable {
     margin-bottom: 24px;
+}
+
+div.input-select-vector {
+    margin-bottom: 24px;
+}
+
+div.input-select-vector-vec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.input-select-vector-vec-required {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFE9E9;
+    border: 2px solid #C02E2E;
 }
 
 div.input-contents-item-general-title {
@@ -2695,6 +2723,33 @@ div.input-group-add {
     justify-content: flex-end;
     align-items: flex-end;
     padding-bottom: 4px;
+}
+
+div.input-comparison-outer {
+    display: flex;
+    flex-direction: column;
+}
+
+div.input-comparison {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+div.input-comparison-value {
+    width: 260px;
+    margin-left: 4px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+div.input-comparison-value-value {
+    width: 90px;
+    margin-left: 4px;
+    margin-right: 4px;
 }
 
 div.notification {

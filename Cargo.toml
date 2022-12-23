@@ -1,6 +1,6 @@
 [package]
 name = "frontary"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2021"
 publish = false
 
@@ -10,7 +10,8 @@ test = []
 
 [dependencies]
 anyhow = "1"
-base64 = "0.13"
+base64 = "0.21"
+bincode = "1"
 chrono = { version = "0.4", features = ["serde", "wasmbind"] }
 gloo-events = "0.1"
 gloo-file = "0.2"
@@ -21,8 +22,9 @@ ipnet = { version = "2", features = ["serde"] }
 js-sys = "0.3"
 json-gettext = "4"
 num-traits = "0.2"
-passwords = { version = "3.1", features = ["common-password"] }
+passwords = { version = "3", features = ["common-password"] }
 serde = { version = "1",  features = ["derive"] }
+strum = "0.24"
 strum_macros = "0.24"
 wasm-bindgen = { version = ">=0.2.83", features = ["serde-serialize"] }
 web-sys = { version = "0.3", features = ["CanvasRenderingContext2d", "CssStyleDeclaration", "HtmlCanvasElement", "Navigator", "TextMetrics"] }

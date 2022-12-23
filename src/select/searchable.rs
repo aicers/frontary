@@ -11,6 +11,8 @@ use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{events::InputEvent, html, Component, Context, Html, Properties};
 
+const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     Single,
@@ -35,7 +37,9 @@ pub enum Message {
 
 const ELEM_HEIGHT: u32 = 32;
 const DEFAULT_MAX_WIDTH: u32 = 500;
+pub(super) const DEFAULT_SIZED_VALUE: bool = true;
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props<T>
 where
@@ -54,6 +58,7 @@ where
     pub max_height: u32,
     #[prop_or(true)]
     pub align_left: bool,
+    #[prop_or(DEFAULT_FONT.to_string())]
     pub font: String,
     pub list: Rc<RefCell<Vec<Item>>>,
     pub selected: Rc<RefCell<Option<HashSet<String>>>>,
@@ -61,6 +66,8 @@ where
     pub allow_empty: bool,
     #[prop_or(true)]
     pub default_all: bool,
+    #[prop_or(DEFAULT_SIZED_VALUE)]
+    pub sized_value: bool,
 
     #[prop_or(None)]
     pub parent_message: Option<T::Message>,
@@ -506,7 +513,8 @@ where
                                     } else {
                                         CheckStatus::Unchecked
                                     };
-                                    let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
+                                    let mut item_value = item.value_txt(&txt, ctx.props().language);
+                                    if  ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); };
                                     html! {
                                         <tr>
                                             <td class="searchable-select-list-checkbox">
@@ -515,7 +523,7 @@ where
                                                 </div>
                                             </td>
                                             <td class="searchable-select-list-item">
-                                                { sized_item_value }
+                                                { item_value }
                                             </td>
                                         </tr>
                                     }
@@ -534,7 +542,8 @@ where
                                     } else {
                                         CheckStatus::Unchecked
                                     };
-                                    let sized_item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5);
+                                    let mut item_value = item.value_txt(&txt, ctx.props().language);
+                                    if  ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); };
                                     if ctx.props().kind == Kind::Multi {
                                         html! {
                                             <tr>
@@ -544,7 +553,7 @@ where
                                                     </div>
                                                 </td>
                                                 <td class="searchable-select-list-item">
-                                                    { sized_item_value }
+                                                    { item_value }
                                                 </td>
                                             </tr>
                                         }
@@ -552,7 +561,7 @@ where
                                         html! {
                                             <tr class="searchable-select-list-item-single" onclick={onclick_item(item.id().clone())}>
                                                 <td class="searchable-select-list-item-single">
-                                                    { sized_item_value }
+                                                    { item_value }
                                                 </td>
                                             </tr>
                                         }
