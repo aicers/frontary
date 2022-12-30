@@ -51,6 +51,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
     pub(super) fn view_text(
         &self,
@@ -102,6 +103,11 @@ where
             "width: {};",
             width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
+        let explanation_message = if let Some(example_message) = &ctx.props().example_message {
+            example_message.to_string()
+        } else {
+            String::new()
+        };
 
         html! {
             <div class={class_item}>
@@ -119,24 +125,34 @@ where
                 {
                     if let Some(length) = length {
                         html! {
-                            <input type="text" class={class} style={style}
-                                value={value}
-                                placeholder={placeholder}
-                                autofocus={autofocus}
-                                autocomplete="off"
-                                oninput={oninput}
-                                maxlength={length.to_string()}
-                            />
+                            <>
+                                <input type="text" class={class} style={style}
+                                    value={value}
+                                    placeholder={placeholder}
+                                    autofocus={autofocus}
+                                    autocomplete="off"
+                                    oninput={oninput}
+                                    maxlength={length.to_string()}
+                                />
+                                <div class="host-network-group-input-input-notice">
+                                    { text!(txt, ctx.props().language, explanation_message) }
+                                </div>
+                            </>
                         }
                     } else {
                         html! {
-                            <input type="text" class={class} style={style}
-                                value={value}
-                                placeholder={placeholder}
-                                autofocus={autofocus}
-                                autocomplete="off"
-                                oninput={oninput}
-                            />
+                            <>
+                                <input type="text" class={class} style={style}
+                                    value={value}
+                                    placeholder={placeholder}
+                                    autofocus={autofocus}
+                                    autocomplete="off"
+                                    oninput={oninput}
+                                />
+                                <div class="host-network-group-input-input-notice">
+                                    { text!(txt, ctx.props().language, explanation_message) }
+                                </div>
+                            </>
                         }
                     }
                 }

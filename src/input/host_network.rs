@@ -11,6 +11,8 @@ use yew::{events::InputEvent, html, Component, Context, Html, Properties, Target
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     HostOnly,
+    NetworkOnly,
+    RangeOnly,
     All,
 }
 
@@ -51,10 +53,13 @@ const EXIST_MSG: &str = "The input already exists.";
 const INVALID_INPUT_MSG: &str =
     "Invalid input (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)";
 const INVALID_INPUT_MSG_HOST: &str = "Invalid IP address";
+const INVALID_INPUT_MSG_RANGE: &str = "Invalid input (valid examples: 10.1.1.1 ~ 10.1.1.20)";
 const MAX_NUM_MSG: &str = "The maximum number of input was reached.";
 const INPUT_ALL_NOTICE: &str =
     "Multiple inputs possible (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)";
 const INPUT_HOST_NOTICE: &str = "Multiple IP addresses possible";
+const INPUT_RANGE_NOTICE: &str = "(Input Example: 192.168.1.100 ~ 192.168.1.200)";
+const INPUT_NETWORK_NOTICE: &str = "(Input Example: 192.168.10.0/24)";
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct Props<T>
@@ -406,6 +411,20 @@ where
                     Some(INPUT_HOST_NOTICE)
                 }
             }
+            Kind::NetworkOnly => {
+                if ctx.props().num.map_or(false, |x| x == 1) {
+                    None
+                } else {
+                    Some(INPUT_NETWORK_NOTICE)
+                }
+            }
+            Kind::RangeOnly => {
+                if ctx.props().num.map_or(false, |x| x == 1) {
+                    None
+                } else {
+                    Some(INPUT_RANGE_NOTICE)
+                }
+            }
         };
         if let Some(msg) = self.message {
             html! {
@@ -501,6 +520,38 @@ where
                         }
                     } else {
                         self.message = Some(INVALID_INPUT_MSG_HOST);
+                        Some(false)
+                    }
+                }
+                Kind::NetworkOnly => {
+                    if let Some(HostNetwork::Network(network)) = parse_host_network(&self.input) {
+                        if data.networks.binary_search(&network).is_ok() {
+                            self.message = Some(EXIST_MSG);
+                            Some(false)
+                        } else {
+                            self.view_order.push(ItemType::Network(data.networks.len()));
+                            data.networks.push(network);
+                            self.input = String::new();
+                            Some(true)
+                        }
+                    } else {
+                        self.message = Some(INVALID_INPUT_MSG);
+                        Some(false)
+                    }
+                }
+                Kind::RangeOnly => {
+                    if let Some(HostNetwork::Range(range)) = parse_host_network(&self.input) {
+                        if data.ranges.binary_search(&range).is_ok() {
+                            self.message = Some(EXIST_MSG);
+                            Some(false)
+                        } else {
+                            self.view_order.push(ItemType::Range(data.ranges.len()));
+                            data.ranges.push(range);
+                            self.input = String::new();
+                            Some(true)
+                        }
+                    } else {
+                        self.message = Some(INVALID_INPUT_MSG_RANGE);
                         Some(false)
                     }
                 }
