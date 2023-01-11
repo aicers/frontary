@@ -4,6 +4,7 @@ use json_gettext::get_text;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
 use web_sys::{Event, HtmlElement};
+use yew::virtual_dom::AttrValue;
 use yew::{classes, html, Component, Context, Html, NodeRef, Properties};
 
 pub struct Model<T, U> {
@@ -51,8 +52,8 @@ where
     #[prop_or(true)]
     pub active: bool,
     #[prop_or(None)]
-    pub deactive_class_suffix: Option<String>,
-    pub id: String,
+    pub deactive_class_suffix: Option<AttrValue>,
+    pub id: AttrValue,
     pub list: Rc<Vec<ViewString>>,
     pub candidate_values: Rc<Vec<T>>,
     #[prop_or(None)]
@@ -75,12 +76,12 @@ where
     #[prop_or(false)]
     pub list_align_center: bool,
     pub kind: Kind,
-    #[prop_or(DEFAULT_BG_COLOR.to_string())]
-    pub top_bg_color: String,
-    #[prop_or(DEFAULT_VALUE_TEXT_COLOR.to_string())]
-    pub value_text_color: String,
-    #[prop_or(DEFAULT_LIST_TEXT_COLOR.to_string())]
-    pub list_text_color: String,
+    #[prop_or(DEFAULT_BG_COLOR.into())]
+    pub top_bg_color: AttrValue,
+    #[prop_or(DEFAULT_VALUE_TEXT_COLOR.into())]
+    pub value_text_color: AttrValue,
+    #[prop_or(DEFAULT_LIST_TEXT_COLOR.into())]
+    pub list_text_color: AttrValue,
 }
 
 impl<T, U> Component for Model<T, U>
@@ -351,7 +352,7 @@ where
         let suffix = if ctx.props().active {
             String::new()
         } else if let Some(suffix) = ctx.props().deactive_class_suffix.as_ref() {
-            suffix.clone()
+            suffix.as_ref().into()
         } else {
             String::new()
         };

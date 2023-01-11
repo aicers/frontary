@@ -10,7 +10,7 @@ use json_gettext::get_text;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
-use yew::{html, Component, Context, Html, Properties};
+use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SortColumn {
@@ -99,7 +99,7 @@ where
     pub language: Language,
 
     // id:: 1st layer: customer/network, 2nd layer: customer-{item's id}
-    pub id: String,
+    pub id: AttrValue,
     pub title: &'static str,
     #[prop_or(None)]
     pub title_second: Option<&'static str>,
@@ -168,7 +168,7 @@ where
     fn create(ctx: &Context<Self>) -> Self {
         let mut s = Self {
             data_cache: (*ctx.props().data).clone(),
-            id_cache: ctx.props().id.clone(),
+            id_cache: ctx.props().id.as_ref().into(),
             pages_info: ctx.props().pages_info.try_borrow().ok().map(|info| *info),
             check_status_second: ctx.props().check_status_second.clone(),
 
@@ -197,7 +197,7 @@ where
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
         // even if the page or sort changes in Flat or LayeredFirst, this `change` is not called. Instead `update` is called.
         let data_changed = self.data_cache != *ctx.props().data;
-        let id_changed = self.id_cache != ctx.props().id;
+        let id_changed = self.id_cache != ctx.props().id.as_ref();
 
         let sort_changed = self.sort != ctx.props().sort;
         if self.data_cache.len() < ctx.props().data.len() {
@@ -323,7 +323,7 @@ where
         }
 
         if id_changed {
-            self.id_cache = ctx.props().id.clone();
+            self.id_cache = ctx.props().id.as_ref().into();
         }
         if data_changed {
             self.data_cache = (*ctx.props().data).clone();

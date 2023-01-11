@@ -3,6 +3,7 @@ use crate::{language::Language, Item, SelectSearchable, SelectSearchableKind, Te
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+use yew::virtual_dom::AttrValue;
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(Clone, PartialEq, Eq)]
@@ -20,7 +21,7 @@ where
 {
     pub txt: Texts,
     pub language: Language,
-    pub id: String,
+    pub id: AttrValue,
     pub title: Vec<String>,
     pub kind_last: SelectSearchableKind,
     pub empty_msg: Vec<String>,

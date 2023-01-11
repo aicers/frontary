@@ -16,7 +16,7 @@ use json_gettext::get_text;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
-use yew::{html, Component, Context, Html, Properties};
+use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum InvalidMessage {
@@ -341,7 +341,7 @@ where
 
     pub data: Rc<HashMap<String, ListItem>>,
     #[prop_or(None)]
-    pub input_id: Option<String>, // Some: Edit, None: Add
+    pub input_id: Option<AttrValue>, // Some: Edit, None: Add
     #[prop_or(None)]
     pub input_second_id: Option<InputSecondId>,
 

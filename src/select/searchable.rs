@@ -9,6 +9,7 @@ use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
+use yew::virtual_dom::AttrValue;
 use yew::{events::InputEvent, html, Component, Context, Html, Properties};
 
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
@@ -48,18 +49,18 @@ where
 {
     pub txt: Texts,
     pub language: Language,
-    pub id: String,
+    pub id: AttrValue,
     pub kind: Kind,
-    pub title: String,
-    pub empty_msg: String,
+    pub title: AttrValue,
+    pub empty_msg: AttrValue,
     pub top_width: u32,
     #[prop_or(DEFAULT_MAX_WIDTH)]
     pub max_width: u32,
     pub max_height: u32,
     #[prop_or(true)]
     pub align_left: bool,
-    #[prop_or(DEFAULT_FONT.to_string())]
-    pub font: String,
+    #[prop_or(DEFAULT_FONT.into())]
+    pub font: AttrValue,
     pub list: Rc<RefCell<Vec<Item>>>,
     pub selected: Rc<RefCell<Option<HashSet<String>>>>,
     #[prop_or(false)]
