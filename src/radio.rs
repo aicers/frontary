@@ -2,6 +2,7 @@ use crate::{language::Language, text, Texts, ViewString};
 use json_gettext::get_text;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+use yew::virtual_dom::AttrValue;
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(PartialEq, Eq)]
@@ -26,7 +27,7 @@ where
     pub list: Rc<Vec<ViewString>>,
     pub candidate_values: Rc<Vec<String>>,
     #[prop_or(None)]
-    pub default_value: Option<String>,
+    pub default_value: Option<AttrValue>,
     pub selected_value: Rc<RefCell<String>>,
     #[prop_or(None)]
     pub width_item: Option<u32>,
@@ -48,7 +49,7 @@ where
         };
         if let Some(value) = ctx.props().default_value.as_ref() {
             if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
-                *selected = value.clone();
+                *selected = value.as_ref().into();
             }
         }
         s

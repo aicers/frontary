@@ -10,6 +10,7 @@ use std::collections::{
     HashMap, HashSet,
 };
 use std::rc::Rc;
+use yew::virtual_dom::AttrValue;
 use yew::{html, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -57,13 +58,13 @@ pub struct Props {
     pub language: Language,
     #[prop_or(Kind::Basic)]
     pub kind: Kind,
-    pub id: String,
-    pub title: String,
-    pub empty_msg: String,
+    pub id: AttrValue,
+    pub title: AttrValue,
+    pub empty_msg: AttrValue,
     pub top_width: u32,
     #[prop_or(DEFAULT_POP_WIDTH)]
     pub pop_width: u32,
-    pub font: String,
+    pub font: AttrValue,
     pub list: Rc<RefCell<Vec<Item>>>,
     pub selected: Rc<ComplexSelection>,
     #[prop_or(true)]
