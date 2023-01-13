@@ -93,7 +93,7 @@ impl ToString for ViewString {
 
 impl ViewString {
     #[must_use]
-    pub fn to_string_txt(&self, txt: &Rc<JSONGetText<'static>>, language: Language) -> String {
+    pub fn to_string_txt(&self, txt: &JSONGetText<'static>, language: Language) -> String {
         match self {
             Self::Key(key) => {
                 get_text!(txt, language.tag(), key).map_or_else(String::new, |t| t.to_string())
@@ -433,7 +433,7 @@ impl Item {
     }
 
     #[must_use]
-    pub fn value_txt(&self, txt: &Rc<JSONGetText<'static>>, language: Language) -> String {
+    pub fn value_txt(&self, txt: &JSONGetText<'static>, language: Language) -> String {
         self.value.to_string_txt(txt, language)
     }
 
