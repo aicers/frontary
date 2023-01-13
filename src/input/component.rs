@@ -7,7 +7,7 @@ use crate::{
     list::{Column, ListItem},
     sort_hosts, sort_networks, text, InputNic, MessageType, Rerender, Texts, ViewString,
 };
-use base64::{engine::general_purpose, Engine as _};
+use data_encoding::BASE64;
 use gloo_file::{
     callbacks::{read_as_bytes, FileReader},
     File,
@@ -930,7 +930,7 @@ where
             Message::FileLoaded(file_name, file) => {
                 if let Some(input_data) = self.file_input_data.as_ref() {
                     if let Ok(mut item) = input_data.try_borrow_mut() {
-                        let content = general_purpose::STANDARD.encode(file);
+                        let content = BASE64.encode(&file);
                         *item = InputItem::File(file_name, content);
                     }
                 }

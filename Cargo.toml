@@ -10,9 +10,9 @@ test = []
 
 [dependencies]
 anyhow = "1"
-base64 = "0.21"
 bincode = "1"
 chrono = { version = "0.4", features = ["serde", "wasmbind"] }
+data-encoding = "2.3"
 gloo-events = "0.1"
 gloo-file = "0.2"
 gloo-storage = "0.2"
