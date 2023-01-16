@@ -641,7 +641,7 @@ where
                 if let Some(sep) = ctx.props().br_separator {
                     let display = col.to_string();
                     let display = display
-                        .rsplit(sep)
+                        .split(sep)
                         .map(ToString::to_string)
                         .collect::<Vec<String>>();
                     {
