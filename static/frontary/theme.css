@@ -177,9 +177,9 @@ input[type=text].searchable-select-input-empty-alert {
     padding-left: 10px;
     padding-right: 27px;
     font-size: 13px;
-    color: #C02E2E;
+    color: var(--alert-text-color);
     background-color: #FFE9E9;
-    border: 2px solid #C02E2E;
+    border: 2px solid var(--alert-text-color);
     border-radius: 3px;
     background-image: url('/frontary/select-down-alert.png');
     background-size: 13px 8px;
@@ -312,9 +312,9 @@ input[type=text].complex-select-input-empty-alert {
     padding-left: 10px;
     padding-right: 27px;
     font-size: 13px;
-    color: #C02E2E;
+    color: var(--alert-text-color);
     background-color: #FFE9E9;
-    border: 2px solid #C02E2E;
+    border: 2px solid var(--alert-text-color);
     border-radius: 3px;
     background-image: url('/frontary/complex-select-pop-alert.png');
     background-size: 24px 24px;
@@ -350,7 +350,7 @@ td.complex-select-pop-head-text {
 }
 
 span.complex-select-pop-head-color {
-    color: #B5131A;
+    color: var(--title-text-color);
 }
 
 td.complex-select-pop-head-close {
@@ -557,7 +557,7 @@ div.complex-select-pop-input-input-message {
     padding-right: 26px;
     padding-top: 2px;
     height: 30px;
-    color: #B5131A;
+    color: var(--alert-text-color);
 }
 
 input[type=text].complex-select-pop-input {
@@ -956,7 +956,7 @@ div.mini-select-on-off-action:hover {
 
 div.list-title {
     float: left;
-    color: #B5131A;
+    color: var(--title-text-color);
     font-size: 16px;
     font-weight: bold;
     margin-top: 14px;
@@ -989,12 +989,12 @@ div.list-add {
     height: 36px;
     font-size: 14px;
     color: #FFFFFF;
-    background-color: #B5131A;
+    background-color: var(--submit-button-bg-color);
     border-radius: 2px;
 }
 
 div.list-add:hover {
-    background-color: #9A1319;
+    background-color: var(--submit-button-bg-hover-color);
     cursor: pointer;
 }
 
@@ -1217,7 +1217,7 @@ div.list-whole-list-pages-inner {
 }
 
 span.list-whole-list-multiple-sep {
-    color: #B5131A;
+    color: var(--whole-list-sep-color);
 }
 
 div.list-whole-delete-checked {
@@ -1437,7 +1437,7 @@ div.page-selected {
 }
 
 div.page-unselected:hover {
-    color: #B5131A;
+    color: var(--page-unselected-hover-color);
     cursor: pointer;
 }
 
@@ -1453,7 +1453,7 @@ td.page-bar {
     font-size: 13px;
     line-height: 13px;
     color: #666666;
-    border-left: 1px solid #B5131A;
+    border-left: 1px solid var(--page-bar-border-color);
 }
 
 table.page-go {
@@ -1536,7 +1536,7 @@ td.input-title {
     height: 24px;
     font-weight: bold;
     font-size: 16px;
-    color: #B5131A;
+    color: var(--title-text-color);
     vertical-align: middle;
 }
 
@@ -1591,7 +1591,7 @@ div.input-contents-item-title {
 
 div.input-required-asterisk {
     display: inline-block;
-    color: #B5131A;
+    color: var(--alert-required-color);
 }
 
 input[type=text].frontary-input-text {
@@ -1614,9 +1614,9 @@ input[type=text].frontary-input-text-alert {
     width: 100%;
     padding-left: 8px;
     padding-right: 8px;
-    color: #C02E2E;
+    color: var(--alert-text-color);
     background-color: #FFE9E9;
-    border: 2px solid #C02E2E;
+    border: 2px solid var(--alert-text-color);
     border-radius: 2px;
     outline: none;
 }
@@ -1629,7 +1629,7 @@ div.input-required-message {
     margin-top: 4px;
     font-size: 12px;
     line-height: 15px;
-    color: #B5131A;
+    color: var(--alert-text-color);
 }
 
 div.input-contents-item-alert-message {
@@ -1639,7 +1639,7 @@ div.input-contents-item-alert-message {
     font-size: 12px;
     display: flex;
     align-items: center;
-    color: #B5131A;
+    color: var(--alert-text-color);
 }
 
 div.input-password-notice {
@@ -1678,9 +1678,9 @@ input[type=password].input-password-alert {
     width: 100%;
     padding-left: 8px;
     padding-right: 8px;
-    color: #C02E2E;
+    color: var(--alert-text-color);
     background-color: #FFE9E9;
-    border: 2px solid #C02E2E;
+    border: 2px solid var(--alert-text-color);
     border-radius: 2px;
     outline: none;
 }
@@ -1705,9 +1705,9 @@ input[type=number].input-number-alert {
     width: 100%;
     padding-left: 8px;
     padding-right: 8px;
-    color: #C02E2E;
+    color: var(--alert-text-color);
     background-color: #FFE9E9;
-    border: 2px solid #C02E2E;
+    border: 2px solid var(--alert-text-color);
     border-radius: 2px;
     outline: none;
 }
@@ -1729,18 +1729,18 @@ div.input-cancel {
     height: 30px;
     margin-right: 16px;
     background-color: #FFFFFF;
-    border: 1px solid #B5131A;
+    border: 1px solid var(--action-button-color);
     border-radius: 2px;
     font-weight: normal;
     font-size: 14px;
     line-height: 14px;
-    color: #B5131A;
+    color: var(--action-button-color);
 }
 
 div.input-cancel:hover {
-    border: 1px solid #841419;
+    border: 1px solid var(--action-button-hover-color);
     border-radius: 2px;
-    color: #841419;
+    color: var(--action-button-hover-color);
     cursor: pointer;
 }
 
@@ -1751,7 +1751,7 @@ div.input-save {
     align-items: center;
     width: 160px;
     height: 30px;
-    background-color: #B5131A;
+    background-color: var(--submit-button-bg-color);
     border-radius: 2px;
     font-weight: normal;
     font-size: 14px;
@@ -1760,7 +1760,7 @@ div.input-save {
 }
 
 div.input-save:hover {
-    background-color: #9A1319;
+    background-color: var(--submit-button-bg-hover-color);
     cursor: pointer;
 }
 
@@ -1828,7 +1828,7 @@ div.input-select-vector-vec-required {
     align-items: center;
     justify-content: center;
     background-color: #FFE9E9;
-    border: 2px solid #C02E2E;
+    border: 2px solid var(--alert-text-color);
 }
 
 div.input-contents-item-general-title {
@@ -1912,7 +1912,7 @@ div.host-network-group-input-input-message {
     font-size: 12px;
     display: flex;
     align-items: center;
-    color: #B5131A;
+    color: var(--alert-text-color);
 }
 
 div.host-network-group-input-input-notice {
@@ -1956,7 +1956,7 @@ div.tag-group-message-text {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: #B5131A;
+    color: var(--alert-text-color);
 }
 
 div.tag-group-input-item {
@@ -2166,7 +2166,7 @@ div.tag-edit-message {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: #B5131A;
+    color: var(--alert-text-color);
 }
 
 div.input-checkbox {
@@ -2376,7 +2376,7 @@ div.input-nic-msg {
     font-size: 12px;
     font-weight: normal;
     line-height: 15px;
-    color: #B5131A;
+    color: var(--title-text-color);
     text-align: left;
     margin-top: 4px;
 }
@@ -2738,12 +2738,12 @@ div.modal-button-item-recommendation {
     font-weight: normal;
     font-size: 14px;
     color: #FFFFFF;
-    background-color: #B5131A;
+    background-color: var(--submit-button-bg-color);
     border-radius: 2px;
 }
 
 div.modal-button-item-recommendation:hover {
-    background-color: #9A1319;
+    background-color: var(--submit-button-bg-hover-color);
     cursor: pointer;
 }
 
@@ -2753,15 +2753,15 @@ div.modal-button-item-option {
     align-items: center;
     font-weight: normal;
     font-size: 14px;
-    color: #B5131A;
+    color: var(--action-button-color);
     background-color: #FFFFFF;
     border-radius: 2px;
-    border: 1px solid #B5131A;
+    border: 1px solid var(--action-button-color);
 }
 
 div.modal-button-item-option:hover {
     color: #841419;
-    border: 1px solid #841419;
+    border: 1px solid var(--action-button-hover-color);
     cursor: pointer;
 }
 
