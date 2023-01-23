@@ -97,15 +97,6 @@ where
             "width: {};",
             width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
-        let explanation_message_buffer = if let Some(example_message) = &ctx.props().example_message
-        {
-            example_message.to_string()
-        } else {
-            String::new()
-        };
-        let explanation_message =
-            get_text!(txt, ctx.props().language.tag(), &explanation_message_buffer)
-                .map_or(explanation_message_buffer.clone(), |text| text.to_string());
 
         html! {
             <div class={class_item}>
@@ -132,7 +123,7 @@ where
                                     oninput={oninput}
                                     maxlength={length.to_string()}
                                 />
-                                { view_explanation_msg(explanation_message)}
+                                { Self::view_explanation_msg(ctx)}
                             </>
                         }
                     } else {
@@ -145,7 +136,7 @@ where
                                     autocomplete="off"
                                     oninput={oninput}
                                 />
-                                { view_explanation_msg(explanation_message)}
+                                { Self::view_explanation_msg(ctx)}
                             </>
                         }
                     }
@@ -885,6 +876,19 @@ where
             html! {}
         }
     }
+
+    pub(super) fn view_explanation_msg(ctx: &Context<Self>) -> Html {
+        let txt = ctx.props().txt.txt.clone();
+        if let Some(example_message) = &ctx.props().example_message {
+            html! {
+                <div class="host-network-group-input-input-notice">
+                    { text!(txt, ctx.props().language, example_message)}
+                </div>
+            }
+        } else {
+            html! {}
+        }
+    }
 }
 
 pub(super) fn view_asterisk(required: bool) -> Html {
@@ -896,16 +900,5 @@ pub(super) fn view_asterisk(required: bool) -> Html {
         }
     } else {
         html! {}
-    }
-}
-
-pub(super) fn view_explanation_msg(explanation_message: String) -> Html {
-    if explanation_message.is_empty() {
-        html! {}
-    } else {
-        html! {
-        <div class="host-network-group-input-input-notice">
-            { explanation_message }
-        </div>}
     }
 }
