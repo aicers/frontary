@@ -900,7 +900,7 @@ pub(super) fn view_asterisk(required: bool) -> Html {
 }
 
 pub(super) fn view_explanation_msg(explanation_message: String) -> Html {
-    if explanation_message == String::new() {
+    if explanation_message.is_empty() {
         html! {}
     } else {
         html! {
