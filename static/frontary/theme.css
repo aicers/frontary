@@ -2800,7 +2800,7 @@ td.tab-menu-unselected {
     vertical-align: middle;
     font-weight: normal;
     font-size: 14px;
-    color: #9E6E6E;
+    color: var(--tab-menu-unselected-color);
     background-color: #EEEEEE;
     border-radius: 2px 2px 0px 0px;
     border: 1px solid #D7D7D7;
