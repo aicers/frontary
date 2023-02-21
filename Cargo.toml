@@ -1,6 +1,6 @@
 [package]
 name = "frontary"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 publish = false
 
@@ -27,5 +27,5 @@ serde = { version = "1",  features = ["derive"] }
 strum = "0.24"
 strum_macros = "0.24"
 wasm-bindgen = { version = ">=0.2.83", features = ["serde-serialize"] }
-web-sys = { version = "0.3", features = ["CanvasRenderingContext2d", "CssStyleDeclaration", "HtmlCanvasElement", "Navigator", "TextMetrics"] }
+web-sys = { version = "0.3", features = ["CanvasRenderingContext2d", "HtmlCanvasElement", "Navigator", "TextMetrics"] }
 yew = "0.19"
