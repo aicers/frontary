@@ -433,11 +433,10 @@ where
                                 .collect::<HashMap<String, String>>();
 
                             if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                                let deleted = buffer
-                                    .delete
-                                    .as_ref()
-                                    .map_or_else(String::new, Clone::clone);
-                                buffer.old.remove(&deleted);
+                                let deleted = buffer.delete.clone();
+                                if let Some(deleted) = deleted {
+                                    buffer.old.remove(&deleted);
+                                }
                                 buffer.delete = None;
                                 *item = InputItem::Tag((*buffer).clone());
                             }

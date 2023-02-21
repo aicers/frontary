@@ -8,9 +8,13 @@ use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
-use yew::{events::InputEvent, html, Component, Context, Html, Properties, TargetCast};
+use yew::{
+    events::InputEvent, html, virtual_dom::AttrValue, Component, Context, Html, Properties,
+    TargetCast,
+};
 
 pub struct Model<T> {
+    id: String,
     prev_list: Rc<HashMap<String, String>>,
     input: String,
     message: Option<&'static str>,
@@ -49,6 +53,10 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    #[prop_or(0)]
+    pub rerender_serial: u64,
+    #[prop_or(None)]
+    pub id: Option<AttrValue>,
     pub txt: Texts,
     pub language: Language,
     #[prop_or(None)]
@@ -73,6 +81,11 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         let mut s = Self {
+            id: ctx
+                .props()
+                .id
+                .as_ref()
+                .map_or(ID.to_string(), ToString::to_string),
             prev_list: ctx.props().prev_list.clone(),
             input: String::new(),
             message: None,
@@ -98,11 +111,20 @@ where
             }
             for new_key in ctx.props().prev_list.keys() {
                 if !self.prev_list.contains_key(new_key) {
-                    self.view_order.push(new_key.clone());
+                    if let Ok(data) = ctx.props().input_data.try_borrow() {
+                        if data.old.contains(new_key) {
+                            self.view_order.push(new_key.clone());
+                        }
+                    }
                 }
             }
             self.prev_list = ctx.props().prev_list.clone();
         }
+        self.id = ctx
+            .props()
+            .id
+            .as_ref()
+            .map_or(ID.to_string(), ToString::to_string);
 
         self.reset_search_list(ctx);
         true
@@ -111,7 +133,7 @@ where
     #[allow(clippy::too_many_lines)]
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Message::Focus => visible_tag_select(ID),
+            Message::Focus => visible_tag_select(&self.id),
             Message::Input(input) => {
                 self.input = input;
                 self.reset_search_list(ctx);
@@ -197,7 +219,7 @@ where
                         data.old.insert(key.clone());
                         self.view_order.push(key);
                         self.input = String::new();
-                        toggle_visibility(ID);
+                        toggle_visibility(&self.id);
                         true
                     }
                 } else {
@@ -374,7 +396,7 @@ where
 
     fn view_select(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div id={ID.to_string()} class="tag-group-input-select">
+            <div id={self.id.clone()} class="tag-group-input-select">
             {
                 for self.search_list.iter().enumerate().map(|(index, (k, v))| {
                     if self.edit.as_ref().map_or(false, |t| t == k) {
