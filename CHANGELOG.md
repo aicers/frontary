@@ -11,6 +11,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Make multiple `<Tag>`s available at the same time without `<Input>`.
 
+### Security
+
+- Turned off the default features of chrono that might casue SEGFAULT. See
+  [RUSTSEC-2020-0071](https://rustsec.org/advisories/RUSTSEC-2020-0071)
+  for details.
+
 ## [0.4.0] - 2023-01-24
 
 ### Changed
