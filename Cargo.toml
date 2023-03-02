@@ -11,7 +11,7 @@ test = []
 [dependencies]
 anyhow = "1"
 bincode = "1"
-chrono = { version = "0.4", features = ["serde", "wasmbind"] }
+chrono = { version = "0.4", default_features = false, features = ["serde", "wasmbind"] }
 data-encoding = "2.3"
 gloo-events = "0.1"
 gloo-file = "0.2"
