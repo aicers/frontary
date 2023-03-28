@@ -1,5 +1,5 @@
 use strum_macros::Display;
-use yew::{function_component, html, Properties};
+use yew::{function_component, html, Html, Properties};
 
 #[derive(Clone, Copy, Display, PartialEq, Eq)]
 pub enum CheckStatus {

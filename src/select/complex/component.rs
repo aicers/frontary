@@ -95,7 +95,7 @@ impl Component for Model {
         s
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         if let (Ok(mut sel), Ok(list)) = (
             ctx.props().selected.predefined.try_borrow_mut(),
             ctx.props().list.try_borrow(),

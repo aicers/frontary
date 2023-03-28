@@ -61,7 +61,7 @@ impl Component for Model {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         let Ok(list) = ctx.props().list.try_borrow() else { return false };
         let (serial, time) = if let Some((serial, item)) = list.last() {
             (*serial, item.time)

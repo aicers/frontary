@@ -278,7 +278,6 @@ where
                     None
                 }
             })
-            .into_iter()
             .map(|d| Rc::new(RefCell::new(d)))
             .collect::<Vec<Rc<RefCell<InputItem>>>>();
         if default.len() == copy_default.len() {
