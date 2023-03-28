@@ -1,4 +1,4 @@
-use yew::{function_component, html, Properties};
+use yew::{function_component, html, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Status {

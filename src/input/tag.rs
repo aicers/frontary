@@ -102,7 +102,7 @@ where
         s
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         if self.prev_list != ctx.props().prev_list {
             for old_key in self.prev_list.keys() {
                 if !ctx.props().prev_list.contains_key(old_key) {

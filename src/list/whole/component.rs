@@ -194,7 +194,7 @@ where
     }
 
     #[allow(clippy::too_many_lines)]
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         // even if the page or sort changes in Flat or LayeredFirst, this `change` is not called. Instead `update` is called.
         let data_changed = self.data_cache != *ctx.props().data;
         let id_changed = self.id_cache != ctx.props().id.as_ref();

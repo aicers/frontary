@@ -90,7 +90,7 @@ where
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         if ctx.props().kind == Kind::Multi {
             if let (Ok(mut sel), Ok(list)) = (
                 ctx.props().selected.try_borrow_mut(),
