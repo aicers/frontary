@@ -51,6 +51,10 @@ export function visible_tag_select(id) {
 }
 
 function close_custom_select(elmnt) {
+    if (elmnt.target.className == "tag-select-edit" || elmnt.target.className == "tag-select-edit-done") {
+        return;
+    }
+
     // HIGHLIGHT: in case when elmnt has been removed after it was clicked.
     if (elmnt.target.parentNode == null) return;
 

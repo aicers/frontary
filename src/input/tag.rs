@@ -208,7 +208,9 @@ where
                     }
                     return false;
                 }
-                _ => {}
+                _ => {
+                    return false;
+                }
             },
             Message::SelectTag(key) => {
                 let send_msg = if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
@@ -468,7 +470,7 @@ where
                             <div class={class}>
                                 <div class="tag-group-input-select-item">
                                     <div class="tag-group-input-select-item-text" onclick={ onclick_item(k.clone()) }>
-                                    { v.clone() }
+                                        { v.clone() }
                                     </div>
                                     <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
                                     <img src="/frontary/tag-select-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
