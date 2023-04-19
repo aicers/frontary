@@ -51,7 +51,9 @@ export function visible_tag_select(id) {
 }
 
 function close_custom_select(elmnt) {
-    if (elmnt.target.className == "tag-select-edit" || elmnt.target.className == "tag-select-edit-done") {
+    if (elmnt.target.className == "tag-select-edit"
+        || elmnt.target.className == "tag-select-edit-done"
+        || elmnt.target.className == "tag-input-close") {
         return;
     }
 
