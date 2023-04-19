@@ -51,14 +51,14 @@ export function visible_tag_select(id) {
 }
 
 function close_custom_select(elmnt) {
+    // HIGHLIGHT: in case when elmnt has been removed after it was clicked.
+    if (elmnt.target.parentNode == null) return;
+
     if (elmnt.target.className == "tag-select-edit"
         || elmnt.target.className == "tag-select-edit-done"
         || elmnt.target.className == "tag-input-close") {
         return;
     }
-
-    // HIGHLIGHT: in case when elmnt has been removed after it was clicked.
-    if (elmnt.target.parentNode == null) return;
 
     var elems = document.getElementsByClassName("searchable-select");
     var i;
