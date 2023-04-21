@@ -7,6 +7,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.5.2] - 2023-04-19
 
+## Fixed
+
 - Check if an HTML element still exists to avoid a null pointer in JS code.
 
 ## [0.5.1] - 2023-04-19
