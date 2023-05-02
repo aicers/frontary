@@ -1,6 +1,6 @@
 use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
-    text, window_inner_height, CheckBox, CheckStatus, EndpointKind, Item, SelectComplexKind,
+    text, window_inner_height, CheckBox, CheckStatus, EndpointKind, NetworkItem, SelectComplexKind,
     SelectMini, SelectMiniKind, SelectionExtraInfo, ViewString, NBSP,
 };
 use htmlescape::decode_html;
@@ -251,7 +251,7 @@ impl Model {
         }
     }
 
-    fn view_list_item(&self, ctx: &Context<Self>, item: &Item) -> Html {
+    fn view_list_item(&self, ctx: &Context<Self>, item: &NetworkItem) -> Html {
         let (key, checked) = if item.networks().is_some() {
             (
                 item.id.clone(),
