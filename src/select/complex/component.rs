@@ -1,7 +1,7 @@
 use super::DEFAULT_POP_WIDTH;
 use crate::{
     language::Language, text, toggle_visibility_complex, validate_host_network, CheckStatus,
-    ComplexSelection, EndpointKind, Item, NetworkGroup, SelectionExtraInfo, Texts,
+    ComplexSelection, EndpointKind, NetworkGroup, NetworkItem, SelectionExtraInfo, Texts,
 };
 use json_gettext::get_text;
 use std::cell::RefCell;
@@ -65,7 +65,7 @@ pub struct Props {
     #[prop_or(DEFAULT_POP_WIDTH)]
     pub pop_width: u32,
     pub font: AttrValue,
-    pub list: Rc<RefCell<Vec<Item>>>,
+    pub list: Rc<RefCell<Vec<NetworkItem>>>,
     pub selected: Rc<ComplexSelection>,
     #[prop_or(true)]
     pub allow_input: bool,
@@ -101,7 +101,10 @@ impl Component for Model {
             ctx.props().list.try_borrow(),
         ) {
             if let Some(predefined) = sel.as_mut() {
-                let list_tmp = list.iter().map(Item::id).collect::<HashSet<&String>>();
+                let list_tmp = list
+                    .iter()
+                    .map(NetworkItem::id)
+                    .collect::<HashSet<&String>>();
                 predefined.retain(|k, _| list_tmp.get(k).is_some());
                 if self.check_status(ctx, false) == CheckStatus::Checked {
                     *sel = None;

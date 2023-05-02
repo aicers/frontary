@@ -410,9 +410,38 @@ pub struct NetworkGroup {
 pub struct Item {
     id: String,
     value: ViewString,
+}
+
+impl Item {
+    #[must_use]
+    pub fn new(id: String, value: ViewString) -> Self {
+        Self { id, value }
+    }
+
+    #[must_use]
+    pub fn id(&self) -> &String {
+        &self.id
+    }
+
+    #[must_use]
+    pub fn value(&self) -> String {
+        self.value.to_string()
+    }
+
+    #[must_use]
+    pub fn value_txt(&self, txt: &JSONGetText<'static>, language: Language) -> String {
+        self.value.to_string_txt(txt, language)
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct NetworkItem {
+    id: String,
+    value: ViewString,
     networks: Option<NetworkGroup>,
 }
-impl Item {
+
+impl NetworkItem {
     #[must_use]
     pub fn new(id: String, value: ViewString, networks: Option<NetworkGroup>) -> Self {
         Self {
@@ -442,6 +471,7 @@ impl Item {
         self.networks.as_ref()
     }
 }
+
 #[derive(Clone, Properties)]
 pub struct Props {}
 

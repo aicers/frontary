@@ -412,7 +412,6 @@ fn value_kind(kind: ValueKind) -> Item {
     Item {
         id: kind.to_string(),
         value: ViewString::Raw(kind.to_string()),
-        networks: None,
     }
 }
 
@@ -421,7 +420,6 @@ fn cmp_kind(kind: ComparisonKind) -> Item {
     Item {
         id: kind.to_string(),
         value: ViewString::Raw(kind.to_string()),
-        networks: None,
     }
 }
 

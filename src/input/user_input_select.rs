@@ -41,7 +41,6 @@ where
             .map(|(id, value)| Item {
                 id: id.clone(),
                 value: value.clone(),
-                networks: None,
             })
             .collect::<Vec<Item>>();
         list.sort_unstable_by(|a, b| {
@@ -174,7 +173,6 @@ where
                                     .map(|(a, b)| Item {
                                         id: a.clone(),
                                         value: b.clone(),
-                                        networks: None,
                                     })
                                     .collect::<Vec<Item>>(),
                             )),
