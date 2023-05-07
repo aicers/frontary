@@ -9,6 +9,7 @@ mod user_input_composite;
 mod user_input_nic;
 mod user_input_select;
 
+pub use self::user_input::view_asterisk;
 pub use component::{InputSecondId, Model};
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;

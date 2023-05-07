@@ -1,26 +1,30 @@
 mod checkbox;
 mod input;
+mod ip_range_input;
 pub mod language;
 mod list;
 mod modal;
 mod notification;
 mod pages;
+mod port_range_input;
 mod radio;
 mod radio_separate;
 mod select;
 mod sort;
 pub mod static_files;
 mod tab_menu;
+mod text_input;
 
 use num_traits::ToPrimitive;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
-    ChildrenPosition, Comparison, ComparisonKind, Essential as InputEssential, HostNetworkHtml,
-    HostNetworkKind, InputHostNetworkGroup, InputItem, InputNic, InputTag, InputTagGroup,
-    InputType, Model as Input, Tag, Value as ComparisonValue, ValueKind,
+    view_asterisk, ChildrenPosition, Comparison, ComparisonKind, Essential as InputEssential,
+    HostNetworkHtml, HostNetworkKind, InputHostNetworkGroup, InputItem, InputNic, InputTag,
+    InputTagGroup, InputType, Model as Input, Tag, Value as ComparisonValue, ValueKind,
 };
+pub use crate::ip_range_input::Model as IpRangeInput;
 pub use crate::language::Language;
 pub use crate::list::{
     ColWidths, Column, DataType, DisplayInfo, Kind, ListItem, MessageType, SortColumn, WholeList,
@@ -33,6 +37,7 @@ pub use crate::notification::{
     NotificationItem, NotificationType, TIMEOUT_SECS,
 };
 pub use crate::pages::{Info as PagesInfo, Model as Pages};
+pub use crate::port_range_input::{Model as PortRangeInput, PortRange};
 pub use crate::radio::Model as Radio;
 pub use crate::radio_separate::Model as RadioSeparate;
 pub use crate::select::complex::{Kind as SelectComplexKind, Model as SelectComplex};
@@ -41,7 +46,7 @@ pub use crate::select::searchable::{Kind as SelectSearchableKind, Model as Selec
 pub use crate::select::vec_searchable::Model as VecSelect;
 pub use crate::sort::{Model as Sort, Status as SortStatus};
 pub use crate::tab_menu::Model as TabMenu;
-
+pub use crate::text_input::Model as TextInput;
 use ipnet::Ipv4Net;
 use json_gettext::{get_text, JSONGetText};
 use std::net::Ipv4Addr;

@@ -891,7 +891,8 @@ where
     }
 }
 
-pub(super) fn view_asterisk(required: bool) -> Html {
+#[must_use]
+pub fn view_asterisk(required: bool) -> Html {
     if required {
         html! {
             <div class="input-required-asterisk">

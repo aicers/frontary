@@ -1925,6 +1925,16 @@ div.host-network-group-input-input-notice {
     color: #818181;
 }
 
+div.simple-input-input-notice {
+    width: 100%;
+    line-height: 15px;
+    font-weight: normal;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    color: #818181;
+}
+
 div.input-tag-group {
     width: 100%;
     margin-bottom: 24px;
