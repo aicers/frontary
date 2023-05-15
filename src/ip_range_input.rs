@@ -54,7 +54,7 @@ impl Component for Model {
         match msg {
             Message::InputString(text) => {
                 self.input = text.clone();
-                if let Some(mut data) = ctx.props().input_data.try_borrow_mut().ok() {
+                if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
                     if let Some(range) = check_input(&text) {
                         data.replace(range);
                     }
