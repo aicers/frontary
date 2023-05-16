@@ -53,10 +53,10 @@ impl Component for Model {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Message::InputString(text) => {
-                self.input = text.clone();
                 if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
                     data.replace(text.trim().to_string());
                 }
+                self.input = text;
             }
             Message::InputError => {
                 // TODO: issue #5
