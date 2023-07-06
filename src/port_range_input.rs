@@ -154,7 +154,7 @@ fn check_input(input: &str) -> Option<PortRange> {
                 if let (Ok(start), Ok(end)) =
                     (i64::from_str(start.trim()), i64::from_str(end.trim()))
                 {
-                    Some(PortRange {
+                    (start < end).then_some(PortRange {
                         start: Some(start),
                         end: Some(end),
                     })

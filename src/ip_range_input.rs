@@ -146,12 +146,13 @@ fn check_input(input: &str) -> Option<IpRange> {
         input.split_once('~').map_or_else(
             || None,
             |(start, end)| {
-                if Ipv4Addr::from_str(start.trim()).is_ok()
-                    && Ipv4Addr::from_str(end.trim()).is_ok()
-                {
-                    Some(IpRange {
-                        start: start.trim().to_string(),
-                        end: end.trim().to_string(),
+                if let (Ok(start), Ok(end)) = (
+                    Ipv4Addr::from_str(start.trim()),
+                    Ipv4Addr::from_str(end.trim()),
+                ) {
+                    (start < end).then_some(IpRange {
+                        start: start.to_string(),
+                        end: end.to_string(),
                     })
                 } else {
                     None
