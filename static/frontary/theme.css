@@ -2831,3 +2831,8 @@ td.tab-menu-right {
     border-bottom: 1px solid #D7D7D7;
     background-color: #FFFFFF;
 }
+
+.disable-outer {
+    filter: brightness(0.5);
+    pointer-events: none;
+}
