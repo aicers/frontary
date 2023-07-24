@@ -58,6 +58,8 @@ where
     pub to_ends: bool,
     #[prop_or(false)]
     pub input: bool,
+    #[prop_or(false)]
+    pub disable: bool,
 }
 
 pub struct Model<T> {
@@ -169,8 +171,14 @@ where
             let onclick_first = ctx.link().callback(|_| Message::First);
             let onclick_last = ctx.link().callback(|_| Message::Last);
             let onclick_page = |page: usize| ctx.link().callback(move |_| Message::Page(page));
+            let class_disable = if ctx.props().disable {
+                "page-outer disable-outer"
+            } else {
+                "page-outer"
+            };
+
             html! {
-                <div class="page-outer">
+                <div class={class_disable}>
                     <div class="page-number">
                     {
                         if info.start > 1 {
