@@ -325,9 +325,9 @@ where
         html! {
             <div class="searchable-select">
                 <div onclick={onclick} class="searchable-select-top">
-                    <input type="text" class={classes!("searchable-select-top-input", class_input)} readonly={true} value={value} style={style} />
+                    <input type="text" class={classes!("searchable-select-top-input", class_input)} readonly={true} value={value.clone()} style={style} />
                 </div>
-                { self.view_searchable_list(ctx) }
+                { self.view_searchable_list(ctx, &value) }
             </div>
         }
     }
@@ -364,7 +364,7 @@ where
     }
 
     #[allow(clippy::too_many_lines)]
-    fn view_searchable_list(&self, ctx: &Context<Self>) -> Html {
+    fn view_searchable_list(&self, ctx: &Context<Self>, value: &str) -> Html {
         let width = Self::caculate_width(ctx);
         let list_len = ctx
             .props()
@@ -373,8 +373,11 @@ where
             .map_or(0, |list| list.len())
             .to_u32()
             .expect("> u32::MAX never happens");
-        let height = std::cmp::min(list_len * ELEM_HEIGHT + 80, ctx.props().max_height);
-
+        let height = if ctx.props().kind == Kind::Single {
+            std::cmp::min(list_len * ELEM_HEIGHT + 42, ctx.props().max_height)
+        } else {
+            std::cmp::min(list_len * ELEM_HEIGHT + 80, ctx.props().max_height)
+        };
         let left = if width > ctx.props().top_width - 8 && !ctx.props().align_left {
             format!("-{}", width - (ctx.props().top_width - 8) + 4)
         } else {
@@ -544,7 +547,7 @@ where
                                         CheckStatus::Unchecked
                                     };
                                     let mut item_value = item.value_txt(&txt, ctx.props().language);
-                                    if  ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); };
+                                    if ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); };
                                     if ctx.props().kind == Kind::Multi {
                                         html! {
                                             <tr>
@@ -558,7 +561,16 @@ where
                                                 </td>
                                             </tr>
                                         }
-                                    } else {
+                                    } else if item_value == value {
+                                        html!{
+                                            <tr class="searchable-select-list-item-single-selected" onclick={onclick_item(item.id().clone())}>
+                                                <td class="searchable-select-list-item-single-selected">
+                                                    { item_value }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else {
                                         html! {
                                             <tr class="searchable-select-list-item-single" onclick={onclick_item(item.id().clone())}>
                                                 <td class="searchable-select-list-item-single">
