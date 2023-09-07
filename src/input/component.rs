@@ -1088,7 +1088,7 @@ where
                     if let Ok(input) = data.try_borrow() {
                         if t.unique() {
                             let mut different = true;
-                            for (key, item) in ctx.props().data.iter() {
+                            for (key, item) in &*ctx.props().data {
                                 if id.as_ref().map_or(true, |id| id != key) {
                                     if let Some(other) = item.columns.get(index) {
                                         if let (
@@ -1127,9 +1127,7 @@ fn rearrange_buffer<T>(
     T: Clone,
 {
     for index in row + 1..len {
-        let Some(item) = buffer.remove(&(
-            col + (index + base) * MAX_PER_LAYER
-        )) else {
+        let Some(item) = buffer.remove(&(col + (index + base) * MAX_PER_LAYER)) else {
             continue;
         };
         buffer.insert(col + (index - 1 + base) * MAX_PER_LAYER, item.clone());

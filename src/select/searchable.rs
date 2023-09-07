@@ -10,7 +10,7 @@ use std::{cell::RefCell, marker::PhantomData};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::virtual_dom::AttrValue;
-use yew::{events::InputEvent, html, Component, Context, Html, Properties};
+use yew::{classes, events::InputEvent, html, Component, Context, Html, Properties};
 
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
 
@@ -325,7 +325,7 @@ where
         html! {
             <div class="searchable-select">
                 <div onclick={onclick} class="searchable-select-top">
-                    <input type="text" class={class_input} disabled={true} value={value} style={style} />
+                    <input type="text" class={classes!("searchable-select-top-input", class_input)} readonly={true} value={value} style={style} />
                 </div>
                 { self.view_searchable_list(ctx) }
             </div>

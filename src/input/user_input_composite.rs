@@ -196,7 +196,7 @@ where
         let input_data_clone = input_data.clone();
         let input_data_clone_1 = &(input_data.clone());
         let Ok(input_data) = input_data.try_borrow() else {
-            return html! {}
+            return html! {};
         };
         let InputItem::Group(input_data) = &*input_data else {
             return html! {};

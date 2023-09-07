@@ -98,7 +98,7 @@ where
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let num_pages = ctx.props().num_pages;
-        let Ok(mut info) = ctx.props().pages_info.try_borrow_mut()  else {
+        let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() else {
             return false;
         };
         match msg {

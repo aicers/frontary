@@ -11,7 +11,7 @@ use std::collections::{
 };
 use std::rc::Rc;
 use yew::virtual_dom::AttrValue;
-use yew::{html, Component, Context, Html, Properties};
+use yew::{classes, html, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Kind {
@@ -398,7 +398,7 @@ impl Component for Model {
         html! {
             <div class="complex-select">
                 <div onclick={onclick} class="complex-select-top">
-                    <input type="text" class={class_input} disabled=true value={value} style={style} />
+                    <input type="text" class={classes!("complex-select-top-input", class_input)} readonly={true} value={value} style={style} />
                 </div>
                 { self.view_pop(ctx) }
             </div>

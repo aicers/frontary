@@ -58,7 +58,7 @@ where
             }
 
             if ctx.props().kind == Kind::LayeredFirst {
-                for (key, item) in ctx.props().data.iter() {
+                for (key, item) in &*ctx.props().data {
                     let total = if item.sub_items.is_empty() {
                         0
                     } else {
@@ -278,7 +278,7 @@ where
             }
             Kind::LayeredSecond => {
                 if let Some(input) = ctx.props().input_second_data.as_ref() {
-                    for input in input.iter() {
+                    for input in input {
                         if let Ok(mut input) = input.try_borrow_mut() {
                             input.clear();
                         }

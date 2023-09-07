@@ -393,6 +393,11 @@ pub fn sort_hosts(hosts: &mut Vec<String>) {
     hosts.dedup();
 }
 
+/// Sorts networks by the network address.
+///
+/// # Panics
+///
+/// If "0.0.0.0/32" cannot be parsed as `Ipv4Net`.
 pub fn sort_networks(networks: &mut Vec<String>) {
     networks.sort_unstable_by_key(|n| {
         if let Ok(network) = Ipv4Net::from_str(n) {

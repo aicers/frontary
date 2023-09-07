@@ -142,6 +142,10 @@ div.searchable-select-top:hover {
     cursor: pointer;
 }
 
+input[type=text].searchable-select-top-input:hover {
+    cursor: pointer;
+}
+
 input[type=text].searchable-select-input {
     height: 30px;
     padding-left: 10px;
@@ -275,6 +279,14 @@ div.complex-select {
 
 div.complex-select-top {
     height: 30px;
+}
+
+div.complex-select-top:hover {
+    cursor: pointer;
+}
+
+input[type=text].complex-select-top-input:hover {
+    cursor: pointer;
 }
 
 input[type=text].complex-select-input {

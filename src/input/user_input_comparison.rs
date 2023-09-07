@@ -27,10 +27,10 @@ where
     ) -> Html {
         let data_id = layer_index + base_index;
         let Some(value_kind_selected) = self.comparison_value_kind_buffer.get(&data_id) else {
-            return html! {}
+            return html! {};
         };
         let Some(value_cmp_selected) = self.comparison_value_cmp_buffer.get(&data_id) else {
-            return html! {}
+            return html! {};
         };
         let selected = vec![value_kind_selected.clone(), value_cmp_selected.clone()];
         let title = vec!["Type".to_string(), "Comparison".to_string()];
@@ -145,10 +145,9 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         data_id: usize,
     ) -> Html {
-        let (Some(value_kind), Some(cmp_kind)) = (
-            self.comparison_kind(data_id),
-            self.comparison_cmp(data_id)
-        ) else {
+        let (Some(value_kind), Some(cmp_kind)) =
+            (self.comparison_kind(data_id), self.comparison_cmp(data_id))
+        else {
             return html! {
                 <div class="input-comparison-value">
                 </div>
@@ -358,7 +357,8 @@ where
         let Some((first, second)) = self.comparison_value_buffer.get(&data_id) else {
             return;
         };
-        let (Ok(mut first), Ok(mut second)) = (first.try_borrow_mut(), second.try_borrow_mut()) else {
+        let (Ok(mut first), Ok(mut second)) = (first.try_borrow_mut(), second.try_borrow_mut())
+        else {
             return;
         };
         if value_index == 0 {
