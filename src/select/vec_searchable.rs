@@ -66,7 +66,7 @@ where
             Message::Select(index) => {
                 self.rerender_serial = self.rerender_serial.wrapping_add(1);
                 for i in index + 1..ctx.props().selected.len() {
-                    let Some(selected) = ctx.props().selected.get(i)  else {
+                    let Some(selected) = ctx.props().selected.get(i) else {
                         continue;
                     };
                     if let Ok(mut selected) = selected.try_borrow_mut() {

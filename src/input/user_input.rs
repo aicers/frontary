@@ -848,7 +848,7 @@ where
                 <div class="input-file">
                     <input class="input-file-file-name"
                         value={file_name}
-                        disabled={true} />
+                        readonly={true} />
                     <label for="input-file" class="input-file-choose-file">
                         { text!(txt, ctx.props().language, "Choose a file") }
                     </label>
