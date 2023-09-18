@@ -159,6 +159,30 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let txt = ctx.props().txt.txt.clone();
+        let msg = text!(txt, ctx.props().language, "Select one").to_string();
+        let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
+            selected.map_or(msg.clone(), |value| {
+                ctx.props()
+                    .candidate_values
+                    .iter()
+                    .enumerate()
+                    .find(|(_, &v)| v == value)
+                    .map_or(msg.clone(), |(index, _)| {
+                        ctx.props()
+                            .list
+                            .get(index)
+                            .map_or(msg.clone(), |v| match v {
+                                ViewString::Key(key) => {
+                                    text!(txt, ctx.props().language, key).to_string()
+                                }
+                                ViewString::Raw(txt) => txt.clone(),
+                            })
+                    })
+            })
+        } else {
+            msg
+        };
         html! {
             <div class="mini-select">
             {
@@ -169,10 +193,10 @@ where
                     Kind::MoreAction => Self::view_more_action(ctx),
                     Kind::MoreActionNoImage => html! {},
                     Kind::OnOffAction => Self::view_on_off_action(ctx),
-                    Kind::Round | Kind::Soft => Self::view_basic(ctx),
+                    Kind::Round | Kind::Soft => Self::view_basic(ctx,&value),
                 }
             }
-            { Self::view_list(ctx) }
+            { Self::view_list(ctx,&value) }
             </div>
         }
     }
@@ -184,7 +208,8 @@ where
     U: Clone + Component + PartialEq,
     <U as Component>::Message: Clone + PartialEq,
 {
-    fn view_list(ctx: &Context<Self>) -> Html {
+    #[allow(clippy::too_many_lines)]
+    fn view_list(ctx: &Context<Self>, value: &str) -> Html {
         let list = ctx.props().list.clone();
         let onclick_item = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
         let style_width = ctx
@@ -223,9 +248,21 @@ where
             <div id={ctx.props().id.clone()} class={classes!("mini-select-list-down", class)} style={style}>
                 <table class="mini-select-list-down-table">
                     {
-                        for list.iter().enumerate().map(|(index, item)| html! {
+                        for list.iter().enumerate().map(|(index, item)|{
+                        let class_select = match item {
+                            ViewString::Key(key) => if key == value {
+                                "mini-select-list-down-item-selected"
+                            } else {
+                                "mini-select-list-down-item"
+                            },
+                            ViewString::Raw(txt) => if txt == value {
+                                "mini-select-list-down-item-selected"
+                            } else {
+                                "mini-select-list-down-item"
+                            },
+                        };
+                        html! {
                             <tr>
-                                <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
                                 {
                                     if ctx.props().kind == Kind::MoreAction {
                                         match item {
@@ -238,12 +275,14 @@ where
                                                     ""
                                                 };
                                                 html! {
-                                                    <div class="mini-select-list-down-item-more-action">
-                                                        <img src={icon} class="mini-select-list-down-item-more-action" />
-                                                        <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
-                                                        { text!(txt, ctx.props().language, key) }
+                                                    <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                        <div class="mini-select-list-down-item-more-action">
+                                                            <img src={icon} class="mini-select-list-down-item-more-action" />
+                                                            <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
+                                                            { text!(txt, ctx.props().language, key) }
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </td>
                                                 }
                                             }
                                             ViewString::Raw(_) => html! {}
@@ -259,57 +298,44 @@ where
                                                     ""
                                                 };
                                                 html! {
-                                                    <div class="mini-select-list-down-item-more-action">
-                                                        <img src={icon} class="mini-select-list-down-item-more-action" />
-                                                        <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
-                                                        { text!(txt, ctx.props().language, key) }
+                                                    <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                        <div class="mini-select-list-down-item-more-action">
+                                                            <img src={icon} class="mini-select-list-down-item-more-action" />
+                                                            <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
+                                                            { text!(txt, ctx.props().language, key) }
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </td>
                                                 }
                                             }
                                             ViewString::Raw(_) => html! {}
                                         }
                                     } else {
                                         match item {
-                                            ViewString::Key(key) => html! { text!(txt, ctx.props().language, key) },
-                                            ViewString::Raw(txt) => html! { txt },
+                                            ViewString::Key(key) =>
+                                                html! {
+                                                    <td class={classes!(class_select, class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                        {text!(txt, ctx.props().language, key)}
+                                                    </td>
+                                                },
+                                            ViewString::Raw(txt) =>
+                                                html! {
+                                                    <td class={classes!(class_select, class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                        { txt }
+                                                    </td>
+                                                },
                                         }
                                     }
                                 }
-                                </td>
                             </tr>
-                        })
+                        }})
                     }
                 </table>
             </div>
         }
     }
 
-    fn view_basic(ctx: &Context<Self>) -> Html {
-        let txt = ctx.props().txt.txt.clone();
-        let msg = text!(txt, ctx.props().language, "Select one").to_string();
-        let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
-            selected.map_or(msg.clone(), |value| {
-                ctx.props()
-                    .candidate_values
-                    .iter()
-                    .enumerate()
-                    .find(|(_, &v)| v == value)
-                    .map_or(msg.clone(), |(index, _)| {
-                        ctx.props()
-                            .list
-                            .get(index)
-                            .map_or(msg.clone(), |v| match v {
-                                ViewString::Key(key) => {
-                                    text!(txt, ctx.props().language, key).to_string()
-                                }
-                                ViewString::Raw(txt) => txt.clone(),
-                            })
-                    })
-            })
-        } else {
-            msg
-        };
+    fn view_basic(ctx: &Context<Self>, value: &str) -> Html {
         let style_width = ctx
             .props()
             .top_width
