@@ -561,9 +561,9 @@ where
                                                 </td>
                                             </tr>
                                         }
-                                    } else if item_value == value {
+                                    } else if item.value_txt(&txt, ctx.props().language) == value {
                                         html!{
-                                            <tr class="searchable-select-list-item-single-selected" onclick={onclick_item(item.id().clone())}>
+                                            <tr class="searchable-select-list-item-single" onclick={onclick_item(item.id().clone())}>
                                                 <td class="searchable-select-list-item-single-selected">
                                                     { item_value }
                                                 </td>

@@ -262,7 +262,7 @@ tr.searchable-select-list-item-single:hover {
     background-color: #EDEDED;
 }
 
-tr.searchable-select-list-item-single-selected {
+td.searchable-select-list-item-single-selected {
     width: 100%;
     float: left;
     padding-top: 8px;
