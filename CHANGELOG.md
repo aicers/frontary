@@ -5,6 +5,14 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.5] - 2023-09-19
+
+### Fixed
+
+- Fixed `SelectSingle` and `SelectMini` component to compare what value the
+  user has selected with the pre-shortened value of the item selected instead
+  of the shortend value.
+
 ## [0.7.4] - 2023-09-12
 
 ### Changed
@@ -115,6 +123,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
+[0.7.5]: https://github.com/aicers/frontary/compare/0.7.4...0.7.5
 [0.7.4]: https://github.com/aicers/frontary/compare/0.7.3...0.7.4
 [0.7.3]: https://github.com/aicers/frontary/compare/0.7.2...0.7.3
 [0.7.2]: https://github.com/aicers/frontary/compare/0.7.1...0.7.2
