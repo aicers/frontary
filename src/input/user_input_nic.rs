@@ -36,7 +36,7 @@ where
                 html! {
                     <div class="input-item">
                         <div class="input-contents-item-title">
-                            { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                            { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
                         <table class="input-nic">
                             <tr>

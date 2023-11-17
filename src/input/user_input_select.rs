@@ -74,7 +74,7 @@ where
                         } else {
                             html! {
                                 <div class="input-contents-item-general-title">
-                                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                                 </div>
                             }
                         }
@@ -87,7 +87,7 @@ where
                                     language={ctx.props().language}
                                     id={format!("select-searchable-{base_index}-{layer_index}")}
                                     kind={SelectSearchableKind::Multi}
-                                    title={ess.title}
+                                    title={ess.title.clone()}
                                     empty_msg={ess.notice}
                                     top_width={top_width}
                                     max_height={200}
@@ -105,7 +105,7 @@ where
                                     language={ctx.props().language}
                                     id={format!("select-searchable-{base_index}-{layer_index}")}
                                     kind={SelectSearchableKind::Single}
-                                    title={ess.title}
+                                    title={ess.title.clone()}
                                     empty_msg={ess.notice}
                                     top_width={top_width}
                                     max_height={200}
@@ -145,7 +145,7 @@ where
     ) -> Html {
         let title = ess_list
             .iter()
-            .map(|ess| ess.title.to_string())
+            .map(|ess| ess.title().to_string())
             .collect::<Vec<String>>();
         let empty_msg = ess_list
             .iter()
@@ -211,7 +211,7 @@ where
                     } else {
                         html! {
                             <div class="input-contents-item-general-title">
-                                { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                             </div>
                         }
                     }

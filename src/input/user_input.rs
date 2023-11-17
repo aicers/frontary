@@ -106,7 +106,7 @@ where
                     } else {
                         html! {
                             <div class="input-contents-item-title">
-                                { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                             </div>
                         }
                     }
@@ -224,7 +224,7 @@ where
         html! {
             <div class="input-item">
                 <div class="input-contents-item-title">
-                    { text!(txt, ctx.props().language, ess.title) }
+                    { text!(txt, ctx.props().language, ess.title()) }
                     {
                         if ctx.props().input_id.is_none() {
                             { view_asterisk(ess.required) }
@@ -352,7 +352,7 @@ where
                     } else {
                         html! {
                             <div class="input-contents-item-title">
-                                { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                             </div>
                         }
                     }
@@ -479,7 +479,7 @@ where
                 } else {
                     html! {
                         <div class="input-contents-item-title">
-                            { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                            { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
                     }
                 }
@@ -606,7 +606,7 @@ where
         html! {
             <div class="input-item">
                 <div class="input-contents-item-title">
-                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                 </div>
                 <div class="input-contents-item-input">
                 {
@@ -688,7 +688,7 @@ where
                 <div class="input-radio-outer">
                     <div class="input-radio">
                         <div class="input-radio-title">
-                            { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                            { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
                         <div class="input-radio-radio">
                             <Radio::<Self>
@@ -739,7 +739,7 @@ where
             html! {
                 <div class="input-host-network-group">
                     <div class="input-contents-item-general-title">
-                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                     </div>
                     <HostNetworkHtml<Self>
                         txt={ctx.props().txt.clone()}
@@ -779,7 +779,7 @@ where
             html! {
                 <div class="input-tag-group">
                     <div class="input-contents-item-general-title">
-                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                     </div>
                     <Tag<Self>
                         txt={ctx.props().txt.clone()}
@@ -843,7 +843,7 @@ where
         html! {
             <div class="input-item">
                 <div class="input-contents-item-title">
-                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                 </div>
                 <div class="input-file">
                     <input class="input-file-file-name"
