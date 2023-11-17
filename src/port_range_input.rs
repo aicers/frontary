@@ -89,11 +89,7 @@ impl Component for Model {
                 .width
                 .map_or("100%".to_string(), |w| format!("{w}px"))
         );
-        let placeholder = ctx
-            .props()
-            .placeholder_message
-            .clone()
-            .unwrap_or(String::new());
+        let placeholder = ctx.props().placeholder_message.clone().unwrap_or_default();
         let class = if check_input(&self.input).is_some() || self.input.is_empty() {
             "frontary-input-text"
         } else {

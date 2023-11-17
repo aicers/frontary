@@ -82,7 +82,7 @@ where
                                         always={always}
                                     />
                                     <div class="input-checkbox-me-title">
-                                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                                     </div>
                                 </div>
                             }
@@ -95,7 +95,7 @@ where
                                         />
                                     </div>
                                     <div class="input-checkbox-me-title">
-                                        { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                                     </div>
                                 </div>
                             }
@@ -211,7 +211,7 @@ where
         html! {
             <div class="input-item">
                 <div class="input-contents-item-title">
-                    { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                 </div>
                 <div class="input-group">
                     <div>

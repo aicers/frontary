@@ -110,7 +110,7 @@ where
                     } else {
                         html! {
                             <div class="input-contents-item-title">
-                                { text!(txt, ctx.props().language, ess.title) }{ view_asterisk(ess.required) }
+                                { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                             </div>
                         }
                     }

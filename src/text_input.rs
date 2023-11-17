@@ -80,11 +80,7 @@ impl Component for Model {
                 .width
                 .map_or("100%".to_string(), |w| format!("{w}px"))
         );
-        let placeholder = ctx
-            .props()
-            .placeholder_message
-            .clone()
-            .unwrap_or(String::new());
+        let placeholder = ctx.props().placeholder_message.clone().unwrap_or_default();
 
         html! {
             <div class="input-contents" style={style.clone()}>

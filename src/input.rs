@@ -79,7 +79,7 @@ pub struct InputTag {
 
 #[derive(Clone, PartialEq)]
 pub struct Essential {
-    pub title: &'static str,
+    pub title: String,
     pub notice: &'static str,
     pub required: bool,
     pub unique: bool, // for InputType::Text only. In other cases, this is meaningless.
@@ -88,6 +88,13 @@ pub struct Essential {
                                     // as for VecSelect, default should be like the below
                                     // let v = vec![HashSet::new(), HashSet::new()];
                                     // ess.default = Some(InputItem::VecSelect(v));
+}
+
+impl Essential {
+    #[must_use]
+    pub fn title(&self) -> &str {
+        self.title.as_str()
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -217,7 +224,7 @@ impl InputType {
             | Self::Nic(ess, ..)
             | Self::File(ess, ..)
             | Self::Group(ess, ..)
-            | Self::Comparison(ess, ..) => ess.title,
+            | Self::Comparison(ess, ..) => ess.title(),
         }
     }
 }
