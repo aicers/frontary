@@ -69,6 +69,10 @@ where
             },
         );
 
+        // Since dynamic titles for checkbox are not included in language files, the below is reuqired.
+        let title = get_text!(txt, ctx.props().language.tag(), ess.title())
+            .map_or(ess.title.clone(), |text| text.to_string());
+
         if let Some(checked) = checked {
             html! {
                 <div class={class}>
@@ -82,7 +86,7 @@ where
                                         always={always}
                                     />
                                     <div class="input-checkbox-me-title">
-                                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                                        { title }{ view_asterisk(ess.required) }
                                     </div>
                                 </div>
                             }
@@ -95,7 +99,7 @@ where
                                         />
                                     </div>
                                     <div class="input-checkbox-me-title">
-                                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                                        { title }{ view_asterisk(ess.required) }
                                     </div>
                                 </div>
                             }
