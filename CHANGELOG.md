@@ -5,6 +5,12 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2023-11-20
+
+### Changed
+
+- Support dynamic titles of `CheckBox` which are not included language files.
+
 ## [0.8.0] - 2023-11-17
 
 ### Changed
@@ -129,6 +135,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
+[0.8.1]: https://github.com/aicers/frontary/compare/0.8.0...0.8.1
 [0.8.0]: https://github.com/aicers/frontary/compare/0.7.5...0.8.0
 [0.7.5]: https://github.com/aicers/frontary/compare/0.7.4...0.7.5
 [0.7.4]: https://github.com/aicers/frontary/compare/0.7.3...0.7.4
