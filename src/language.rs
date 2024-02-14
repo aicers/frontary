@@ -69,6 +69,6 @@ pub fn set(lang: Language) {
 #[macro_export]
 macro_rules! text {
     ($c:ident, $l:expr, $k:expr) => {
-        get_text!($c, $l.tag(), $k).expect("valid key")
+        get_text!($c, $l.tag(), $k).expect("valid key").to_string()
     };
 }
