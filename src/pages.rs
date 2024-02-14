@@ -7,7 +7,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{events::InputEvent, html, Component, Context, Html, Properties};
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Info {
     // starts at 1
     pub current: usize, // current page
