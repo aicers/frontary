@@ -1,6 +1,6 @@
 [package]
 name = "frontary"
-version = "0.8.2"
+version = "0.9.0-alpha.1"
 edition = "2021"
 publish = false
 
@@ -11,21 +11,31 @@ test = []
 [dependencies]
 anyhow = "1"
 bincode = "1"
-chrono = { version = "0.4", default_features = false, features = ["serde", "wasmbind"] }
-data-encoding = "2.3"
-gloo-events = "0.1"
-gloo-file = "0.2"
-gloo-storage = "0.2"
-gloo-timers = "0.2"
+chrono = { version = "0.4", default_features = false, features = [
+    "serde",
+    "wasmbind",
+] }
+data-encoding = "2"
+gloo-events = "0.2"
+gloo-file = "0.3"
+gloo-storage = "0.3"
+gloo-timers = "0.3"
 htmlescape = "0.3"
 ipnet = { version = "2", features = ["serde"] }
 js-sys = "0.3"
 json-gettext = "4"
 num-traits = "0.2"
 passwords = { version = "3", features = ["common-password"] }
-serde = { version = "1",  features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 strum = "0.24"
 strum_macros = "0.24"
-wasm-bindgen = { version = ">=0.2.83", features = ["serde-serialize"] }
-web-sys = { version = "0.3", features = ["CanvasRenderingContext2d", "HtmlCanvasElement", "Navigator", "TextMetrics"] }
-yew = "0.20"
+wasm-bindgen = { version = ">=0.2.82", features = [
+    "serde-serialize",
+] } # rustwasm/wasm-bindgen#2963
+web-sys = { version = "0.3", features = [
+    "CanvasRenderingContext2d",
+    "HtmlCanvasElement",
+    "Navigator",
+    "TextMetrics",
+] }
+yew = "0.21"

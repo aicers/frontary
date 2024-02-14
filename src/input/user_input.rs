@@ -891,7 +891,6 @@ where
     }
 }
 
-#[must_use]
 pub fn view_asterisk(required: bool) -> Html {
     if required {
         html! {
