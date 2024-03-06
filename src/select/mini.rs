@@ -15,6 +15,7 @@ pub struct Model<T, U> {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
+    RebootShutdown,
     DirectionAll,
     DirectionItem,
     MoreAction,
@@ -187,6 +188,7 @@ where
             <div class="mini-select">
             {
                 match ctx.props().kind {
+                    Kind::RebootShutdown => Self::view_reboot_shutdown_action(ctx),
                     Kind::DirectionAll => Self::view_direction_all(ctx),
                     Kind::DirectionItem => Self::view_direction_item(ctx),
                     Kind::SortList => Self::view_sort_list(ctx),
@@ -310,7 +312,22 @@ where
                                             }
                                             ViewString::Raw(_) => html! {}
                                         }
-                                    } else {
+                                    } else if ctx.props().kind == Kind::RebootShutdown {
+                                        match item {
+                                            ViewString::Key(key) => {
+                                                html! {
+                                                    <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                        <div class="mini-select-list-down-item-more-action">
+                                                            <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
+                                                            { text!(txt, ctx.props().language, key) }
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+                                            ViewString::Raw(_) => html! {}
+                                        }
+                                    }else {
                                         match item {
                                             ViewString::Key(key) =>
                                                 html! {
@@ -507,6 +524,14 @@ where
         let onclick = ctx.link().callback(|_| Message::ClickTop);
         html! {
             <div onclick={onclick} class="mini-select-on-off-action">
+            </div>
+        }
+    }
+
+    fn view_reboot_shutdown_action(ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| Message::ClickTop);
+        html! {
+            <div onclick={onclick} class="mini-select-reboot-shutdown-action">
             </div>
         }
     }

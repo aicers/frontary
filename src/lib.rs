@@ -81,6 +81,12 @@ pub enum OnOffAction {
     Off,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RebootShutdownAction {
+    Reboot,
+    Shutdown,
+}
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ViewString {
     Key(String),
