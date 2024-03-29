@@ -850,7 +850,7 @@ where
                                 } else {
                                     None
                                 };
-                                let tag = ctx.props().input_data_tag.as_ref().map(Rc::clone);
+                                let tag = ctx.props().input_data_tag.clone();
                                 html! {
                                     <Input<Self>
                                         txt={ctx.props().txt.clone()}
@@ -896,7 +896,7 @@ where
                                 ViewInputStatus::None => unreachable!(),
                             };
                             if let Some(data) = ctx.props().input_second_data.as_ref() {
-                                let tag = ctx.props().input_data_tag.as_ref().map(Rc::clone);
+                                let tag = ctx.props().input_data_tag.clone();
                                 html! {
                                     <Input<Self>
                                         txt={ctx.props().txt.clone()}
