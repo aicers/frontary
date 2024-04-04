@@ -113,7 +113,7 @@ where
                                 html! {
                                     for children.1.iter().enumerate().map(|(sub_index, child)| {
                                         let child_data = if let InputItem::CheckBox(_, childs) = input_data.clone() {
-                                            childs.and_then(|childs| childs.get(sub_index).map(Rc::clone))
+                                            childs.and_then(|childs| childs.get(sub_index).cloned())
                                         } else {
                                             None
                                         };

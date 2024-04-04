@@ -311,37 +311,29 @@ where
     }
 
     pub(super) fn comparison_kind(&self, data_id: usize) -> Option<ValueKind> {
-        let Some(kind) = self.comparison_value_kind_buffer.get(&data_id) else {
-            return None;
-        };
-        let Ok(kind) = kind.try_borrow() else {
-            return None;
-        };
-        let Some(kind) = &*kind else {
-            return None;
-        };
-        let kind = kind.iter().map(Clone::clone).collect::<Vec<String>>();
-        let Some(kind) = kind.first() else {
-            return None;
-        };
-        ValueKind::from_str(kind).ok()
+        self.comparison_value_kind_buffer
+            .get(&data_id)?
+            .try_borrow()
+            .ok()?
+            .as_ref()
+            .and_then(|kind| {
+                kind.iter()
+                    .next()
+                    .and_then(|first| ValueKind::from_str(first).ok())
+            })
     }
 
     pub(super) fn comparison_cmp(&self, data_id: usize) -> Option<ComparisonKind> {
-        let Some(cmp) = self.comparison_value_cmp_buffer.get(&data_id) else {
-            return None;
-        };
-        let Ok(cmp) = cmp.try_borrow() else {
-            return None;
-        };
-        let Some(cmp) = &*cmp else {
-            return None;
-        };
-        let cmp = cmp.iter().map(Clone::clone).collect::<Vec<String>>();
-        let Some(cmp) = cmp.first() else {
-            return None;
-        };
-        ComparisonKind::from_str(cmp).ok()
+        self.comparison_value_cmp_buffer
+            .get(&data_id)?
+            .try_borrow()
+            .ok()?
+            .as_ref()
+            .and_then(|cmp| {
+                cmp.iter()
+                    .next()
+                    .and_then(|first| ComparisonKind::from_str(first).ok())
+            })
     }
 
     pub(super) fn input_comparison_value(
