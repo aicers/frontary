@@ -1,6 +1,6 @@
 [package]
 name = "frontary"
-version = "0.9.0-alpha.1"
+version = "0.9.0"
 edition = "2021"
 publish = false
 
@@ -27,8 +27,8 @@ json-gettext = "4"
 num-traits = "0.2"
 passwords = { version = "3", features = ["common-password"] }
 serde = { version = "1", features = ["derive"] }
-strum = "0.24"
-strum_macros = "0.24"
+strum = "0.26"
+strum_macros = "0.26"
 wasm-bindgen = { version = ">=0.2.82", features = [
     "serde-serialize",
 ] } # rustwasm/wasm-bindgen#2963
