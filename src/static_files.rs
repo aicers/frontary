@@ -14,6 +14,13 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
     let checkbox_checked = include_bytes!("../static/frontary/checkbox-checked.png");
     rtn.push(("checkbox-checked.png", checkbox_checked));
 
+    let checkbox_indeterminate_always =
+        include_bytes!("../static/frontary/checkbox-indeterminate-always.png");
+    rtn.push((
+        "checkbox-indeterminate-always.png",
+        checkbox_indeterminate_always,
+    ));
+
     let checkbox_indeterminate = include_bytes!("../static/frontary/checkbox-indeterminate.png");
     rtn.push(("checkbox-indeterminate.png", checkbox_indeterminate));
 
