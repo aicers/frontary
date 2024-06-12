@@ -1,10 +1,12 @@
-use crate::{input::view_asterisk, language::Language, text, Texts};
-use json_gettext::get_text;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{html, Component, Context, Html, InputEvent, Properties};
+
+use crate::{input::view_asterisk, language::Language, text, Texts};
 const DEFAULT_MAX_HEIGHT: u32 = 280;
 
 #[derive(Clone, PartialEq, Eq)]

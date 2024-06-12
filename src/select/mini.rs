@@ -1,11 +1,13 @@
-use crate::{language::Language, text, toggle_visibility, Texts, ViewString};
-use gloo_events::EventListener;
-use json_gettext::get_text;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
+use gloo_events::EventListener;
+use json_gettext::get_text;
 use web_sys::{Event, HtmlElement};
 use yew::virtual_dom::AttrValue;
 use yew::{classes, html, Component, Context, Html, NodeRef, Properties};
+
+use crate::{language::Language, text, toggle_visibility, Texts, ViewString};
 
 pub struct Model<T, U> {
     click_listener: Option<EventListener>,

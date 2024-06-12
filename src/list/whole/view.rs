@@ -1,3 +1,10 @@
+use std::collections::HashMap;
+use std::rc::Rc;
+
+use htmlescape::decode_html;
+use json_gettext::get_text;
+use yew::{classes, html, Component, Context, Html};
+
 use super::{
     component::{Message, Model},
     DEFAULT_NUM_PAGES,
@@ -7,11 +14,6 @@ use crate::{
     text, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
     SortStatus, ViewString, WholeList, NBSP,
 };
-use htmlescape::decode_html;
-use json_gettext::get_text;
-use std::collections::HashMap;
-use std::rc::Rc;
-use yew::{classes, html, Component, Context, Html};
 
 impl<T> Model<T>
 where

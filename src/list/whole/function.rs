@@ -1,14 +1,16 @@
+use std::cell::RefCell;
+use std::collections::hash_map::Entry::Vacant;
+use std::collections::HashSet;
+use std::rc::Rc;
+
+use chrono::{DateTime, Utc};
+use yew::{Component, Context};
+
 use super::{component::SortListKind, Message, Model, SortColumn, ViewInputStatus};
 use crate::{
     list::{DataType, Kind},
     {CheckStatus, PagesInfo, SortStatus},
 };
-use chrono::{DateTime, Utc};
-use std::cell::RefCell;
-use std::collections::hash_map::Entry::Vacant;
-use std::collections::HashSet;
-use std::rc::Rc;
-use yew::{Component, Context};
 
 impl<T> Model<T>
 where

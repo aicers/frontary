@@ -1,13 +1,15 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use json_gettext::get_text;
+use yew::{classes, html, Component, Context, Html};
+
 use super::{
     component::{Message, Model},
     user_input::{view_asterisk, MAX_PER_LAYER},
     InputItem,
 };
 use crate::{text, CheckBox, CheckStatus, ChildrenPosition, InputEssential, InputType};
-use json_gettext::get_text;
-use std::cell::RefCell;
-use std::rc::Rc;
-use yew::{classes, html, Component, Context, Html};
 
 impl<T> Model<T>
 where

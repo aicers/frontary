@@ -1,13 +1,15 @@
-use crate::{language::Language, text, window_inner_height, Texts};
-use gloo_timers::callback::Timeout;
-use json_gettext::get_text;
-use num_traits::ToPrimitive;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::rc::Rc;
 use std::time::Duration;
+
+use gloo_timers::callback::Timeout;
+use json_gettext::get_text;
+use num_traits::ToPrimitive;
 use yew::{html, Component, Context, Html, Properties};
+
+use crate::{language::Language, text, window_inner_height, Texts};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Category {
