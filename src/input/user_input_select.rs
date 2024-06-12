@@ -1,3 +1,8 @@
+use std::{cell::RefCell, cmp::Ordering, collections::HashMap, rc::Rc};
+
+use json_gettext::get_text;
+use yew::{html, Component, Context, Html};
+
 use super::{
     component::{Message, Model},
     user_input::view_asterisk,
@@ -6,9 +11,6 @@ use super::{
 use crate::{
     text, InputEssential, Item, SelectSearchable, SelectSearchableKind, VecSelect, ViewString,
 };
-use json_gettext::get_text;
-use std::{cell::RefCell, cmp::Ordering, collections::HashMap, rc::Rc};
-use yew::{html, Component, Context, Html};
 
 const PADDING_SUM: u32 = 66; // left + right paddings
 const SELECT_NIC_WIDTH: u32 = 130;
@@ -192,7 +194,7 @@ where
             })
             .collect::<Vec<_>>();
         let class_item = if group { "" } else { "input-select-vector" };
-        let class_vec = if self.required_msg.get(&(base_index + layer_index)).is_some() {
+        let class_vec = if self.required_msg.contains(&(base_index + layer_index)) {
             "input-select-vector-vec-required"
         } else {
             "input-select-vector-vec"

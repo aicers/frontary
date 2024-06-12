@@ -9,25 +9,26 @@ mod user_input_composite;
 mod user_input_nic;
 mod user_input_select;
 
-pub use self::user_input::view_asterisk;
-pub use component::{InputSecondId, Model};
-pub use host_network::Kind as HostNetworkKind;
-pub use host_network::Model as HostNetworkHtml;
-pub use tag::Model as Tag;
-
-use self::user_input_select::VecSelectListMap;
-use crate::list::Column;
-use crate::{
-    parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange, ViewString,
-};
-use bincode::Options;
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
     fmt,
     rc::Rc,
 };
+
+use bincode::Options;
+pub use component::{InputSecondId, Model};
+pub use host_network::Kind as HostNetworkKind;
+pub use host_network::Model as HostNetworkHtml;
 use strum_macros::{Display, EnumIter, EnumString};
+pub use tag::Model as Tag;
+
+pub use self::user_input::view_asterisk;
+use self::user_input_select::VecSelectListMap;
+use crate::list::Column;
+use crate::{
+    parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange, ViewString,
+};
 
 #[derive(Clone, PartialEq, Eq, Default)]
 pub struct InputHostNetworkGroup {
@@ -331,25 +332,25 @@ pub enum Comparison {
     NotRightOpenRange(Value, Value), // !(a <= x < b)
 }
 
-impl ToString for Comparison {
-    fn to_string(&self) -> String {
+impl fmt::Display for Comparison {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Less(v) => format!("x < {v}"),
-            Self::Equal(v) => format!("x = {v}"),
-            Self::Greater(v) => format!("x > {v}"),
-            Self::LessOrEqual(v) => format!("x ≤ {v}"),
-            Self::GreaterOrEqual(v) => format!("x ≥ {v}"),
-            Self::Contain(v) => format!("x Contains {v}"),
-            Self::OpenRange(a, b) => format!("{a} < x < {b}"),
-            Self::CloseRange(a, b) => format!("{a} ≤ x ≤ {b}"),
-            Self::LeftOpenRange(a, b) => format!("{a} < x ≤ {b}"),
-            Self::RightOpenRange(a, b) => format!("{a} ≤ x < {b}"),
-            Self::NotEqual(v) => format!("x != {v}"),
-            Self::NotContain(v) => format!("x !Contains {v}"),
-            Self::NotOpenRange(a, b) => format!("!({a} < x < {b})"),
-            Self::NotCloseRange(a, b) => format!("!({a} ≤ x ≤ {b})"),
-            Self::NotLeftOpenRange(a, b) => format!("!({a} < x ≤ {b})"),
-            Self::NotRightOpenRange(a, b) => format!("!({a} ≤ x < {b})"),
+            Self::Less(v) => write!(f, "x < {v}"),
+            Self::Equal(v) => write!(f, "x = {v}"),
+            Self::Greater(v) => write!(f, "x > {v}"),
+            Self::LessOrEqual(v) => write!(f, "x ≤ {v}"),
+            Self::GreaterOrEqual(v) => write!(f, "x ≥ {v}"),
+            Self::Contain(v) => write!(f, "x Contains {v}"),
+            Self::OpenRange(a, b) => write!(f, "{a} < x < {b}"),
+            Self::CloseRange(a, b) => write!(f, "{a} ≤ x ≤ {b}"),
+            Self::LeftOpenRange(a, b) => write!(f, "{a} < x ≤ {b}"),
+            Self::RightOpenRange(a, b) => write!(f, "{a} ≤ x < {b}"),
+            Self::NotEqual(v) => write!(f, "x != {v}"),
+            Self::NotContain(v) => write!(f, "x !Contains {v}"),
+            Self::NotOpenRange(a, b) => write!(f, "!({a} < x < {b})"),
+            Self::NotCloseRange(a, b) => write!(f, "!({a} ≤ x ≤ {b})"),
+            Self::NotLeftOpenRange(a, b) => write!(f, "!({a} < x ≤ {b})"),
+            Self::NotRightOpenRange(a, b) => write!(f, "!({a} ≤ x < {b})"),
         }
     }
 }

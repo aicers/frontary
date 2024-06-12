@@ -1,3 +1,10 @@
+use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
+
+use json_gettext::get_text;
+use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
+
 use super::{MessageType, DEFAULT_NUM_PAGES, DEFAULT_NUM_PER_PAGE};
 use crate::{
     input::InputSecondId,
@@ -6,11 +13,6 @@ use crate::{
     text, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo, SelectMini,
     SelectMiniKind, SortStatus, Texts, ViewString,
 };
-use json_gettext::get_text;
-use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
-use std::{cell::RefCell, marker::PhantomData};
-use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SortColumn {
@@ -326,7 +328,7 @@ where
             self.id_cache = ctx.props().id.as_ref().into();
         }
         if data_changed {
-            self.data_cache = (*ctx.props().data).clone();
+            self.data_cache.clone_from(&(*ctx.props().data));
         }
 
         true

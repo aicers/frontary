@@ -15,8 +15,22 @@ pub mod static_files;
 mod tab_menu;
 mod text_input;
 
+use std::cell::RefCell;
+use std::cmp::{Ord, Ordering};
+use std::collections::HashMap;
+use std::fmt;
+use std::net::Ipv4Addr;
+use std::rc::Rc;
+use std::str::FromStr;
+
+use anyhow::Result;
+use ipnet::Ipv4Net;
+use json_gettext::{get_text, JSONGetText};
 use num_traits::ToPrimitive;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::JsCast;
+use yew::Properties;
 
 pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
@@ -47,19 +61,6 @@ pub use crate::select::vec_searchable::Model as VecSelect;
 pub use crate::sort::{Model as Sort, Status as SortStatus};
 pub use crate::tab_menu::Model as TabMenu;
 pub use crate::text_input::Model as TextInput;
-use ipnet::Ipv4Net;
-use json_gettext::{get_text, JSONGetText};
-use std::net::Ipv4Addr;
-use std::rc::Rc;
-use std::str::FromStr;
-use wasm_bindgen::JsCast;
-
-use anyhow::Result;
-use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
-use std::cmp::{Ord, Ordering};
-use std::collections::HashMap;
-use yew::Properties;
 
 #[cfg(feature = "test")]
 pub fn alert(msg: &str) {
@@ -87,11 +88,11 @@ pub enum ViewString {
     Raw(String),
 }
 
-impl ToString for ViewString {
-    fn to_string(&self) -> String {
+impl fmt::Display for ViewString {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Key(key) => key.clone(),
-            Self::Raw(txt) => txt.clone(),
+            Self::Key(key) => write!(f, "{key}"),
+            Self::Raw(txt) => write!(f, "{txt}"),
         }
     }
 }
@@ -320,9 +321,9 @@ impl Ord for IpRange {
     }
 }
 
-impl ToString for IpRange {
-    fn to_string(&self) -> String {
-        format!("{} ~ {}", &self.start, &self.end)
+impl fmt::Display for IpRange {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} ~ {}", self.start, self.end)
     }
 }
 

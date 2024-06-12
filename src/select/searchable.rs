@@ -1,16 +1,18 @@
-use crate::{
-    language::Language, shorten_text, text, text_width, toggle_visibility, CheckBox, CheckStatus,
-    Item, Texts,
-};
-use json_gettext::get_text;
-use num_traits::ToPrimitive;
 use std::collections::HashSet;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
+use json_gettext::get_text;
+use num_traits::ToPrimitive;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::virtual_dom::AttrValue;
 use yew::{classes, events::InputEvent, html, Component, Context, Html, Properties};
+
+use crate::{
+    language::Language, shorten_text, text, text_width, toggle_visibility, CheckBox, CheckStatus,
+    Item, Texts,
+};
 
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
 
@@ -99,7 +101,7 @@ where
                 // if threre is any deleted item that belongs to the list of the selected
                 if let Some(selected) = sel.as_mut() {
                     let list_tmp = list.iter().map(Item::id).collect::<HashSet<&String>>();
-                    selected.retain(|k| list_tmp.get(k).is_some());
+                    selected.retain(|k| list_tmp.contains(k));
                     if !list.is_empty() && selected.len() == list.len() {
                         *sel = None;
                     }
@@ -119,7 +121,7 @@ where
                 false
             }
             Message::InputSearch(input) => {
-                self.search_text = input.clone();
+                self.search_text.clone_from(&input);
                 if input.is_empty() {
                     self.search_result = None;
                 } else if let Ok(list) = ctx.props().list.try_borrow() {
