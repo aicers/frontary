@@ -1,6 +1,10 @@
 #![allow(clippy::module_name_repetitions)]
 mod whole;
 
+use std::collections::{HashMap, HashSet};
+use std::fmt;
+
+use chrono::{DateTime, Utc};
 pub use whole::MessageType;
 pub use whole::Model as WholeList;
 pub use whole::SortColumn;
@@ -10,8 +14,6 @@ use crate::{
     input::{Comparison, InputNic},
     ViewString,
 };
-use chrono::{DateTime, Utc};
-use std::collections::{HashMap, HashSet};
 
 const NUM_OF_DECIMALS_DEFAULT: usize = 2;
 
@@ -38,52 +40,85 @@ pub enum Column {
     Group(Vec<Vec<Column>>),
     Comparison(Option<Comparison>),
 }
-
-impl ToString for Column {
-    // HIGHLIGHT:
-    // In the case of ViewString, returns the key of ViewString.
-    // Not all of these are for html output.
-    fn to_string(&self) -> String {
+impl std::fmt::Display for Column {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Text(d) => d.to_string(),
-            Self::HostNetworkGroup(d) => d.join(","),
-            Self::SelectSingle(d) => d.as_ref().map_or_else(String::new, |d| d.1.to_string()),
-            Self::SelectMultiple(d) => d
-                .values()
-                .map(ToString::to_string)
-                .collect::<Vec<_>>()
-                .join(","),
-            Self::VecSelect(d) => d
-                .iter()
-                .map(|s| {
-                    s.values()
-                        .map(ToString::to_string)
-                        .collect::<Vec<_>>()
-                        .join(",")
-                })
-                .collect::<Vec<_>>()
-                .join(" | "),
-            Self::Tag(d) => d.iter().map(String::as_str).collect::<Vec<_>>().join(","),
-            Self::Unsigned32(d) => d.map_or_else(String::new, |d| d.to_string()),
-            Self::Float64(d) => d.map_or_else(String::new, |d| d.to_string()),
-            Self::Percentage(f, d) => f.map_or_else(String::new, |f| {
-                format!("{0:.1$}%", f * 100.0, d.unwrap_or(NUM_OF_DECIMALS_DEFAULT))
-            }),
+            Self::Text(d) => write!(formatter, "{d}"),
+            Self::HostNetworkGroup(d) => write!(formatter, "{}", d.join(",")),
+            Self::SelectSingle(d) => {
+                if let Some((_, value)) = d {
+                    write!(formatter, "{value}")
+                } else {
+                    Ok(())
+                }
+            }
+            Self::SelectMultiple(d) => {
+                let values = d
+                    .values()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(",");
+                write!(formatter, "{values}")?;
+                Ok(())
+            }
+            Self::VecSelect(d) => {
+                let values = d
+                    .iter()
+                    .map(|s| {
+                        s.values()
+                            .map(ToString::to_string)
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" | ");
+                write!(formatter, "{values}")?;
+                Ok(())
+            }
+            Self::Tag(d) => {
+                let values = d.iter().map(String::as_str).collect::<Vec<_>>().join(",");
+                write!(formatter, "{values}")?;
+                Ok(())
+            }
+            Self::Unsigned32(d) => {
+                let value = d.map_or_else(String::new, |d| d.to_string());
+                write!(formatter, "{value}")
+            }
+            Self::Float64(d) => {
+                let value = d.map_or_else(String::new, |d| d.to_string());
+                write!(formatter, "{value}")
+            }
+            Self::Percentage(f, d) => {
+                let value = f.map_or_else(String::new, |f| {
+                    format!("{0:.1$}%", f * 100.0, d.unwrap_or(NUM_OF_DECIMALS_DEFAULT))
+                });
+                write!(formatter, "{value}")
+            }
             Self::Nic(nics) => {
                 let mut display = String::new();
-                for n in nics {
+                for nic in nics {
                     display.push_str(&format!(
                         "{{{}: {}(interface) {}(gateway)}} ",
-                        n.name, n.interface, n.gateway
+                        nic.name, nic.interface, nic.gateway
                     ));
                 }
-                display
+                write!(formatter, "{display}")
             }
             Self::CheckBox(_, _, display) => {
-                display.as_ref().map_or_else(String::new, Clone::clone)
+                if let Some(display) = display {
+                    write!(formatter, "{display}")
+                } else {
+                    Ok(())
+                }
             }
-            Self::Group(_) => String::new(),
-            Self::Comparison(d) => d.as_ref().map_or_else(String::new, ToString::to_string),
+            Self::Group(_) => Ok(()),
+            Self::Comparison(d) => {
+                if let Some(d) = d {
+                    write!(formatter, "{d}")
+                } else {
+                    Ok(())
+                }
+            }
         }
     }
 }

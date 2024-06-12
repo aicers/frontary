@@ -1,13 +1,15 @@
+use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
+
+use ipnet::Ipv4Net;
+use passwords::analyzer;
+use yew::{Component, Context};
+
 use super::{
     super::CheckStatus,
     component::{InvalidMessage, Model, Verification},
     user_input::MAX_PER_LAYER,
     InputItem, InputType,
 };
-use ipnet::Ipv4Net;
-use passwords::analyzer;
-use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
-use yew::{Component, Context};
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
 const PASSWORD_MIN_FORBID_ADJACENT_LEN: usize = 4; // adjacent keyboard characters
@@ -291,7 +293,7 @@ where
         if let (InputItem::Text(default), Some(buffer)) = (default, self.radio_buffer.get(&id)) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
                 if !default.is_empty() {
-                    *buffer = default.clone();
+                    buffer.clone_from(default);
                 }
             }
         }

@@ -1,17 +1,19 @@
-use super::DEFAULT_POP_WIDTH;
-use crate::{
-    language::Language, text, toggle_visibility_complex, validate_host_network, CheckStatus,
-    ComplexSelection, EndpointKind, NetworkGroup, NetworkItem, SelectionExtraInfo, Texts,
-};
-use json_gettext::get_text;
 use std::cell::RefCell;
 use std::collections::{
     hash_map::Entry::{Occupied, Vacant},
     HashMap, HashSet,
 };
 use std::rc::Rc;
+
+use json_gettext::get_text;
 use yew::virtual_dom::AttrValue;
 use yew::{classes, html, Component, Context, Html, Properties};
+
+use super::DEFAULT_POP_WIDTH;
+use crate::{
+    language::Language, text, toggle_visibility_complex, validate_host_network, CheckStatus,
+    ComplexSelection, EndpointKind, NetworkGroup, NetworkItem, SelectionExtraInfo, Texts,
+};
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Kind {
@@ -105,7 +107,7 @@ impl Component for Model {
                     .iter()
                     .map(NetworkItem::id)
                     .collect::<HashSet<&String>>();
-                predefined.retain(|k, _| list_tmp.get(k).is_some());
+                predefined.retain(|k, _| list_tmp.contains(k));
                 if self.check_status(ctx, false) == CheckStatus::Checked {
                     *sel = None;
                 }
@@ -135,7 +137,7 @@ impl Component for Model {
                 }
             }
             Message::InputSearch(text) => {
-                self.search_text = text.clone();
+                self.search_text.clone_from(&text);
                 if text.is_empty() {
                     self.search_result = None;
                 } else if let Ok(list) = ctx.props().list.try_borrow() {

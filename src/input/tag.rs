@@ -1,16 +1,18 @@
-use crate::{
-    language::Language, text, toggle_visibility, visible_tag_select, InputTagGroup, Texts,
-};
-use json_gettext::get_text;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
+use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{
     events::InputEvent, html, virtual_dom::AttrValue, Component, Context, Html, Properties,
     TargetCast,
+};
+
+use crate::{
+    language::Language, text, toggle_visibility, visible_tag_select, InputTagGroup, Texts,
 };
 
 pub struct Model<T> {
@@ -506,7 +508,7 @@ where
             .map(|(k, v)| (k.clone(), v.clone()))
             .collect::<Vec<(String, String)>>();
         if let Ok(data) = ctx.props().input_data.try_borrow() {
-            self.search_list.retain(|(k, _)| data.old.get(k).is_none());
+            self.search_list.retain(|(k, _)| !data.old.contains(k));
         }
         if !self.input.is_empty() {
             let input = self.input.to_lowercase();

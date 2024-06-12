@@ -1,3 +1,15 @@
+use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
+use std::{cell::RefCell, marker::PhantomData};
+
+use data_encoding::BASE64;
+use gloo_file::{
+    callbacks::{read_as_bytes, FileReader},
+    File,
+};
+use json_gettext::get_text;
+use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
+
 use super::{
     user_input::MAX_PER_LAYER, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup,
     InputType, Value as ComparisonValue,
@@ -7,16 +19,6 @@ use crate::{
     list::{Column, ListItem},
     sort_hosts, sort_networks, text, InputNic, MessageType, Rerender, Texts, ViewString,
 };
-use data_encoding::BASE64;
-use gloo_file::{
-    callbacks::{read_as_bytes, FileReader},
-    File,
-};
-use json_gettext::get_text;
-use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
-use std::{cell::RefCell, marker::PhantomData};
-use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum InvalidMessage {
@@ -629,7 +631,7 @@ where
                             (buffer.try_borrow(), input_data.get_mut(col_id))
                         {
                             if let Some(buffer) = &*buffer {
-                                *input_data = buffer.clone();
+                                input_data.clone_from(buffer);
                                 if !buffer.is_empty() {
                                     self.required_msg.remove(&data_id);
                                 }
@@ -721,7 +723,7 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            nic.name = name.clone();
+                            nic.name.clone_from(&name);
                         }
                     }
                 }
@@ -732,7 +734,7 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            nic.interface = interface.clone();
+                            nic.interface.clone_from(&interface);
                         }
                     }
                 }
@@ -743,7 +745,7 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Nic(data) = &mut *input_data {
                         if let Some(nic) = data.get_mut(nic_id) {
-                            nic.gateway = gateway.clone();
+                            nic.gateway.clone_from(&gateway);
                         }
                     }
                 }

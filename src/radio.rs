@@ -1,9 +1,11 @@
-use crate::{language::Language, text, Texts, ViewString};
-use json_gettext::get_text;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
+use json_gettext::get_text;
 use yew::virtual_dom::AttrValue;
 use yew::{html, Component, Context, Html, Properties};
+
+use crate::{language::Language, text, Texts, ViewString};
 
 #[derive(PartialEq, Eq)]
 pub enum Message {
@@ -59,7 +61,7 @@ where
         let Message::ClickItem(index) = msg;
         if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
             if let Some(value) = ctx.props().candidate_values.get(index) {
-                *selected = value.clone();
+                selected.clone_from(value);
             }
         }
         if let (Some(msg), Some(parent)) =
