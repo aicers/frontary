@@ -212,13 +212,23 @@ where
                                     Kind::LayeredFirst => {
                                         if ctx.props().data_type == Some(DataType::Customer) {
                                             let cols = ctx.props().display_info.titles.len().to_string();
-                                            let style = if self.expand_list.contains(key) {
-                                                "background-image: url('/frontary/collapse-list.png');"
+                                            let prefix = if cfg!(feature = "pumpkin-dark") {
+                                                "clumit-"
                                             } else {
-                                                "background-image: url('/frontary/expand-list.png');"
+                                                ""
                                             };
+                                            let expand_collapse_img = if self.expand_list.contains(key) {
+                                                "collapse-list.png"
+                                            } else {
+                                                "expand-list.png"
+                                            };
+                                            let style = format!("background-image: url('/frontary/{prefix}{expand_collapse_img}');");
                                             let onclick_expandible = |key: String| ctx.link().callback(move |_| Message::ClickExpandible(key.clone()));
-
+                                            let list_top = if cfg!(feature = "pumpkin-dark") {
+                                                34
+                                            } else {
+                                                28
+                                            };
                                             html! {
                                                 <tr class="list-whole-first-layer">
                                                     <td class="list-whole-list-first-check">
@@ -252,7 +262,7 @@ where
                                                                 selected_value={Rc::clone(&self.more_action)}
                                                                 selected_value_cache={self.more_action.try_borrow().ok().and_then(|x| *x)}
                                                                 align_left={false}
-                                                                list_top={28}
+                                                                list_top={list_top}
                                                                 kind={SelectMiniKind::MoreAction}
                                                             />
                                                         </div>
@@ -272,6 +282,11 @@ where
                                             "list-whole-list-flat"
                                         };
                                         let rowspan = ctx.props().display_info.widths.len().to_string();
+                                        let list_top = if cfg!(feature = "pumpkin-dark") {
+                                            34
+                                        } else {
+                                            28
+                                        };
 
                                         html! {
                                             <>
@@ -279,7 +294,7 @@ where
                                                     {
                                                         if ctx.props().kind == Kind::LayeredSecond {
                                                             html! {
-                                                                <td></td>
+                                                                <td class="list-whole-list-layered-second"></td>
                                                             }
                                                         } else {
                                                             html! {}
@@ -318,7 +333,7 @@ where
                                                                 selected_value={Rc::clone(&self.more_action)}
                                                                 selected_value_cache={self.more_action.try_borrow().ok().and_then(|x| *x)}
                                                                 align_left={false}
-                                                                list_top={28}
+                                                                {list_top}
                                                                 kind={SelectMiniKind::MoreAction}
                                                             />
                                                         </div>
@@ -595,9 +610,9 @@ where
             );
 
             html! {
-                <tr>
-                    <td></td>
-                    <td></td>
+                <tr class="list-whloe-list-pages-outer">
+                    <td class="list-whole-list-second-page-checkbox"></td>
+                    <td class="list-whole-list-second-page-caret-down"></td>
                     <td colspan={cols.to_string()} class="list-whole-list-second-pages">
                         <div class="list-whole-list-pages-inner">
                             <Pages::<Self>
@@ -614,7 +629,7 @@ where
                             { self.view_delete_checked(ctx, msg) }
                         </div>
                     </td>
-                    <td></td>
+                    <td class="list-whole-list-second-page-last-column"></td>
                 </tr>
             }
         }

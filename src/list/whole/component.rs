@@ -14,6 +14,8 @@ use crate::{
     SelectMiniKind, SortStatus, Texts, ViewString,
 };
 
+const DEFAULT_TABLE_WIDTH: u32 = 100;
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SortColumn {
     pub index: usize,
@@ -760,8 +762,17 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style_full = format!("width: {}px;", ctx.props().display_info.width_full);
-        let style_view = format!("width: {}px;", ctx.props().display_info.width_view);
+        let style_full = if cfg!(feature = "pumpkin-dark") {
+            String::new()
+        } else {
+            format!("width: {}px;", ctx.props().display_info.width_full)
+        };
+        let style_view = if cfg!(feature = "pumpkin-dark") {
+            format!("width: {DEFAULT_TABLE_WIDTH}%;")
+        } else {
+            format!("width: {}px;", ctx.props().display_info.width_view)
+        };
+
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(|_| Message::InputAdd);
         let input_id = ctx
@@ -798,6 +809,11 @@ where
             SortListKind::Ascending,
             SortListKind::Descending,
         ]);
+        let list_top = if cfg!(feature = "pumpkin-dark") {
+            42
+        } else {
+            38
+        };
 
         match ctx.props().kind {
             Kind::LayeredFirst | Kind::Flat => {
@@ -807,7 +823,11 @@ where
                             { text!(txt, ctx.props().language, &ctx.props().title) }
                         </div>
                         <div class="list-add" onclick={onclick_add}>
-                            <img src="/frontary/list-add.png" class="list-add" />
+                            if cfg!(feature = "pumpkin-dark") {
+                                <img src="/frontary/clumit-list-add.png" class="list-add" />
+                            } else {
+                                <img src="/frontary/list-add.png" class="list-add" />
+                            }
                             { text!(txt, ctx.props().language, "Add") }
                         </div>
                         <div class="list-sort-recently">
@@ -822,7 +842,7 @@ where
                                 selected_value={Rc::clone(&self.sort_list_kind)}
                                 selected_value_cache={self.sort_list_kind.try_borrow().ok().and_then(|k| *k)}
                                 align_left={false}
-                                list_top={38}
+                                {list_top}
                                 kind={SelectMiniKind::SortList}
                             />
                         </div>
