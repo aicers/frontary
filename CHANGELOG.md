@@ -18,6 +18,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `view_asterisk`, `Notification`.
 - Applied Clumit theme to `WholeList`, `Tag`, and `HostNetworkHtml`.
 - Applied Clumit theme to `Modal` and `SelectComplex`.
+- Applied the Clumit theme to `Input` and `WholeList` components.
 
 ### Fixed
 
