@@ -12,6 +12,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `MoreActionBasic` to `SelectMiniKind` in `SelectMini`.
 - Added correct CSS styling for `MoreActionBasic` for `SelectMini`.
 - Added Clumit components: `Radio`, `CheckBox`, `TabMenu`, `Modal`.
+- Added Clumit components: `Sort`, `SelectMini`, `SelectSearchable`, `Input`,
+  `view_asterisk`, `Notification`.
 
 ### Fixed
 
