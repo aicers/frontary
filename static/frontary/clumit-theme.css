@@ -167,7 +167,7 @@ input[type=text].searchable-select-input-empty {
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
     padding: 8px 12px;
-    color: #B4BBC6;
+    color: #616974;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -299,47 +299,50 @@ input[type=text].complex-select-top-input:hover {
 }
 
 input[type=text].complex-select-input {
-    height: 30px;
-    padding-left: 10px;
-    padding-right: 27px;
-    font-size: 13px;
-    color: #000000;
-    background-color: #FFFFFF;
-    border: 1px solid #CECECE;
-    border-radius: 3px;
-    background-image: url('/frontary/complex-select-pop.png');
-    background-size: 24px 24px;
-    background-position: right 7px top 2px;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #FFFFFF;
+    border-radius: 8px;
+    background-color: rgba(97, 105, 116, 0.24);
+    background-image: url('/frontary/clumit-complex-select-pop.png');
+    background-size: 32px 32px;
+    background-position: right 8px top 3px;
     background-repeat: no-repeat;
+    border: none;
 }
 
 input[type=text].complex-select-input-empty {
-    height: 30px;
-    padding-left: 10px;
-    padding-right: 27px;
-    font-size: 13px;
-    color: #A9A9A9;
-    background-color: #FFFFFF;
-    border: 1px solid #CECECE;
-    border-radius: 3px;
-    background-image: url('/frontary/complex-select-pop.png');
-    background-size: 24px 24px;
-    background-position: right 7px top 2px;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #B4BBC6;
+    border-radius: 8px;
+    background-color: rgba(97, 105, 116, 0.24);
+    background-image: url('/frontary/clumit-complex-select-pop.png');
+    background-size: 32px 32px;
+    background-position: right 8px top 3px;
     background-repeat: no-repeat;
+    border: none;
 }
 
 input[type=text].complex-select-input-empty-alert {
-    height: 30px;
-    padding-left: 10px;
-    padding-right: 27px;
-    font-size: 13px;
-    color: var(--alert-text-color);
-    background-color: #FFE9E9;
-    border: 2px solid var(--alert-text-color);
-    border-radius: 3px;
-    background-image: url('/frontary/complex-select-pop-alert.png');
-    background-size: 24px 24px;
-    background-position: right 7px top 2px;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #B4BBC6;
+    background-color: rgba(97, 105, 116, 0.24);
+    border: 2px solid #FB2C10;
+    border-radius: 8px;
+    background-image: url('/frontary/clumit-complex-select-pop-alert.png');
+    background-size: 32px 32px;
+    background-position: right 8px top 3px;
     background-repeat: no-repeat;
 }
 
@@ -350,8 +353,8 @@ div.complex-select-pop {
     height: 100%;
     right: 0px;
     top: 0px;
-    background-color: #FFFFFF;
-    box-shadow: -10px 0px 50px rgba(0, 0, 0, 0.25);
+    background-color: #212428;
+    box-shadow: -10px 0px 50px 0px rgba(0, 0, 0, 0.25);
 }
 
 div.complex-select-pop-head {
@@ -364,10 +367,10 @@ td.complex-select-pop-head-text {
     height: 70px;
     padding-left: 24px;
     padding-right: 20px;
-    background-color: #E2E2E2;
+    background-color: #212428;
     vertical-align: middle;
     font-size: 16px;
-    color: #000000;
+    color: #FFFFFF;
 }
 
 span.complex-select-pop-head-color {
@@ -379,22 +382,22 @@ td.complex-select-pop-head-close {
     width: 34px;
     padding-top: 10px;
     padding-right: 10px;
-    background-color: #E2E2E2;
+    background-color: #212428;
     vertical-align: top;
     font-size: 16px;
     color: #000000;
 }
 
 div.complex-select-pop-head-close-icon {
-    width: 24px;
-    height: 24px;
-    background-image: url('/frontary/close.png');
-    background-size: 24px 24px;
+    width: 40px;
+    height: 40px;
+    background-image: url('/frontary/clumit-modal-close.png');
+    background-size: 40px 40px;
     background-repeat: no-repeat;
 }
 
 div.complex-select-pop-all {
-    height: 42px;
+    height: 48px;
     margin-top: 6px;
     padding-left: 24px;
     padding-right: 24px;
@@ -404,47 +407,47 @@ div.complex-select-pop-all-text {
     float: left;
     height: 42px;
     padding-top: 12px;
-    font-weight: bold;
-    font-size: 14px;
-    color: #98080E;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #FFFFFF;
 }
 
 div.complex-select-pop-all-button {
     float: right;
     width: 48px;
-    height: 42px;
-    background-size: 48px 28px;
-    background-position: right 0px top 7px;
+    height: 48px;
+    background-size: 48px 48px;
     background-repeat: no-repeat;
 }
 
 div.complex-select-pop-list-head {
-    height: 42px;
+    height: 48px;
     width: 100%;
-    font-size: 14px;
-    font-weight: bold;
-    color: #98080E;
-    background-color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 500;
+    color: #FFFFFF;
+    line-height: 24px;
 }
 
 div.complex-select-pop-input-head {
-    height: 42px;
+    height: 48px;
     width: 100%;
-    font-size: 14px;
-    font-weight: bold;
-    color: #98080E;
-    background-color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 500;
+    color: #FFFFFF;
+    line-height: 24px;
 }
 
 div.complex-select-pop-input-head-bottom {
-    height: 42px;
+    height: 48px;
     width: 100%;
     position: fixed;
     bottom: 0px;
     font-size: 14px;
-    font-weight: bold;
-    color: #98080E;
-    background-color: #FFFFFF;
+    font-weight: 500;
+    line-height: 24px;
+    color: #FFFFFF;
 }
 
 td.complex-select-pop-head-1st {
@@ -466,10 +469,6 @@ div.complex-select-pop-list-search {
     height: 42px;
 }
 
-div.complex-select-pop-list-list {
-    background-color: #F7F7F7;
-}
-
 div.complex-select-pop-list-list-all {
     padding-left: 26px;
     padding-right: 26px;
@@ -479,7 +478,7 @@ div.complex-select-pop-list-list-all {
 table.complex-select-pop-list-list-all {
     height: 42px;
     width: 100%;
-    border-bottom: 1px solid #EDEDED;
+    border-bottom: 1px solid #2F333A;
 }
 
 div.complex-select-pop-list-list-items {
@@ -495,6 +494,10 @@ td.complex-select-pop-list-list-all-checkbox {
 
 td.complex-select-pop-list-list-all-item {
     padding-top: 2px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
 }
 
 td.complex-select-pop-list-list-items-checkbox {
@@ -504,41 +507,44 @@ td.complex-select-pop-list-list-items-checkbox {
 }
 
 td.complex-select-pop-list-list-items-item {
-    padding-top: 12px;
-    font-size: 13px;
-    color: #4D4D4D;
+    padding-top: 20px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #FFFFFF;
     vertical-align: top;
 }
 
 td.complex-select-pop-list-list-items-direction {
     width: 70px;
     vertical-align: top;
-    padding-top: 12px;
+    padding-top: 20px;
 }
 
 div.complex-select-pop-list-networks {
-    font-size: 11px;
-    line-height: 14px;
-    color: #828282;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    color: #CFD6EA;
 }
 
 input[type=text].complex-select-search {
-    height: 30px;
+    height: 40px;
     margin-left: 24px;
-    padding-left: 20px;
-    padding-right: 45px;
-    background-color: #FFFFFF;
-    border: 1px solid #CECECE;
-    border-radius: 15px;
-    background-image: url('/frontary/clumit-magnifier.png');
-    background-size: 20px 20px;
-    background-position: right 20px top 5px;
+    padding: 4px 12px;
+    background-color: rgba(97, 105, 116, 0.24);
+    border: none;
+    border-radius: 8px;
+    background-image: url(/frontary/clumit-magnifier.png);
+    background-size: 32px 32px;
+    background-position: right 12px top 5px;
     background-repeat: no-repeat;
+    color: #FFFFFF;
 }
 
 input[type=text].complex-select-search::placeholder {
-    font-size: 13px;
-    color: #A9A9A9;
+    font-size: 16px;
+    color: #B4BBC6;
 }
 
 input[type=text].complex-select-search:focus {
@@ -551,7 +557,7 @@ div.complex-select-pop-input {
 
 div.complex-select-pop-input-input {
     height: 30px;
-    margin-bottom: 0px;
+    margin-bottom: 8px;
     padding-left: 24px;
     padding-right: 24px;
 }
@@ -563,11 +569,11 @@ div.complex-select-pop-input-input-text {
 }
 
 div.complex-select-pop-input-input-plus {
-    float: left;
-    width: 30px;
-    height: 30px;
-    background-image: url('/frontary/plus-for-add.png');
-    background-size: 30px 30px;
+    float: right;
+    width: 40px;
+    height: 40px;
+    background-image: url('/frontary/clumit-plus-for-add.png');
+    background-size: 40px 40px;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -576,24 +582,28 @@ div.complex-select-pop-input-input-message {
     font-size: 12px;
     padding-left: 26px;
     padding-right: 26px;
-    padding-top: 2px;
+    padding-top: 15px;
     height: 30px;
-    color: var(--alert-text-color);
+    color: #FB2C10;
 }
 
 input[type=text].complex-select-pop-input {
-    height: 30px;
-    font-size: 13px;
-    padding-left: 10px;
-    padding-right: 10px;
-    background-color: #FFFFFF;
-    border: 1px solid #CECECE;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    padding: 8px 12px;
+    background-color: rgba(97, 105, 116, 0.24);
+    border: none;
+    border-radius: 8px;
+    color: #FFFFFF;
 }
 
 input[type=text].complex-select-pop-input::placeholder {
-    font-size: 13px;
-    line-height: 16px;
-    color: #A9A9A9;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #B4BBC6;
 }
 
 input[type=text].complex-select-pop-input:focus {
@@ -610,8 +620,9 @@ div.complex-select-pop-input-list {
 }
 
 td.complex-select-pop-input-list-networks {
-    background-color: #F6F6F6;
-    border-radius: 14px;
+    background-color: rgba(97, 105, 116, 0.24);
+    border-radius: 8px;
+    color: #FFFFFF;
 }
 
 div.complex-select-pop-input-list-text {
@@ -623,7 +634,7 @@ div.complex-select-pop-input-list-text {
 
 td.complex-select-pop-input-list-direction {
     width: 74px;
-    padding-left: 3px;
+    padding-left: 8px;
     vertical-align: top;
 }
 
@@ -631,7 +642,7 @@ div.complex-select-pop-input-list-delete {
     width: 28px;
     height: 28px;
     float: right;
-    background-image: url('/static/frotary/delete-x.png');
+    background-image: url('/frontary/clumit-delete-x.png');
     background-size: 24px 24px;
     background-position: 2px 2px;
     background-repeat: no-repeat;
@@ -737,12 +748,13 @@ img.mini-select-list-down-item-more-action {
 
 div.mini-select-top-direction {
     float: right;
-    height: 20px;
+    height: 24px;
     top: -2px;
     padding-top: 2px;
-    font-size: 13px;
-    color: #4D4D4D;
-    background-color: #DBDBDB;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #FFFFFF;
 }
 
 div.mini-select-top-direction-deactive {
@@ -750,14 +762,14 @@ div.mini-select-top-direction-deactive {
     height: 20px;
     top: -2px;
     padding-top: 2px;
-    font-size: 13px;
-    color: #CBCBCB;
-    background-color: #F7F7F7;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #616974;
 }
 
 div.mini-select-top-direction:hover {
-    color: #4D4D4D;
-    background-color: #EBE9EB;
+    color: #46A6FF;
     cursor: pointer;
 }
 
@@ -774,29 +786,29 @@ div.mini-select-top-direction-text-deactive {
 }
 
 div.mini-select-top-direction-icon {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/staic/frontary/traffic-direction.png');
+    background-image: url('/frontary/clumit-traffic-direction.png');
     background-position: center;
     background-size: 16px 16px;
     background-repeat: no-repeat;
 }
 
 div.mini-select-top-direction-icon-deactive {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/frontary/traffic-direction-dim.png');
+    background-image: url('/frontary/clumit-traffic-direction-dim.png');
     background-position: center;
     background-size: 16px 16px;
     background-repeat: no-repeat;
 }
 
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
-    background-image: url('/staic/frontary/traffic-direction.png');
+    background-image: url('/frontary/clumit-traffic-direction-hover.png');
     background-position: center;
     background-size: 16px 16px;
     background-repeat: no-repeat;
@@ -861,13 +873,8 @@ div.mini-select-basic-icon-square {
 
 div.mini-select-item-direction {
     float: right;
-    width: 70px;
-    height: 28px;
-    padding-right: 2px;
-    padding-left: 4px;
-    border-radius: 20px;
-    font-size: 13px;
-    color: #4D4D4D;
+    padding: 4px 12px;
+    border-radius: 8px;
 }
 
 div.mini-select-item-direction:hover {
@@ -875,18 +882,21 @@ div.mini-select-item-direction:hover {
 }
 
 td.mini-select-item-direction {
-    width: 40px;
-    height: 28px;
-    padding-left: 2px;
+    height: 32px;
     vertical-align: middle;
     text-align: center;
+    font-size: 14px;
+    line-height: 24px;
+    color: #FFFFFF;
+    font-weight: 400;
+    padding-right: 5px;
 }
 
 td.mini-select-item-direction-icon {
     width: 24px;
-    height: 28px;
+    height: 24px;
     background-image: url('/frontary/clumit-mini-select-list-down.png');
-    background-size: 12px 7.5px;
+    background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -1629,7 +1639,7 @@ input[type=text].frontary-input-text {
 }
 
 input[type=text].frontary-input-text::placeholder {
-    color: #B4BBC6;
+    color: #616974;
 }
 
 input[type=text].frontary-input-text-alert {
@@ -1699,7 +1709,7 @@ input[type=password].input-password {
 }
 
 input[type=password].input-password::placeholder {
-    color: #B4BBC6;
+    color: #616974;
 }
 
 input[type=password].input-password-alert {
@@ -1731,7 +1741,7 @@ input[type=number].input-number {
 }
 
 input[type=number].input-number::placeholder {
-    color: #B4BBC6;
+    color: #616974;
 }
 
 input[type=number].input-number-alert {
@@ -1935,7 +1945,7 @@ input[type=text].host-network-group-input-input-input {
 }
 
 input[type=text].host-network-group-input-input-input::placeholder {
-    color: #B4BBC6;
+    color: #616974;
 }
 
 div.host-network-group-input-input-message {
@@ -2040,7 +2050,7 @@ input[type=text].tag-group-input-input-input {
 }
 
 input[type=text].tag-group-input-input-input::placeholder {
-    color: #B4BBC6;
+    color: #616974;
     font-size: 16px;
 }
 
@@ -2743,8 +2753,8 @@ div.modal-close {
 }
 
 img.modal-close {
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
 }
 
 img.modal-close:hover {
@@ -2788,8 +2798,9 @@ div.modal-message-item {
 
 div.modal-buttons-row {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 div.modal-buttons-column {
@@ -2802,12 +2813,6 @@ div.modal-buttons-column {
 div.modal-button-item-row {
     margin-top: 6px;
     margin-bottom: 6px;
-    height: 30px;
-}
-
-div.modal-button-item-column {
-    margin-left: 8px;
-    margin-right: 8px;
     height: 30px;
 }
 
@@ -2824,6 +2829,7 @@ div.modal-button-item-recommendation {
     line-height: 24px;
     padding: 12px 24px;
     height: 40px;
+    margin-right: 16px;
 }
 
 div.modal-button-item-recommendation:hover {

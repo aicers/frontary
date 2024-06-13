@@ -13,11 +13,17 @@ use crate::{
 };
 
 impl Model {
+    #[allow(clippy::too_many_lines)]
     pub(super) fn view_pop(&self, ctx: &Context<Self>) -> Html {
         let txt = ctx.props().txt.txt.clone();
-        let style_all = match self.check_status(ctx, false) {
-            CheckStatus::Checked => "background-image: url('/frontary/radio-opener-checked.png');",
-            _ => "background-image: url('/frontary/radio-opener-unchecked.png');",
+        let postfix = match self.check_status(ctx, false) {
+            CheckStatus::Checked => "checked",
+            _ => "unchecked",
+        };
+        let style_all = if cfg!(feature = "pumpkin-dark") {
+            format!("background-image: url('/frontary/clumit-radio-opener-{postfix}.png');")
+        } else {
+            format!("background-image: url('/frontary/radio-opener-{postfix}.png');")
         };
         let style = format!("width: {}px;", ctx.props().pop_width);
         let style_pop = format!(
@@ -26,15 +32,28 @@ impl Model {
             std::cmp::max(MIN_POP_HEIGHT, window_inner_height())
         );
         let style_head_title = format!("width: {}px;", ctx.props().pop_width - 34);
-        let style_list = if self.view_list {
-            "background-image: url('/frontary/collapse-contents.png');"
+        let (style_list, style_input) = if self.view_list {
+            if cfg!(feature = "pumpkin-dark") {
+                (
+                    "background-image: url('/frontary/clumit-collapse-contents.png');",
+                    "background-image: url('/frontary/clumit-collapse-contents.png');",
+                )
+            } else {
+                (
+                    "background-image: url('/frontary/collapse-contents.png');",
+                    "background-image: url('/frontary/collapse-contents.png');",
+                )
+            }
+        } else if cfg!(feature = "pumpkin-dark") {
+            (
+                "background-image: url('/frontary/clumit-expand-contents.png');",
+                "background-image: url('/frontary/clumit-expand-contents.png');",
+            )
         } else {
-            "background-image: url('/frontary/expand-contents.png');"
-        };
-        let style_input = if self.view_input {
-            "background-image: url('/frontary/collapse-contents.png');"
-        } else {
-            "background-image: url('/frontary/expand-contents.png');"
+            (
+                "background-image: url('/frontary/expand-contents.png');",
+                "background-image: url('/frontary/expand-contents.png');",
+            )
         };
         let class_input_head = if self.view_list {
             "complex-select-pop-input-head-bottom"
@@ -401,7 +420,11 @@ impl Model {
                 std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 226 - 15
             }
         });
-        let style_width_input = format!("width: {}px", ctx.props().pop_width - 86);
+        let style_width_input = if cfg!(feature = "pumpkin-dark") {
+            format!("width: {}px", ctx.props().pop_width - 100)
+        } else {
+            format!("width: {}px", ctx.props().pop_width - 86)
+        };
         let style_msg = format!("width: {}px; height: {}px;", ctx.props().pop_width, {
             if self.input_wrong_msg.is_some() {
                 40
@@ -469,7 +492,11 @@ impl Model {
                                 html! {
                                     match ctx.props().kind {
                                         SelectComplexKind::NetworkIp => {
-                                            let style_ip = format!("float: left; width: {}px;", ctx.props().pop_width - 150);
+                                            let style_ip = if cfg!(feature = "pumpkin-dark") {
+                                                format!("float: left; width: {}px;", ctx.props().pop_width - 180)
+                                            } else {
+                                                format!("float: left; width: {}px;", ctx.props().pop_width - 150)
+                                            };
                                             let src_dst_list = Rc::new(vec![
                                                 ViewString::Key("Both (Directions)".to_string()),
                                                 ViewString::Key("SRC".to_string()),
@@ -481,7 +508,11 @@ impl Model {
                                                 SelectionExtraInfo::Network(EndpointKind::Destination),
                                             ]);
                                             let onclick_del = |key: String| ctx.link().callback(move |_| Message::DeleteInputItem(key.clone()));
-
+                                            let (top_bg_color, top_width, list_top) = if cfg!(feature = "pumpkin-dark") {
+                                                ("rgba(97, 105, 116, 0.24)", 90, 42)
+                                            } else {
+                                                ("#F6F6F6", 70, 28)
+                                            };
                                             html! {
                                                 <>
                                                     <tr>
@@ -504,11 +535,11 @@ impl Model {
                                                                 selected_value={value.clone()}
                                                                 selected_value_cache={value.try_borrow().ok().and_then(|x| *x)}
                                                                 align_left={false}
-                                                                list_top={28}
-                                                                top_width={Some(70)}
+                                                                {list_top}
+                                                                top_width={Some(top_width)}
                                                                 list_min_width={Some(70)}
                                                                 kind={SelectMiniKind::DirectionItem}
-                                                                top_bg_color={"#F6F6F6".to_string()}
+                                                                {top_bg_color}
                                                             />
                                                         </td>
                                                     </tr>

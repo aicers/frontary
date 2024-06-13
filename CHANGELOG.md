@@ -9,7 +9,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Applied Clumit theme to `WholeList`, `Tag`, and `HostNetworkHtml`.
+- Applied Clumit theme to `WholeList`,`Tag`, `HostNetworkHtml`, `Modal`, and
+  `SelectComplex`.
 
 ### Fixed
 
