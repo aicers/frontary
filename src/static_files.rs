@@ -159,6 +159,8 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
 
         let delete_x = include_bytes!("../static/frontary/clumit-delete-x.png");
         rtn.push(("clumit-delete-x.png", delete_x));
+        let nic_delete = include_bytes!("../static/frontary/clumit-nic-delete.png");
+        rtn.push(("clumit-nic-delete.png", nic_delete));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));

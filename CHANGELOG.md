@@ -12,6 +12,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Applied Clumit theme to `WholeList`,`Tag`, `HostNetworkHtml`, `Modal`, and
   `SelectComplex`.
 - Added support for `InputType::Text` in the `view_checkbox` method.
+- Applied the Clumit theme to `Input` and `WholeList` components.
 
 ### Changed
 
