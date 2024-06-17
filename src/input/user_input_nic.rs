@@ -1,15 +1,17 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use json_gettext::get_text;
+use wasm_bindgen::JsCast;
+use web_sys::HtmlInputElement;
+use yew::{classes, events::InputEvent, html, Component, Context, Html};
+
 use super::{
     component::{InvalidMessage, Message, Model},
     user_input::{view_asterisk, MAX_PER_LAYER},
     InputItem,
 };
 use crate::{input::component::Verification, text, InputEssential, InputNic, ViewString};
-use json_gettext::get_text;
-use std::cell::RefCell;
-use std::rc::Rc;
-use wasm_bindgen::JsCast;
-use web_sys::HtmlInputElement;
-use yew::{classes, events::InputEvent, html, Component, Context, Html};
 
 const INTERFACE_NOTICE: &str = "x.x.x.x/x";
 const GATEWAY_NOTICE: &str = "x.x.x.x";

@@ -12,6 +12,13 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed the wrong directory of delete-x.png file from `frotary`
   to `frontary` in `theme.css`.
 
+### Changed
+
+- Applied `cargo fmt` with `--config group_imports=StdExternalCrate` for
+  consistent import grouping.
+- Updated CI process to include `--config group_imports=StdExternalCrate`
+  with the `cargo fmt -- --check` command for enforcing import grouping rules.
+
 ## [0.9.0] - 2024-04-11
 
 ### Changed

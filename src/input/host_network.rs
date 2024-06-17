@@ -1,12 +1,14 @@
-use crate::{
-    language::Language, parse_host_network, text, HostNetwork, InputHostNetworkGroup, Texts,
-};
-use json_gettext::get_text;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
+use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{events::InputEvent, html, Component, Context, Html, Properties, TargetCast};
+
+use crate::{
+    language::Language, parse_host_network, text, HostNetwork, InputHostNetworkGroup, Texts,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Kind {

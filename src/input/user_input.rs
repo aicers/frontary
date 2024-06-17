@@ -1,3 +1,13 @@
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
+
+use gloo_file::File;
+use json_gettext::get_text;
+use wasm_bindgen::JsCast;
+use web_sys::{Event, HtmlInputElement};
+use yew::{events::InputEvent, html, html::TargetCast, Component, Context, Html};
+
 use super::{
     component::{InvalidMessage, Message, Model},
     InputItem,
@@ -6,14 +16,6 @@ use crate::{
     input::component::Verification, text, HostNetworkHtml, HostNetworkKind, InputEssential, Radio,
     Tag, ViewString,
 };
-use gloo_file::File;
-use json_gettext::get_text;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::rc::Rc;
-use wasm_bindgen::JsCast;
-use web_sys::{Event, HtmlInputElement};
-use yew::{events::InputEvent, html, html::TargetCast, Component, Context, Html};
 
 const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input a new one.";
 const EXISTING_MSG: &str = "The input already exists.";

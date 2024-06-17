@@ -1,8 +1,10 @@
-use crate::{language::Language, text, Texts, ViewString};
-use json_gettext::get_text;
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
+use json_gettext::get_text;
 use yew::{html, Component, Context, Html, Properties};
+
+use crate::{language::Language, text, Texts, ViewString};
 
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Message {

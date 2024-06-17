@@ -1,14 +1,16 @@
+use std::{cell::RefCell, collections::HashMap, rc::Rc, str::FromStr};
+
+use json_gettext::get_text;
+use wasm_bindgen::JsCast;
+use web_sys::HtmlInputElement;
+use yew::{events::InputEvent, html, Component, Context, Html};
+
 use super::{
     component::{Message, Model},
     user_input::view_asterisk,
     Comparison, ComparisonKind, InputItem, Value as ComparisonValue, ValueKind,
 };
 use crate::{text, InputEssential, Item, SelectSearchableKind, VecSelect, ViewString};
-use json_gettext::get_text;
-use std::{cell::RefCell, collections::HashMap, rc::Rc, str::FromStr};
-use wasm_bindgen::JsCast;
-use web_sys::HtmlInputElement;
-use yew::{events::InputEvent, html, Component, Context, Html};
 
 impl<T> Model<T>
 where

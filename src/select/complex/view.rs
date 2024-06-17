@@ -1,14 +1,16 @@
+use std::rc::Rc;
+
+use htmlescape::decode_html;
+use json_gettext::get_text;
+use wasm_bindgen::JsCast;
+use web_sys::{HtmlInputElement, KeyboardEvent};
+use yew::{events::InputEvent, html, Context, Html};
+
 use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
     text, window_inner_height, CheckBox, CheckStatus, EndpointKind, NetworkItem, SelectComplexKind,
     SelectMini, SelectMiniKind, SelectionExtraInfo, ViewString, NBSP,
 };
-use htmlescape::decode_html;
-use json_gettext::get_text;
-use std::rc::Rc;
-use wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, KeyboardEvent};
-use yew::{events::InputEvent, html, Context, Html};
 
 impl Model {
     pub(super) fn view_pop(&self, ctx: &Context<Self>) -> Html {

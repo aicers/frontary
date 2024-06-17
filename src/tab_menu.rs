@@ -1,7 +1,9 @@
-use crate::{language::Language, text, Texts};
-use json_gettext::get_text;
 use std::{marker::PhantomData, rc::Rc};
+
+use json_gettext::get_text;
 use yew::{classes, html, Component, Context, Html, Properties};
+
+use crate::{language::Language, text, Texts};
 
 pub enum Message {
     ClickMenu(usize),

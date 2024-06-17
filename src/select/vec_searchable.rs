@@ -1,10 +1,12 @@
-use super::searchable::DEFAULT_SIZED_VALUE;
-use crate::{language::Language, Item, SelectSearchable, SelectSearchableKind, Texts};
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
+
 use yew::virtual_dom::AttrValue;
 use yew::{html, Component, Context, Html, Properties};
+
+use super::searchable::DEFAULT_SIZED_VALUE;
+use crate::{language::Language, Item, SelectSearchable, SelectSearchableKind, Texts};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum Message {
