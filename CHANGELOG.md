@@ -9,7 +9,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed the wrong directory of delete-x.png file from `frotary` to `frontary` in `theme.css`.
+- Fixed the wrong directory of delete-x.png file from `frotary`
+  to `frontary` in `theme.css`.
 
 ## [0.9.0] - 2024-04-11
 
