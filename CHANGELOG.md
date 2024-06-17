@@ -5,6 +5,12 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed the wrong path of a png file `/frotary` to `/frontary` in `theme.css`.
+
 ## [0.9.0] - 2024-04-11
 
 ### Changed
