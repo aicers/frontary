@@ -530,3 +530,21 @@ trait Rerender {
         *self.rerender_serial() = self.rerender_serial().wrapping_add(1);
     }
 }
+
+#[macro_export]
+macro_rules! define_str_consts {
+    ($($name:ident => $value:expr),+) => {
+        $(
+            const $name: &str = $value;
+        )+
+    };
+}
+
+#[macro_export]
+macro_rules! define_u32_consts {
+    ($($name:ident => $value:expr),+) => {
+        $(
+            const $name: u32 = $value;
+        )+
+    };
+}

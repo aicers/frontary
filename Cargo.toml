@@ -7,6 +7,8 @@ publish = false
 [features]
 default = []
 test = []
+pumpkin-dark = []
+pumpkin-light = []
 
 [dependencies]
 anyhow = "1"

@@ -3,13 +3,21 @@ use std::{marker::PhantomData, rc::Rc};
 use json_gettext::get_text;
 use yew::{classes, html, Component, Context, Html, Properties};
 
-use crate::{language::Language, text, Texts};
+use crate::{define_u32_consts, language::Language, text, Texts};
 
 const MAX_HEIGHT: u32 = 700;
 const DEFAULT_MIN_HEIGHT: u32 = 306;
-const DEFAULT_WIDTH: u32 = 714;
 const DEFAULT_MIN_OPTION_WIDTH: u32 = 220;
 const DEFAULT_MAX_OPTION_WIDTH: u32 = 440;
+
+#[cfg(feature = "pumpkin-dark")]
+define_u32_consts! {
+    DEFAULT_WIDTH => 600
+}
+#[cfg(not(feature = "pumpkin-dark"))]
+define_u32_consts! {
+    DEFAULT_WIDTH => 714
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum MsgType {
@@ -54,6 +62,7 @@ where
     pub max_option_width: u32,
     pub kind: MsgType,
     pub align_button: AlignButton,
+    pub title_header: &'static str,
     pub title_messages: Rc<Vec<Vec<(String, TextStyle)>>>,
     pub option_messages: Rc<Vec<String>>,
     pub parent_messages: Vec<T::Message>,
@@ -101,6 +110,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
         let (icon, icon_class) = match ctx.props().kind {
             MsgType::Info => ("/frontary/modal-info.png", "modal-info"),
@@ -110,29 +120,49 @@ where
             AlignButton::Row => ("modal-buttons-row", "modal-button-item-row"),
             AlignButton::Column => ("modal-buttons-column", "modal-button-item-column"),
         };
-        let style = format!(
-            "width: {}px; min-height: {}px; max-height: {}px;",
-            ctx.props().width,
-            ctx.props().min_height,
-            MAX_HEIGHT,
-        );
-        let button_style = format!(
-            "min-width: {}px; max-width: {}px;",
-            ctx.props().min_option_width,
-            ctx.props().max_option_width
-        );
+        let style = if cfg!(feature = "pumpkin-dark") {
+            format!("width: {}px", ctx.props().width)
+        } else {
+            format!(
+                "width: {}px; min-height: {}px; max-height: {}px;",
+                ctx.props().width,
+                ctx.props().min_height,
+                MAX_HEIGHT,
+            )
+        };
+        let button_style = if cfg!(feature = "pumpkin-dark") {
+            String::new()
+        } else {
+            format!(
+                "min-width: {}px; max-width: {}px;",
+                ctx.props().min_option_width,
+                ctx.props().max_option_width
+            )
+        };
         let onclick_close = ctx.link().callback(|_| Message::Close);
         let txt = ctx.props().txt.txt.clone();
 
         html! {
             <div class="modal-outer">
                 <div class="modal-contents" style={style}>
+                if cfg!(feature="pumpkin-dark") {
+                    <div class="modal-icon-close">
+                        <div class="modal-icon">
+                            { text!(txt, ctx.props().language, ctx.props().title_header) }
+                        </div>
+                        <div class="modal-close">
+                            <img src="/frontary/clumit-modal-close.png" class="modal-close" onclick={onclick_close} />
+                        </div>
+                    </div>
+                    <img src="/frontary/clumit-modal-divider.png" class="modal-divider" />
+                } else {
                     <div class="modal-close">
                         <img src="/frontary/modal-close.png" class="modal-close" onclick={onclick_close} />
                     </div>
                     <div class="modal-icon">
                         <img src={icon} class={icon_class} />
                     </div>
+                }
                     <div class="modal-messages">
                     {
                         for ctx.props().title_messages.iter().map(|ms| {
@@ -158,6 +188,9 @@ where
                         })
                     }
                     </div>
+                    if cfg!(feature="pumpkin-dark") {
+                        <img src="/frontary/clumit-modal-divider.png" class="modal-divider" />
+                    }
                     <div class={align_class}>
                     {
                         for ctx.props().option_messages.iter().enumerate().map(|(index, m)| {

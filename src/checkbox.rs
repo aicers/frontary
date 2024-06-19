@@ -1,6 +1,27 @@
 use strum_macros::Display;
 use yew::{function_component, html, Html, Properties};
 
+use crate::define_str_consts;
+
+#[cfg(feature = "pumpkin-dark")]
+define_str_consts! {
+    CHECKED_URL => "/frontary/clumit-enabled-checked.png",
+    INDETERMINATE_URL => "/frontary/clumit-enabled-indeterminate.png",
+    UNCHECKED_URL => "/frontary/clumit-enabled-unchecked.png",
+    ALWAYS_CHECKED_URL => "/frontary/clumit-disabled-checked.png",
+    ALWAYS_INDETERMINATE_URL => "/frontary/clumit-disabled-indeterminate.png",
+    ALWAYS_UNCHECKED_URL => "/frontary/clumit-disabled-unchecked.png"
+}
+#[cfg(not(feature = "pumpkin-dark"))]
+define_str_consts! {
+    CHECKED_URL => "/frontary/checkbox-checked.png",
+    INDETERMINATE_URL => "/frontary/checkbox-indeterminate.png",
+    UNCHECKED_URL => "/frontary/checkbox-unchecked.png",
+    ALWAYS_CHECKED_URL => "/frontary/checkbox-checked-always.png",
+    ALWAYS_INDETERMINATE_URL => "/frontary/checkbox-indeterminate-always.png",
+    ALWAYS_UNCHECKED_URL => "/frontary/checkbox-unchecked-always.png"
+}
+
 #[derive(Clone, Copy, Display, PartialEq, Eq)]
 pub enum CheckStatus {
     Checked,
@@ -15,13 +36,6 @@ pub struct Props {
     #[prop_or(None)]
     pub always: Option<CheckStatus>,
 }
-
-const CHECKED_URL: &str = "/frontary/checkbox-checked.png";
-const INDETERMINATE_URL: &str = "/frontary/checkbox-indeterminate.png";
-const UNCHECKED_URL: &str = "/frontary/checkbox-unchecked.png";
-const ALWAYS_CHECKED_URL: &str = "/frontary/checkbox-checked-always.png";
-const ALWAYS_INDETERMINATE_URL: &str = "/frontary/checkbox-indeterminate-always.png";
-const ALWAYS_UNCHECKED_URL: &str = "/frontary/checkbox-unchecked-always.png";
 
 #[function_component(Model)]
 pub fn model(props: &Props) -> Html {

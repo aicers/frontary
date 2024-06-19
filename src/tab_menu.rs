@@ -3,15 +3,24 @@ use std::{marker::PhantomData, rc::Rc};
 use json_gettext::get_text;
 use yew::{classes, html, Component, Context, Html, Properties};
 
-use crate::{language::Language, text, Texts};
+use crate::{define_u32_consts, language::Language, text, Texts};
+
+#[cfg(feature = "pumpkin-dark")]
+define_u32_consts! {
+    DEFAULT_FULL_WIDTH => 1080,
+    DEFAULT_ITEM_WIDTH => 80,
+    MAX_ITEM_WIDTH => 100
+}
+#[cfg(not(feature = "pumpkin-dark"))]
+define_u32_consts! {
+    DEFAULT_FULL_WIDTH => 1080,
+    DEFAULT_ITEM_WIDTH => 120,
+    MAX_ITEM_WIDTH => 240
+}
 
 pub enum Message {
     ClickMenu(usize),
 }
-
-const DEFAULT_FULL_WIDTH: u32 = 1080;
-const DEFAULT_ITEM_WIDTH: u32 = 120;
-const MAX_ITEM_WIDTH: u32 = 240;
 
 pub struct Model<T> {
     phantom: PhantomData<T>,
@@ -64,16 +73,30 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = format!("width: {}px;", ctx.props().full_width);
-        let style_menu = format!(
-            "width: {}px; max-width: {}px;",
-            ctx.props().item_width,
-            MAX_ITEM_WIDTH
-        );
+        let div_style = if cfg!(feature = "pumpkin-dark") {
+            format!("width: {MAX_ITEM_WIDTH}%;")
+        } else {
+            format!("width: {}px;", ctx.props().full_width)
+        };
+        let table_style = if cfg!(feature = "pumpkin-dark") {
+            String::new()
+        } else {
+            format!("width: {}px;", ctx.props().full_width)
+        };
+
+        let style_menu = if cfg!(feature = "pumpkin-dark") {
+            String::new()
+        } else {
+            format!(
+                "width: {}px; max-width: {}px;",
+                ctx.props().item_width,
+                MAX_ITEM_WIDTH
+            )
+        };
 
         html! {
-            <div class="tab-menu" style={style.clone()}>
-                <table class="tab-menu" style={style}>
+            <div class="tab-menu" style={div_style}>
+                <table class="tab-menu" style={table_style}>
                     <tr>
                     {
                         for ctx.props().menu_titles.iter().enumerate().map(|(index, title)| {
@@ -90,6 +113,12 @@ where
                                 html! {
                                     <td class={classes!("tab-menu-selected", class_last)} style={style_menu.clone()}>
                                         { text!(txt, ctx.props().language, title) }
+                                        if cfg!(feature ="pumpkin-dark") {
+                                            <div class="selected-background">
+                                            </div>
+                                            <div class="selected-bar">
+                                            </div>
+                                        }
                                     </td>
                                 }
                             } else {
