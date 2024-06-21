@@ -21,6 +21,7 @@ pub enum Kind {
     DirectionItem,
     MoreAction,
     MoreActionNoImage,
+    MoreActionBasic,
     OnOffAction,
     SortList,
     Round,
@@ -194,6 +195,7 @@ where
                     Kind::SortList => Self::view_sort_list(ctx),
                     Kind::MoreAction => Self::view_more_action(ctx),
                     Kind::MoreActionNoImage => html! {},
+                    Kind::MoreActionBasic => Self::view_more_action_basic(ctx),
                     Kind::OnOffAction => Self::view_on_off_action(ctx),
                     Kind::Round | Kind::Soft => Self::view_basic(ctx,&value),
                 }
@@ -303,6 +305,21 @@ where
                                                     <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
                                                         <div class="mini-select-list-down-item-more-action">
                                                             <img src={icon} class="mini-select-list-down-item-more-action" />
+                                                            <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
+                                                            { text!(txt, ctx.props().language, key) }
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+                                            ViewString::Raw(_) => html! {}
+                                        }
+                                    } else if ctx.props().kind == Kind::MoreActionBasic {
+                                        match item {
+                                            ViewString::Key(key) => {
+                                                html! {
+                                                    <td class={classes!("mini-select-list-down-item-more-action-basic", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                        <div class="mini-select-list-down-item-more-action">
                                                             <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
                                                             { text!(txt, ctx.props().language, key) }
                                                             </div>
@@ -506,6 +523,14 @@ where
     }
 
     fn view_on_off_action(ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(|_| Message::ClickTop);
+        html! {
+            <div onclick={onclick} class="mini-select-on-off-action">
+            </div>
+        }
+    }
+
+    fn view_more_action_basic(ctx: &Context<Self>) -> Html {
         let onclick = ctx.link().callback(|_| Message::ClickTop);
         html! {
             <div onclick={onclick} class="mini-select-on-off-action">

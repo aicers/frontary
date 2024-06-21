@@ -7,6 +7,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Added `MoreActionBasic` to `SelectMiniKind` in `SelectMini`.
+
 ### Fixed
 
 - Fixed the wrong directory of delete-x.png file from `frotary`
