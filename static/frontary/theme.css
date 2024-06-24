@@ -677,6 +677,15 @@ td.mini-select-list-down-item {
     white-space: nowrap;
 }
 
+td.mini-select-list-down-item-more-action-basic {
+    width: 100%;
+    height: 26px;
+    padding-left: 9px;
+    padding-right: 18px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
 td.mini-select-list-down-item-selected {
     width: 100%;
     height: 26px;
