@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Added `MoreActionBasic` to `SelectMiniKind` in `SelectMini`.
+- Added correct CSS styling for `MoreActionBasic` for `SelectMini`.
 
 ### Fixed
 

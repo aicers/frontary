@@ -709,6 +709,11 @@ td.mini-select-list-down-item:hover {
     cursor: pointer;
 }
 
+td.mini-select-list-down-item-more-action-basic:hover {
+    background-color: #EDEDED;
+    cursor: pointer;
+}
+
 div.mini-select-list-down-item-more-action {
     display: flex;
     flex-direction: row;
