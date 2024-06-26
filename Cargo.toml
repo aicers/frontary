@@ -13,7 +13,7 @@ pumpkin-light = []
 [dependencies]
 anyhow = "1"
 bincode = "1"
-chrono = { version = ">=0.4.35", default_features = false, features = [
+chrono = { version = ">=0.4.35", default-features = false, features = [
     "serde",
     "wasmbind",
 ] }
@@ -22,12 +22,15 @@ gloo-events = "0.2"
 gloo-file = "0.3"
 gloo-storage = "0.3"
 gloo-timers = "0.3"
+gloo-utils = "0.2"
 htmlescape = "0.3"
 ipnet = { version = "2", features = ["serde"] }
 js-sys = "0.3"
 json-gettext = "4"
 num-traits = "0.2"
 passwords = { version = "3", features = ["common-password"] }
+reqwasm = "0.5"
+scraper = "0.19"
 serde = { version = "1", features = ["derive"] }
 strum = "0.26"
 strum_macros = "0.26"

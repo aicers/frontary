@@ -12,6 +12,7 @@ mod radio_separate;
 mod select;
 mod sort;
 pub mod static_files;
+mod svg;
 mod tab_menu;
 mod text_input;
 
@@ -59,6 +60,7 @@ pub use crate::select::mini::{Kind as SelectMiniKind, Model as SelectMini};
 pub use crate::select::searchable::{Kind as SelectSearchableKind, Model as SelectSearchable};
 pub use crate::select::vec_searchable::Model as VecSelect;
 pub use crate::sort::{Model as Sort, Status as SortStatus};
+pub use crate::svg::Model as Svg;
 pub use crate::tab_menu::Model as TabMenu;
 pub use crate::text_input::Model as TextInput;
 
