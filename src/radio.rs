@@ -84,9 +84,15 @@ where
                         false
                     };
                     let img = if checked {
-                        "/frontary/radio-checked.png"
+                        if cfg!(feature="pumpkin-dark") {
+                            "/frontary/clumit-radio-checked.png"
+                        } else {
+                            "/frontary/radio-checked.png"
+                        }
+                    } else if cfg!(feature="pumpkin-dark") {
+                            "/frontary/clumit-radio-unchecked.png"
                     } else {
-                        "/frontary/radio-unchecked.png"
+                            "/frontary/radio-unchecked.png"
                     };
                     let txt = ctx.props().txt.txt.clone();
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
