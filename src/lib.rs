@@ -544,7 +544,7 @@ macro_rules! define_str_consts {
 macro_rules! define_u32_consts {
     ($($name:ident => $value:expr),+) => {
         $(
-            const $name: u32 = $value;
+            pub const $name: u32 = $value;
         )+
     };
 }

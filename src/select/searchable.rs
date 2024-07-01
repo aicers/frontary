@@ -385,7 +385,11 @@ where
         } else {
             "4".to_string() // 4 is for left shadow
         };
-        let style = format!("width: {width}px; height: {height}px; left: {left}px;",);
+        let style = if cfg!(feature = "pumpkin-dark") {
+            format!("height: {height}px;",)
+        } else {
+            format!("width: {width}px; height: {height}px; left: {left}px;",)
+        };
         let style_inner = format!("width: {}px; height: {height}px;", width - 10);
         let style_inner_width = format!("width: {}px;", width - 10);
         let style_inner_width_search = format!("width: {}px", width - 10 - 28);
