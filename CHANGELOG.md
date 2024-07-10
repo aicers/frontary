@@ -18,6 +18,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fixed the wrong directory of delete-x.png file from `frotary`
   to `frontary` in `theme.css`.
+- Fixed `Modal` error for title header.
 
 ### Changed
 

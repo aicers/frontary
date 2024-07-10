@@ -62,7 +62,8 @@ where
     pub max_option_width: u32,
     pub kind: MsgType,
     pub align_button: AlignButton,
-    pub title_header: &'static str,
+    #[prop_or(None)]
+    pub title_header: Option<&'static str>,
     pub title_messages: Rc<Vec<Vec<(String, TextStyle)>>>,
     pub option_messages: Rc<Vec<String>>,
     pub parent_messages: Vec<T::Message>,
@@ -148,7 +149,15 @@ where
                 if cfg!(feature="pumpkin-dark") {
                     <div class="modal-icon-close">
                         <div class="modal-icon">
-                            { text!(txt, ctx.props().language, ctx.props().title_header) }
+                        {
+                            if let Some(title_header) = ctx.props().title_header {
+                                html! {
+                                    { text!(txt, ctx.props().language, title_header) }
+                                }
+                            } else {
+                                html! {}
+                            }
+                        }
                         </div>
                         <div class="modal-close">
                             <img src="/frontary/clumit-modal-close.png" class="modal-close" onclick={onclick_close} />
