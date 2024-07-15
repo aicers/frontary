@@ -68,7 +68,14 @@ pub fn set(lang: Language) {
 
 #[macro_export]
 macro_rules! text {
-    ($c:ident, $l:expr, $k:expr) => {
-        get_text!($c, $l.tag(), $k).expect("valid key").to_string()
-    };
+    ($c:ident, $l:expr, $k:expr) => {{
+        let invalid_text_key_msg = if cfg!(feature = "test") {
+            format!("invalid text key: {}", $k)
+        } else {
+            "invalid text key".to_string()
+        };
+        get_text!($c, $l.tag(), $k)
+            .expect(&invalid_text_key_msg)
+            .to_string()
+    }};
 }
