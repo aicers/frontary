@@ -26,6 +26,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   consistent import grouping.
 - Updated CI process to include `--config group_imports=StdExternalCrate`
   with the `cargo fmt -- --check` command for enforcing import grouping rules.
+- Changed `expect` message in `text` macro to show the invalid key name
+  if `test` feature is enabled
 
 ## [0.9.0] - 2024-04-11
 
