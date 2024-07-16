@@ -31,6 +31,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   with the `cargo fmt -- --check` command for enforcing import grouping rules.
 - Changed `expect` message in `text` macro to show the invalid key name
   if `test` feature is enabled
+- Removed the scrollbar in `WholeList` and adjusted the width size for
+  `TabMenu`.
 
 ## [0.9.0] - 2024-04-11
 

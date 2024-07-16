@@ -991,7 +991,7 @@ div.list-sort-recently {
 
 div.list-table {
     overflow-x: auto;
-    padding-bottom: 30px;
+    padding-bottom: 50px;
     border-radius: 10px;
     background: rgba(97, 105, 116, 0.08);
 }
@@ -2855,7 +2855,6 @@ div.tab-menu {
 
 table.tab-menu {
     border-collapse: separate;
-    min-width: 347px;
 }
 
 td.tab-menu-selected {
@@ -2863,12 +2862,16 @@ td.tab-menu-selected {
     padding: 0 16px;
     text-align: center;
     vertical-align: botton;
-    font-weight: normal;
+    font-weight: 500;
     line-height: 24px;
     font-size: 16px;
-    color: #FFF;
+    color: #FFFFFF;
     position: relative;
     overflow: hidden;
+}
+
+td.tab-menu-selected:hover {
+    cursor: pointer;
 }
 
 div.selected-background {
@@ -2905,6 +2908,10 @@ td.tab-menu-unselected {
     font-size: 16px;
     color: #CFD6E0;
     padding: 8px 16px;
+}
+
+td.tab-menu-unselected:hover {
+    cursor: pointer;
 }
 
 td.tab-menu-before-last {
