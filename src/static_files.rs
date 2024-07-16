@@ -40,6 +40,70 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
 
         let modal_close = include_bytes!("../static/frontary/clumit-modal-close.png");
         rtn.push(("clumit-modal-close.png", modal_close));
+
+        let list_add = include_bytes!("../static/frontary/clumit-list-add.png");
+        rtn.push(("clumit-list-add.png", list_add));
+
+        let list_sort_recently = include_bytes!("../static/frontary/clumit-list-sort-recently.png");
+        rtn.push(("clumit-list-sort-recently.png", list_sort_recently));
+
+        let sort_unsorted = include_bytes!("../static/frontary/clumit-sort-unsorted.png");
+        rtn.push(("clumit-sort-unsorted.png", sort_unsorted));
+
+        let sort_ascending = include_bytes!("../static/frontary/clumit-sort-ascending.png");
+        rtn.push(("clumit-sort-ascending.png", sort_ascending));
+
+        let sort_descending = include_bytes!("../static/frontary/clumit-sort-descending.png");
+        rtn.push(("clumit-sort-descending.png", sort_descending));
+
+        let sort_unsorted_hover =
+            include_bytes!("../static/frontary/clumit-sort-unsorted-hover.png");
+        rtn.push(("clumit-sort-unsorted-hover.png", sort_unsorted_hover));
+
+        let input_close = include_bytes!("../static/frontary/clumit-input-close.png");
+        rtn.push(("clumit-input-close.png", input_close));
+
+        let select_down = include_bytes!("../static/frontary/clumit-select-down.png");
+        rtn.push(("clumit-select-down.png", select_down));
+
+        let magnifier = include_bytes!("../static/frontary/clumit-magnifier.png");
+        rtn.push(("clumit-magnifier.png", magnifier));
+
+        let collapse_list = include_bytes!("../static/frontary/clumit-collapse-list.png");
+        rtn.push(("clumit-collapse-list.png", collapse_list));
+
+        let expand_list = include_bytes!("../static/frontary/clumit-expand-list.png");
+        rtn.push(("clumit-expand-list.png", expand_list));
+
+        let more_action_dots_hover =
+            include_bytes!("../static/frontary/clumit-more-action-dots-hover.png");
+        rtn.push(("clumit-more-action-dots-hover.png", more_action_dots_hover));
+
+        let more_action_dots = include_bytes!("../static/frontary/clumit-more-action-dots.png");
+        rtn.push(("clumit-more-action-dots.png", more_action_dots));
+
+        let edit = include_bytes!("../static/frontary/clumit-edit.png");
+        rtn.push(("clumit-edit.png", edit));
+
+        let delete_trash = include_bytes!("../static/frontary/clumit-delete-trash.png");
+        rtn.push(("clumit-delete-trash.png", delete_trash));
+
+        let mini_select_list_down =
+            include_bytes!("../static/frontary/clumit-mini-select-list-down.png");
+        rtn.push(("clumit-mini-select-list-down.png", mini_select_list_down));
+
+        let notification_error = include_bytes!("../static/frontary/clumit-notification-error.png");
+        rtn.push(("clumit-notification-error.png", notification_error));
+
+        let select_down_alert = include_bytes!("../static/frontary/clumit-select-down-alert.png");
+        rtn.push(("clumit-select-down-alert.png", select_down_alert));
+
+        let clumit_checkbox_link_up_line =
+            include_bytes!("../static/frontary/clumit-checkbox-link-up-line.png");
+        rtn.push((
+            "clumit-checkbox-link-up-line.png",
+            clumit_checkbox_link_up_line,
+        ));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));

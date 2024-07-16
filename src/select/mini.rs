@@ -272,9 +272,17 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 let icon = if key == "Edit" {
-                                                    "/frontary/edit.png"
+                                                    if cfg!(feature = "pumpkin-dark") {
+                                                        "/frontary/clumit-edit.png"
+                                                    } else {
+                                                        "/frontary/edit.png"
+                                                    }
                                                 } else if key == "Delete" {
-                                                    "/frontary/delete-trash.png"
+                                                    if cfg!(feature = "pumpkin-dark") {
+                                                        "/frontary/clumit-delete-trash.png"
+                                                    } else {
+                                                        "/frontary/delete-trash.png"
+                                                    }
                                                 } else {
                                                     ""
                                                 };
@@ -355,10 +363,13 @@ where
     }
 
     fn view_basic(ctx: &Context<Self>, value: &str) -> Html {
-        let style_width = ctx
-            .props()
-            .top_width
-            .map_or_else(String::new, |w| format!("width: {w}px;"));
+        let style_width = ctx.props().top_width.map_or_else(String::new, |w| {
+            if cfg!(feature = "pumpkin-dark") {
+                format!("width: {w}%;")
+            } else {
+                format!("width: {w}px;")
+            }
+        });
         let style_height = ctx
             .props()
             .top_height

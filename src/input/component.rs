@@ -950,12 +950,20 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = format!(
-            "width: {}px; max-height: {}px;",
-            ctx.props().width,
-            ctx.props().height
-        );
-        let style_input = format!("height: {}px;", ctx.props().height - 166);
+        let style = if cfg!(feature = "pumpkin-dark") {
+            format!("width: {}px;", ctx.props().width)
+        } else {
+            format!(
+                "width: {}px; max-height: {}px;",
+                ctx.props().width,
+                ctx.props().height
+            )
+        };
+        let style_input = if cfg!(feature = "pumpkin-dark") {
+            String::new()
+        } else {
+            format!("height: {}px;", ctx.props().height - 166)
+        };
         let txt = ctx.props().txt.txt.clone();
         let onclick_escape = ctx.link().callback(|_| Message::Escape);
         let onclick_save = ctx.link().callback(|_| Message::TrySave);

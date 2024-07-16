@@ -9,7 +9,16 @@ use json_gettext::get_text;
 use num_traits::ToPrimitive;
 use yew::{html, Component, Context, Html, Properties};
 
-use crate::{language::Language, text, window_inner_height, Texts};
+use crate::{define_u32_consts, language::Language, text, window_inner_height, Texts};
+
+#[cfg(feature = "pumpkin-dark")]
+define_u32_consts! {
+    DEFAULT_NOTIFICATION_WIDTH => 400
+}
+#[cfg(not(feature = "pumpkin-dark"))]
+define_u32_consts! {
+    DEFAULT_NOTIFICATION_WIDTH => 252
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Category {
@@ -17,7 +26,6 @@ pub enum Category {
     Success,
 }
 
-const DEFAULT_WIDTH: u32 = 252;
 const SUCCESS_COLOR: &str = "#83CA29";
 const FAIL_COLOR: &str = "#B5131A";
 
@@ -49,7 +57,7 @@ pub struct Props {
     pub language: Language,
     pub list: Rc<RefCell<Vec<(usize, NotificationItem)>>>,
     pub serial: usize,
-    #[prop_or(DEFAULT_WIDTH)]
+    #[prop_or(DEFAULT_NOTIFICATION_WIDTH)]
     pub width: u32,
 }
 
@@ -152,6 +160,21 @@ impl Model {
             <table class="notification">
                 <tr>
                     <td class="notification-contents" style={style_contents}>
+                        if cfg!(feature = "pumpkin-dark") {
+                            {
+                                if noti.time.is_none() {
+                                    html! {
+                                        <div class="clumit-notification-error">
+                                            <img src="/frontary/clumit-notification-error.png" class="clumit-notification-error"/>
+                                            { text!(txt, ctx.props().language, "Error") }
+                                        </div>
+                                    }
+                                } else {
+                                    html! {}
+                                }
+                            }
+
+                        }
                         <div class="notification-contents-text">
                             <table class="notification-contents-text-table">
                                 <tr>
@@ -178,8 +201,10 @@ impl Model {
                             }
                         }
                     </td>
-                    <td class="notification-label" style={style_label}>
-                    </td>
+                    if !cfg!(feature = "pumpkin-dark")  {
+                        <td class="notification-label" style={style_label}>
+                        </td>
+                    }
                 </tr>
             </table>
         }
