@@ -5,10 +5,11 @@ edition = "2021"
 publish = false
 
 [features]
+cc-password = []
 default = []
-test = []
 pumpkin-dark = []
 pumpkin-light = []
+test = []
 
 [dependencies]
 anyhow = "1"
