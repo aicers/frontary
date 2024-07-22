@@ -88,6 +88,9 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let delete_trash = include_bytes!("../static/frontary/clumit-delete-trash.png");
         rtn.push(("clumit-delete-trash.png", delete_trash));
 
+        let delete_x = include_bytes!("../static/frontary/clumit-delete-x.png");
+        rtn.push(("clumit-delete-x.png", delete_x));
+
         let mini_select_list_down =
             include_bytes!("../static/frontary/clumit-mini-select-list-down.png");
         rtn.push(("clumit-mini-select-list-down.png", mini_select_list_down));
@@ -104,6 +107,20 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             "clumit-checkbox-link-up-line.png",
             clumit_checkbox_link_up_line,
         ));
+
+        let tag_input_close = include_bytes!("../static/frontary/clumit-tag-input-close.png");
+        rtn.push(("clumit-tag-input-close.png", tag_input_close));
+
+        let tag_select_edit_done_dim =
+            include_bytes!("../static/frontary/clumit-tag-select-edit-done-dim.png");
+        rtn.push((
+            "clumit-tag-select-edit-done-dim.png",
+            tag_select_edit_done_dim,
+        ));
+
+        let tag_select_edit_done =
+            include_bytes!("../static/frontary/clumit-tag-select-edit-done.png");
+        rtn.push(("clumit-tag-select-edit-done.png", tag_select_edit_done));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));

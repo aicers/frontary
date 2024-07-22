@@ -22,6 +22,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `cc-password` feature in `Cargo.toml`.
 - Applied Clumit theme to `Sort`, `SelectMini`, `SelectSearchable`, `Input`,
   `view_asterisk`, `Notification`.
+- Applied Clumit theme to `WholeList`, `Tag`, and `HostNetworkHtml`.
 
 ### Fixed
 
