@@ -349,7 +349,11 @@ where
         html! {
             <div class="host-network-group-input-item">
                 { item }
-                <img src="/frontary/host-network-close.png" class="host-network-group-close" onclick={onclick_delete(index)} />
+                if cfg!(feature = "pumpkin-dark") {
+                    <img src="/frontary/clumit-delete-x.png" class="host-network-group-close" onclick={onclick_delete(index)} />
+                } else {
+                    <img src="/frontary/host-network-close.png" class="host-network-group-close" onclick={onclick_delete(index)} />
+                }
             </div>
         }
     }

@@ -339,7 +339,11 @@ where
         html! {
             <div class="tag-group-input-item">
                 { tag }
-                <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
+                if cfg!(feature = "pumpkin-dark") {
+                    <img src="/frontary/clumit-delete-x.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
+                } else {
+                    <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
+                }
             </div>
         }
     }
@@ -398,6 +402,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn view_select(&self, ctx: &Context<Self>) -> Html {
         html! {
             <div id={self.id.clone()} class="tag-group-input-select">
@@ -415,7 +420,13 @@ where
                         let onclick_cancel_edit = ctx.link().callback(|_| Message::CancelEdit);
                         let onclick_edit_done = ctx.link().callback(move |_| Message::EditDone);
                         let done_img = if self.input_edit.is_empty() {
-                            "/frontary/tag-select-edit-done-dim.png"
+                            if cfg!(feature = "pumpkin-dark") {
+                                "/frontary/clumit-tag-select-edit-done-dim.png"
+                            } else {
+                                "/frontary/tag-select-edit-done-dim.png"
+                            }
+                        } else if cfg!(feature = "pumpkin-dark") {
+                            "/frontary/clumit-tag-select-edit-done.png"
                         } else {
                             "/frontary/tag-select-edit-done.png"
                         };
@@ -431,9 +442,15 @@ where
                                         />
                                     </div>
                                     <div class="tag-group-input-select-item-edit-img">
+                                    if !cfg!(feature = "pumpkin-dark") {
                                         <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
+                                    }
                                         <img src={done_img} class="tag-select-edit-done" onclick={onclick_edit_done} />
-                                        <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
+                                        if cfg!(feature = "pumpkin-dark") {
+                                            <img src="/frontary/clumit-tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
+                                        } else {
+                                            <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
+                                        }
                                     </div>
                                 </div>
                                 {
@@ -474,9 +491,14 @@ where
                                     <div class="tag-group-input-select-item-text" onclick={ onclick_item(k.clone()) }>
                                         { v.clone() }
                                     </div>
-                                    <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
-                                    <img src="/frontary/tag-select-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
-                                    <img src="/frontary/tag-select-trash.png" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
+                                    if cfg!(feature = "pumpkin-dark") {
+                                        <img src="/frontary/clumit-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
+                                        <img src="/frontary/clumit-delete-trash.png" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
+                                    } else {
+                                        <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
+                                        <img src="/frontary/tag-select-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
+                                        <img src="/frontary/tag-select-trash.png" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
+                                    }
                                 </div>
                             </div>
                         }
