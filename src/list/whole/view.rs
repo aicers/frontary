@@ -135,12 +135,16 @@ where
                     } else {
                         ""
                     };
-                    let style = Self::style_width_height(ctx, widths, i, varied_width);
+                    let style = if cfg!(feature = "pumpkin-dark") {
+                        format!("width: {}px;", ctx.props().display_info.width_full)
+                    } else {
+                        Self::style_width_height(ctx, widths, i, varied_width)
+                    };
                     let style_inner = format!("width: 100%; height: {}px", ctx.props().display_info.height);
                     let onclick_sort = |index: usize| ctx.link().callback(move |_| Message::ClickSort(index));
 
                     html! {
-                        <td class={classes!("list-whole-head-title", class_border)} style={style}  onclick={onclick_sort(index)}>
+                        <td class={classes!("list-whole-head-title", class_border)} style={style} onclick={onclick_sort(index)}>
                             <table style={style_inner}>
                                 <tr>
                                     <td class="list-whole-head-title-inner-text">

@@ -80,11 +80,12 @@ where
         } else {
             false
         };
-
-        let img = if checked {
-            "/frontary/radio-checked.png"
-        } else {
-            "/frontary/radio-unchecked.png"
+        let pumpkin = cfg!(feature = "pumpkin-dark");
+        let img = match (checked, pumpkin) {
+            (true, true) => "/frontary/clumit-radio-checked.png",
+            (true, false) => "/frontary/radio-checked.png",
+            (false, true) => "/frontary/clumit-radio-unchecked.png",
+            (false, false) => "/frontary/radio-unchecked.png",
         };
 
         let txt = ctx.props().txt.txt.clone();

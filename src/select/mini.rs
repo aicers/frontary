@@ -38,6 +38,9 @@ pub enum Message {
 const DEFAULT_BG_COLOR: &str = "rgba(97, 105, 116, 0.24);";
 #[cfg(not(feature = "pumpkin-dark"))]
 const DEFAULT_BG_COLOR: &str = "#EAEAEA";
+#[cfg(feature = "pumpkin-dark")]
+const DEFAULT_VALUE_TEXT_COLOR: &str = "#FFFFFF";
+#[cfg(not(feature = "pumpkin-dark"))]
 const DEFAULT_VALUE_TEXT_COLOR: &str = "#363636";
 const DEFAULT_LIST_TEXT_COLOR: &str = "#363636";
 
@@ -228,10 +231,15 @@ where
         } else {
             "right"
         };
+        let list_top = if cfg!(feature = "pumpkin-dark") {
+            43
+        } else {
+            ctx.props().list_top
+        };
         let style = format!(
             "{}: 0px; top: {}px; {}; color: {};",
             align,
-            ctx.props().list_top,
+            list_top,
             &style_width,
             ctx.props().list_text_color,
         );
@@ -368,15 +376,14 @@ where
     fn view_basic(ctx: &Context<Self>, value: &str) -> Html {
         let style_width = ctx.props().top_width.map_or_else(String::new, |w| {
             if cfg!(feature = "pumpkin-dark") {
-                format!("width: {w}%;")
+                String::new()
             } else {
                 format!("width: {w}px;")
             }
         });
-        let style_height = ctx
-            .props()
-            .top_height
-            .map_or_else(String::new, |h| format!("height: {h}px;"));
+        let style_height = ctx.props()
+                .top_height
+                .map_or_else(String::new, |h| format!("height: {h}px;"));
         let style = if ctx.props().kind == Kind::Round {
             format!(
                 "{} {} background-color: {}; color: {};",
@@ -387,7 +394,11 @@ where
             )
         } else {
             // `Kind::Soft` only
-            format!("{style_width} {style_height} background-color: #FFFFFF;",)
+            if cfg!(feature = "pumpkin-dark") {
+                format!("{style_width} {style_height} background-color: rgba(97, 105, 116, 0.24);",)
+            } else {
+                format!("{style_width} {style_height} background-color: #FFFFFF;",)
+            }
         };
         let (outer_sub_class, icon_sub_class) = if ctx.props().kind == Kind::Round {
             ("mini-select-basic-basic", "mini-select-basic-icon-basic")
@@ -398,10 +409,22 @@ where
 
         html! {
             <div onclick={onclick} class={classes!("mini-select-basic", outer_sub_class)} style={style}>
-                <div class="mini-select-basic-value" style={style_height.clone()}>
+            <div class="mini-select-basic-value" style={
+                if cfg!(feature = "pumpkin-dark") {
+                    String::new()
+                } else {
+                    style_height.clone()
+                }
+            }>
                     { value }
                 </div>
-                <div class={classes!("mini-select-basic-icon", icon_sub_class)} style={style_height}>
+                <div class={classes!("mini-select-basic-icon", icon_sub_class)} style={
+                    if cfg!(feature = "pumpkin-dark") {
+                        String::new()
+                    } else {
+                        style_height
+                    }
+                }>
                 </div>
             </div>
         }
