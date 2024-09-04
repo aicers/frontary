@@ -5,6 +5,12 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed a bug with incorrect page number display in pagination.
+
 ## [0.9.1] - 2024-07-18
 
 ### Added
@@ -176,6 +182,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
+[Unreleased]: https://github.com/aicers/frontary/compare/0.9.1...main
 [0.9.1]: https://github.com/aicers/frontary/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/aicers/frontary/compare/0.8.2...0.9.0
 [0.8.2]: https://github.com/aicers/frontary/compare/0.8.1...0.8.2

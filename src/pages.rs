@@ -115,7 +115,13 @@ where
                 } else {
                     1
                 };
-                info.end -= num_pages;
+                let end_offset = info.end % num_pages;
+                let end_offset = if end_offset > 0 {
+                    end_offset
+                } else {
+                    num_pages
+                };
+                info.end -= end_offset;
                 info.current = info.end;
             }
             Message::First => {
@@ -125,7 +131,13 @@ where
             }
             Message::Last => {
                 info.start = if info.total > num_pages {
-                    info.total + 1 - num_pages
+                    let last_page_display_count = info.total % num_pages;
+                    let last_page_display_count = if last_page_display_count == 0 {
+                        num_pages
+                    } else {
+                        last_page_display_count
+                    };
+                    info.total + 1 - last_page_display_count
                 } else {
                     1
                 };
