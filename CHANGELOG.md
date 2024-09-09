@@ -7,6 +7,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Applied Clumit theme to `WholeList`, `Tag`, and `HostNetworkHtml`.
+
 ### Fixed
 
 - Fixed a bug with incorrect page number display in pagination.
