@@ -101,11 +101,23 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let select_down_alert = include_bytes!("../static/frontary/clumit-select-down-alert.png");
         rtn.push(("clumit-select-down-alert.png", select_down_alert));
 
-        let clumit_checkbox_link_up_line =
+        let checkbox_link_up_line =
             include_bytes!("../static/frontary/clumit-checkbox-link-up-line.png");
+        rtn.push(("clumit-checkbox-link-up-line.png", checkbox_link_up_line));
+        let collapse_contents = include_bytes!("../static/frontary/clumit-collapse-contents.png");
+        rtn.push(("clumit-collapse-contents.png", collapse_contents));
+
+        let expand_contents = include_bytes!("../static/frontary/clumit-expand-contents.png");
+        rtn.push(("clumit-expand-contents.png", expand_contents));
+
+        let complex_select_pop = include_bytes!("../static/frontary/clumit-complex-select-pop.png");
+        rtn.push(("clumit-complex-select-pop.png", complex_select_pop));
+
+        let complex_select_pop_alert =
+            include_bytes!("../static/frontary/clumit-complex-select-pop-alert.png");
         rtn.push((
-            "clumit-checkbox-link-up-line.png",
-            clumit_checkbox_link_up_line,
+            "clumit-complex-select-pop-alert.png",
+            complex_select_pop_alert,
         ));
 
         let tag_input_close = include_bytes!("../static/frontary/clumit-tag-input-close.png");
@@ -121,6 +133,32 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let tag_select_edit_done =
             include_bytes!("../static/frontary/clumit-tag-select-edit-done.png");
         rtn.push(("clumit-tag-select-edit-done.png", tag_select_edit_done));
+        let radio_opener_checked =
+            include_bytes!("../static/frontary/clumit-radio-opener-checked.png");
+        rtn.push(("clumit-radio-opener-checked.png", radio_opener_checked));
+
+        let radio_opener_unchecked =
+            include_bytes!("../static/frontary/clumit-radio-opener-unchecked.png");
+        rtn.push(("clumit-radio-opener-unchecked.png", radio_opener_unchecked));
+
+        let traffic_direction_dim =
+            include_bytes!("../static/frontary/clumit-traffic-direction-dim.png");
+        rtn.push(("clumit-traffic-direction-dim.png", traffic_direction_dim));
+
+        let traffic_direction = include_bytes!("../static/frontary/clumit-traffic-direction.png");
+        rtn.push(("clumit-traffic-direction.png", traffic_direction));
+
+        let traffic_direction_hover =
+            include_bytes!("../static/frontary/clumit-traffic-direction-hover.png");
+        rtn.push((
+            "clumit-traffic-direction-hover.png",
+            traffic_direction_hover,
+        ));
+        let plus_for_add = include_bytes!("../static/frontary/clumit-plus-for-add.png");
+        rtn.push(("clumit-plus-for-add.png", plus_for_add));
+
+        let delete_x = include_bytes!("../static/frontary/clumit-delete-x.png");
+        rtn.push(("clumit-delete-x.png", delete_x));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));

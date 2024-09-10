@@ -34,6 +34,9 @@ pub enum Message {
     ListenClick,
 }
 
+#[cfg(feature = "pumpkin-dark")]
+const DEFAULT_BG_COLOR: &str = "rgba(97, 105, 116, 0.24);";
+#[cfg(not(feature = "pumpkin-dark"))]
 const DEFAULT_BG_COLOR: &str = "#EAEAEA";
 const DEFAULT_VALUE_TEXT_COLOR: &str = "#363636";
 const DEFAULT_LIST_TEXT_COLOR: &str = "#363636";
