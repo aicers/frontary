@@ -166,6 +166,15 @@ where
                                                         </div>
                                                     }
                                                 }
+                                                InputType::Text(ess, length, width) =>{
+                                                    html! {
+                                                        <div class={class_child}>
+                                                            <div class={class_line}>
+                                                            </div>
+                                                            { self.view_text(ctx, ess, *length, *width, &child_data, sub_index, base_index, false, false) }
+                                                        </div>
+                                                    }
+                                                }
                                                 _ => html! {}
                                             }
                                         } else {
