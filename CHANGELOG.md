@@ -11,15 +11,15 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Applied Clumit theme to `WholeList`,`Tag`, `HostNetworkHtml`, `Modal`, and
   `SelectComplex`.
-- Added InputType::Text to `view_checkbox`.
-
-### Fixed
-
-- Fixed a bug with incorrect page number display in pagination.
+- Added support for `InputType::Text` in the `view_checkbox` method.
 
 ### Changed
 
 - Changed to hide the `Essential::title` when it is empty.
+
+### Fixed
+
+- Fixed a bug with incorrect page number display in pagination.
 
 ## [0.9.1] - 2024-07-18
 
