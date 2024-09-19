@@ -1978,6 +1978,7 @@ div.simple-input-input-notice {
     font-weight: normal;
     font-size: 11px;
     display: flex;
+    white-space: nowrap;
     align-items: center;
     color: #818181;
 }
