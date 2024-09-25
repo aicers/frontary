@@ -848,6 +848,9 @@ div.mini-select-basic-square {
 
 div.mini-select-basic-value {
     height: 28px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
     padding-left: 2px;
     display: flex;
     align-items: center;
