@@ -1426,14 +1426,11 @@ table.list-whole-group {
 
 th.list-whole-group-heading {
     height: 30px;
-    background-color: #F4F1F1;
+    background-color: rgba(95, 104, 118, 0.24);
     font-weight: normal;
     font-size: 11px;
-    color: #000000;
-    border-right: 1px solid #D7D7D7;
-    border-top: 1px solid #D7D7D7;
-    border-bottom: 1px solid #D7D7D7;
-
+    color: #CFD6E0;
+    font-weight: 400;
 }
 
 td.list-whole-group {
@@ -1748,15 +1745,17 @@ input[type=number].input-number::placeholder {
 }
 
 input[type=number].input-number-alert {
-    height: 30px;
+    height: 40px;
     width: 100%;
-    padding-left: 8px;
-    padding-right: 8px;
-    color: var(--alert-text-color);
-    background-color: #FFE9E9;
-    border: 2px solid var(--alert-text-color);
-    border-radius: 2px;
+    padding: 8px 12px;
+    color: #B4BBC6;
     outline: none;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    border-radius: 8px;
+    border: 2px solid #FB2C10;
+    background-color: rgba(97, 105, 116, 0.24);
 }
 
 div.input-cancel-save {
@@ -2041,7 +2040,7 @@ img.tag-group-close {
 
 input[type=text].tag-group-input-input-input {
     width: 100%;
-    background-color: #30353A;
+    background-color: transparent;
     border: 0px;
     font-weight: 400;
     line-height: 24px;
@@ -2054,6 +2053,7 @@ input[type=text].tag-group-input-input-input {
 
 input[type=text].tag-group-input-input-input::placeholder {
     color: #616974;
+    background-color: transparent;
     font-size: 16px;
 }
 
@@ -2384,11 +2384,11 @@ div.input-nic-delete-outer {
 }
 
 div.input-nic-delete {
-    width: 18px;
-    height: 18px;
+    width: 32px;
+    height: 32px;
     display: inline-block;
-    background-image: url('/frontary/nic-delete.png');
-    background-size: 18px 18px;
+    background-image: url('/frontary/clumit-nic-delete.png');
+    background-size: 32px 32px;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -2402,21 +2402,24 @@ td.input-nic-input-add {
 }
 
 div.input-add-item {
-    width: 60px;
-    height: 30px;
-    font-weight: normal;
-    font-size: 13px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #F5F5F5;
-    border: 1px solid #CECECE;
-    border-radius: 2px;
+    border-radius: 8px;
+    border: 2px solid rgba(97, 105, 116, 0.48);
+    color: #46A6FF;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    padding: 8px 24px;
 }
 
 div.input-add-item:hover {
     cursor: pointer;
-    background-color: #FFFFFF;
+    border: 2px solid #46A6FF;
+    background-color: #212428;
 }
 
 input[type=text].input-nic {
@@ -2532,7 +2535,7 @@ label.input-file-choose-file:hover {
 div.input-group {
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 1fr 80px;
+    grid-template-columns: 1fr 95px;
 }
 
 table.input-group {
@@ -2541,21 +2544,16 @@ table.input-group {
 
 th.input-group-heading {
     height: 30px;
-    background-color: #F4F1F1;
+    background-color: rgba(95, 104, 118, 0.24);
     font-weight: normal;
     font-size: 11px;
-    color: #000000;
-    border-right: 1px solid #D7D7D7;
-    border-top: 1px solid #D7D7D7;
-    border-bottom: 1px solid #D7D7D7;
-
+    color: #CFD6E0;
+    font-weight: 400;
 }
 
 th.input-group-heading-delete {
     width: 24px;
-    background-color: #F4F1F1;
-    border-top: 1px solid #D7D7D7;
-    border-bottom: 1px solid #D7D7D7;
+    background-color: rgba(95, 104, 118, 0.24);
 }
 
 td.input-group {
