@@ -89,13 +89,18 @@ div.radio-outer {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+    margin-top: -3px;
+}
+
+img.radio-separate-img {
+    width: 32px;
+    height: 32px;
 }
 
 div.radio-item {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 6px;
     color: #FFFFFF;
     font-size: 16px;
     font-weight: 400;
@@ -654,7 +659,6 @@ div.mini-select {
 
 div.mini-select-list-down {
     position: absolute;
-
     right: 0px;
     top: 32px;
     z-index: 99;
@@ -835,26 +839,27 @@ div.mini-select-basic-basic {
     border-radius: 8px;
     background: rgba(97, 105, 116, 0.24);
     display: inline-flex;
-    padding: 4px 8px;
+    padding: 8px 12px;
     justify-content: center;
     align-items: center;
     gap: 10px;
+    height: 40px;
 }
 
 div.mini-select-basic-square {
-    border: 1px solid #CECECE;
-    border-radius: 3px;
+    border-radius: 8px;
+    padding: 8px 12px;
 }
 
 div.mini-select-basic-value {
-    height: 28px;
+    display: flex;
+    color: #FFFFFF;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    padding-left: 2px;
-    display: flex;
+    white-space: nowrap;
     align-items: center;
-    justify-content: center;
+    width: 100%;
 }
 
 div.mini-select-basic-icon {
@@ -870,8 +875,8 @@ div.mini-select-basic-icon-basic {
 }
 
 div.mini-select-basic-icon-square {
-    background-image: url('/frontary/mini-select-list-down-triangular.png');
-    background-size: 13px 8px;
+    background-image: url('/frontary/clumit-mini-select-list-down.png');
+    background-size: 24px 24px;
 }
 
 div.mini-select-item-direction {
@@ -1057,7 +1062,6 @@ td.list-whole-head-title {
     text-align: center;
     vertical-align: middle;
     font-weight: 500;
-    padding: 12px 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
@@ -1568,11 +1572,9 @@ table.input-head {
 }
 
 td.input-title {
-    height: 24px;
-    font-weight: 500;
+    color: #FFFFFF;
     font-size: 18px;
-    color: var(--title-text-color);
-    vertical-align: middle;
+    font-weight: 500;
     line-height: 24px;
 }
 
@@ -1617,6 +1619,7 @@ div.input-contents-item-title {
     font-size: 16px;
     color: #FFFFFF;
     line-height: 24px;
+    padding-bottom: 4px;
 }
 
 div.input-required-asterisk {
@@ -1972,12 +1975,13 @@ div.host-network-group-input-input-notice {
 
 div.simple-input-input-notice {
     width: 100%;
-    line-height: 15px;
-    font-weight: normal;
-    font-size: 11px;
     display: flex;
     align-items: center;
-    color: #818181;
+    color: #CFD6E0;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    white-space: nowrap;
 }
 
 div.input-tag-group {
@@ -2656,13 +2660,14 @@ table.notification-contents-text-table {
 
 td.notification-contents-text-close {
     width: 24px;
-    height: 22px;
-    padding-top: 10px;
+    height: 24px;
+    align-items: center;
+    display: flex;
 }
 
 img.notification-close {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
 }
 
 img.notification-close:hover {
