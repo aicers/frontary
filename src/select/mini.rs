@@ -381,9 +381,10 @@ where
                 format!("width: {w}px;")
             }
         });
-        let style_height = ctx.props()
-                .top_height
-                .map_or_else(String::new, |h| format!("height: {h}px;"));
+        let style_height = ctx
+            .props()
+            .top_height
+            .map_or_else(String::new, |h| format!("height: {h}px;"));
         let style = if ctx.props().kind == Kind::Round {
             format!(
                 "{} {} background-color: {}; color: {};",
