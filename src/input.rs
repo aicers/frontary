@@ -546,7 +546,7 @@ pub enum InputItem {
     Unsigned32(Option<u32>),
     Float64(Option<f64>),
     Percentage(Option<f32>),
-    CheckBox(CheckStatus, Option<Vec<Rc<RefCell<InputItem>>>>),
+    CheckBox(CheckStatus, Option<Vec<Rc<RefCell<InputItem>>>>, bool),
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
     Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
@@ -566,7 +566,7 @@ impl InputItem {
             InputItem::Unsigned32(value) => *value = None,
             InputItem::Float64(value) => *value = None,
             InputItem::Percentage(value) => *value = None,
-            InputItem::CheckBox(value, children) => {
+            InputItem::CheckBox(value, children, _) => {
                 *value = CheckStatus::Unchecked;
                 if let Some(children) = children {
                     for child in children {
@@ -624,7 +624,7 @@ impl From<&Column> for InputItem {
             Column::Float64(value) => Self::Float64(*value),
             Column::Percentage(f, _) => Self::Percentage(*f),
             Column::Nic(nics) => Self::Nic(nics.clone()),
-            Column::CheckBox(status, children, _) => Self::CheckBox(
+            Column::CheckBox(status, children, _, parent_update) => Self::CheckBox(
                 *status,
                 children.as_ref().map(|children| {
                     children
@@ -632,6 +632,7 @@ impl From<&Column> for InputItem {
                         .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                         .collect::<Vec<Rc<RefCell<InputItem>>>>()
                 }),
+                *parent_update,
             ),
             Column::Group(group) => {
                 let mut input: Vec<Vec<Rc<RefCell<InputItem>>>> = Vec::new();

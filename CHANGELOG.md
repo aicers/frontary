@@ -7,6 +7,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Added a boolean field to the `InputItem::CheckBox` to prevent the parent
+  checkbox from being automatically unchecked when child checkboxes are
+  deselected.
+
 ### Changed
 
 - Replaced `Png` images with `Svg` images for Clumit theme.

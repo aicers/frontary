@@ -74,7 +74,7 @@ where
                                 .insert(this_index, Rc::new(RefCell::new(data.clone())));
                         }
                         (
-                            InputItem::CheckBox(_, data_children),
+                            InputItem::CheckBox(_, data_children, _),
                             InputType::CheckBox(_, _, Some(children)),
                         ) => {
                             if let Some(data_children) = data_children {
@@ -200,10 +200,10 @@ where
                             }
                         }
                         (
-                            InputItem::CheckBox(checked, data_children),
+                            InputItem::CheckBox(checked, data_children, _),
                             InputType::CheckBox(ess, _, children),
                         ) => {
-                            if let Some(InputItem::CheckBox(c, _)) = &ess.default {
+                            if let Some(InputItem::CheckBox(c, _, _)) = &ess.default {
                                 if parent_checked {
                                     *checked = *c;
                                 }
@@ -395,7 +395,7 @@ where
                             InputItem::Unsigned32(v) => v.is_none(),
                             InputItem::Float64(v) => v.is_none(),
                             InputItem::Percentage(v) => v.is_none(),
-                            InputItem::CheckBox(s, _) => *s == CheckStatus::Unchecked,
+                            InputItem::CheckBox(s, _, _) => *s == CheckStatus::Unchecked,
                             InputItem::Nic(n) => n
                                 .iter()
                                 .find_map(|n| {
@@ -503,7 +503,7 @@ where
                             }
                         }
                     } else if let (
-                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputItem::CheckBox(checked, Some(data_children), _),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&(*item), &**input_type)
                     {
@@ -670,7 +670,7 @@ where
                             }
                         }
                         (
-                            InputItem::CheckBox(checked, Some(data_children)),
+                            InputItem::CheckBox(checked, Some(data_children), _),
                             InputType::CheckBox(_, _, Some(type_children)),
                         ) => {
                             if *checked != CheckStatus::Unchecked
@@ -713,7 +713,7 @@ where
                 }
                 if let Ok(input_data) = input_data.try_borrow() {
                     if let (
-                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputItem::CheckBox(checked, Some(data_children), _),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&*input_data, &**input_type)
                     {
@@ -739,7 +739,7 @@ where
             .zip(ctx.props().input_type.iter())
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(item) = input_data.try_borrow() {
-                    if let (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) =
+                    if let (InputItem::CheckBox(_, _, _), InputType::CheckBox(_, _, _)) =
                         (&(*item), &**input_type)
                     {
                         propagate.push((index, Rc::clone(input_data), Rc::clone(input_type)));
@@ -767,7 +767,7 @@ where
     ) -> Option<CheckStatus> {
         let this_checked = if Rc::ptr_eq(click, pos) {
             if let Ok(mut click) = click.try_borrow_mut() {
-                if let (InputItem::CheckBox(status, _), InputType::CheckBox(_, always, _)) =
+                if let (InputItem::CheckBox(status, _, _), InputType::CheckBox(_, always, _)) =
                     (&mut *click, &**input_type)
                 {
                     match *status {
@@ -794,7 +794,7 @@ where
             }
         } else if let Some(checked) = checked {
             if let Ok(mut pos) = pos.try_borrow_mut() {
-                if let (InputItem::CheckBox(status, _), InputType::CheckBox(_, _, _)) =
+                if let (InputItem::CheckBox(status, _, _), InputType::CheckBox(_, _, _)) =
                     (&mut *pos, &**input_type)
                 {
                     *status = checked;
@@ -811,7 +811,7 @@ where
 
         let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputType>)> = Vec::new();
         if let Ok(pos) = pos.try_borrow_mut() {
-            if let (InputItem::CheckBox(_, children), InputType::CheckBox(_, _, type_children)) =
+            if let (InputItem::CheckBox(_, children, _), InputType::CheckBox(_, _, type_children)) =
                 (&*pos, &**input_type)
             {
                 if let (Some(children), Some(type_children)) = (children, type_children) {
@@ -820,7 +820,7 @@ where
                             (child.try_borrow_mut(), type_children.1.get(index))
                         {
                             match (&(*c), &**t) {
-                                (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) => {
+                                (InputItem::CheckBox(_, _, _), InputType::CheckBox(_, _, _)) => {
                                     propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                                 }
                                 (
@@ -973,9 +973,11 @@ where
         };
 
         let final_checked = if let Ok(mut pos) = pos.try_borrow_mut() {
-            if let InputItem::CheckBox(status, _) = &mut (*pos) {
+            if let InputItem::CheckBox(status, _, parent_update) = &mut (*pos) {
                 if let Some(updated_checked) = updated_checked {
-                    *status = updated_checked;
+                    if *parent_update {
+                        *status = updated_checked;
+                    }
                 }
                 Some(*status)
             } else {
@@ -1029,7 +1031,7 @@ where
                     }
 
                     if let (
-                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputItem::CheckBox(checked, Some(data_children), _),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&*input_data, &**input_type)
                     {
