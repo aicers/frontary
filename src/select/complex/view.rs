@@ -21,7 +21,7 @@ impl Model {
             _ => "unchecked",
         };
         let style_all = if cfg!(feature = "pumpkin-dark") {
-            format!("background-image: url('/frontary/clumit-radio-opener-{postfix}.png');")
+            format!("background-image: url('/frontary/clumit-radio-opener-{postfix}.svg');")
         } else {
             format!("background-image: url('/frontary/radio-opener-{postfix}.png');")
         };
@@ -35,8 +35,8 @@ impl Model {
         let (style_list, style_input) = if self.view_list {
             if cfg!(feature = "pumpkin-dark") {
                 (
-                    "background-image: url('/frontary/clumit-collapse-contents.png');",
-                    "background-image: url('/frontary/clumit-collapse-contents.png');",
+                    "background-image: url('/frontary/clumit-collapse-contents.svg');",
+                    "background-image: url('/frontary/clumit-collapse-contents.svg');",
                 )
             } else {
                 (
@@ -46,8 +46,8 @@ impl Model {
             }
         } else if cfg!(feature = "pumpkin-dark") {
             (
-                "background-image: url('/frontary/clumit-expand-contents.png');",
-                "background-image: url('/frontary/clumit-expand-contents.png');",
+                "background-image: url('/frontary/clumit-expand-contents.svg');",
+                "background-image: url('/frontary/clumit-expand-contents.svg');",
             )
         } else {
             (
