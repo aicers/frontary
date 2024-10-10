@@ -216,15 +216,15 @@ where
                                     Kind::LayeredFirst => {
                                         if ctx.props().data_type == Some(DataType::Customer) {
                                             let cols = ctx.props().display_info.titles.len().to_string();
-                                            let prefix = if cfg!(feature = "pumpkin-dark") {
-                                                "clumit-"
+                                            let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
+                                                ("clumit-", "svg")
                                             } else {
-                                                ""
+                                                ("", "png")
                                             };
                                             let expand_collapse_img = if self.expand_list.contains(key) {
-                                                "collapse-list.png"
+                                                format!("collapse-list.{extension}")
                                             } else {
-                                                "expand-list.png"
+                                                format!("expand-list.{extension}")
                                             };
                                             let style = format!("background-image: url('/frontary/{prefix}{expand_collapse_img}');");
                                             let onclick_expandible = |key: String| ctx.link().callback(move |_| Message::ClickExpandible(key.clone()));

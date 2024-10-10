@@ -85,12 +85,12 @@ where
                     };
                     let img = if checked {
                         if cfg!(feature="pumpkin-dark") {
-                            "/frontary/clumit-radio-checked.png"
+                            "/frontary/clumit-radio-checked.svg"
                         } else {
                             "/frontary/radio-checked.png"
                         }
                     } else if cfg!(feature="pumpkin-dark") {
-                            "/frontary/clumit-radio-unchecked.png"
+                            "/frontary/clumit-radio-unchecked.svg"
                     } else {
                             "/frontary/radio-unchecked.png"
                     };
