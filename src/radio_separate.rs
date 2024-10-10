@@ -92,8 +92,8 @@ where
         let onclick = ctx.link().callback(move |_| Message::ClickItem);
 
         html! {
-            <div class="radio-outer">
-                <div class="radio-item" onclick={onclick}>
+            <div class="radio-outer" role="radiogroup">
+                <div role="radio" class="radio-item" onclick={onclick}>
                     <img src={img} class="radio-separate-img" />
                     {
                         match ctx.props().value.as_ref() {
