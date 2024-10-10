@@ -54,7 +54,7 @@ pub fn model(props: &Props) -> Html {
     let style = format!("background-image: url({url});");
 
     html! {
-        <div class="basic-checkbox" style={style}>
+        <div role="checkbox" class="basic-checkbox" style={style}>
         </div>
     }
 }

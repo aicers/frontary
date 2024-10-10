@@ -5,6 +5,13 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Added the `role` attribute to the `radio` and `checkbox` elements implemented
+  with `div` tags, which will enhance web accessibility.
+
 ## [0.9.2] - 2024-10-07
 
 ### Added
