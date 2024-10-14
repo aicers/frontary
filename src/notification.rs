@@ -165,7 +165,7 @@ impl Model {
                                 if noti.time.is_none() {
                                     html! {
                                         <div class="clumit-notification-error">
-                                            <img src="/frontary/clumit-notification-error.png" class="clumit-notification-error"/>
+                                            <img src="/frontary/clumit-notification-error.svg" class="clumit-notification-error"/>
                                             { text!(txt, ctx.props().language, "Error") }
                                         </div>
                                     }
@@ -184,7 +184,7 @@ impl Model {
                                     <td class="notification-contents-text-close">
                                         <img src={
                                             if cfg!(feature = "pumpkin-dark") {
-                                                "/frontary/clumit-notification-close.png"
+                                                "/frontary/clumit-notification-close.svg"
                                             } else {
                                                 "/frontary/notification-close.png"
                                             }

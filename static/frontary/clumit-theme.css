@@ -151,7 +151,7 @@ input[type=text].searchable-select-top-input:hover {
 input[type=text].searchable-select-input {
     height: 40px;
     border: none;
-    background-image: url('/frontary/clumit-select-down.png');
+    background-image: url('/frontary/clumit-select-down.svg');
     background-size: 32px 32px;
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
@@ -167,7 +167,7 @@ input[type=text].searchable-select-input {
 input[type=text].searchable-select-input-empty {
     height: 40px;
     border: none;
-    background-image: url('/frontary/clumit-select-down.png');
+    background-image: url('/frontary/clumit-select-down.svg');
     background-size: 32px 32px;
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
@@ -185,7 +185,7 @@ input[type=text].searchable-select-input-empty-alert {
     padding: 8px 12px;
     font-size: 16px;
     border-radius: 8px;
-    background-image: url(/frontary/clumit-select-down-alert.png);
+    background-image: url(/frontary/clumit-select-down-alert.svg);
     background-size: 32px 32px;
     background-position: right 7px top 3px;
     background-color: rgba(97, 105, 116, 0.24);
@@ -214,7 +214,7 @@ div.searchable-select-list-down {
 div.searchable-select-list-search {
     margin-top: 6px;
     height: 48px;
-    background-image: url('/frontary/clumit-magnifier.png');
+    background-image: url('/frontary/clumit-magnifier.svg');
     background-size: 32px 32px;
     background-position: left 12px top 3px;
     background-repeat: no-repeat;
@@ -312,7 +312,7 @@ input[type=text].complex-select-input {
     color: #FFFFFF;
     border-radius: 8px;
     background-color: rgba(97, 105, 116, 0.24);
-    background-image: url('/frontary/clumit-complex-select-pop.png');
+    background-image: url('/frontary/clumit-complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -328,7 +328,7 @@ input[type=text].complex-select-input-empty {
     color: #B4BBC6;
     border-radius: 8px;
     background-color: rgba(97, 105, 116, 0.24);
-    background-image: url('/frontary/clumit-complex-select-pop.png');
+    background-image: url('/frontary/clumit-complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -345,7 +345,7 @@ input[type=text].complex-select-input-empty-alert {
     background-color: rgba(97, 105, 116, 0.24);
     border: 2px solid #FB2C10;
     border-radius: 8px;
-    background-image: url('/frontary/clumit-complex-select-pop-alert.png');
+    background-image: url('/frontary/clumit-complex-select-pop-alert.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -396,7 +396,7 @@ td.complex-select-pop-head-close {
 div.complex-select-pop-head-close-icon {
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-modal-close.png');
+    background-image: url('/frontary/clumit-modal-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
 }
@@ -540,7 +540,7 @@ input[type=text].complex-select-search {
     background-color: rgba(97, 105, 116, 0.24);
     border: none;
     border-radius: 8px;
-    background-image: url(/frontary/clumit-magnifier.png);
+    background-image: url(/frontary/clumit-magnifier.svg);
     background-size: 32px 32px;
     background-position: right 12px top 5px;
     background-repeat: no-repeat;
@@ -577,7 +577,7 @@ div.complex-select-pop-input-input-plus {
     float: right;
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-plus-for-add.png');
+    background-image: url('/frontary/clumit-plus-for-add.svg');
     background-size: 40px 40px;
     background-position: center;
     background-repeat: no-repeat;
@@ -644,11 +644,10 @@ td.complex-select-pop-input-list-direction {
 }
 
 div.complex-select-pop-input-list-delete {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     float: right;
-    background-image: url('/frontary/clumit-delete-x.png');
-    background-size: 24px 24px;
+    background-image: url('/frontary/clumit-delete-x.svg');
     background-position: 2px 2px;
     background-repeat: no-repeat;
 }
@@ -764,8 +763,6 @@ div.mini-select-top-direction {
 div.mini-select-top-direction-deactive {
     float: right;
     height: 20px;
-    top: -2px;
-    padding-top: 2px;
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
@@ -794,9 +791,8 @@ div.mini-select-top-direction-icon {
     height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/frontary/clumit-traffic-direction.png');
+    background-image: url('/frontary/clumit-traffic-direction.svg');
     background-position: center;
-    background-size: 16px 16px;
     background-repeat: no-repeat;
 }
 
@@ -805,16 +801,14 @@ div.mini-select-top-direction-icon-deactive {
     height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/frontary/clumit-traffic-direction-dim.png');
+    background-image: url('/frontary/clumit-traffic-direction-dim.svg');
     background-position: center;
-    background-size: 16px 16px;
     background-repeat: no-repeat;
 }
 
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
-    background-image: url('/frontary/clumit-traffic-direction-hover.png');
+    background-image: url('/frontary/clumit-traffic-direction-hover.svg');
     background-position: center;
-    background-size: 16px 16px;
     background-repeat: no-repeat;
 }
 
@@ -870,12 +864,11 @@ div.mini-select-basic-icon {
 }
 
 div.mini-select-basic-icon-basic {
-    background-image: url('/frontary/clumit-mini-select-list-down.png');
-    background-size: 24px 24px;
+    background-image: url('/frontary/clumit-mini-select-list-down.svg');
 }
 
 div.mini-select-basic-icon-square {
-    background-image: url('/frontary/clumit-mini-select-list-down.png');
+    background-image: url('/frontary/clumit-mini-select-list-down.svg');
     background-size: 24px 24px;
 }
 
@@ -903,7 +896,7 @@ td.mini-select-item-direction {
 td.mini-select-item-direction-icon {
     width: 24px;
     height: 24px;
-    background-image: url('/frontary/clumit-mini-select-list-down.png');
+    background-image: url('/frontary/clumit-mini-select-list-down.svg');
     background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
@@ -912,7 +905,7 @@ td.mini-select-item-direction-icon {
 div.mini-select-list-sort-recently-icon {
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-list-sort-recently.png');
+    background-image: url('/frontary/clumit-list-sort-recently.svg');
     background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
@@ -932,7 +925,7 @@ div.mini-select-list-sort-recently-text {
 div.mini-select-list-sort-recently-text-icon {
     width: 24px;
     height: 24px;
-    background-image: url('/frontary/clumit-list-sort-recently.png');
+    background-image: url('/frontary/clumit-list-sort-recently.svg');
     background-size: 24px 24px;
     background-repeat: no-repeat;
     margin-right: 4px;
@@ -960,7 +953,7 @@ div.mini-select-list-sort-recently-text:hover {
 div.mini-select-more-action {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots.png');
+    background-image: url('/frontary/clumit-more-action-dots.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
 }
@@ -968,7 +961,7 @@ div.mini-select-more-action {
 div.mini-select-more-action:hover {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots-hover.png');
+    background-image: url('/frontary/clumit-more-action-dots-hover.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -977,7 +970,7 @@ div.mini-select-more-action:hover {
 div.mini-select-on-off-action {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots.png');
+    background-image: url('/frontary/clumit-more-action-dots.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
 }
@@ -985,7 +978,7 @@ div.mini-select-on-off-action {
 div.mini-select-on-off-action:hover {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots-hover.png');
+    background-image: url('/frontary/clumit-more-action-dots-hover.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1122,16 +1115,16 @@ td.list-whole-list-first-check {
 td.list-whole-list-first-expand {
     width: 30px;
     height: 30px;
-    padding-left: 27px;
+    padding-left: 22px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
     -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 div.list-whole-list-first-expand {
-    width: 9px;
-    height: 16px;
-    background-size: 9px 16px;
+    width: 24px;
+    height: 24px;
     background-repeat: no-repeat;
+    background-position: center;
 }
 
 div.list-whole-list-first-expand:hover {
@@ -1368,7 +1361,7 @@ div.list-whole-tag-item {
 div.basic-sort-unsorted {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/clumit-sort-unsorted.png');
+    background-image: url('/frontary/clumit-sort-unsorted.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
@@ -1377,7 +1370,7 @@ div.basic-sort-unsorted {
 div.basic-sort-ascending {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/clumit-sort-ascending.png');
+    background-image: url('/frontary/clumit-sort-ascending.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
@@ -1386,40 +1379,40 @@ div.basic-sort-ascending {
 div.basic-sort-descending {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/clumit-sort-descending.png');
+    background-image: url('/frontary/clumit-sort-descending.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
 }
 
 div.basic-sort-unsorted:hover {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.png');
+    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
 
 div.basic-sort-ascending:hover {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.png');
+    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
 
 div.basic-sort-descending:hover {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.png');
+    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
 
 td.list-whole-head-title:hover div.basic-sort-unsorted {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.png');
+    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
 }
 
 td.list-whole-head-title:hover div.basic-sort-ascending {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.png');
+    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
 }
 
 td.list-whole-head-title:hover div.basic-sort-descending {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.png');
+    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
 }
 
 table.list-whole-group {
@@ -1581,7 +1574,7 @@ td.input-title {
 td.input-close-x {
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-input-close.png');
+    background-image: url('/frontary/clumit-input-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
     background-position: 0px 0px;
@@ -2302,7 +2295,7 @@ div.input-checkbox-link-line {
     top: -10px;
     width: 30px;
     height: 25px;
-    background-image: url('/frontary/clumit-checkbox-link-up-line.png');
+    background-image: url('/frontary/clumit-checkbox-link-up-line.svg');
     background-size: 25px 25px;
     background-repeat: no-repeat;
 }
@@ -2391,7 +2384,7 @@ div.input-nic-delete {
     width: 32px;
     height: 32px;
     display: inline-block;
-    background-image: url('/frontary/clumit-nic-delete.png');
+    background-image: url('/frontary/clumit-nic-delete.svg');
     background-size: 32px 32px;
     background-position: center;
     background-repeat: no-repeat;

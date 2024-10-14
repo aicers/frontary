@@ -5,12 +5,12 @@ use crate::define_str_consts;
 
 #[cfg(feature = "pumpkin-dark")]
 define_str_consts! {
-    CHECKED_URL => "/frontary/clumit-enabled-checked.png",
-    INDETERMINATE_URL => "/frontary/clumit-enabled-indeterminate.png",
-    UNCHECKED_URL => "/frontary/clumit-enabled-unchecked.png",
-    ALWAYS_CHECKED_URL => "/frontary/clumit-disabled-checked.png",
-    ALWAYS_INDETERMINATE_URL => "/frontary/clumit-disabled-indeterminate.png",
-    ALWAYS_UNCHECKED_URL => "/frontary/clumit-disabled-unchecked.png"
+    CHECKED_URL => "/frontary/clumit-enabled-checked.svg",
+    INDETERMINATE_URL => "/frontary/clumit-enabled-indeterminate.svg",
+    UNCHECKED_URL => "/frontary/clumit-enabled-unchecked.svg",
+    ALWAYS_CHECKED_URL => "/frontary/clumit-disabled-checked.svg",
+    ALWAYS_INDETERMINATE_URL => "/frontary/clumit-disabled-indeterminate.svg",
+    ALWAYS_UNCHECKED_URL => "/frontary/clumit-disabled-unchecked.svg"
 }
 #[cfg(not(feature = "pumpkin-dark"))]
 define_str_consts! {
