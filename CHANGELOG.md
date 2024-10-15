@@ -28,6 +28,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Fixed a bug with incorrect page number display in pagination.
+- Added the `role` attribute to the `radio` and `checkbox` elements implemented
+  with `div` tags, which will enhance web accessibility.
 
 ## [0.9.1] - 2024-07-18
 

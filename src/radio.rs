@@ -75,7 +75,7 @@ where
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div class="radio-outer">
+            <div class="radio-outer" role="radiogroup">
             {
                 for ctx.props().list.iter().enumerate().map(|(index, item)| {
                     let checked = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
@@ -100,7 +100,7 @@ where
 
                     html! {
                         <>
-                            <div class="radio-item" onclick={onclick(index)} style={style}>
+                            <div class="radio-item" role="radio" onclick={onclick(index)} style={style}>
                                 <img src={img} class="radio-img" />
                                 {
                                     match item {
