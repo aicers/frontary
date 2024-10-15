@@ -160,10 +160,10 @@ where
                         }
                         </div>
                         <div class="modal-close">
-                            <img src="/frontary/clumit-modal-close.png" class="modal-close" onclick={onclick_close} />
+                            <img src="/frontary/clumit-modal-close.svg" class="modal-close" onclick={onclick_close} />
                         </div>
                     </div>
-                    <img src="/frontary/clumit-modal-divider.png" class="modal-divider" />
+                    <img src="/frontary/clumit-modal-divider.svg" class="modal-divider" />
                 } else {
                     <div class="modal-close">
                         <img src="/frontary/modal-close.png" class="modal-close" onclick={onclick_close} />
@@ -198,7 +198,7 @@ where
                     }
                     </div>
                     if cfg!(feature="pumpkin-dark") {
-                        <img src="/frontary/clumit-modal-divider.png" class="modal-divider" />
+                        <img src="/frontary/clumit-modal-divider.svg" class="modal-divider" />
                     }
                     <div class={align_class}>
                     {

@@ -82,9 +82,9 @@ where
         };
         let pumpkin = cfg!(feature = "pumpkin-dark");
         let img = match (checked, pumpkin) {
-            (true, true) => "/frontary/clumit-radio-checked.png",
+            (true, true) => "/frontary/clumit-radio-checked.svg",
             (true, false) => "/frontary/radio-checked.png",
-            (false, true) => "/frontary/clumit-radio-unchecked.png",
+            (false, true) => "/frontary/clumit-radio-unchecked.svg",
             (false, false) => "/frontary/radio-unchecked.png",
         };
 
@@ -92,8 +92,8 @@ where
         let onclick = ctx.link().callback(move |_| Message::ClickItem);
 
         html! {
-            <div class="radio-outer">
-                <div class="radio-item" onclick={onclick}>
+            <div class="radio-outer" role="radiogroup">
+                <div role="radio" class="radio-item" onclick={onclick}>
                     <img src={img} class="radio-separate-img" />
                     {
                         match ctx.props().value.as_ref() {
