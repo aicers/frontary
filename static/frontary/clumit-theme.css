@@ -1596,7 +1596,7 @@ div.input-item {
     width: 100%;
     display: flex;
     flex-direction: column;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 div.input-item-group {
@@ -1883,7 +1883,7 @@ div.input-contents-item-general-title {
 
 div.input-host-network-group {
     width: 100%;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 div.host-network-group-input {
@@ -2266,6 +2266,7 @@ div.input-checkbox-me-nextline {
 }
 
 div.input-checkbox-me-title {
+    width: 100%;
     margin-left: 6px;
     margin-top: 13px;
     font-size: 16px;
@@ -2287,7 +2288,7 @@ div.input-checkbox-child-right {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    margin-bottom: -6px;
+    margin-bottom: 3px;
 }
 
 div.input-checkbox-link-line {

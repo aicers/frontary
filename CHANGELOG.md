@@ -9,6 +9,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Adjusted the space between `CheckBox` items.
 - Replaced `Png` images with `Svg` images for Clumit theme.
 
 ## [0.9.2] - 2024-10-07
