@@ -37,7 +37,9 @@ pub enum Message {
     ClickItem(String),
     InputError,
 }
-
+#[cfg(feature = "pumpkin-dark")]
+const ELEM_HEIGHT: u32 = 48;
+#[cfg(not(feature = "pumpkin-dark"))]
 const ELEM_HEIGHT: u32 = 32;
 const DEFAULT_MAX_WIDTH: u32 = 500;
 pub(super) const DEFAULT_SIZED_VALUE: bool = true;
@@ -375,11 +377,19 @@ where
             .map_or(0, |list| list.len())
             .to_u32()
             .expect("> u32::MAX never happens");
-        let height = if ctx.props().kind == Kind::Single {
-            std::cmp::min(list_len * ELEM_HEIGHT + 42, ctx.props().max_height)
+        let extra_height = if ctx.props().kind == Kind::Single {
+            if cfg!(feature = "pumpkin-dark") {
+                67
+            } else {
+                42
+            }
         } else {
-            std::cmp::min(list_len * ELEM_HEIGHT + 80, ctx.props().max_height)
+            80
         };
+        let height = std::cmp::min(
+            list_len * ELEM_HEIGHT + extra_height,
+            ctx.props().max_height,
+        );
         let left = if width > ctx.props().top_width - 8 && !ctx.props().align_left {
             format!("-{}", width - (ctx.props().top_width - 8) + 4)
         } else {
