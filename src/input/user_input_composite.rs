@@ -36,7 +36,7 @@ where
             .link()
             .callback(move |_| Message::ClickCheckBox(input_data_msg.clone()));
         let checked = if let Ok(data) = input_data.try_borrow() {
-            if let InputItem::CheckBox(checked, _) = (*data).clone() {
+            if let InputItem::CheckBox(checked, _, _) = (*data).clone() {
                 Some(checked)
             } else {
                 None
@@ -114,7 +114,7 @@ where
                             } else if let (Some(children), Ok(input_data)) = (children, input_data.try_borrow()) {
                                 html! {
                                     for children.1.iter().enumerate().map(|(sub_index, child)| {
-                                        let child_data = if let InputItem::CheckBox(_, childs) = input_data.clone() {
+                                        let child_data = if let InputItem::CheckBox(_, childs,_) = input_data.clone() {
                                             childs.and_then(|childs| childs.get(sub_index).cloned())
                                         } else {
                                             None

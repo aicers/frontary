@@ -36,7 +36,7 @@ pub enum Column {
     Float64(Option<f64>),
     Percentage(Option<f32>, Option<usize>), // usize = # of decimals
     Nic(Vec<InputNic>),
-    CheckBox(CheckStatus, Option<Vec<Column>>, Option<String>), // String = display
+    CheckBox(CheckStatus, Option<Vec<Column>>, Option<String>, bool), // String = display
     Group(Vec<Vec<Column>>),
     Comparison(Option<Comparison>),
 }
@@ -104,7 +104,7 @@ impl std::fmt::Display for Column {
                 }
                 write!(formatter, "{display}")
             }
-            Self::CheckBox(_, _, display) => {
+            Self::CheckBox(_, _, display, _) => {
                 if let Some(display) = display {
                     write!(formatter, "{display}")
                 } else {

@@ -658,7 +658,7 @@ where
                     elem.to_string_txt(&txt, ctx.props().language)
                 }
             }
-            Column::CheckBox(_, _, _) => {
+            Column::CheckBox(_, _, _, _) => {
                 if let Some(sep) = ctx.props().br_separator {
                     let display = col.to_string();
                     let display = display

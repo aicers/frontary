@@ -7,6 +7,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.9.3] - 2024-10-16
 
+### Added
+
+- Added a boolean field to the `InputItem::CheckBox` to prevent the parent
+  checkbox from being automatically unchecked when child checkboxes are
+  deselected.
+
 ### Changed
 
 - Adjusted the space between `CheckBox` items.
