@@ -1,6 +1,6 @@
 [package]
 name = "frontary"
-version = "0.9.2"
+version = "0.9.3"
 edition = "2021"
 publish = false
 
@@ -31,7 +31,7 @@ json-gettext = "4"
 num-traits = "0.2"
 passwords = { version = "3", features = ["common-password"] }
 reqwasm = "0.5"
-scraper = "0.19"
+scraper = "0.20"
 serde = { version = "1", features = ["derive"] }
 strum = "0.26"
 strum_macros = "0.26"
