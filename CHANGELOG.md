@@ -5,6 +5,16 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed `clumit-delete-trash` and `clumit-close-white` icon.
+- Fixed overlapping placeholder text.
+- Fixed search box width and border radius.
+- Fixed `SelectMini` component to ensure long data entries are display on a
+  single line.
+
 ## [0.9.4] - 2024-10-16
 
 ### Fixed
@@ -214,6 +224,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
+[Unreleased]: https://github.com/aicers/frontary/compare/0.9.4...main
 [0.9.4]: https://github.com/aicers/frontary/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/aicers/frontary/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/aicers/frontary/compare/0.9.1...0.9.2
