@@ -266,7 +266,15 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = format!("width: {}px;", ctx.props().top_width);
+        let style = if cfg!(feature = "pumpkin-dark") {
+            if ctx.props().id == "select-searchable-report" {
+                format!("width: {}px;", ctx.props().top_width)
+            } else {
+                "width: 100%;".to_string()
+            }
+        } else {
+            format!("width: {}px;", ctx.props().top_width)
+        };
         let onclick = ctx.link().callback(|_| Message::Click);
         let txt = ctx.props().txt.txt.clone();
         let mut class_input = "searchable-select-input";
@@ -395,14 +403,23 @@ where
         } else {
             "4".to_string() // 4 is for left shadow
         };
-        let style = if cfg!(feature = "pumpkin-dark") {
-            format!("height: {height}px;",)
-        } else {
-            format!("width: {width}px; height: {height}px; left: {left}px;",)
-        };
-        let style_inner = format!("width: {}px; height: {height}px;", width - 10);
-        let style_inner_width = format!("width: {}px;", width - 10);
-        let style_inner_width_search = format!("width: {}px", width - 10 - 28);
+
+        let (style, style_inner, style_inner_width, style_inner_width_search) =
+            if cfg!(feature = "pumpkin-dark") {
+                (
+                    format!("height: {height}px;"),
+                    format!("width: 100%; height: {height}px;"),
+                    "width: 100%;".to_string(),
+                    "width: 100%;".to_string(),
+                )
+            } else {
+                (
+                    format!("width: {width}px; height: {height}px; left: {left}px;"),
+                    format!("width: {}px; height: {height}px;", width - 10),
+                    format!("width: {}px;", width - 10),
+                    format!("width: {}px", width - 10 - 28),
+                )
+            };
         let oninput_search = ctx.link().callback(|e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())

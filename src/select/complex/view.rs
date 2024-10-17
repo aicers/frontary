@@ -381,6 +381,11 @@ impl Model {
                 SelectionExtraInfo::Network(EndpointKind::Source),
                 SelectionExtraInfo::Network(EndpointKind::Destination),
             ]);
+            let top_width = if cfg!(feature = "pumpkin-dark") {
+                90
+            } else {
+                70
+            };
             if let Some(selected) = self.direction_items.get(id) {
                 html! {
                     <SelectMini::<SelectionExtraInfo, Self>
@@ -394,7 +399,7 @@ impl Model {
                         selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
                         align_left={false}
                         list_top={28}
-                        top_width={Some(70)}
+                        {top_width}
                         list_min_width={Some(70)}
                         kind={SelectMiniKind::DirectionItem}
                     />

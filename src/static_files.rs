@@ -163,6 +163,9 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
 
         let notification_close = include_bytes!("../static/frontary/clumit-notification-close.svg");
         rtn.push(("clumit-notification-close.svg", notification_close));
+
+        let close_white = include_bytes!("../static/frontary/clumit-close-white.svg");
+        rtn.push(("clumit-close-white.svg", close_white));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));
