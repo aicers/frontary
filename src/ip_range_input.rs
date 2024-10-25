@@ -141,22 +141,19 @@ impl Model {
 
 fn check_input(input: &str) -> Option<IpRange> {
     if input.contains('~') {
-        input.split_once('~').map_or_else(
-            || None,
-            |(start, end)| {
-                if let (Ok(start), Ok(end)) = (
-                    Ipv4Addr::from_str(start.trim()),
-                    Ipv4Addr::from_str(end.trim()),
-                ) {
-                    (start < end).then_some(IpRange {
-                        start: start.to_string(),
-                        end: end.to_string(),
-                    })
-                } else {
-                    None
-                }
-            },
-        )
+        input.split_once('~').and_then(|(start, end)| {
+            if let (Ok(start), Ok(end)) = (
+                Ipv4Addr::from_str(start.trim()),
+                Ipv4Addr::from_str(end.trim()),
+            ) {
+                (start < end).then_some(IpRange {
+                    start: start.to_string(),
+                    end: end.to_string(),
+                })
+            } else {
+                None
+            }
+        })
     } else {
         Ipv4Addr::from_str(input.trim()).ok().map(|ip| IpRange {
             start: ip.to_string(),
