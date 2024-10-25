@@ -14,6 +14,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed search box width and border radius.
 - Fixed `SelectMini` component to ensure long data entries are display on a
   single line.
+- Adjusted alignment for example text in input fields.
 
 ## [0.9.4] - 2024-10-16
 

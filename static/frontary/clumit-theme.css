@@ -1975,6 +1975,7 @@ div.simple-input-input-notice {
     font-weight: 400;
     line-height: 16px;
     white-space: nowrap;
+    padding-top: 4px;
 }
 
 div.input-tag-group {
