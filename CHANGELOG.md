@@ -7,6 +7,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Adjusted Clumit notification component's styling for consistency with the
+  design.
+
 ### Fixed
 
 - Fixed `clumit-delete-trash` and `clumit-close-white` icon.

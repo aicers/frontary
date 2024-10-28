@@ -2621,9 +2621,11 @@ table.notification {
 }
 
 td.notification-contents {
-    padding: 16px 24px;
+    padding: 16px 15px 16px 24px;
     background-color: #F0F1F3;
     border-radius: 8px;
+    gap: 10px;
+    display: grid;
 }
 
 div.clumit-notification {
@@ -2658,6 +2660,7 @@ td.notification-contents-text-close {
     height: 24px;
     align-items: center;
     display: flex;
+    margin-left: auto;
 }
 
 img.notification-close {
@@ -2681,7 +2684,6 @@ div.notification-contents-text {
 
 div.notification-contents-done {
     width: 100%;
-    padding-bottom: 10px;
     display: flex;
 }
 
