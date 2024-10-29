@@ -199,12 +199,10 @@ input[type=text].searchable-select-input-empty-alert {
 div.searchable-select-list-down {
     visibility: hidden;
     margin-top: 3px;
-    padding-left: 5px;
     font-size: 16px;
     color: #4D4D4D;
     position: relative;
     z-index: 199;
-    overflow: auto;
     background-color: #30353A;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
@@ -212,10 +210,11 @@ div.searchable-select-list-down {
 
 div.searchable-select-list-search {
     margin-top: 6px;
+    padding: 8px;
     height: 48px;
     background-image: url('/frontary/clumit-magnifier.svg');
     background-size: 32px 32px;
-    background-position: left 12px top 3px;
+    background-position: 12px 10px;
     background-repeat: no-repeat;
 }
 
@@ -284,6 +283,32 @@ td.searchable-select-list-item-single {
     font-weight: 400;
     line-height: 24px;
     height: 48px;
+}
+
+div.scrollable-table-wrapper {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #474C55 transparent;
+}
+
+div.scrollable-table-wrapper::-webkit-scrollbar {
+    width: 10px;
+}
+
+div.scrollable-table-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+div.scrollable-table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #474C55;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+div.scrollable-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #5a5f69;
 }
 
 div.complex-select {
