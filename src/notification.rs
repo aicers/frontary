@@ -116,11 +116,15 @@ impl Component for Model {
         let Ok(list) = ctx.props().list.try_borrow() else {
             return html! {};
         };
-        let style = format!(
-            "width: {}px; max-height: {}px;",
-            ctx.props().width,
-            window_inner_height() - 60
-        );
+        let style = if cfg!(feature = "pumpkin-dark") {
+            format!("max-height: {}px;", window_inner_height() - 60)
+        } else {
+            format!(
+                "width: {}px; max-height: {}px;",
+                ctx.props().width,
+                window_inner_height() - 60
+            )
+        };
         html! {
             <>
                 <div id="notification" class="notification" style={style}>
@@ -155,6 +159,12 @@ impl Model {
 
         let onclick_close = ctx.link().callback(move |_| Message::Close(serial));
         let onclick_done = ctx.link().callback(move |_| Message::Close(serial));
+        let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
+            ("clumit-", "svg")
+        } else {
+            ("", "png")
+        };
+        let close_img = format!("/frontary/{prefix}notification-close.{extension}");
 
         html! {
             <table class="notification">
@@ -167,13 +177,20 @@ impl Model {
                                         <div class="clumit-notification-error">
                                             <img src="/frontary/clumit-notification-error.svg" class="clumit-notification-error"/>
                                             { text!(txt, ctx.props().language, "Error") }
+                                            if cfg!(feature = "pumpkin-dark") {
+                                                <td class="notification-contents-text-close">
+                                                    <img src={ close_img.clone() }
+                                                    class="notification-close"
+                                                    onclick={onclick_close.clone()}
+                                                    />
+                                                </td>
+                                            }
                                         </div>
                                     }
                                 } else {
                                     html! {}
                                 }
                             }
-
                         }
                         <div class="notification-contents-text">
                             <table class="notification-contents-text-table">
@@ -181,18 +198,23 @@ impl Model {
                                     <td class="notification-contents-text-text">
                                         { msg }
                                     </td>
-                                    <td class="notification-contents-text-close">
-                                        <img src={
-                                            if cfg!(feature = "pumpkin-dark") {
-                                                "/frontary/clumit-notification-close.svg"
-                                            } else {
-                                                "/frontary/notification-close.png"
-                                            }
+                                    if cfg!(feature = "pumpkin-dark") {
+                                        if noti.time.is_some() {
+                                            <td class="notification-contents-text-close">
+                                                <img src={ close_img.clone() }
+                                                class="notification-close"
+                                                onclick={onclick_close.clone()}
+                                                />
+                                            </td>
                                         }
-                                        class="notification-close"
-                                        onclick={onclick_close}
-                                        />
-                                    </td>
+                                    } else {
+                                        <td class="notification-contents-text-close">
+                                            <img src={ close_img }
+                                            class="notification-close"
+                                            onclick={onclick_close}
+                                            />
+                                        </td>
+                                    }
                                 </tr>
                             </table>
                         </div>
