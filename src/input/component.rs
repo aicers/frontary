@@ -61,15 +61,16 @@ type CompValueBuf = HashMap<
 >;
 
 type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
+type RadioBuffer = HashMap<
+    usize,
+    (
+        Rc<RefCell<String>>,
+        Rc<RefCell<Vec<(bool, Vec<Rc<RefCell<InputItem>>>)>>>,
+    ),
+>;
 
 pub struct Model<T> {
-    pub(super) radio_buffer: HashMap<
-        usize,
-        (
-            Rc<RefCell<String>>,
-            Rc<RefCell<Vec<(bool, Option<Vec<Rc<RefCell<InputItem>>>>)>>>,
-        ),
-    >,
+    pub(super) radio_buffer: RadioBuffer,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) vec_select_buffer: VecSelectBuf,

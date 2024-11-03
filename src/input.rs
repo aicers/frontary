@@ -154,7 +154,7 @@ pub enum InputType {
     Radio(
         Essential,
         Vec<ViewString>,
-        Vec<Option<(ChildrenPosition, Vec<Rc<InputType>>)>>,
+        Vec<Option<(ChildrenPosition, Vec<Rc<InputType>>)>>, // children
     ),
     Nic(Essential),
     File(Essential),
@@ -550,8 +550,8 @@ pub enum InputItem {
     Unsigned32(Option<u32>),
     Float64(Option<f64>),
     Percentage(Option<f32>),
-    CheckBox(CheckStatus, Option<Vec<Rc<RefCell<InputItem>>>>),
-    Radio(String, Vec<(bool, Option<Vec<Rc<RefCell<InputItem>>>>)>), // bool = checked
+    CheckBox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
+    Radio(String, Vec<(bool, Vec<Rc<RefCell<InputItem>>>)>), // (bool = checked, Vec = children)
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
     Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
@@ -573,22 +573,20 @@ impl InputItem {
             InputItem::Percentage(value) => *value = None,
             InputItem::CheckBox(value, children) => {
                 *value = CheckStatus::Unchecked;
-                if let Some(children) = children {
-                    for child in children {
-                        if let Ok(mut child) = child.try_borrow_mut() {
-                            child.clear();
-                        }
+                // if let Some(children) = children {
+                for child in children {
+                    if let Ok(mut child) = child.try_borrow_mut() {
+                        child.clear();
                     }
                 }
+                // }
             }
             InputItem::Radio(value, children_group) => {
                 *value = String::new();
                 for (_, children) in children_group {
-                    if let Some(children) = children {
-                        for child in children {
-                            if let Ok(mut child) = child.try_borrow_mut() {
-                                child.clear();
-                            }
+                    for child in children {
+                        if let Ok(mut child) = child.try_borrow_mut() {
+                            child.clear();
                         }
                     }
                 }
@@ -643,12 +641,10 @@ impl From<&Column> for InputItem {
             Column::Nic(nics) => Self::Nic(nics.clone()),
             Column::CheckBox(status, children, _) => Self::CheckBox(
                 *status,
-                children.as_ref().map(|children| {
-                    children
-                        .iter()
-                        .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
-                        .collect::<Vec<Rc<RefCell<InputItem>>>>()
-                }),
+                children
+                    .iter()
+                    .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
+                    .collect::<Vec<Rc<RefCell<InputItem>>>>(),
             ),
             Column::Radio(option, children_group, _) => Self::Radio(
                 option.to_string(),
@@ -657,12 +653,10 @@ impl From<&Column> for InputItem {
                     .map(|(checked, children)| {
                         (
                             *checked,
-                            children.as_ref().map(|children| {
-                                children
-                                    .iter()
-                                    .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
-                                    .collect::<Vec<Rc<RefCell<InputItem>>>>()
-                            }),
+                            children
+                                .iter()
+                                .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
+                                .collect::<Vec<Rc<RefCell<InputItem>>>>(),
                         )
                     })
                     .collect::<_>(),
