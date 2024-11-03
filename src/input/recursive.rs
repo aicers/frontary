@@ -84,10 +84,8 @@ where
                             if let Some(index) =
                                 options.iter().position(|vs| data_option == &vs.to_string())
                             {
-                                if let (
-                                    Some((checked, Some(data_children))),
-                                    Some(Some(children)),
-                                ) = (data_children_group.get(index), children_group.get(index))
+                                if let (Some((checked, data_children)), Some(Some(children))) =
+                                    (data_children_group.get(index), children_group.get(index))
                                 {
                                     if *checked {
                                         self.prepare_buffer_recursive(
@@ -103,7 +101,7 @@ where
                             InputItem::CheckBox(_, data_children),
                             InputType::CheckBox(_, _, Some(children)),
                         ) => {
-                            if let Some(data_children) = data_children {
+                            if !data_children.is_empty() {
                                 self.prepare_buffer_recursive(
                                     data_children,
                                     &children.1,
@@ -190,6 +188,7 @@ where
         self.prepare_default_recursive(&ctx.props().input_data, &ctx.props().input_type, true, 1);
     }
 
+    #[allow(clippy::too_many_lines)]
     pub(super) fn prepare_default_recursive(
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
@@ -220,9 +219,6 @@ where
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     *item = default.clone();
-                                    // TODO: remove this, 원래 있던 코드
-                                    // let id = base_index + index;
-                                    // self.default_to_buffer_radio(id, default);
                                 }
                             }
                         }
@@ -233,8 +229,9 @@ where
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     if let InputItem::Radio(o, d) = default {
-                                        *option = o.clone();
-                                        *data_children = d.clone();
+                                        // *option = o.clone();
+                                        option.clone_from(o);
+                                        data_children.clone_from(d);
                                     }
                                     let id = base_index + index;
                                     self.default_to_buffer_radio(id, default);
@@ -242,10 +239,8 @@ where
                                 if let Some(index) =
                                     options.iter().position(|vs| option == &vs.to_string())
                                 {
-                                    if let (
-                                        Some((checked, Some(data_children))),
-                                        Some(Some(children)),
-                                    ) = (data_children.get(index), children_group.get(index))
+                                    if let (Some((checked, data_children)), Some(Some(children))) =
+                                        (data_children.get(index), children_group.get(index))
                                     {
                                         if *checked {
                                             self.prepare_default_recursive(
@@ -268,9 +263,8 @@ where
                                     *checked = *c;
                                 }
                             }
-                            if let (Some(data_children), Some(children)) = (data_children, children)
-                            {
-                                if *checked != CheckStatus::Unchecked {
+                            if let Some(children) = children {
+                                if !data_children.is_empty() && *checked != CheckStatus::Unchecked {
                                     self.prepare_default_recursive(
                                         data_children,
                                         &children.1,
@@ -572,17 +566,19 @@ where
                             }
                         }
                     } else if let (
-                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputItem::CheckBox(checked, data_children),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&(*item), &**input_type)
                     {
-                        if self.decide_required_all_recursive(
-                            ctx,
-                            data_children,
-                            &type_children.1,
-                            (base_index + index) * MAX_PER_LAYER,
-                            *checked == CheckStatus::Checked,
-                        ) {
+                        if !data_children.is_empty()
+                            && self.decide_required_all_recursive(
+                                ctx,
+                                data_children,
+                                &type_children.1,
+                                (base_index + index) * MAX_PER_LAYER,
+                                *checked == CheckStatus::Checked,
+                            )
+                        {
                             required.push(true);
                         }
                     }
@@ -739,10 +735,11 @@ where
                             }
                         }
                         (
-                            InputItem::CheckBox(checked, Some(data_children)),
+                            InputItem::CheckBox(checked, data_children),
                             InputType::CheckBox(_, _, Some(type_children)),
                         ) => {
                             if *checked != CheckStatus::Unchecked
+                                && !data_children.is_empty()
                                 && !self.verify_recursive(
                                     data_children,
                                     &type_children.1,
@@ -782,11 +779,11 @@ where
                 }
                 if let Ok(input_data) = input_data.try_borrow() {
                     if let (
-                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputItem::CheckBox(checked, data_children),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&*input_data, &**input_type)
                     {
-                        if *checked != CheckStatus::Unchecked {
+                        if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
                             Self::trim_nic_recursive(data_children, &type_children.1);
                         }
                     }
@@ -880,113 +877,92 @@ where
 
         let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputType>)> = Vec::new();
         if let Ok(pos) = pos.try_borrow_mut() {
-            if let (InputItem::CheckBox(_, children), InputType::CheckBox(_, _, type_children)) =
-                (&*pos, &**input_type)
+            if let (
+                InputItem::CheckBox(_, children),
+                InputType::CheckBox(_, _, Some((_, type_children))),
+            ) = (&*pos, &**input_type)
             {
-                if let (Some(children), Some(type_children)) = (children, type_children) {
-                    for (index, child) in children.iter().enumerate() {
-                        if let (Ok(mut c), Some(t)) =
-                            (child.try_borrow_mut(), type_children.1.get(index))
-                        {
-                            match (&(*c), &**t) {
-                                (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) => {
-                                    propa_children.push((index, Rc::clone(child), Rc::clone(t)));
-                                }
-                                (
-                                    InputItem::Text(user),
-                                    InputType::Text(ess, _, _) | InputType::Radio(ess, _, _),
-                                ) => {
-                                    if user.is_empty()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (
-                                    InputItem::HostNetworkGroup(user),
-                                    InputType::HostNetworkGroup(ess, _, _, _),
-                                ) => {
-                                    if user.is_empty()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (
-                                    InputItem::SelectSingle(user),
-                                    InputType::SelectSingle(ess, _, _),
-                                ) => {
-                                    if user.is_none()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (
-                                    InputItem::SelectMultiple(user),
-                                    InputType::SelectMultiple(ess, _, _, _, _),
-                                ) => {
-                                    if user.is_empty()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (InputItem::Tag(user), InputType::Tag(ess, _)) => {
-                                    if (user.old.is_empty()
-                                        && user.new.is_none()
-                                        && user.edit.is_none()
-                                        && user.delete.is_none())
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (
-                                    InputItem::Unsigned32(user),
-                                    InputType::Unsigned32(ess, _, _, _),
-                                ) => {
-                                    if user.is_none()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (
-                                    InputItem::Percentage(user),
-                                    InputType::Percentage(ess, _, _, _, _),
-                                ) => {
-                                    if user.is_none()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (InputItem::Nic(user), InputType::Nic(ess)) => {
-                                    if user.is_empty()
-                                        || this_checked == Some(CheckStatus::Unchecked)
-                                    {
-                                        if let Some(value) = &ess.default {
-                                            *c = value.clone();
-                                        }
-                                    }
-                                }
-                                (_, _) => (),
+                for (index, child) in children.iter().enumerate() {
+                    if let (Ok(mut c), Some(t)) = (child.try_borrow_mut(), type_children.get(index))
+                    {
+                        match (&(*c), &**t) {
+                            (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) => {
+                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
+                            (
+                                InputItem::Text(user),
+                                InputType::Text(ess, _, _) | InputType::Radio(ess, _, _),
+                            ) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (
+                                InputItem::HostNetworkGroup(user),
+                                InputType::HostNetworkGroup(ess, _, _, _),
+                            ) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (InputItem::SelectSingle(user), InputType::SelectSingle(ess, _, _)) => {
+                                if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (
+                                InputItem::SelectMultiple(user),
+                                InputType::SelectMultiple(ess, _, _, _, _),
+                            ) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (InputItem::Tag(user), InputType::Tag(ess, _)) => {
+                                if (user.old.is_empty()
+                                    && user.new.is_none()
+                                    && user.edit.is_none()
+                                    && user.delete.is_none())
+                                    || this_checked == Some(CheckStatus::Unchecked)
+                                {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (InputItem::Unsigned32(user), InputType::Unsigned32(ess, _, _, _)) => {
+                                if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (
+                                InputItem::Percentage(user),
+                                InputType::Percentage(ess, _, _, _, _),
+                            ) => {
+                                if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (InputItem::Nic(user), InputType::Nic(ess)) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(value) = &ess.default {
+                                        *c = value.clone();
+                                    }
+                                }
+                            }
+                            (_, _) => (),
                         }
                     }
                 }
@@ -1098,11 +1074,11 @@ where
                     }
 
                     if let (
-                        InputItem::CheckBox(checked, Some(data_children)),
+                        InputItem::CheckBox(checked, data_children),
                         InputType::CheckBox(_, _, Some(type_children)),
                     ) = (&*input_data, &**input_type)
                     {
-                        if *checked != CheckStatus::Unchecked {
+                        if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
                             self.reset_veri_host_network_recursive(
                                 data_children,
                                 &type_children.1,

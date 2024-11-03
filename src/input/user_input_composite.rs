@@ -18,6 +18,7 @@ where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    #[allow(clippy::too_many_arguments, clippy::type_complexity)]
     pub(super) fn view_radio(
         &self,
         ctx: &Context<Self>,
@@ -176,7 +177,7 @@ where
                                 html! {
                                     for children.1.iter().enumerate().map(|(sub_index, child)| {
                                         let child_data = if let InputItem::CheckBox(_, childs) = input_data.clone() {
-                                            childs.and_then(|childs| childs.get(sub_index).cloned())
+                                            childs.get(sub_index).cloned()
                                         } else {
                                             None
                                         };

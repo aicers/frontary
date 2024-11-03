@@ -64,6 +64,7 @@ pub use crate::svg::Model as Svg;
 pub use crate::tab_menu::Model as TabMenu;
 pub use crate::text_input::Model as TextInput;
 
+#[allow(clippy::missing_panics_doc)]
 #[cfg(feature = "test")]
 pub fn alert(msg: &str) {
     web_sys::window()

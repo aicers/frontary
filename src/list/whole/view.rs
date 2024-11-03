@@ -672,7 +672,7 @@ where
                     html! { col.to_string() }
                 }
             }
-            // TODO
+            // TODO Radio
             Column::Radio(option, _, _) => html! {
                 option.to_string_txt(&txt, ctx.props().language)
             },
