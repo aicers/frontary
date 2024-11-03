@@ -38,10 +38,6 @@ where
                 let this_index = base_index + index;
                 if let Ok(data) = input_data.try_borrow() {
                     match (&*data, &**input_type) {
-                        (InputItem::Text(data), InputType::Radio(_, _)) => {
-                            self.radio_buffer
-                                .insert(this_index, Rc::new(RefCell::new(data.clone())));
-                        }
                         (
                             InputItem::HostNetworkGroup(data),
                             InputType::HostNetworkGroup(_, _, _, _),
@@ -72,6 +68,36 @@ where
                         (InputItem::Tag(data), InputType::Tag(_, _)) => {
                             self.tag_buffer
                                 .insert(this_index, Rc::new(RefCell::new(data.clone())));
+                        }
+                        (
+                            InputItem::Radio(data_option, data_children_group),
+                            InputType::Radio(_, options, children_group),
+                        ) => {
+                            self.radio_buffer.insert(
+                                this_index,
+                                (
+                                    Rc::new(RefCell::new(data_option.clone())),
+                                    Rc::new(RefCell::new(data_children_group.clone())),
+                                ),
+                            );
+
+                            if let Some(index) =
+                                options.iter().position(|vs| data_option == &vs.to_string())
+                            {
+                                if let (
+                                    Some((checked, Some(data_children))),
+                                    Some(Some(children)),
+                                ) = (data_children_group.get(index), children_group.get(index))
+                                {
+                                    if *checked {
+                                        self.prepare_buffer_recursive(
+                                            data_children,
+                                            &children.1,
+                                            this_index * MAX_PER_LAYER,
+                                        );
+                                    }
+                                }
+                            }
                         }
                         (
                             InputItem::CheckBox(_, data_children),
@@ -180,7 +206,7 @@ where
                     match (&mut *item, &**input_type) {
                         (
                             InputItem::Text(_) | InputItem::Password(_),
-                            InputType::Text(ess, _, _) | InputType::Radio(ess, _),
+                            InputType::Text(ess, _, _),
                         )
                         | (
                             InputItem::HostNetworkGroup(_),
@@ -194,8 +220,42 @@ where
                             if let Some(default) = &ess.default {
                                 if parent_checked {
                                     *item = default.clone();
+                                    // TODO: remove this, 원래 있던 코드
+                                    // let id = base_index + index;
+                                    // self.default_to_buffer_radio(id, default);
+                                }
+                            }
+                        }
+                        (
+                            InputItem::Radio(option, data_children),
+                            InputType::Radio(ess, options, children_group),
+                        ) => {
+                            if let Some(default) = &ess.default {
+                                if parent_checked {
+                                    if let InputItem::Radio(o, d) = default {
+                                        *option = o.clone();
+                                        *data_children = d.clone();
+                                    }
                                     let id = base_index + index;
                                     self.default_to_buffer_radio(id, default);
+                                }
+                                if let Some(index) =
+                                    options.iter().position(|vs| option == &vs.to_string())
+                                {
+                                    if let (
+                                        Some((checked, Some(data_children))),
+                                        Some(Some(children)),
+                                    ) = (data_children.get(index), children_group.get(index))
+                                    {
+                                        if *checked {
+                                            self.prepare_default_recursive(
+                                                data_children,
+                                                &children.1,
+                                                true,
+                                                (base_index + index) * MAX_PER_LAYER,
+                                            );
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -290,10 +350,18 @@ where
     }
 
     pub(super) fn default_to_buffer_radio(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::Text(default), Some(buffer)) = (default, self.radio_buffer.get(&id)) {
-            if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                if !default.is_empty() {
-                    buffer.clone_from(default);
+        if let (
+            InputItem::Radio(default_option, default_children),
+            Some((buffer_option, buffer_children)),
+        ) = (default, self.radio_buffer.get(&id))
+        {
+            if let (Ok(mut buffer_option), Ok(mut buffer_children)) = (
+                buffer_option.try_borrow_mut(),
+                buffer_children.try_borrow_mut(),
+            ) {
+                if !default_option.is_empty() {
+                    buffer_option.clone_from(default_option);
+                    buffer_children.clone_from(default_children);
                 }
             }
         }
@@ -367,6 +435,7 @@ where
                     if parent_checked && (*input_type).required() {
                         let empty = match &(*item) {
                             InputItem::Text(txt) => txt.is_empty(),
+                            InputItem::Radio(option, _) => option.is_empty(),
                             InputItem::Password(pw) => {
                                 // HIGHLIGHT: In case of Edit, empty means no change of passwords
                                 ctx.props().input_id.is_none() && pw.is_empty()
@@ -825,7 +894,7 @@ where
                                 }
                                 (
                                     InputItem::Text(user),
-                                    InputType::Text(ess, _, _) | InputType::Radio(ess, _),
+                                    InputType::Text(ess, _, _) | InputType::Radio(ess, _, _),
                                 ) => {
                                     if user.is_empty()
                                         || this_checked == Some(CheckStatus::Unchecked)

@@ -9,13 +9,74 @@ use super::{
     user_input::{view_asterisk, MAX_PER_LAYER},
     InputItem,
 };
-use crate::{text, CheckBox, CheckStatus, ChildrenPosition, InputEssential, InputType};
+use crate::{
+    text, CheckBox, CheckStatus, ChildrenPosition, InputEssential, InputType, Radio, ViewString,
+};
 
 impl<T> Model<T>
 where
     T: Clone + Component + PartialEq,
     <T as Component>::Message: Clone + PartialEq,
 {
+    pub(super) fn view_radio(
+        &self,
+        ctx: &Context<Self>,
+        ess: &InputEssential,
+        options: &[ViewString],
+        children_group: &[Option<(ChildrenPosition, Vec<Rc<InputType>>)>],
+        input_data: &Rc<RefCell<InputItem>>,
+        layer_index: usize,
+        base_index: usize,
+    ) -> Html {
+        let list = Rc::new(options.to_vec());
+        let candidates = Rc::new(
+            list.iter()
+                .map(ToString::to_string)
+                .collect::<Vec<String>>(),
+        );
+        let txt = ctx.props().txt.txt.clone();
+        if let Some((buffer_option, buffer_children)) =
+            self.radio_buffer.get(&(base_index + layer_index))
+        {
+            html! {
+                <div class="input-radio-outer">
+                    <div class="input-radio">
+                        <div class="input-radio-title">
+                            { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                        </div>
+                        <div class="input-radio-radio">
+                            { format!("{}:{}", base_index, layer_index) }
+                            <Radio::<Self>
+                                txt={ctx.props().txt.clone()}
+                                language={ctx.props().language}
+                                parent_message={Some(Message::InputRadio(base_index + layer_index, input_data.clone()))}
+                                list={Rc::clone(&list)}
+                                candidate_values={Rc::clone(&candidates)}
+                                selected_value={Rc::clone(buffer_option)}
+                            />
+                            {
+                                if ess.notice.is_empty() {
+                                    html! {}
+                                } else {
+                                    html! {
+                                        <div class="input-radio-notice">
+                                            { text!(txt, ctx.props().language, ess.notice) }
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="input-radio-message">
+                        { self.view_required_msg(ctx, base_index + layer_index) }
+                    </div>
+                </div>
+            }
+        } else {
+            html! {}
+        }
+    }
+
     #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
     pub(super) fn view_checkbox(

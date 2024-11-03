@@ -672,6 +672,10 @@ where
                     html! { col.to_string() }
                 }
             }
+            // TODO
+            Column::Radio(option, _, _) => html! {
+                option.to_string_txt(&txt, ctx.props().language)
+            },
             Column::Nic(nics) => {
                 html! {
                     for nics.iter().map(|n| html! {
@@ -768,6 +772,7 @@ where
                                                 | Column::SelectSingle(..)
                                                 | Column::Comparison(..)
                                                 | Column::VecSelect(..)
+                                                | Column::Radio(..)
                                                 => html! {
                                                     <td class="list-whole-group">
                                                         { Self::view_column(ctx, index, c) }
