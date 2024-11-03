@@ -37,9 +37,11 @@ pub enum Column {
     Percentage(Option<f32>, Option<usize>), // usize = # of decimals
     Nic(Vec<InputNic>),
     CheckBox(CheckStatus, Option<Vec<Column>>, Option<String>), // String = display
+    Radio(ViewString, Vec<(bool, Option<Vec<Column>>)>, Option<String>), // bool = checked, String = display
     Group(Vec<Vec<Column>>),
     Comparison(Option<Comparison>),
 }
+
 impl std::fmt::Display for Column {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -109,6 +111,14 @@ impl std::fmt::Display for Column {
                     write!(formatter, "{display}")
                 } else {
                     Ok(())
+                }
+            }
+            Self::Radio(option, _, display) => {
+                // TODO
+                if let Some(display) = display {
+                    write!(formatter, "{display}")
+                } else {
+                    write!(formatter, "{option}")
                 }
             }
             Self::Group(_) => Ok(()),

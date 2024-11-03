@@ -13,8 +13,7 @@ use super::{
     InputItem,
 };
 use crate::{
-    input::component::Verification, text, HostNetworkHtml, HostNetworkKind, InputEssential, Radio,
-    Tag, ViewString,
+    input::component::Verification, text, HostNetworkHtml, HostNetworkKind, InputEssential, Tag,
 };
 
 const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input a new one.";
@@ -672,61 +671,6 @@ where
                 <div class="input-contents-item-space">
                 </div>
             </div>
-        }
-    }
-
-    pub(super) fn view_radio(
-        &self,
-        ctx: &Context<Self>,
-        ess: &InputEssential,
-        options: &[ViewString],
-        input_data: &Rc<RefCell<InputItem>>,
-        layer_index: usize,
-        base_index: usize,
-    ) -> Html {
-        let list = Rc::new(options.to_vec());
-        let candidates = Rc::new(
-            list.iter()
-                .map(ToString::to_string)
-                .collect::<Vec<String>>(),
-        );
-        let txt = ctx.props().txt.txt.clone();
-        if let Some(buffer) = self.radio_buffer.get(&(base_index + layer_index)) {
-            html! {
-                <div class="input-radio-outer">
-                    <div class="input-radio">
-                        <div class="input-radio-title">
-                            { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
-                        </div>
-                        <div class="input-radio-radio">
-                            <Radio::<Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                parent_message={Some(Message::InputRadio(base_index + layer_index, input_data.clone()))}
-                                list={Rc::clone(&list)}
-                                candidate_values={Rc::clone(&candidates)}
-                                selected_value={Rc::clone(buffer)}
-                            />
-                            {
-                                if ess.notice.is_empty() {
-                                    html! {}
-                                } else {
-                                    html! {
-                                        <div class="input-radio-notice">
-                                            { text!(txt, ctx.props().language, ess.notice) }
-                                        </div>
-                                    }
-                                }
-                            }
-                        </div>
-                    </div>
-                    <div class="input-radio-message">
-                        { self.view_required_msg(ctx, base_index + layer_index) }
-                    </div>
-                </div>
-            }
-        } else {
-            html! {}
         }
     }
 

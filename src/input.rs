@@ -116,7 +116,6 @@ pub enum ValueKind {
 pub enum InputType {
     Text(Essential, Option<usize>, Option<u32>), // (length, width)
     Password(Essential, Option<u32>),
-    Radio(Essential, Vec<ViewString>),
     HostNetworkGroup(Essential, HostNetworkKind, Option<usize>, Option<u32>), // (usize, u32) = (# of input, width)
     SelectSingle(Essential, Vec<(String, ViewString)>, Option<u32>), // (String, ViewString, Option<u32>) = (key, display, width)
     SelectMultiple(
@@ -152,6 +151,11 @@ pub enum InputType {
         Option<CheckStatus>, // if always checked/unchecked/indeterminate, Some(CheckStatus::*)
         Option<(ChildrenPosition, Vec<Rc<InputType>>)>, // children
     ),
+    Radio(
+        Essential,
+        Vec<ViewString>,
+        Vec<Option<(ChildrenPosition, Vec<Rc<InputType>>)>>,
+    ),
     Nic(Essential),
     File(Essential),
     // bool = true if one row displays all the items, false if one row displays one item.
@@ -168,7 +172,6 @@ impl InputType {
         match self {
             Self::Text(ess, ..)
             | Self::Password(ess, ..)
-            | Self::Radio(ess, ..)
             | Self::HostNetworkGroup(ess, ..)
             | Self::SelectSingle(ess, ..)
             | Self::SelectMultiple(ess, ..)
@@ -178,6 +181,7 @@ impl InputType {
             | Self::Float64(ess, ..)
             | Self::Percentage(ess, ..)
             | Self::CheckBox(ess, ..)
+            | Self::Radio(ess, ..)
             | Self::Nic(ess, ..)
             | Self::File(ess, ..)
             | Self::Group(ess, ..)
@@ -190,7 +194,6 @@ impl InputType {
         match self {
             Self::Text(ess, ..)
             | Self::Password(ess, ..)
-            | Self::Radio(ess, ..)
             | Self::HostNetworkGroup(ess, ..)
             | Self::SelectSingle(ess, ..)
             | Self::SelectMultiple(ess, ..)
@@ -200,6 +203,7 @@ impl InputType {
             | Self::Float64(ess, ..)
             | Self::Percentage(ess, ..)
             | Self::CheckBox(ess, ..)
+            | Self::Radio(ess, ..)
             | Self::Nic(ess, ..)
             | Self::File(ess, ..)
             | Self::Group(ess, ..)
@@ -212,7 +216,6 @@ impl InputType {
         match self {
             Self::Text(ess, ..)
             | Self::Password(ess, ..)
-            | Self::Radio(ess, ..)
             | Self::HostNetworkGroup(ess, ..)
             | Self::SelectSingle(ess, ..)
             | Self::SelectMultiple(ess, ..)
@@ -222,6 +225,7 @@ impl InputType {
             | Self::Float64(ess, ..)
             | Self::Percentage(ess, ..)
             | Self::CheckBox(ess, ..)
+            | Self::Radio(ess, ..)
             | Self::Nic(ess, ..)
             | Self::File(ess, ..)
             | Self::Group(ess, ..)
@@ -536,7 +540,7 @@ impl Comparison {
 
 #[derive(Clone, PartialEq)]
 pub enum InputItem {
-    Text(String), // includes InputType::Radio
+    Text(String),
     Password(String),
     HostNetworkGroup(InputHostNetworkGroup),
     SelectSingle(Option<String>),    // key
@@ -547,6 +551,7 @@ pub enum InputItem {
     Float64(Option<f64>),
     Percentage(Option<f32>),
     CheckBox(CheckStatus, Option<Vec<Rc<RefCell<InputItem>>>>),
+    Radio(String, Vec<(bool, Option<Vec<Rc<RefCell<InputItem>>>>)>), // bool = checked
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
     Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
@@ -572,6 +577,18 @@ impl InputItem {
                     for child in children {
                         if let Ok(mut child) = child.try_borrow_mut() {
                             child.clear();
+                        }
+                    }
+                }
+            }
+            InputItem::Radio(value, children_group) => {
+                *value = String::new();
+                for (_, children) in children_group {
+                    if let Some(children) = children {
+                        for child in children {
+                            if let Ok(mut child) = child.try_borrow_mut() {
+                                child.clear();
+                            }
                         }
                     }
                 }
@@ -632,6 +649,23 @@ impl From<&Column> for InputItem {
                         .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                         .collect::<Vec<Rc<RefCell<InputItem>>>>()
                 }),
+            ),
+            Column::Radio(option, children_group, _) => Self::Radio(
+                option.to_string(),
+                children_group
+                    .iter()
+                    .map(|(checked, children)| {
+                        (
+                            *checked,
+                            children.as_ref().map(|children| {
+                                children
+                                    .iter()
+                                    .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
+                                    .collect::<Vec<Rc<RefCell<InputItem>>>>()
+                            }),
+                        )
+                    })
+                    .collect::<_>(),
             ),
             Column::Group(group) => {
                 let mut input: Vec<Vec<Rc<RefCell<InputItem>>>> = Vec::new();
