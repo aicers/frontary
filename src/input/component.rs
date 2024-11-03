@@ -63,7 +63,13 @@ type CompValueBuf = HashMap<
 type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
 
 pub struct Model<T> {
-    pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
+    pub(super) radio_buffer: HashMap<
+        usize,
+        (
+            Rc<RefCell<String>>,
+            Rc<RefCell<Vec<(bool, Option<Vec<Rc<RefCell<InputItem>>>>)>>>,
+        ),
+    >,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) vec_select_buffer: VecSelectBuf,
@@ -556,12 +562,18 @@ where
                 self.unique_msg.remove(&id);
             }
             Message::InputRadio(id, input_data) => {
-                if let Some(buffer) = self.radio_buffer.get(&id) {
-                    let empty = if let Ok(buffer) = buffer.try_borrow_mut() {
+                if let Some((buffer_option, buffer_children_group)) = self.radio_buffer.get(&id) {
+                    let empty = if let (Ok(buffer_option), Ok(buffer_children_group)) = (
+                        buffer_option.try_borrow(),
+                        buffer_children_group.try_borrow(),
+                    ) {
                         if let Ok(mut item) = input_data.try_borrow_mut() {
-                            *item = InputItem::Text(buffer.clone());
+                            *item = InputItem::Radio(
+                                buffer_option.clone(),
+                                buffer_children_group.clone(),
+                            );
                         }
-                        buffer.is_empty()
+                        buffer_option.is_empty()
                     } else {
                         false
                     };
@@ -1011,7 +1023,7 @@ where
                 match &**input_type {
                     InputType::Text(ess, length, width) => self.view_text(ctx, ess, *length, *width, input_data, index, 1 , index == 0, false),
                     InputType::Password(ess,width) => self.view_password(ctx, ess, *width, input_data, index, 1, index == 0),
-                    InputType::Radio(ess, options) => self.view_radio(ctx, ess, options, input_data, index, 1),
+                    InputType::Radio(ess, options, children_group) => self.view_radio(ctx, ess, options, children_group, input_data, index, 1),
                     InputType::HostNetworkGroup(ess, kind, num, width) => self.view_host_network_group(ctx, ess, *kind, *num, *width, input_data, index, 1),
                     InputType::SelectMultiple(ess, list, nics, _, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
                     InputType::SelectSingle(ess, list, width) => self.view_select_searchable(ctx, false, ess, *width, list, input_data, index, 1, 0, false),
