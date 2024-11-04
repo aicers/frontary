@@ -551,7 +551,7 @@ pub enum InputItem {
     Float64(Option<f64>),
     Percentage(Option<f32>),
     CheckBox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
-    Radio(String, Vec<(bool, Vec<Rc<RefCell<InputItem>>>)>), // (bool = checked, Vec = children)
+    Radio(String, Vec<Vec<Rc<RefCell<InputItem>>>>),
     Nic(Vec<InputNic>),
     File(String, String), // (file name, base64 encoded content)
     Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
@@ -583,7 +583,7 @@ impl InputItem {
             }
             InputItem::Radio(value, children_group) => {
                 *value = String::new();
-                for (_, children) in children_group {
+                for children in children_group {
                     for child in children {
                         if let Ok(mut child) = child.try_borrow_mut() {
                             child.clear();
@@ -650,14 +650,11 @@ impl From<&Column> for InputItem {
                 option.to_string(),
                 children_group
                     .iter()
-                    .map(|(checked, children)| {
-                        (
-                            *checked,
-                            children
-                                .iter()
-                                .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
-                                .collect::<Vec<Rc<RefCell<InputItem>>>>(),
-                        )
+                    .map(|(_, children)| {
+                        children
+                            .iter()
+                            .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
+                            .collect::<Vec<Rc<RefCell<InputItem>>>>()
                     })
                     .collect::<_>(),
             ),
