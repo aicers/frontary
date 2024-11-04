@@ -73,27 +73,20 @@ where
                             InputItem::Radio(data_option, data_children_group),
                             InputType::Radio(_, options, children_group),
                         ) => {
-                            self.radio_buffer.insert(
-                                this_index,
-                                (
-                                    Rc::new(RefCell::new(data_option.clone())),
-                                    Rc::new(RefCell::new(data_children_group.clone())),
-                                ),
-                            );
+                            self.radio_buffer
+                                .insert(this_index, Rc::new(RefCell::new(data_option.clone())));
 
                             if let Some(index) =
                                 options.iter().position(|vs| data_option == &vs.to_string())
                             {
-                                if let (Some((checked, data_children)), Some(Some(children))) =
+                                if let (Some(data_children), Some(Some(children))) =
                                     (data_children_group.get(index), children_group.get(index))
                                 {
-                                    if *checked {
-                                        self.prepare_buffer_recursive(
-                                            data_children,
-                                            &children.1,
-                                            this_index * MAX_PER_LAYER,
-                                        );
-                                    }
+                                    self.prepare_buffer_recursive(
+                                        data_children,
+                                        &children.1,
+                                        this_index * MAX_PER_LAYER,
+                                    );
                                 }
                             }
                         }
@@ -223,34 +216,35 @@ where
                             }
                         }
                         (
-                            InputItem::Radio(option, data_children),
+                            InputItem::Radio(option, data_children_group),
                             InputType::Radio(ess, options, children_group),
                         ) => {
                             if let Some(default) = &ess.default {
                                 if parent_checked {
-                                    if let InputItem::Radio(o, d) = default {
-                                        // *option = o.clone();
-                                        option.clone_from(o);
-                                        data_children.clone_from(d);
+                                    if let InputItem::Radio(default_option, _) = default {
+                                        option.clone_from(default_option);
+                                        let checked_index = options
+                                            .iter()
+                                            .position(|o| &o.to_string() == default_option);
+                                        if let Some(checked_index) = checked_index {
+                                            if let (
+                                                Some(data_children),
+                                                Some(Some((_, children))),
+                                            ) = (
+                                                data_children_group.get(checked_index),
+                                                children_group.get(checked_index),
+                                            ) {
+                                                self.prepare_default_recursive(
+                                                    data_children,
+                                                    children,
+                                                    parent_checked,
+                                                    (base_index + index) * MAX_PER_LAYER,
+                                                );
+                                            }
+                                        }
                                     }
                                     let id = base_index + index;
                                     self.default_to_buffer_radio(id, default);
-                                }
-                                if let Some(index) =
-                                    options.iter().position(|vs| option == &vs.to_string())
-                                {
-                                    if let (Some((checked, data_children)), Some(Some(children))) =
-                                        (data_children.get(index), children_group.get(index))
-                                    {
-                                        if *checked {
-                                            self.prepare_default_recursive(
-                                                data_children,
-                                                &children.1,
-                                                true,
-                                                (base_index + index) * MAX_PER_LAYER,
-                                            );
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -344,19 +338,10 @@ where
     }
 
     pub(super) fn default_to_buffer_radio(&mut self, id: usize, default: &InputItem) {
-        if let (
-            InputItem::Radio(default_option, default_children),
-            Some((buffer_option, buffer_children)),
-        ) = (default, self.radio_buffer.get(&id))
+        if let (InputItem::Radio(default, _), Some(buffer)) = (default, self.radio_buffer.get(&id))
         {
-            if let (Ok(mut buffer_option), Ok(mut buffer_children)) = (
-                buffer_option.try_borrow_mut(),
-                buffer_children.try_borrow_mut(),
-            ) {
-                if !default_option.is_empty() {
-                    buffer_option.clone_from(default_option);
-                    buffer_children.clone_from(default_children);
-                }
+            if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                buffer.clone_from(default);
             }
         }
     }
@@ -805,7 +790,8 @@ where
             .zip(ctx.props().input_type.iter())
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(item) = input_data.try_borrow() {
-                    if let (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) =
+                    if let (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _))
+                    | (InputItem::Radio(_, _), InputType::Radio(_, _, _)) =
                         (&(*item), &**input_type)
                     {
                         propagate.push((index, Rc::clone(input_data), Rc::clone(input_type)));
@@ -852,6 +838,14 @@ where
                             Some(*status)
                         }
                     }
+                } else if let (InputItem::Radio(option, _), InputType::Radio(_, _, _)) =
+                    (&*click, &**input_type)
+                {
+                    if option.is_empty() {
+                        Some(CheckStatus::Unchecked)
+                    } else {
+                        Some(CheckStatus::Checked)
+                    }
                 } else {
                     None
                 }
@@ -865,6 +859,14 @@ where
                 {
                     *status = checked;
                     Some(checked)
+                } else if let (InputItem::Radio(option, _), InputType::Radio(_, _, _)) =
+                    (&*pos, &**input_type)
+                {
+                    if option.is_empty() {
+                        Some(CheckStatus::Unchecked)
+                    } else {
+                        Some(CheckStatus::Checked)
+                    }
                 } else {
                     None
                 }
@@ -877,11 +879,35 @@ where
 
         let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputType>)> = Vec::new();
         if let Ok(pos) = pos.try_borrow_mut() {
-            if let (
+            let children = if let (
                 InputItem::CheckBox(_, children),
                 InputType::CheckBox(_, _, Some((_, type_children))),
             ) = (&*pos, &**input_type)
             {
+                Some((children, type_children))
+            } else if let (
+                InputItem::Radio(option, children_group),
+                InputType::Radio(_, options, type_children_group),
+            ) = (&*pos, &**input_type)
+            {
+                let checked_index = options.iter().position(|o| option == &o.to_string());
+                if let Some(checked_index) = checked_index {
+                    if let (Some(children), Some(Some((_, type_children)))) = (
+                        children_group.get(checked_index),
+                        type_children_group.get(checked_index),
+                    ) {
+                        Some((children, type_children))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            if let Some((children, type_children)) = children {
                 for (index, child) in children.iter().enumerate() {
                     if let (Ok(mut c), Some(t)) = (child.try_borrow_mut(), type_children.get(index))
                     {
@@ -889,15 +915,25 @@ where
                             (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) => {
                                 propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
-                            (
-                                InputItem::Text(user),
-                                InputType::Text(ess, _, _) | InputType::Radio(ess, _, _),
-                            ) => {
+                            (InputItem::Text(user), InputType::Text(ess, _, _)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(value) = &ess.default {
                                         *c = value.clone();
                                     }
                                 }
+                            }
+                            (InputItem::Radio(option, _), InputType::Radio(ess, _, _)) => {
+                                if option.is_empty() || this_checked == Some(CheckStatus::Unchecked)
+                                {
+                                    if let (
+                                        Some(InputItem::Radio(default_option, _)),
+                                        InputItem::Radio(option, _),
+                                    ) = (&ess.default, &mut *c)
+                                    {
+                                        option.clone_from(default_option);
+                                    }
+                                }
+                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
                             (
                                 InputItem::HostNetworkGroup(user),

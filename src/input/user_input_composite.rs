@@ -28,6 +28,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
+        depth: u32,
     ) -> Html {
         let list = Rc::new(options.to_vec());
         let candidates = Rc::new(
@@ -36,9 +37,38 @@ where
                 .collect::<Vec<String>>(),
         );
         let txt = ctx.props().txt.txt.clone();
-        if let Some((buffer_option, buffer_children)) =
-            self.radio_buffer.get(&(base_index + layer_index))
-        {
+
+        if let Some(buffer_option) = self.radio_buffer.get(&(base_index + layer_index)) {
+            let checked_index = buffer_option.try_borrow().ok().and_then(|buffer_option| {
+                options
+                    .iter()
+                    .position(|x| x.to_string() == buffer_option.as_str())
+            });
+
+            let checked_children_group_data = input_data.try_borrow().ok().and_then(|input_data| {
+                if let (Some(checked_index), InputItem::Radio(_, children_group)) =
+                    (checked_index, &*input_data)
+                {
+                    children_group.get(checked_index).cloned()
+                } else {
+                    None
+                }
+            });
+
+            let (children, children_data) =
+                if let (Some(checked_index), Some(checked_children_group_data)) =
+                    (checked_index, checked_children_group_data)
+                {
+                    (
+                        children_group.get(checked_index).and_then(Clone::clone),
+                        checked_children_group_data,
+                    )
+                } else {
+                    (None, Vec::new())
+                };
+
+            let (class_child, class_line) = ("input-checkbox-child", "input-checkbox-link-line");
+
             html! {
                 <div class="input-radio-outer">
                     <div class="input-radio">
@@ -46,7 +76,7 @@ where
                             { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
                         <div class="input-radio-radio">
-                            { format!("{}:{}", base_index, layer_index) }
+                            // { format!("{}:{}", base_index, layer_index) }
                             <Radio::<Self>
                                 txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
@@ -68,6 +98,29 @@ where
                             }
                         </div>
                     </div>
+                    {
+                        if let Some((_, children)) = children {
+                            if children_data.is_empty() {
+                                html! {}
+                            } else {
+                                html! {
+                                    <div class="input-checkbox-children">
+                                    {
+                                        for children.iter().enumerate().map(|(sub_index, child)|
+                                            if let Some(child_data) = children_data.get(sub_index) {
+                                                self.view_child(ctx, child, child_data, layer_index, base_index, sub_index, depth, class_child, class_line)
+                                            } else {
+                                                html! {}
+                                            }
+                                        )
+                                    }
+                                    </div>
+                                }
+                            }
+                        } else {
+                            html! {}
+                        }
+                    }
                     <div class="input-radio-message">
                         { self.view_required_msg(ctx, base_index + layer_index) }
                     </div>
@@ -94,9 +147,9 @@ where
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let input_data_msg = input_data.clone();
-        let onclick = ctx
-            .link()
-            .callback(move |_| Message::ClickCheckBox(input_data_msg.clone()));
+        let onclick = ctx.link().callback(move |_| {
+            Message::ClickCheckBox(base_index + layer_index, input_data_msg.clone())
+        });
         let checked = if let Ok(data) = input_data.try_borrow() {
             if let InputItem::CheckBox(checked, _) = (*data).clone() {
                 Some(checked)
@@ -173,15 +226,15 @@ where
                         {
                             if checked == CheckStatus::Unchecked {
                                 html! {}
-                            } else if let (Some(children), Ok(input_data)) = (children, input_data.try_borrow()) {
+                            } else if let (Some((position, children)), Ok(input_data)) = (children, input_data.try_borrow()) {
                                 html! {
-                                    for children.1.iter().enumerate().map(|(sub_index, child)| {
+                                    for children.iter().enumerate().map(|(sub_index, child)| {
                                         let child_data = if let InputItem::CheckBox(_, childs) = input_data.clone() {
                                             childs.get(sub_index).cloned()
                                         } else {
                                             None
                                         };
-                                        let class_line = if children.0 == ChildrenPosition::Right {
+                                        let class_line = if *position == ChildrenPosition::Right {
                                             if sub_index == 0 {
                                                 "input-checkbox-link-line-right"
                                             } else {
@@ -191,54 +244,7 @@ where
                                             "input-checkbox-link-line"
                                         };
                                         if let Some(child_data) = child_data {
-                                            match &**child {
-                                                InputType::CheckBox(ess, always, children) => {
-                                                    html! {
-                                                        <div class={class_child}>
-                                                            <div class={class_line}>
-                                                            </div>
-                                                            { self.view_checkbox(ctx, ess, *always, children, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
-                                                        </div>
-                                                    }
-                                                }
-                                                InputType::HostNetworkGroup(ess, kind, num, width) => {
-                                                    html! {
-                                                        <div class={class_child}>
-                                                            <div class={class_line}>
-                                                            </div>
-                                                            { self.view_host_network_group(ctx, ess, *kind, *num, *width, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                                                        </div>
-                                                    }
-                                                }
-                                                InputType::Unsigned32(ess, min, max, width) => {
-                                                    html! {
-                                                        <div class={class_child}>
-                                                            <div class={class_line}>
-                                                            </div>
-                                                            { self.view_unsigned_32(ctx, ess, *min, *max, *width, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
-                                                        </div>
-                                                    }
-                                                }
-                                                InputType::SelectMultiple(ess, list, nics, _, _) => {
-                                                    html! {
-                                                        <div class={class_child}>
-                                                            <div class={class_line}>
-                                                            </div>
-                                                            { self.view_select_nic_or(ctx, list, *nics, ess, &child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
-                                                        </div>
-                                                    }
-                                                }
-                                                InputType::Text(ess, length, width) =>{
-                                                    html! {
-                                                        <div class={class_child}>
-                                                            <div class={class_line}>
-                                                            </div>
-                                                            { self.view_text(ctx, ess, *length, *width, &child_data, sub_index, base_index, false, false) }
-                                                        </div>
-                                                    }
-                                                }
-                                                _ => html! {}
-                                            }
+                                            self.view_child(ctx, child, &child_data, layer_index, base_index, sub_index, depth, class_child, class_line)
                                         } else {
                                             html! {}
                                         }
@@ -254,6 +260,96 @@ where
             }
         } else {
             html! {}
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn view_child(
+        &self,
+        ctx: &Context<Self>,
+        child: &Rc<InputType>,
+        child_data: &Rc<RefCell<InputItem>>,
+        layer_index: usize,
+        base_index: usize,
+        sub_index: usize,
+        depth: u32,
+        class_child: &'static str,
+        class_line: &'static str,
+    ) -> Html {
+        match &**child {
+            InputType::CheckBox(ess, always, children) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                            // <font color="white">
+                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                            // </font>
+                        </div>
+                        { self.view_checkbox(ctx, ess, *always, children, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
+                    </div>
+                }
+            }
+            InputType::Radio(ess, options, children_group) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                            // <font color="white">
+                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                            // </font>
+                        </div>
+                        { self.view_radio(ctx, ess, options, children_group, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth + 1) }
+                    </div>
+                }
+            }
+            InputType::HostNetworkGroup(ess, kind, num, width) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                            // <font color="white">
+                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                            // </font>
+                        </div>
+                        { self.view_host_network_group(ctx, ess, *kind, *num, *width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                    </div>
+                }
+            }
+            InputType::Unsigned32(ess, min, max, width) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                            // <font color="white">
+                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                            // </font>
+                        </div>
+                        { self.view_unsigned_32(ctx, ess, *min, *max, *width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
+                    </div>
+                }
+            }
+            InputType::SelectMultiple(ess, list, nics, _, _) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                            // <font color="white">
+                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                            // </font>
+                        </div>
+                        { self.view_select_nic_or(ctx, list, *nics, ess, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
+                    </div>
+                }
+            }
+            InputType::Text(ess, length, width) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                            // <font color="white">
+                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                            // </font>
+                        </div>
+                        { self.view_text(ctx, ess, *length, *width, child_data, sub_index, base_index, false, false) }
+                    </div>
+                }
+            }
+            _ => html! {},
         }
     }
 
