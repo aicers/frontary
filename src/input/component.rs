@@ -61,16 +61,9 @@ type CompValueBuf = HashMap<
 >;
 
 type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
-type RadioBuffer = HashMap<
-    usize,
-    (
-        Rc<RefCell<String>>,
-        Rc<RefCell<Vec<(bool, Vec<Rc<RefCell<InputItem>>>)>>>,
-    ),
->;
 
 pub struct Model<T> {
-    pub(super) radio_buffer: RadioBuffer,
+    pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) vec_select_buffer: VecSelectBuf,
@@ -193,7 +186,7 @@ pub enum Message {
     UserInputHostNetworkGroup(usize),
     WrongHostNetworkGroup(usize),
     RightHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
-    ClickCheckBox(Rc<RefCell<InputItem>>),
+    ClickCheckBox(usize, Rc<RefCell<InputItem>>),
     InputNicName(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicInterface(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicGateway(usize, usize, String, Rc<RefCell<InputItem>>),
@@ -238,7 +231,7 @@ impl Clone for Message {
             Self::UserInputHostNetworkGroup(a) => Self::UserInputHostNetworkGroup(*a),
             Self::RightHostNetworkGroup(a, b) => Self::RightHostNetworkGroup(*a, b.clone()),
             Self::WrongHostNetworkGroup(a) => Self::WrongHostNetworkGroup(*a),
-            Self::ClickCheckBox(a) => Self::ClickCheckBox(a.clone()),
+            Self::ClickCheckBox(a, b) => Self::ClickCheckBox(*a, b.clone()),
             Self::InputNicName(a, b, c, d) => Self::InputNicName(*a, *b, c.clone(), d.clone()),
             Self::InputNicInterface(a, b, c, d) => {
                 Self::InputNicInterface(*a, *b, c.clone(), d.clone())
@@ -297,7 +290,8 @@ impl PartialEq for Message {
             (Self::InputPercentage(s1, s2, s3), Self::InputPercentage(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::InputRadio(s1, s2), Self::InputRadio(o1, o2))
+            (Self::ClickCheckBox(s1, s2), Self::ClickCheckBox(o1, o2))
+            | (Self::InputRadio(s1, s2), Self::InputRadio(o1, o2))
             | (Self::InputTagGroup(s1, s2), Self::InputTagGroup(o1, o2))
             | (Self::InputComparisonValueKind(s1, s2), Self::InputComparisonValueKind(o1, o2))
             | (
@@ -321,7 +315,6 @@ impl PartialEq for Message {
             | (Self::InputNicDelete(s1, s2, s3), Self::InputNicDelete(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::ClickCheckBox(s), Self::ClickCheckBox(o)) => s == o,
             (Self::InputNicName(s1, s2, s3, s4), Self::InputNicName(o1, o2, o3, o4))
             | (Self::InputNicGateway(s1, s2, s3, s4), Self::InputNicGateway(o1, o2, o3, o4))
             | (Self::InputNicInterface(s1, s2, s3, s4), Self::InputNicInterface(o1, o2, o3, o4)) => {
@@ -563,16 +556,12 @@ where
                 self.unique_msg.remove(&id);
             }
             Message::InputRadio(id, input_data) => {
-                if let Some((buffer_option, buffer_children_group)) = self.radio_buffer.get(&id) {
-                    let empty = if let (Ok(buffer_option), Ok(buffer_children_group)) = (
-                        buffer_option.try_borrow(),
-                        buffer_children_group.try_borrow(),
-                    ) {
+                if let Some(buffer_option) = self.radio_buffer.get(&id) {
+                    let empty = if let Ok(buffer_option) = buffer_option.try_borrow() {
                         if let Ok(mut item) = input_data.try_borrow_mut() {
-                            *item = InputItem::Radio(
-                                buffer_option.clone(),
-                                buffer_children_group.clone(),
-                            );
+                            if let InputItem::Radio(option, _) = &mut *item {
+                                option.clone_from(&buffer_option);
+                            }
                         }
                         buffer_option.is_empty()
                     } else {
@@ -580,6 +569,7 @@ where
                     };
                     self.clear_required_msg(id, empty);
                 }
+                self.propagate_checkbox(ctx, &input_data);
             }
             Message::InputHostNetworkGroup(id, input_data) => {
                 self.input_host_network_group(id, &input_data);
@@ -729,7 +719,8 @@ where
 
                 return false; // HIGHLIGHT: DO NOT return true
             }
-            Message::ClickCheckBox(item) => {
+            Message::ClickCheckBox(data_id, item) => {
+                self.radio_buffer_after_checkbox(data_id, &item);
                 self.propagate_checkbox(ctx, &item);
             }
             Message::InputNicName(data_id, nic_id, name, input_data) => {
@@ -1024,7 +1015,6 @@ where
                 match &**input_type {
                     InputType::Text(ess, length, width) => self.view_text(ctx, ess, *length, *width, input_data, index, 1 , index == 0, false),
                     InputType::Password(ess,width) => self.view_password(ctx, ess, *width, input_data, index, 1, index == 0),
-                    InputType::Radio(ess, options, children_group) => self.view_radio(ctx, ess, options, children_group, input_data, index, 1),
                     InputType::HostNetworkGroup(ess, kind, num, width) => self.view_host_network_group(ctx, ess, *kind, *num, *width, input_data, index, 1),
                     InputType::SelectMultiple(ess, list, nics, _, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
                     InputType::SelectSingle(ess, list, width) => self.view_select_searchable(ctx, false, ess, *width, list, input_data, index, 1, 0, false),
@@ -1043,6 +1033,7 @@ where
                         });
                         self.view_checkbox(ctx, ess, *always, children, input_data, index, 1, both, 1)
                     }
+                    InputType::Radio(ess, options, children_group) => self.view_radio(ctx, ess, options, children_group, input_data, index, 1, 1),
                     InputType::Nic(ess) => self.view_nic(ctx, ess, input_data, index, 1),
                     InputType::File(ess) => self.view_file(ctx, ess, input_data, index, 1),
                     InputType::Group(ess, one_row, widths, group_type) => self.view_group(ctx, ess, *one_row, widths, group_type, input_data, index, 1),
@@ -1137,6 +1128,25 @@ where
             }
         }
         !unique.is_empty()
+    }
+
+    fn radio_buffer_after_checkbox(&mut self, data_id: usize, item: &Rc<RefCell<InputItem>>) {
+        if let Ok(item) = item.try_borrow() {
+            if let InputItem::CheckBox(_, children) = &*item {
+                for (sub_index, child) in children.iter().enumerate() {
+                    if let Ok(child) = child.try_borrow() {
+                        if let InputItem::Radio(option, _) = &*child {
+                            let id = data_id * MAX_PER_LAYER + sub_index;
+                            if let Some(buffer_option) = self.radio_buffer.get(&id) {
+                                if let Ok(mut buffer_option) = buffer_option.try_borrow_mut() {
+                                    (*buffer_option).clone_from(option);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
