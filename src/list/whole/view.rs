@@ -719,8 +719,8 @@ where
                     .iter()
                     .filter_map(|t| {
                         ctx.props().input_type.get(index).and_then(|x| {
-                            if let InputType::Tag(_, tag_values) = &**x {
-                                tag_values.get(t).cloned()
+                            if let InputType::Tag(config) = &**x {
+                                config.name_map.get(t).cloned()
                             } else {
                                 None
                             }
@@ -744,7 +744,7 @@ where
                 let Some(input_type) = ctx.props().input_type.get(index) else {
                     return html! {};
                 };
-                let InputType::Group(_, _, _, col_type) = &**input_type else {
+                let InputType::Group(config) = &**input_type else {
                     return html! {};
                 };
 
@@ -752,7 +752,7 @@ where
                     <table class="list-whole-group">
                         <tr>
                         {
-                            for col_type.iter().map(|t| html! {
+                            for config.items.iter().map(|t| html! {
                                 <th class="list-whole-group-heading">
                                     { text!(txt, ctx.props().language, t.title()) }
                                 </th>
