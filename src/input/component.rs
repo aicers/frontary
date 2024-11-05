@@ -422,11 +422,12 @@ where
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     if let InputItem::Tag(_) = *item {
-                        if let (InputType::Tag(_, updated), Some(buffer)) =
+                        if let (InputType::Tag(config), Some(buffer)) =
                             (&**input_type, self.tag_buffer.get(&(index + 1)))
                         // HIGHLIGHT: Since Tag is always on the first layer, don't need to check recursively
                         {
-                            let reverse = updated
+                            let reverse = config
+                                .name_map // This is the updated one.
                                 .iter()
                                 .map(|(k, v)| (v.clone(), k.clone()))
                                 .collect::<HashMap<String, String>>();
@@ -1013,31 +1014,74 @@ where
         html! {
             for ctx.props().input_data.iter().enumerate().zip(ctx.props().input_type.iter()).map(|((index , input_data), input_type)| {
                 match &**input_type {
-                    InputType::Text(ess, length, width) => self.view_text(ctx, ess, *length, *width, input_data, index, 1 , index == 0, false),
-                    InputType::Password(ess,width) => self.view_password(ctx, ess, *width, input_data, index, 1, index == 0),
-                    InputType::HostNetworkGroup(ess, kind, num, width) => self.view_host_network_group(ctx, ess, *kind, *num, *width, input_data, index, 1),
-                    InputType::SelectMultiple(ess, list, nics, _, _) => self.view_select_nic_or(ctx, list, *nics, ess, input_data, index, 1, 0),
-                    InputType::SelectSingle(ess, list, width) => self.view_select_searchable(ctx, false, ess, *width, list, input_data, index, 1, 0, false),
-                    InputType::Tag(ess, list) => self.view_tag_group(ctx, ess, list, input_data, index, 1),
-                    InputType::VecSelect(ess, ess_list, last_multi, list, width, width_list, max_width_list, max_height_list) => self.view_vec_select(ctx, ess, ess_list, *last_multi, *width, width_list, max_width_list, max_height_list, list, input_data, index, 1, false),
-                    InputType::Unsigned32(ess, min, max, width) => self.view_unsigned_32(ctx, ess, *min, *max, *width, input_data, index, 1, index == 0, false),
-                    InputType::Float64(ess, step, width) => self.view_float_64(ctx, ess, *step, *width, input_data, index, 1, index == 0, false),
-                    InputType::Percentage(ess, min, max, decimals, width) => self.view_percentage(ctx, ess, *min, *max, *decimals, *width, input_data, index, 1, index == 0),
-                    InputType::CheckBox(ess, always, children) => {
+                    InputType::Text(config) => {
+                        self.view_text(ctx, &config.ess, config.length, config.width, input_data,
+                            index, 1 , index == 0, false)
+                    }
+                    InputType::Password(config) => {
+                        self.view_password(ctx, &config.ess, config.width, input_data, index, 1,
+                            index == 0)
+                    }
+                    InputType::HostNetworkGroup(config) => {
+                        self.view_host_network_group(ctx, &config.ess, config.kind, config.num,
+                            config.width, input_data, index, 1)
+                    }
+                    InputType::SelectSingle(config) => {
+                        self.view_select_searchable(ctx, false, &config.ess, config.width,
+                            &config.options, input_data, index, 1, 0, false)
+                    }
+                    InputType::SelectMultiple(config) => {
+                        self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess,
+                            input_data, index, 1, 0)
+                    }
+                    InputType::Tag(config) => {
+                        self.view_tag_group(ctx, &config.ess, &config.name_map, input_data, index, 1)
+                    }
+                    InputType::VecSelect(config) => {
+                        self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last,
+                            config.full_width, &config.widths, &config.max_widths,
+                            &config.max_heights, &config.map_list, input_data, index, 1, false)
+                    }
+                    InputType::Unsigned32(config) => {
+                        self.view_unsigned_32(ctx, &config.ess, config.min, config.max,
+                            config.width, input_data, index, 1, index == 0, false)
+                    }
+                    InputType::Float64(config) => {
+                        self.view_float_64(ctx, &config.ess, config.step, config.width, input_data,
+                            index, 1, index == 0, false)
+                    }
+                    InputType::Percentage(config) => {
+                        self.view_percentage(ctx, &config.ess, config.min, config.max,
+                            config.num_decimals, config.width, input_data, index, 1, index == 0)
+                    }
+                    InputType::Nic(config) => {
+                        self.view_nic(ctx, &config.ess, input_data, index, 1)
+                    }
+                    InputType::File(config) => {
+                        self.view_file(ctx, &config.ess, input_data, index, 1)
+                    }
+                    InputType::Comparison(config) => {
+                        self.view_comparison(ctx, &config.ess, input_data, index, 1, false)
+                    }
+                    InputType::Group(config) => {
+                        self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths,
+                            &config.items, input_data, index, 1)
+                    }
+                    InputType::CheckBox(config) => {
                         let both = ctx.props().input_type.get(index + 1).map_or(Some(false),|next| {
-                            if let InputType::CheckBox(_, _, _) = &**next {
+                            if let InputType::CheckBox(_) = &**next {
                                 Some(false)
                             } else {
                                 Some(true)
                             }
                         });
-                        self.view_checkbox(ctx, ess, *always, children, input_data, index, 1, both, 1)
+                        self.view_checkbox(ctx, &config.ess, config.always, &config.children,
+                            input_data, index, 1, both, 1)
                     }
-                    InputType::Radio(ess, options, children_group) => self.view_radio(ctx, ess, options, children_group, input_data, index, 1, 1),
-                    InputType::Nic(ess) => self.view_nic(ctx, ess, input_data, index, 1),
-                    InputType::File(ess) => self.view_file(ctx, ess, input_data, index, 1),
-                    InputType::Group(ess, one_row, widths, group_type) => self.view_group(ctx, ess, *one_row, widths, group_type, input_data, index, 1),
-                    InputType::Comparison(ess) => self.view_comparison(ctx, ess, input_data, index, 1, false),
+                    InputType::Radio(config) => {
+                        self.view_radio(ctx, &config.ess, &config.options, &config.children_group,
+                            input_data, index, 1, 1)
+                    }
                 }
             })
         }

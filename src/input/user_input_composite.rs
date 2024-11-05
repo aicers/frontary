@@ -24,7 +24,7 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         options: &[ViewString],
-        children_group: &[Option<(ChildrenPosition, Vec<Rc<InputType>>)>],
+        children_group: &[Option<Vec<Rc<InputType>>>],
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
@@ -99,7 +99,7 @@ where
                         </div>
                     </div>
                     {
-                        if let Some((_, children)) = children {
+                        if let Some(children) = children {
                             if children_data.is_empty() {
                                 html! {}
                             } else {
@@ -277,75 +277,57 @@ where
         class_line: &'static str,
     ) -> Html {
         match &**child {
-            InputType::CheckBox(ess, always, children) => {
+            InputType::CheckBox(config) => {
                 html! {
                     <div class={class_child}>
-                        <div class={class_line}>
-                            // <font color="white">
-                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                            // </font>
+                        <div class={class_line}> // TODO: remove this empty div
                         </div>
-                        { self.view_checkbox(ctx, ess, *always, children, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
+                        { self.view_checkbox(ctx, &config.ess, config.always, &config.children, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
                     </div>
                 }
             }
-            InputType::Radio(ess, options, children_group) => {
+            InputType::Radio(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
-                            // <font color="white">
-                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                            // </font>
                         </div>
-                        { self.view_radio(ctx, ess, options, children_group, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth + 1) }
+                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth + 1) }
                     </div>
                 }
             }
-            InputType::HostNetworkGroup(ess, kind, num, width) => {
+            InputType::HostNetworkGroup(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
-                            // <font color="white">
-                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                            // </font>
                         </div>
-                        { self.view_host_network_group(ctx, ess, *kind, *num, *width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
                     </div>
                 }
             }
-            InputType::Unsigned32(ess, min, max, width) => {
+            InputType::Unsigned32(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
-                            // <font color="white">
-                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                            // </font>
                         </div>
-                        { self.view_unsigned_32(ctx, ess, *min, *max, *width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
+                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
                     </div>
                 }
             }
-            InputType::SelectMultiple(ess, list, nics, _, _) => {
+            InputType::SelectMultiple(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
-                            // <font color="white">
-                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                            // </font>
                         </div>
-                        { self.view_select_nic_or(ctx, list, *nics, ess, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
+                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
                     </div>
                 }
             }
-            InputType::Text(ess, length, width) => {
+            InputType::Text(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
-                            // <font color="white">
-                            //     { format!("{}:{}", sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                            // </font>
                         </div>
-                        { self.view_text(ctx, ess, *length, *width, child_data, sub_index, base_index, false, false) }
+                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, base_index, false, false) }
                     </div>
                 }
             }
@@ -434,31 +416,31 @@ where
                                                                 <div class="input-group-item-outer">
                                                                 {
                                                                     match &**each {
-                                                                        InputType::Text(ess, length, width) =>{
-                                                                            let mut ess = ess.clone();
+                                                                        InputType::Text(config) => {
+                                                                            let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_text(ctx, &ess, *length, *width, input_data, col_index, base_index, false, true)
+                                                                            self.view_text(ctx, &ess, config.length, config.width, input_data, col_index, base_index, false, true)
                                                                         }
-                                                                        InputType::SelectSingle(ess, list, width) => {
-                                                                            let mut ess = ess.clone();
+                                                                        InputType::SelectSingle(config) => {
+                                                                            let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_select_searchable(ctx, false, &ess, *width, list, input_data, col_index, base_index, 1, true)
+                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data, col_index, base_index, 1, true)
                                                                         }
-                                                                        InputType::VecSelect(ess, ess_list, last_multi, list, width, width_list, max_width_list, max_height_list) => {
-                                                                            self.view_vec_select(ctx, ess, ess_list, *last_multi, *width, width_list, max_width_list, max_height_list, list, input_data, col_index, base_index, true)
+                                                                        InputType::VecSelect(config) => {
+                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths, &config.max_heights, &config.map_list, input_data, col_index, base_index, true)
                                                                         }
-                                                                        InputType::Unsigned32(ess, min, max, width) => {
-                                                                            let mut ess = ess.clone();
+                                                                        InputType::Unsigned32(config) => {
+                                                                            let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_unsigned_32(ctx, &ess, *min, *max, *width, input_data, col_index, base_index, false, true)
+                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data, col_index, base_index, false, true)
                                                                         }
-                                                                        InputType::Float64(ess, step, width) => {
-                                                                            let mut ess = ess.clone();
+                                                                        InputType::Float64(config) => {
+                                                                            let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_float_64(ctx, &ess, *step, *width, input_data, col_index, base_index, false, true)
+                                                                            self.view_float_64(ctx, &ess, config.step, config.width, input_data, col_index, base_index, false, true)
                                                                         }
-                                                                        InputType::Comparison(ess) => {
-                                                                            let mut ess = ess.clone();
+                                                                        InputType::Comparison(config) => {
+                                                                            let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_comparison(ctx, &ess, input_data, col_index, base_index, true)
                                                                         }

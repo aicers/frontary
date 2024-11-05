@@ -38,18 +38,12 @@ where
                 let this_index = base_index + index;
                 if let Ok(data) = input_data.try_borrow() {
                     match (&*data, &**input_type) {
-                        (
-                            InputItem::HostNetworkGroup(data),
-                            InputType::HostNetworkGroup(_, _, _, _),
-                        ) => {
+                        (InputItem::HostNetworkGroup(data), InputType::HostNetworkGroup(_)) => {
                             self.host_network_buffer
                                 .insert(this_index, Rc::new(RefCell::new(data.clone())));
                         }
-                        (
-                            InputItem::SelectMultiple(data),
-                            InputType::SelectMultiple(_, _, _, _, all),
-                        ) => {
-                            if *all {
+                        (InputItem::SelectMultiple(data), InputType::SelectMultiple(config)) => {
+                            if config.all {
                                 self.select_searchable_buffer
                                     .insert(this_index, Rc::new(RefCell::new(None)));
                             } else {
@@ -57,7 +51,7 @@ where
                                     .insert(this_index, Rc::new(RefCell::new(Some(data.clone()))));
                             }
                         }
-                        (InputItem::SelectSingle(data), InputType::SelectSingle(_, _, _)) => {
+                        (InputItem::SelectSingle(data), InputType::SelectSingle(_)) => {
                             let mut buf = HashSet::new();
                             if let Some(data) = data {
                                 buf.insert(data.clone());
@@ -65,46 +59,48 @@ where
                             self.select_searchable_buffer
                                 .insert(this_index, Rc::new(RefCell::new(Some(buf))));
                         }
-                        (InputItem::Tag(data), InputType::Tag(_, _)) => {
+                        (InputItem::Tag(data), InputType::Tag(_)) => {
                             self.tag_buffer
                                 .insert(this_index, Rc::new(RefCell::new(data.clone())));
                         }
                         (
                             InputItem::Radio(data_option, data_children_group),
-                            InputType::Radio(_, options, children_group),
+                            InputType::Radio(config),
                         ) => {
                             self.radio_buffer
                                 .insert(this_index, Rc::new(RefCell::new(data_option.clone())));
 
-                            if let Some(index) =
-                                options.iter().position(|vs| data_option == &vs.to_string())
+                            if let Some(index) = config
+                                .options
+                                .iter()
+                                .position(|vs| data_option == &vs.to_string())
                             {
-                                if let (Some(data_children), Some(Some(children))) =
-                                    (data_children_group.get(index), children_group.get(index))
-                                {
+                                if let (Some(data_children), Some(Some(config_children))) = (
+                                    data_children_group.get(index),
+                                    config.children_group.get(index),
+                                ) {
                                     self.prepare_buffer_recursive(
                                         data_children,
-                                        &children.1,
+                                        config_children,
                                         this_index * MAX_PER_LAYER,
                                     );
                                 }
                             }
                         }
-                        (
-                            InputItem::CheckBox(_, data_children),
-                            InputType::CheckBox(_, _, Some(children)),
-                        ) => {
-                            if !data_children.is_empty() {
-                                self.prepare_buffer_recursive(
-                                    data_children,
-                                    &children.1,
-                                    this_index * MAX_PER_LAYER,
-                                );
+                        (InputItem::CheckBox(_, data_children), InputType::CheckBox(config)) => {
+                            if let Some((_, config_children)) = config.children.as_ref() {
+                                if !data_children.is_empty() {
+                                    self.prepare_buffer_recursive(
+                                        data_children,
+                                        config_children,
+                                        this_index * MAX_PER_LAYER,
+                                    );
+                                }
                             }
                         }
-                        (InputItem::Group(data), InputType::Group(_, _, _, group)) => {
+                        (InputItem::Group(data), InputType::Group(config)) => {
                             for (row, d) in data.iter().enumerate() {
-                                for ((col, d), t) in d.iter().enumerate().zip(group.iter()) {
+                                for ((col, d), t) in d.iter().enumerate().zip(config.items.iter()) {
                                     if let Ok(d) = d.try_borrow() {
                                         let sub_base_index = this_index * MAX_PER_LAYER;
 
@@ -196,20 +192,64 @@ where
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     match (&mut *item, &**input_type) {
-                        (
-                            InputItem::Text(_) | InputItem::Password(_),
-                            InputType::Text(ess, _, _),
-                        )
-                        | (
-                            InputItem::HostNetworkGroup(_),
-                            InputType::HostNetworkGroup(ess, _, _, _),
-                        )
-                        | (InputItem::Tag(_), InputType::Tag(ess, _))
-                        | (InputItem::Unsigned32(_), InputType::Unsigned32(ess, _, _, _))
-                        | (InputItem::Percentage(_), InputType::Percentage(ess, _, _, _, _))
-                        | (InputItem::Nic(_), InputType::Nic(ess))
-                        | (InputItem::File(_, _), InputType::File(ess)) => {
-                            if let Some(default) = &ess.default {
+                        (InputItem::Text(_), InputType::Text(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::Password(_), InputType::Password(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::HostNetworkGroup(_), InputType::HostNetworkGroup(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::Tag(_), InputType::Tag(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::Unsigned32(_), InputType::Unsigned32(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::Float64(_), InputType::Float64(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::Percentage(_), InputType::Percentage(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::Nic(_), InputType::Nic(config)) => {
+                            if let Some(default) = &config.ess.default {
+                                if parent_checked {
+                                    *item = default.clone();
+                                }
+                            }
+                        }
+                        (InputItem::File(_, _), InputType::File(config)) => {
+                            if let Some(default) = &config.ess.default {
                                 if parent_checked {
                                     *item = default.clone();
                                 }
@@ -217,26 +257,27 @@ where
                         }
                         (
                             InputItem::Radio(option, data_children_group),
-                            InputType::Radio(ess, options, children_group),
+                            InputType::Radio(config),
                         ) => {
-                            if let Some(default) = &ess.default {
+                            if let Some(default) = &config.ess.default {
                                 if parent_checked {
                                     if let InputItem::Radio(default_option, _) = default {
                                         option.clone_from(default_option);
-                                        let checked_index = options
+                                        let checked_index = config
+                                            .options
                                             .iter()
                                             .position(|o| &o.to_string() == default_option);
                                         if let Some(checked_index) = checked_index {
                                             if let (
                                                 Some(data_children),
-                                                Some(Some((_, children))),
+                                                Some(Some(config_children)),
                                             ) = (
                                                 data_children_group.get(checked_index),
-                                                children_group.get(checked_index),
+                                                config.children_group.get(checked_index),
                                             ) {
                                                 self.prepare_default_recursive(
                                                     data_children,
-                                                    children,
+                                                    config_children,
                                                     parent_checked,
                                                     (base_index + index) * MAX_PER_LAYER,
                                                 );
@@ -250,18 +291,18 @@ where
                         }
                         (
                             InputItem::CheckBox(checked, data_children),
-                            InputType::CheckBox(ess, _, children),
+                            InputType::CheckBox(config),
                         ) => {
-                            if let Some(InputItem::CheckBox(c, _)) = &ess.default {
+                            if let Some(InputItem::CheckBox(c, _)) = &config.ess.default {
                                 if parent_checked {
                                     *checked = *c;
                                 }
                             }
-                            if let Some(children) = children {
+                            if let Some((_, config_children)) = config.children.as_ref() {
                                 if !data_children.is_empty() && *checked != CheckStatus::Unchecked {
                                     self.prepare_default_recursive(
                                         data_children,
-                                        &children.1,
+                                        config_children,
                                         *checked == CheckStatus::Checked
                                             || *checked == CheckStatus::Indeterminate,
                                         (base_index + index) * MAX_PER_LAYER,
@@ -269,8 +310,8 @@ where
                                 }
                             }
                         }
-                        (InputItem::SelectSingle(_), InputType::SelectSingle(ess, _, _)) => {
-                            if let Some(default) = &ess.default {
+                        (InputItem::SelectSingle(_), InputType::SelectSingle(config)) => {
+                            if let Some(default) = &config.ess.default {
                                 if parent_checked {
                                     *item = default.clone();
                                     let id = base_index + index;
@@ -278,11 +319,8 @@ where
                                 }
                             }
                         }
-                        (
-                            InputItem::SelectMultiple(_),
-                            InputType::SelectMultiple(ess, _, _, _, _),
-                        ) => {
-                            if let Some(default) = &ess.default {
+                        (InputItem::SelectMultiple(_), InputType::SelectMultiple(config)) => {
+                            if let Some(default) = &config.ess.default {
                                 if parent_checked {
                                     *item = default.clone();
                                     let id = base_index + index;
@@ -290,8 +328,8 @@ where
                                 }
                             }
                         }
-                        (InputItem::VecSelect(_), InputType::VecSelect(ess, ..)) => {
-                            if let Some(default) = &ess.default {
+                        (InputItem::VecSelect(_), InputType::VecSelect(config)) => {
+                            if let Some(default) = &config.ess.default {
                                 if parent_checked {
                                     *item = default.clone();
                                     let id = base_index + index;
@@ -299,8 +337,8 @@ where
                                 }
                             }
                         }
-                        (InputItem::Group(_), InputType::Group(ess, _, _, _)) => {
-                            if let Some(InputItem::Group(default)) = &ess.default {
+                        (InputItem::Group(_), InputType::Group(config)) => {
+                            if let Some(InputItem::Group(default)) = &config.ess.default {
                                 if let Some(default) = default.first() {
                                     if let Some(copy_default) = Self::copy_default(default) {
                                         if parent_checked {
@@ -310,7 +348,8 @@ where
                                 }
                             }
                         }
-                        (_, _) => (),
+                        // TODO: InputItem::Comparison isn't implemented yet
+                        _ => (),
                     }
                 }
             });
@@ -431,11 +470,10 @@ where
                             InputItem::SelectMultiple(s) => s.is_empty(),
                             InputItem::VecSelect(s) => {
                                 s.is_empty()
-                                    || if let InputType::VecSelect(_, ess_list, ..) = &**input_type
-                                    {
-                                        s.iter().zip(ess_list.iter()).any(|(selected, ess)| {
-                                            selected.is_empty() && ess.required
-                                        })
+                                    || if let InputType::VecSelect(config) = &**input_type {
+                                        s.iter().zip(config.items_ess_list.iter()).any(
+                                            |(selected, ess)| selected.is_empty() && ess.required,
+                                        )
                                     } else {
                                         true
                                     }
@@ -466,18 +504,21 @@ where
                             required.push(true);
                         }
                     }
-                    if let (InputItem::Group(group), InputType::Group(ess, _, _, col_types)) =
+                    if let (InputItem::Group(group), InputType::Group(config)) =
                         (&(*item), &**input_type)
                     {
-                        let required = col_types
+                        let required = config
+                            .items
                             .iter()
                             .filter_map(|t| match &(**t) {
-                                InputType::Text(ess, ..)
-                                | InputType::Unsigned32(ess, ..)
-                                | InputType::Float64(ess, ..)
-                                | InputType::SelectSingle(ess, ..)
-                                | InputType::VecSelect(ess, ..)
-                                | InputType::Comparison(ess) => Some(ess.required),
+                                InputType::Text(config) => Some(config.ess.required),
+                                InputType::SelectSingle(config) => Some(config.ess.required),
+                                // TODO: SelectMultiple isn't needed?
+                                InputType::VecSelect(config) => Some(config.ess.required),
+                                InputType::Unsigned32(config) => Some(config.ess.required),
+                                InputType::Float64(config) => Some(config.ess.required),
+                                InputType::Comparison(config) => Some(config.ess.required),
+                                // TODO: If not supported, how about a panic?
                                 _ => None,
                             })
                             .collect::<Vec<bool>>();
@@ -539,7 +580,7 @@ where
                         let sub_base_index = (base_index + index) * MAX_PER_LAYER;
                         for (row_index, row) in empty.iter().enumerate() {
                             let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
-                            if !all_empty || ess.required && row_index == 0 {
+                            if !all_empty || config.ess.required && row_index == 0 {
                                 let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
                                 for ((col_index, data_empty), data_required) in
                                     row.iter().enumerate().zip(required.iter())
@@ -552,19 +593,21 @@ where
                         }
                     } else if let (
                         InputItem::CheckBox(checked, data_children),
-                        InputType::CheckBox(_, _, Some(type_children)),
+                        InputType::CheckBox(config),
                     ) = (&(*item), &**input_type)
                     {
-                        if !data_children.is_empty()
-                            && self.decide_required_all_recursive(
-                                ctx,
-                                data_children,
-                                &type_children.1,
-                                (base_index + index) * MAX_PER_LAYER,
-                                *checked == CheckStatus::Checked,
-                            )
-                        {
-                            required.push(true);
+                        if let Some((_, config_children)) = config.children.as_ref() {
+                            if !data_children.is_empty()
+                                && self.decide_required_all_recursive(
+                                    ctx,
+                                    data_children,
+                                    config_children,
+                                    (base_index + index) * MAX_PER_LAYER,
+                                    *checked == CheckStatus::Checked,
+                                )
+                            {
+                                required.push(true);
+                            }
                         }
                     }
                 }
@@ -596,12 +639,9 @@ where
                     // HIGHTLIGHT: All kinds are not necessarily to be verified.
                     // HIGHTLIGHT: Since HostNetworkGroup items were verified yet, they don't need to be verified here.
                     match (&*input_data, &**input_type) {
-                        (
-                            InputItem::Unsigned32(Some(value)),
-                            InputType::Unsigned32(_, min, max, _),
-                        ) => {
+                        (InputItem::Unsigned32(Some(value)), InputType::Unsigned32(config)) => {
                             if parent_checked {
-                                if *value >= *min && *value <= *max {
+                                if *value >= config.min && *value <= config.max {
                                     self.verification
                                         .insert(base_index + index, Verification::Valid);
                                 } else {
@@ -613,13 +653,10 @@ where
                                 }
                             }
                         }
-                        (
-                            InputItem::Percentage(Some(value)),
-                            InputType::Percentage(_, min, max, _, _),
-                        ) => {
+                        (InputItem::Percentage(Some(value)), InputType::Percentage(config)) => {
                             if parent_checked {
-                                if *value >= (*min).unwrap_or(0.0)
-                                    && *value <= (*max).unwrap_or(1.0)
+                                if *value >= config.min.unwrap_or(0.0)
+                                    && *value <= config.max.unwrap_or(1.0)
                                 {
                                     self.verification
                                         .insert(base_index + index, Verification::Valid);
@@ -632,7 +669,7 @@ where
                                 }
                             }
                         }
-                        (InputItem::Password(pwd), InputType::Password(_, _)) => {
+                        (InputItem::Password(pwd), InputType::Password(_)) => {
                             if parent_checked {
                                 if let Some(cnf_pwd) =
                                     self.confirm_password.get(&(base_index + index))
@@ -721,18 +758,20 @@ where
                         }
                         (
                             InputItem::CheckBox(checked, data_children),
-                            InputType::CheckBox(_, _, Some(type_children)),
+                            InputType::CheckBox(config),
                         ) => {
-                            if *checked != CheckStatus::Unchecked
-                                && !data_children.is_empty()
-                                && !self.verify_recursive(
-                                    data_children,
-                                    &type_children.1,
-                                    (base_index + index) * MAX_PER_LAYER,
-                                    *checked == CheckStatus::Checked,
-                                )
-                            {
-                                rtn = false;
+                            if let Some((_, config_children)) = config.children.as_ref() {
+                                if *checked != CheckStatus::Unchecked
+                                    && !data_children.is_empty()
+                                    && !self.verify_recursive(
+                                        data_children,
+                                        config_children,
+                                        (base_index + index) * MAX_PER_LAYER,
+                                        *checked == CheckStatus::Checked,
+                                    )
+                                {
+                                    rtn = false;
+                                }
                             }
                         }
                         (_, _) => (),
@@ -765,11 +804,13 @@ where
                 if let Ok(input_data) = input_data.try_borrow() {
                     if let (
                         InputItem::CheckBox(checked, data_children),
-                        InputType::CheckBox(_, _, Some(type_children)),
+                        InputType::CheckBox(config),
                     ) = (&*input_data, &**input_type)
                     {
-                        if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
-                            Self::trim_nic_recursive(data_children, &type_children.1);
+                        if let Some((_, config_children)) = config.children.as_ref() {
+                            if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
+                                Self::trim_nic_recursive(data_children, config_children);
+                            }
                         }
                     }
                 }
@@ -790,9 +831,8 @@ where
             .zip(ctx.props().input_type.iter())
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(item) = input_data.try_borrow() {
-                    if let (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _))
-                    | (InputItem::Radio(_, _), InputType::Radio(_, _, _)) =
-                        (&(*item), &**input_type)
+                    if let (InputItem::CheckBox(_, _), InputType::CheckBox(_))
+                    | (InputItem::Radio(_, _), InputType::Radio(_)) = (&(*item), &**input_type)
                     {
                         propagate.push((index, Rc::clone(input_data), Rc::clone(input_type)));
                     }
@@ -819,26 +859,26 @@ where
     ) -> Option<CheckStatus> {
         let this_checked = if Rc::ptr_eq(click, pos) {
             if let Ok(mut click) = click.try_borrow_mut() {
-                if let (InputItem::CheckBox(status, _), InputType::CheckBox(_, always, _)) =
+                if let (InputItem::CheckBox(status, _), InputType::CheckBox(config)) =
                     (&mut *click, &**input_type)
                 {
                     match *status {
                         CheckStatus::Checked => {
-                            if *always != Some(CheckStatus::Checked)
-                                && *always != Some(CheckStatus::Indeterminate)
+                            if config.always != Some(CheckStatus::Checked)
+                                && config.always != Some(CheckStatus::Indeterminate)
                             {
                                 *status = checked.unwrap_or(CheckStatus::Unchecked);
                             }
                             Some(*status)
                         }
                         CheckStatus::Indeterminate | CheckStatus::Unchecked => {
-                            if *always != Some(CheckStatus::Unchecked) {
+                            if config.always != Some(CheckStatus::Unchecked) {
                                 *status = checked.unwrap_or(CheckStatus::Checked);
                             }
                             Some(*status)
                         }
                     }
-                } else if let (InputItem::Radio(option, _), InputType::Radio(_, _, _)) =
+                } else if let (InputItem::Radio(option, _), InputType::Radio(_)) =
                     (&*click, &**input_type)
                 {
                     if option.is_empty() {
@@ -854,12 +894,12 @@ where
             }
         } else if let Some(checked) = checked {
             if let Ok(mut pos) = pos.try_borrow_mut() {
-                if let (InputItem::CheckBox(status, _), InputType::CheckBox(_, _, _)) =
+                if let (InputItem::CheckBox(status, _), InputType::CheckBox(_)) =
                     (&mut *pos, &**input_type)
                 {
                     *status = checked;
                     Some(checked)
-                } else if let (InputItem::Radio(option, _), InputType::Radio(_, _, _)) =
+                } else if let (InputItem::Radio(option, _), InputType::Radio(_)) =
                     (&*pos, &**input_type)
                 {
                     if option.is_empty() {
@@ -879,24 +919,24 @@ where
 
         let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputType>)> = Vec::new();
         if let Ok(pos) = pos.try_borrow_mut() {
-            let children = if let (
-                InputItem::CheckBox(_, children),
-                InputType::CheckBox(_, _, Some((_, type_children))),
-            ) = (&*pos, &**input_type)
+            let children = if let (InputItem::CheckBox(_, children), InputType::CheckBox(config)) =
+                (&*pos, &**input_type)
             {
-                Some((children, type_children))
-            } else if let (
-                InputItem::Radio(option, children_group),
-                InputType::Radio(_, options, type_children_group),
-            ) = (&*pos, &**input_type)
+                if let Some((_, config_children)) = config.children.as_ref() {
+                    Some((children, config_children))
+                } else {
+                    None
+                }
+            } else if let (InputItem::Radio(option, children_group), InputType::Radio(config)) =
+                (&*pos, &**input_type)
             {
-                let checked_index = options.iter().position(|o| option == &o.to_string());
+                let checked_index = config.options.iter().position(|o| option == &o.to_string());
                 if let Some(checked_index) = checked_index {
-                    if let (Some(children), Some(Some((_, type_children)))) = (
+                    if let (Some(children), Some(Some(config_children))) = (
                         children_group.get(checked_index),
-                        type_children_group.get(checked_index),
+                        config.children_group.get(checked_index),
                     ) {
-                        Some((children, type_children))
+                        Some((children, config_children))
                     } else {
                         None
                     }
@@ -907,28 +947,29 @@ where
                 None
             };
 
-            if let Some((children, type_children)) = children {
+            if let Some((children, config_children)) = children {
                 for (index, child) in children.iter().enumerate() {
-                    if let (Ok(mut c), Some(t)) = (child.try_borrow_mut(), type_children.get(index))
+                    if let (Ok(mut c), Some(t)) =
+                        (child.try_borrow_mut(), config_children.get(index))
                     {
                         match (&(*c), &**t) {
-                            (InputItem::CheckBox(_, _), InputType::CheckBox(_, _, _)) => {
+                            (InputItem::CheckBox(_, _), InputType::CheckBox(_)) => {
                                 propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
-                            (InputItem::Text(user), InputType::Text(ess, _, _)) => {
+                            (InputItem::Text(user), InputType::Text(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
-                            (InputItem::Radio(option, _), InputType::Radio(ess, _, _)) => {
+                            (InputItem::Radio(option, _), InputType::Radio(config)) => {
                                 if option.is_empty() || this_checked == Some(CheckStatus::Unchecked)
                                 {
                                     if let (
                                         Some(InputItem::Radio(default_option, _)),
                                         InputItem::Radio(option, _),
-                                    ) = (&ess.default, &mut *c)
+                                    ) = (&config.ess.default, &mut *c)
                                     {
                                         option.clone_from(default_option);
                                     }
@@ -937,63 +978,60 @@ where
                             }
                             (
                                 InputItem::HostNetworkGroup(user),
-                                InputType::HostNetworkGroup(ess, _, _, _),
+                                InputType::HostNetworkGroup(config),
                             ) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
-                            (InputItem::SelectSingle(user), InputType::SelectSingle(ess, _, _)) => {
+                            (InputItem::SelectSingle(user), InputType::SelectSingle(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
                             (
                                 InputItem::SelectMultiple(user),
-                                InputType::SelectMultiple(ess, _, _, _, _),
+                                InputType::SelectMultiple(config),
                             ) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
-                            (InputItem::Tag(user), InputType::Tag(ess, _)) => {
+                            (InputItem::Tag(user), InputType::Tag(config)) => {
                                 if (user.old.is_empty()
                                     && user.new.is_none()
                                     && user.edit.is_none()
                                     && user.delete.is_none())
                                     || this_checked == Some(CheckStatus::Unchecked)
                                 {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
-                            (InputItem::Unsigned32(user), InputType::Unsigned32(ess, _, _, _)) => {
+                            (InputItem::Unsigned32(user), InputType::Unsigned32(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
-                            (
-                                InputItem::Percentage(user),
-                                InputType::Percentage(ess, _, _, _, _),
-                            ) => {
+                            (InputItem::Percentage(user), InputType::Percentage(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
                             }
-                            (InputItem::Nic(user), InputType::Nic(ess)) => {
+                            (InputItem::Nic(user), InputType::Nic(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &ess.default {
+                                    if let Some(value) = &config.ess.default {
                                         *c = value.clone();
                                     }
                                 }
@@ -1006,11 +1044,11 @@ where
         }
         let mut rtn_checked: Vec<Option<CheckStatus>> = Vec::new();
 
-        for (index, child, type_child) in &propa_children {
+        for (index, child, config_child) in &propa_children {
             rtn_checked.push(self.propagate_checkbox_recursive(
                 click,
                 child,
-                type_child,
+                config_child,
                 this_checked,
                 *index,
                 (base_index + layer_index) * MAX_PER_LAYER,
@@ -1099,10 +1137,8 @@ where
             .for_each(|((index, input_data), input_type)| {
                 if let Ok(input_data) = input_data.try_borrow() {
                     if parent_checked {
-                        if let (
-                            InputItem::HostNetworkGroup(_),
-                            InputType::HostNetworkGroup(_, _, _, _),
-                        ) = (&*input_data, &**input_type)
+                        if let (InputItem::HostNetworkGroup(_), InputType::HostNetworkGroup(_)) =
+                            (&*input_data, &**input_type)
                         {
                             self.verification_host_network
                                 .insert(base_index + index, None);
@@ -1111,16 +1147,18 @@ where
 
                     if let (
                         InputItem::CheckBox(checked, data_children),
-                        InputType::CheckBox(_, _, Some(type_children)),
+                        InputType::CheckBox(config),
                     ) = (&*input_data, &**input_type)
                     {
-                        if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
-                            self.reset_veri_host_network_recursive(
-                                data_children,
-                                &type_children.1,
-                                (base_index + index) * MAX_PER_LAYER,
-                                *checked == CheckStatus::Checked,
-                            );
+                        if let Some((_, config_children)) = config.children.as_ref() {
+                            if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
+                                self.reset_veri_host_network_recursive(
+                                    data_children,
+                                    config_children,
+                                    (base_index + index) * MAX_PER_LAYER,
+                                    *checked == CheckStatus::Checked,
+                                );
+                            }
                         }
                     }
                 }
