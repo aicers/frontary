@@ -35,9 +35,12 @@ use yew::Properties;
 
 pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
-    view_asterisk, ChildrenPosition, Comparison, ComparisonKind, Essential as InputEssential,
+    view_asterisk, CheckBoxConfig, ChildrenPosition, Comparison, ComparisonConfig, ComparisonKind,
+    Essential as InputEssential, FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig,
     HostNetworkHtml, HostNetworkKind, InputHostNetworkGroup, InputItem, InputNic, InputTag,
-    InputTagGroup, InputType, Model as Input, Tag, Value as ComparisonValue, ValueKind,
+    InputTagGroup, InputType, Model as Input, NicConfig, PasswordConfig, PercentageConfig,
+    RadioConfig, SelectMultipleConfig, SelectSingleConfig, Tag, TagConfig, TextConfig,
+    Unsigned32Config, Value as ComparisonValue, ValueKind, VecSelectConfig,
 };
 pub use crate::ip_range_input::Model as IpRangeInput;
 pub use crate::language::Language;
