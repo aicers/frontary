@@ -10,7 +10,7 @@ use super::{
     InputItem,
 };
 use crate::{
-    text, CheckBox, CheckStatus, ChildrenPosition, InputEssential, InputType, Radio, ViewString,
+    text, CheckBox, CheckStatus, ChildrenPosition, InputConfig, InputEssential, Radio, ViewString,
 };
 
 impl<T> Model<T>
@@ -24,7 +24,7 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         options: &[ViewString],
-        children_group: &[Option<Vec<Rc<InputType>>>],
+        children_group: &[Option<Vec<Rc<InputConfig>>>],
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
@@ -138,7 +138,7 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         always: Option<CheckStatus>,
-        children: &Option<(ChildrenPosition, Vec<Rc<InputType>>)>,
+        children: &Option<(ChildrenPosition, Vec<Rc<InputConfig>>)>,
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
@@ -267,7 +267,7 @@ where
     pub(super) fn view_child(
         &self,
         ctx: &Context<Self>,
-        child: &Rc<InputType>,
+        child: &Rc<InputConfig>,
         child_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
@@ -277,7 +277,7 @@ where
         class_line: &'static str,
     ) -> Html {
         match &**child {
-            InputType::CheckBox(config) => {
+            InputConfig::CheckBox(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}> // TODO: remove this empty div
@@ -286,7 +286,7 @@ where
                     </div>
                 }
             }
-            InputType::Radio(config) => {
+            InputConfig::Radio(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
@@ -295,7 +295,7 @@ where
                     </div>
                 }
             }
-            InputType::HostNetworkGroup(config) => {
+            InputConfig::HostNetworkGroup(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
@@ -304,7 +304,7 @@ where
                     </div>
                 }
             }
-            InputType::Unsigned32(config) => {
+            InputConfig::Unsigned32(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
@@ -313,7 +313,7 @@ where
                     </div>
                 }
             }
-            InputType::SelectMultiple(config) => {
+            InputConfig::SelectMultiple(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
@@ -322,7 +322,7 @@ where
                     </div>
                 }
             }
-            InputType::Text(config) => {
+            InputConfig::Text(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}>
@@ -343,7 +343,7 @@ where
         ess: &InputEssential,
         one_row: bool,
         widths: &[Option<u32>],
-        group_type: &[Rc<InputType>],
+        group_type: &[Rc<InputConfig>],
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
@@ -416,30 +416,30 @@ where
                                                                 <div class="input-group-item-outer">
                                                                 {
                                                                     match &**each {
-                                                                        InputType::Text(config) => {
+                                                                        InputConfig::Text(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_text(ctx, &ess, config.length, config.width, input_data, col_index, base_index, false, true)
                                                                         }
-                                                                        InputType::SelectSingle(config) => {
+                                                                        InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data, col_index, base_index, 1, true)
                                                                         }
-                                                                        InputType::VecSelect(config) => {
+                                                                        InputConfig::VecSelect(config) => {
                                                                             self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths, &config.max_heights, &config.map_list, input_data, col_index, base_index, true)
                                                                         }
-                                                                        InputType::Unsigned32(config) => {
+                                                                        InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data, col_index, base_index, false, true)
                                                                         }
-                                                                        InputType::Float64(config) => {
+                                                                        InputConfig::Float64(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_float_64(ctx, &ess, config.step, config.width, input_data, col_index, base_index, false, true)
                                                                         }
-                                                                        InputType::Comparison(config) => {
+                                                                        InputConfig::Comparison(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_comparison(ctx, &ess, input_data, col_index, base_index, true)
