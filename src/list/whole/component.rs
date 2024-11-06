@@ -10,7 +10,7 @@ use crate::{
     input::InputSecondId,
     language::Language,
     list::{DataType, DisplayInfo, Kind, ListItem},
-    text, CheckStatus, Input, InputItem, InputTag, InputType, MoreAction, PagesInfo, SelectMini,
+    text, CheckStatus, Input, InputConfig, InputItem, InputTag, MoreAction, PagesInfo, SelectMini,
     SelectMiniKind, SortStatus, Texts, ViewString,
 };
 
@@ -139,7 +139,7 @@ where
     pub input_edit_title: &'static str,
     pub input_width: u32,
     pub input_height: u32,
-    pub input_type: Vec<Rc<InputType>>,
+    pub input_conf: Vec<Rc<InputConfig>>,
 
     #[prop_or(None)]
     pub input_second_data: Option<Vec<Rc<RefCell<InputItem>>>>,
@@ -153,7 +153,7 @@ where
     #[prop_or(None)]
     pub input_second_height: Option<u32>,
     #[prop_or(None)]
-    pub input_second_type: Option<Vec<Rc<InputType>>>,
+    pub input_second_type: Option<Vec<Rc<InputConfig>>>,
 
     #[prop_or(None)]
     pub br_separator: Option<&'static str>,
@@ -881,7 +881,7 @@ where
                                         title={title}
                                         width={ctx.props().input_width}
                                         height={ctx.props().input_height}
-                                        input_type={ctx.props().input_type.clone()}
+                                        input_conf={ctx.props().input_conf.clone()}
                                         input_id={input_id}
                                         input_data={ctx.props().input_data.clone()}
                                         input_data_tag={tag}
@@ -927,7 +927,7 @@ where
                                         title={title}
                                         width={ctx.props().input_width}
                                         height={ctx.props().input_height}
-                                        input_type={ctx.props().input_type.clone()}
+                                        input_conf={ctx.props().input_conf.clone()}
                                         input_id={input_id}
                                         input_second_id={second_id}
 

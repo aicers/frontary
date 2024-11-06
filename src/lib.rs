@@ -37,8 +37,8 @@ pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
     view_asterisk, CheckBoxConfig, ChildrenPosition, Comparison, ComparisonConfig, ComparisonKind,
     Essential as InputEssential, FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig,
-    HostNetworkHtml, HostNetworkKind, InputHostNetworkGroup, InputItem, InputNic, InputTag,
-    InputTagGroup, InputType, Model as Input, NicConfig, PasswordConfig, PercentageConfig,
+    HostNetworkHtml, HostNetworkKind, InputConfig, InputHostNetworkGroup, InputItem, InputNic,
+    InputTag, InputTagGroup, Model as Input, NicConfig, PasswordConfig, PercentageConfig,
     RadioConfig, SelectMultipleConfig, SelectSingleConfig, Tag, TagConfig, TextConfig,
     Unsigned32Config, Value as ComparisonValue, ValueKind, VecSelectConfig,
 };

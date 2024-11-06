@@ -11,7 +11,7 @@ use super::{
 };
 use crate::{
     list::{ColWidths, Column, DataType, Kind, ListItem},
-    text, CheckBox, CheckStatus, InputType, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
+    text, CheckBox, CheckStatus, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
     SortStatus, ViewString, WholeList, NBSP,
 };
 
@@ -412,7 +412,7 @@ where
                                             Some(edit_title),
                                             Some(width),
                                             Some(height),
-                                            Some(input_type),
+                                            Some(input_conf),
                                             Some(second_data),
                                             Ok(check_status_second),
                                         ) = (
@@ -447,7 +447,7 @@ where
                                                     input_edit_title={edit_title}
                                                     input_width={width}
                                                     input_height={height}
-                                                    input_type={input_type.clone()}
+                                                    input_conf={input_conf.clone()}
                                                     input_second_data={Some(second_data.clone())}
                                                     messages={ctx.props().messages.clone()}
                                                 />
@@ -718,8 +718,8 @@ where
                 let mut list = tags
                     .iter()
                     .filter_map(|t| {
-                        ctx.props().input_type.get(index).and_then(|x| {
-                            if let InputType::Tag(config) = &**x {
+                        ctx.props().input_conf.get(index).and_then(|x| {
+                            if let InputConfig::Tag(config) = &**x {
                                 config.name_map.get(t).cloned()
                             } else {
                                 None
@@ -741,10 +741,10 @@ where
                 }
             }
             Column::Group(group) => {
-                let Some(input_type) = ctx.props().input_type.get(index) else {
+                let Some(input_conf) = ctx.props().input_conf.get(index) else {
                     return html! {};
                 };
-                let InputType::Group(config) = &**input_type else {
+                let InputConfig::Group(config) = &**input_conf else {
                     return html! {};
                 };
 
