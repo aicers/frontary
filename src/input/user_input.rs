@@ -75,8 +75,8 @@ where
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Text(txt) = &(*input_data) {
-                txt.clone()
+            if let InputItem::Text(data) = &(*input_data) {
+                data.to_string()
             } else {
                 String::new()
             }
@@ -324,8 +324,8 @@ where
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Unsigned32(value) = *input_data {
-                value
+            if let InputItem::Unsigned32(value) = &*input_data {
+                value.into_inner()
             } else {
                 None
             }
@@ -454,8 +454,8 @@ where
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Float64(value) = *input_data {
-                value
+            if let InputItem::Float64(value) = &*input_data {
+                value.into_inner()
             } else {
                 None
             }
@@ -580,8 +580,8 @@ where
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Percentage(value) = *input_data {
-                value.map(|v| v * 100.0)
+            if let InputItem::Percentage(value) = &*input_data {
+                value.as_ref().map(|v| v * 100.0)
             } else {
                 None
             }
@@ -783,8 +783,8 @@ where
         });
         let txt = ctx.props().txt.txt.clone();
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::File(name, _) = &(*input_data) {
-                name.clone()
+            if let InputItem::File(file) = &(*input_data) {
+                file.name().to_string()
             } else {
                 String::new()
             }

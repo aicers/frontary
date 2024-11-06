@@ -8,7 +8,7 @@ use super::{
     super::CheckStatus,
     component::{InvalidMessage, Model, Verification},
     user_input::MAX_PER_LAYER,
-    InputConfig, InputItem,
+    GroupItem, InputConfig, InputItem,
 };
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
@@ -40,20 +40,22 @@ where
                     match (&*data, &**input_conf) {
                         (InputItem::HostNetworkGroup(data), InputConfig::HostNetworkGroup(_)) => {
                             self.host_network_buffer
-                                .insert(this_index, Rc::new(RefCell::new(data.clone())));
+                                .insert(this_index, Rc::new(RefCell::new(data.into_inner())));
                         }
                         (InputItem::SelectMultiple(data), InputConfig::SelectMultiple(config)) => {
                             if config.all {
                                 self.select_searchable_buffer
                                     .insert(this_index, Rc::new(RefCell::new(None)));
                             } else {
-                                self.select_searchable_buffer
-                                    .insert(this_index, Rc::new(RefCell::new(Some(data.clone()))));
+                                self.select_searchable_buffer.insert(
+                                    this_index,
+                                    Rc::new(RefCell::new(Some(data.into_inner()))),
+                                );
                             }
                         }
                         (InputItem::SelectSingle(data), InputConfig::SelectSingle(_)) => {
                             let mut buf = HashSet::new();
-                            if let Some(data) = data {
+                            if let Some(data) = data.as_ref() {
                                 buf.insert(data.clone());
                             }
                             self.select_searchable_buffer
@@ -61,7 +63,7 @@ where
                         }
                         (InputItem::Tag(data), InputConfig::Tag(_)) => {
                             self.tag_buffer
-                                .insert(this_index, Rc::new(RefCell::new(data.clone())));
+                                .insert(this_index, Rc::new(RefCell::new(data.into_inner())));
                         }
                         (
                             InputItem::Radio(data_option, data_children_group),
@@ -110,7 +112,7 @@ where
                                                 InputConfig::SelectSingle(..),
                                             ) => {
                                                 let mut buf = HashSet::new();
-                                                if let Some(data) = data {
+                                                if let Some(data) = data.as_ref() {
                                                     buf.insert(data.clone());
                                                 }
                                                 self.select_searchable_buffer.insert(
@@ -124,7 +126,9 @@ where
                                             ) => {
                                                 let (mut buf, mut kind) =
                                                     (HashSet::new(), HashSet::new());
-                                                let (first, second) = if let Some(data) = data {
+                                                let (first, second) = if let Some(data) =
+                                                    data.as_ref()
+                                                {
                                                     buf.insert(data.value_kind().to_string());
                                                     kind.insert(data.comparison_kind().to_string());
                                                     (Some(data.first()), data.second())
@@ -248,7 +252,7 @@ where
                                 }
                             }
                         }
-                        (InputItem::File(_, _), InputConfig::File(config)) => {
+                        (InputItem::File(_), InputConfig::File(config)) => {
                             if let Some(default) = &config.ess.default {
                                 if parent_checked {
                                     *item = default.clone();
@@ -342,7 +346,9 @@ where
                                 if let Some(default) = default.first() {
                                     if let Some(copy_default) = Self::copy_default(default) {
                                         if parent_checked {
-                                            *item = InputItem::Group(vec![copy_default]);
+                                            *item = InputItem::Group(GroupItem::new(vec![
+                                                copy_default,
+                                            ]));
                                         }
                                     }
                                 }
@@ -386,14 +392,16 @@ where
     }
 
     pub(super) fn default_to_buffer_select_single(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::SelectSingle(Some(default)), Some(buffer)) =
+        if let (InputItem::SelectSingle(default), Some(buffer)) =
             (default, self.select_searchable_buffer.get(&id))
         {
-            if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                if !default.is_empty() {
-                    let mut value: HashSet<String> = HashSet::new();
-                    value.insert(default.clone());
-                    *buffer = Some(value);
+            if let Some(default) = default.selected() {
+                if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                    if !default.is_empty() {
+                        let mut value: HashSet<String> = HashSet::new();
+                        value.insert(default.to_string());
+                        *buffer = Some(value);
+                    }
                 }
             }
         }
@@ -405,7 +413,7 @@ where
         {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
                 if !default.is_empty() {
-                    *buffer = Some(default.clone());
+                    *buffer = Some(default.into_inner());
                 }
             }
         }
@@ -452,7 +460,7 @@ where
                 if let Ok(item) = input_data.try_borrow() {
                     if parent_checked && (*input_conf).required() {
                         let empty = match &(*item) {
-                            InputItem::Text(txt) => txt.is_empty(),
+                            InputItem::Text(data) => data.is_empty(),
                             InputItem::Radio(option, _) => option.is_empty(),
                             InputItem::Password(pw) => {
                                 // HIGHLIGHT: In case of Edit, empty means no change of passwords
@@ -495,7 +503,7 @@ where
                                     }
                                 })
                                 .is_none(),
-                            InputItem::File(_, content) => content.is_empty(),
+                            InputItem::File(file) => file.content().is_empty(),
                             InputItem::Comparison(cmp) => cmp.is_none(),
                             InputItem::Tag(_) | InputItem::Group(_) => false,
                         };
@@ -639,33 +647,37 @@ where
                     // HIGHTLIGHT: All kinds are not necessarily to be verified.
                     // HIGHTLIGHT: Since HostNetworkGroup items were verified yet, they don't need to be verified here.
                     match (&*input_data, &**input_conf) {
-                        (InputItem::Unsigned32(Some(value)), InputConfig::Unsigned32(config)) => {
-                            if parent_checked {
-                                if *value >= config.min && *value <= config.max {
-                                    self.verification
-                                        .insert(base_index + index, Verification::Valid);
-                                } else {
-                                    self.verification.insert(
-                                        base_index + index,
-                                        Verification::Invalid(InvalidMessage::InvalidInput),
-                                    );
-                                    rtn = false;
+                        (InputItem::Unsigned32(value), InputConfig::Unsigned32(config)) => {
+                            if let Some(value) = value.as_ref() {
+                                if parent_checked {
+                                    if *value >= config.min && *value <= config.max {
+                                        self.verification
+                                            .insert(base_index + index, Verification::Valid);
+                                    } else {
+                                        self.verification.insert(
+                                            base_index + index,
+                                            Verification::Invalid(InvalidMessage::InvalidInput),
+                                        );
+                                        rtn = false;
+                                    }
                                 }
                             }
                         }
-                        (InputItem::Percentage(Some(value)), InputConfig::Percentage(config)) => {
-                            if parent_checked {
-                                if *value >= config.min.unwrap_or(0.0)
-                                    && *value <= config.max.unwrap_or(1.0)
-                                {
-                                    self.verification
-                                        .insert(base_index + index, Verification::Valid);
-                                } else {
-                                    self.verification.insert(
-                                        base_index + index,
-                                        Verification::Invalid(InvalidMessage::InvalidInput),
-                                    );
-                                    rtn = false;
+                        (InputItem::Percentage(value), InputConfig::Percentage(config)) => {
+                            if let Some(value) = value.as_ref() {
+                                if parent_checked {
+                                    if *value >= config.min.unwrap_or(0.0)
+                                        && *value <= config.max.unwrap_or(1.0)
+                                    {
+                                        self.verification
+                                            .insert(base_index + index, Verification::Valid);
+                                    } else {
+                                        self.verification.insert(
+                                            base_index + index,
+                                            Verification::Invalid(InvalidMessage::InvalidInput),
+                                        );
+                                        rtn = false;
+                                    }
                                 }
                             }
                         }
