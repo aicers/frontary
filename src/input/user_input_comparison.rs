@@ -8,7 +8,7 @@ use yew::{events::InputEvent, html, Component, Context, Html};
 use super::{
     component::{Message, Model},
     user_input::view_asterisk,
-    Comparison, ComparisonKind, InputItem, Value as ComparisonValue, ValueKind,
+    Comparison, ComparisonItem, ComparisonKind, InputItem, Value as ComparisonValue, ValueKind,
 };
 use crate::{text, InputEssential, Item, SelectSearchableKind, VecSelect, ViewString};
 
@@ -308,7 +308,7 @@ where
         };
 
         if let Ok(mut data) = input_data.try_borrow_mut() {
-            *data = InputItem::Comparison(set);
+            *data = InputItem::Comparison(ComparisonItem::new(set));
         }
     }
 
@@ -369,13 +369,13 @@ where
         if cmp.chain_cmp() {
             if let (Some(first), Some(second)) = (&*first, &*second) {
                 if let Ok(data) = Comparison::try_new(cmp, first.clone(), Some(second.clone())) {
-                    *input_data = Some(data);
+                    *input_data = ComparisonItem::new(Some(data));
                     self.required_msg.remove(&data_id);
                 }
             }
         } else if let Some(first) = &*first {
             if let Ok(data) = Comparison::try_new(cmp, first.clone(), None) {
-                *input_data = Some(data);
+                *input_data = ComparisonItem::new(Some(data));
                 self.required_msg.remove(&data_id);
             }
         }
@@ -387,7 +387,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
     ) {
         if let Ok(mut data) = input_data.try_borrow_mut() {
-            *data = InputItem::Comparison(None);
+            *data = InputItem::Comparison(ComparisonItem::new(None));
         }
         let Some((first, second)) = self.comparison_value_buffer.get(&data_id) else {
             return;

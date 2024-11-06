@@ -35,12 +35,15 @@ use yew::Properties;
 
 pub use crate::checkbox::{CheckStatus, Model as CheckBox};
 pub use crate::input::{
-    view_asterisk, CheckBoxConfig, ChildrenPosition, Comparison, ComparisonConfig, ComparisonKind,
-    Essential as InputEssential, FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig,
-    HostNetworkHtml, HostNetworkKind, InputConfig, InputHostNetworkGroup, InputItem, InputNic,
-    InputTag, InputTagGroup, Model as Input, NicConfig, PasswordConfig, PercentageConfig,
-    RadioConfig, SelectMultipleConfig, SelectSingleConfig, Tag, TagConfig, TextConfig,
-    Unsigned32Config, Value as ComparisonValue, ValueKind, VecSelectConfig,
+    view_asterisk, CheckBoxConfig, ChildrenPosition, Comparison, ComparisonConfig, ComparisonItem,
+    ComparisonKind, Essential as InputEssential, FileConfig, FileItem, Float64Config, Float64Item,
+    GroupConfig, GroupItem, HostNetworkGroupConfig, HostNetworkGroupItem, HostNetworkHtml,
+    HostNetworkKind, InputConfig, InputHostNetworkGroup, InputItem, InputNic, InputTag,
+    InputTagGroup, Model as Input, NicConfig, NicItem, PasswordConfig, PasswordItem,
+    PercentageConfig, PercentageItem, RadioConfig, SelectMultipleConfig, SelectMultipleItem,
+    SelectSingleConfig, SelectSingleItem, Tag, TagConfig, TagItem, TextConfig, TextItem,
+    Unsigned32Config, Unsigned32Item, Value as ComparisonValue, ValueKind, VecSelectConfig,
+    VecSelectItem,
 };
 pub use crate::ip_range_input::Model as IpRangeInput;
 pub use crate::language::Language;
@@ -400,11 +403,8 @@ pub fn sort_hosts(hosts: &mut Vec<String>) {
     hosts.dedup();
 }
 
+#[allow(clippy::missing_panics_doc)] // because it never happens
 /// Sorts networks by the network address.
-///
-/// # Panics
-///
-/// If "0.0.0.0/32" cannot be parsed as `Ipv4Net`.
 pub fn sort_networks(networks: &mut Vec<String>) {
     networks.sort_unstable_by_key(|n| {
         if let Ok(network) = Ipv4Net::from_str(n) {
