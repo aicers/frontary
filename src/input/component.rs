@@ -11,8 +11,10 @@ use json_gettext::get_text;
 use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 use super::{
-    user_input::MAX_PER_LAYER, InputConfig, InputHostNetworkGroup, InputItem, InputTag,
-    InputTagGroup, Value as ComparisonValue,
+    user_input::MAX_PER_LAYER, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
+    InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
+    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
+    Value as ComparisonValue,
 };
 use crate::{
     language::Language,
@@ -438,7 +440,7 @@ where
                                     buffer.old.remove(&deleted);
                                 }
                                 buffer.delete = None;
-                                *item = InputItem::Tag((*buffer).clone());
+                                *item = InputItem::Tag(TagItem::new((*buffer).clone()));
                             }
                             if let Ok(mut buffer) = buffer.try_borrow_mut() {
                                 if let Some(new) = buffer.new.as_ref() {
@@ -449,7 +451,7 @@ where
                                 }
                                 // no need to verify the value has been actually edited right.
                                 buffer.edit = None;
-                                *item = InputItem::Tag((*buffer).clone());
+                                *item = InputItem::Tag(TagItem::new((*buffer).clone()));
                             }
                         }
                     }
@@ -516,14 +518,14 @@ where
             }
             Message::InputText(id, txt, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Text(txt.clone());
+                    *item = InputItem::Text(TextItem::new(txt.clone()));
                 }
                 self.clear_required_msg(id, txt.is_empty());
                 self.unique_msg.remove(&id);
             }
             Message::InputPassword(id, txt, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Password(txt.clone());
+                    *item = InputItem::Password(PasswordItem::new(txt.clone()));
                 }
                 self.clear_required_msg(id, txt.is_empty());
             }
@@ -533,14 +535,14 @@ where
             }
             Message::InputUnsigned32(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Unsigned32(Some(value));
+                    *item = InputItem::Unsigned32(Unsigned32Item::new(Some(value)));
                 }
                 self.clear_required_msg(id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InputFloat64(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Float64(Some(value));
+                    *item = InputItem::Float64(Float64Item::new(Some(value)));
                 }
                 self.clear_required_msg(id, false);
                 self.unique_msg.remove(&id);
@@ -551,7 +553,7 @@ where
             | Message::InvalidInputComparisonValue => return false,
             Message::InputPercentage(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Percentage(Some(value));
+                    *item = InputItem::Percentage(PercentageItem::new(Some(value)));
                 }
                 self.clear_required_msg(id, false);
                 self.unique_msg.remove(&id);
@@ -583,7 +585,9 @@ where
                     let empty = if let Ok(buffer) = buffer.try_borrow() {
                         if let Some(buffer) = buffer.as_ref() {
                             if let Ok(mut item) = input_data.try_borrow_mut() {
-                                *item = InputItem::SelectMultiple(buffer.clone());
+                                *item = InputItem::SelectMultiple(SelectMultipleItem::new(
+                                    buffer.clone(),
+                                ));
                             }
                             buffer.is_empty()
                         } else if let Ok(mut item) = input_data.try_borrow_mut() {
@@ -591,7 +595,7 @@ where
                                 .iter()
                                 .map(|item| item.0.clone())
                                 .collect::<HashSet<String>>();
-                            *item = InputItem::SelectMultiple(list);
+                            *item = InputItem::SelectMultiple(SelectMultipleItem::new(list));
                             false
                         } else {
                             false
@@ -608,11 +612,11 @@ where
                         if let Some(buffer) = buffer.as_ref() {
                             let selected = buffer.iter().map(Clone::clone).next();
                             if let Ok(mut item) = input_data.try_borrow_mut() {
-                                *item = InputItem::SelectSingle(selected);
+                                *item = InputItem::SelectSingle(SelectSingleItem::new(selected));
                             }
                             buffer.is_empty()
                         } else if let Ok(mut item) = input_data.try_borrow_mut() {
-                            *item = InputItem::SelectSingle(None);
+                            *item = InputItem::SelectSingle(SelectSingleItem::new(None));
                             false
                         } else {
                             false
@@ -648,7 +652,7 @@ where
                 let (new, edit, delete) = if let Some(buffer) = self.tag_buffer.get(&id) {
                     let (empty, new, edit, delete) = if let Ok(buffer) = buffer.try_borrow_mut() {
                         if let Ok(mut item) = input_data.try_borrow_mut() {
-                            *item = InputItem::Tag(buffer.clone());
+                            *item = InputItem::Tag(TagItem::new(buffer.clone()));
                         }
                         (
                             buffer.old.is_empty(),
@@ -792,7 +796,7 @@ where
                                 if let Ok(d) = d.try_borrow() {
                                     if let InputItem::SelectSingle(copied_default) = &*d {
                                         let mut buf = HashSet::new();
-                                        if let Some(copied_default) = copied_default {
+                                        if let Some(copied_default) = copied_default.as_ref() {
                                             buf.insert(copied_default.clone());
                                         }
                                         self.select_searchable_buffer.insert(
@@ -940,7 +944,7 @@ where
                 if let Some(input_data) = self.file_input_data.as_ref() {
                     if let Ok(mut item) = input_data.try_borrow_mut() {
                         let content = BASE64.encode(&file);
-                        *item = InputItem::File(file_name, content);
+                        *item = InputItem::File(FileItem::new(file_name, content));
                     }
                 }
                 self.file_reader = None;
@@ -1113,7 +1117,7 @@ where
                     sort_hosts(&mut n.hosts);
                     sort_networks(&mut n.networks);
                     n.ranges.sort_unstable();
-                    *item = InputItem::HostNetworkGroup(n);
+                    *item = InputItem::HostNetworkGroup(HostNetworkGroupItem::new(n));
                 }
                 buffer.is_empty()
             } else {
@@ -1154,7 +1158,7 @@ where
                                             InputItem::Text(value),
                                         ) = (other, &(*input))
                                         {
-                                            if other_value == value {
+                                            if value == other_value {
                                                 different = false;
                                                 break;
                                             }

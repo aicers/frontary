@@ -1,6 +1,8 @@
 #![allow(clippy::module_name_repetitions)]
 mod component;
+mod config;
 mod host_network;
+mod item;
 mod recursive;
 mod tag;
 mod user_input;
@@ -9,26 +11,27 @@ mod user_input_composite;
 mod user_input_nic;
 mod user_input_select;
 
-use std::{
-    cell::RefCell,
-    collections::{HashMap, HashSet},
-    fmt,
-    rc::Rc,
-};
+use std::{collections::HashSet, fmt};
 
 use bincode::Options;
 pub use component::{InputSecondId, Model};
+pub use config::{
+    CheckBoxConfig, ChildrenPosition, ComparisonConfig, Essential, FileConfig, Float64Config,
+    GroupConfig, HostNetworkGroupConfig, InputConfig, NicConfig, PasswordConfig, PercentageConfig,
+    RadioConfig, SelectMultipleConfig, SelectSingleConfig, TagConfig, TextConfig, Unsigned32Config,
+    VecSelectConfig,
+};
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
+pub use item::{
+    ComparisonItem, FileItem, Float64Item, HostNetworkGroupItem, InputItem, NicItem, PasswordItem,
+    PercentageItem, SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
+};
 use strum_macros::{Display, EnumIter, EnumString};
 pub use tag::Model as Tag;
 
 pub use self::user_input::view_asterisk;
-use self::user_input_select::VecSelectListMap;
-use crate::list::Column;
-use crate::{
-    parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange, ViewString,
-};
+use crate::{parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange};
 
 #[derive(Clone, PartialEq, Eq, Default)]
 pub struct InputHostNetworkGroup {
@@ -40,6 +43,12 @@ impl InputHostNetworkGroup {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.hosts.is_empty() && self.networks.is_empty() && self.ranges.is_empty()
+    }
+
+    pub fn clear(&mut self) {
+        self.hosts.clear();
+        self.networks.clear();
+        self.ranges.clear();
     }
 }
 
@@ -64,6 +73,20 @@ pub struct InputTagGroup {
     pub delete: Option<String>,         // the key that users want to be deleted
 }
 
+impl InputTagGroup {
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.old.is_empty() && self.new.is_none() && self.edit.is_none() && self.delete.is_none()
+    }
+
+    pub fn clear(&mut self) {
+        self.old.clear();
+        self.new = None;
+        self.edit = None;
+        self.delete = None;
+    }
+}
+
 #[derive(Clone, PartialEq, Eq, Default)]
 pub struct InputNic {
     pub name: String,
@@ -78,263 +101,12 @@ pub struct InputTag {
     pub delete: Option<String>,
 }
 
-#[derive(Clone, PartialEq)]
-pub struct Essential {
-    pub title: String,
-    pub notice: &'static str,
-    pub required: bool,
-    pub unique: bool, // for InputConfig::Text only. In other cases, this is meaningless.
-    pub default: Option<InputItem>, // in CheckBox, CheckStatus only should be set properly in hierarchical meaning
-                                    // e.g. `default: Some(InputItem::CheckBox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
-                                    // as for VecSelect, default should be like the below
-                                    // let v = vec![HashSet::new(), HashSet::new()];
-                                    // ess.default = Some(InputItem::VecSelect(v));
-}
-
-impl Essential {
-    #[must_use]
-    pub fn title(&self) -> &str {
-        self.title.as_str()
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum ChildrenPosition {
-    NextLine,
-    Right,
-}
-
 #[derive(Clone, Copy, Display, EnumIter, EnumString, Eq, PartialEq)]
 #[strum(serialize_all = "PascalCase")]
 pub enum ValueKind {
     String,
     Integer,
     Float,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct TextConfig {
-    pub ess: Essential,
-    pub length: Option<usize>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct PasswordConfig {
-    pub ess: Essential,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct HostNetworkGroupConfig {
-    pub ess: Essential,
-    pub kind: HostNetworkKind,
-    /// The number of user inputs for `HostNetworkGroup`.
-    pub num: Option<usize>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct SelectSingleConfig {
-    pub ess: Essential,
-    /// The list of options for user selection. Each element is a tuple of key and display string.
-    pub options: Vec<(String, ViewString)>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct SelectMultipleConfig {
-    pub ess: Essential,
-    /// The list of options for user selection. Each element is a tuple of key and display string.
-    pub options: Option<Vec<(String, ViewString)>>,
-    /// Just in case of using the NIC list, the index of data's NIC.
-    pub nic_index: Option<usize>,
-    pub width: Option<u32>,
-    /// This represents whether all options are selected by default.
-    pub all: bool,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct VecSelectConfig {
-    pub ess: Essential,
-    pub items_ess_list: Vec<Essential>,
-    /// Whether the last item is for selecting multiple items.
-    pub last: bool,
-    pub map_list: Vec<VecSelectListMap>,
-    pub full_width: Option<u32>,
-    /// The list of width for each item.
-    pub widths: Vec<u32>,
-    /// The list of max width for each item.
-    pub max_widths: Vec<u32>,
-    /// The list of max height for each item.
-    pub max_heights: Vec<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct TagConfig {
-    pub ess: Essential,
-    /// The map of tag's key and name.
-    pub name_map: HashMap<String, String>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Unsigned32Config {
-    pub ess: Essential,
-    pub min: u32,
-    pub max: u32,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Float64Config {
-    pub ess: Essential,
-    pub step: Option<f64>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct PercentageConfig {
-    pub ess: Essential,
-    pub min: Option<f32>,
-    pub max: Option<f32>,
-    /// The number of decimal places.
-    pub num_decimals: Option<usize>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct NicConfig {
-    pub ess: Essential,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct FileConfig {
-    pub ess: Essential,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct ComparisonConfig {
-    pub ess: Essential,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct GroupConfig {
-    // TODO: This comment should be clarified.
-    /// If `Essesntial::required` is set true, one valid row should be included at least. If one or
-    /// more of columns in a given row are not empty, all the columns with `Essential::required ==
-    /// true` cannot be empty.
-    pub ess: Essential,
-    /// If true, all items are displayed in one row. If false, each item is displayed in one row.
-    pub all_in_one_row: bool,
-    /// The list of width for each column. Some if fixed, None if not fixed.
-    pub widths: Vec<Option<u32>>,
-    pub items: Vec<Rc<InputConfig>>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct CheckBoxConfig {
-    pub ess: Essential,
-    // TODO: Check if the below second line is guaranteed.
-    /// `Some(CheckStatus::{Checked|Unchecked|Indeterminate})` means this is always that status.
-    /// This should not contradict with the result of all the configured status of children.
-    pub always: Option<CheckStatus>,
-    pub children: Option<(ChildrenPosition, Vec<Rc<InputConfig>>)>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct RadioConfig {
-    pub ess: Essential,
-    pub options: Vec<ViewString>,
-    /// The list of children group. Each option corresponds to one children of the group.
-    pub children_group: Vec<Option<Vec<Rc<InputConfig>>>>,
-}
-
-#[derive(Clone, PartialEq)]
-pub enum InputConfig {
-    Text(TextConfig),
-    Password(PasswordConfig),
-    HostNetworkGroup(HostNetworkGroupConfig),
-    SelectSingle(SelectSingleConfig),
-    SelectMultiple(SelectMultipleConfig),
-    VecSelect(VecSelectConfig),
-    Tag(TagConfig),
-    Unsigned32(Unsigned32Config),
-    Float64(Float64Config),
-    Percentage(PercentageConfig),
-    Nic(NicConfig),
-    File(FileConfig),
-    Comparison(ComparisonConfig),
-    Group(GroupConfig),
-    CheckBox(CheckBoxConfig),
-    Radio(RadioConfig),
-}
-
-impl InputConfig {
-    #[must_use]
-    pub fn required(&self) -> bool {
-        match self {
-            Self::Text(config) => config.ess.required,
-            Self::Password(config) => config.ess.required,
-            Self::HostNetworkGroup(config) => config.ess.required,
-            Self::SelectSingle(config) => config.ess.required,
-            Self::SelectMultiple(config) => config.ess.required,
-            Self::VecSelect(config) => config.ess.required,
-            Self::Tag(config) => config.ess.required,
-            Self::Unsigned32(config) => config.ess.required,
-            Self::Float64(config) => config.ess.required,
-            Self::Percentage(config) => config.ess.required,
-            Self::Nic(config) => config.ess.required,
-            Self::File(config) => config.ess.required,
-            Self::Comparison(config) => config.ess.required,
-            Self::Group(config) => config.ess.required,
-            Self::CheckBox(config) => config.ess.required,
-            Self::Radio(config) => config.ess.required,
-        }
-    }
-
-    #[must_use]
-    pub fn unique(&self) -> bool {
-        match self {
-            Self::Text(config) => config.ess.unique,
-            Self::Password(config) => config.ess.unique,
-            Self::HostNetworkGroup(config) => config.ess.unique,
-            Self::SelectSingle(config) => config.ess.unique,
-            Self::SelectMultiple(config) => config.ess.unique,
-            Self::VecSelect(config) => config.ess.unique,
-            Self::Tag(config) => config.ess.unique,
-            Self::Unsigned32(config) => config.ess.unique,
-            Self::Float64(config) => config.ess.unique,
-            Self::Percentage(config) => config.ess.unique,
-            Self::Nic(config) => config.ess.unique,
-            Self::File(config) => config.ess.unique,
-            Self::Comparison(config) => config.ess.unique,
-            Self::Group(config) => config.ess.unique,
-            Self::CheckBox(config) => config.ess.unique,
-            Self::Radio(config) => config.ess.unique,
-        }
-    }
-
-    #[must_use]
-    pub fn title(&self) -> &str {
-        match self {
-            Self::Text(config) => config.ess.title(),
-            Self::Password(config) => config.ess.title(),
-            Self::HostNetworkGroup(config) => config.ess.title(),
-            Self::SelectSingle(config) => config.ess.title(),
-            Self::SelectMultiple(config) => config.ess.title(),
-            Self::VecSelect(config) => config.ess.title(),
-            Self::Tag(config) => config.ess.title(),
-            Self::Unsigned32(config) => config.ess.title(),
-            Self::Float64(config) => config.ess.title(),
-            Self::Percentage(config) => config.ess.title(),
-            Self::Nic(config) => config.ess.title(),
-            Self::File(config) => config.ess.title(),
-            Self::Comparison(config) => config.ess.title(),
-            Self::Group(config) => config.ess.title(),
-            Self::CheckBox(config) => config.ess.title(),
-            Self::Radio(config, ..) => config.ess.title(),
-        }
-    }
 }
 
 #[derive(Clone, PartialEq)]
@@ -637,152 +409,6 @@ impl Comparison {
             | Self::NotCloseRange(_, v)
             | Self::NotLeftOpenRange(_, v)
             | Self::NotRightOpenRange(_, v) => Some(v.clone()),
-        }
-    }
-}
-
-#[derive(Clone, PartialEq)]
-pub enum InputItem {
-    Text(String),
-    Password(String),
-    HostNetworkGroup(InputHostNetworkGroup),
-    SelectSingle(Option<String>),    // key
-    SelectMultiple(HashSet<String>), // key
-    VecSelect(Vec<HashSet<String>>), // key, this must be initialized as the same number of `HashSet::new()` as the number of `Select`
-    Tag(InputTagGroup),
-    Unsigned32(Option<u32>),
-    Float64(Option<f64>),
-    Percentage(Option<f32>),
-    CheckBox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
-    Radio(String, Vec<Vec<Rc<RefCell<InputItem>>>>),
-    Nic(Vec<InputNic>),
-    File(String, String), // (file name, base64 encoded content)
-    Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
-    Comparison(Option<Comparison>),
-}
-
-impl InputItem {
-    pub fn clear(&mut self) {
-        match self {
-            InputItem::Text(_) => *self = InputItem::Text(String::new()),
-            InputItem::Password(_) => *self = InputItem::Password(String::new()),
-            InputItem::HostNetworkGroup(group) => *group = InputHostNetworkGroup::default(),
-            InputItem::SelectSingle(item) => *item = None,
-            InputItem::SelectMultiple(list) => list.clear(),
-            InputItem::VecSelect(list) => list.clear(),
-            InputItem::Tag(group) => *group = InputTagGroup::default(),
-            InputItem::Unsigned32(value) => *value = None,
-            InputItem::Float64(value) => *value = None,
-            InputItem::Percentage(value) => *value = None,
-            InputItem::CheckBox(value, children) => {
-                *value = CheckStatus::Unchecked;
-                // if let Some(children) = children {
-                for child in children {
-                    if let Ok(mut child) = child.try_borrow_mut() {
-                        child.clear();
-                    }
-                }
-                // }
-            }
-            InputItem::Radio(value, children_group) => {
-                *value = String::new();
-                for children in children_group {
-                    for child in children {
-                        if let Ok(mut child) = child.try_borrow_mut() {
-                            child.clear();
-                        }
-                    }
-                }
-            }
-            InputItem::Nic(value) => value.clear(),
-            InputItem::File(name, content) => {
-                *name = String::new();
-                *content = String::new();
-            }
-            InputItem::Group(group) => group.clear(),
-            InputItem::Comparison(cmp) => *cmp = None,
-        }
-    }
-}
-
-impl From<&Column> for InputItem {
-    fn from(col: &Column) -> Self {
-        match col {
-            Column::Text(txt) => Self::Text(txt.to_string()),
-            Column::HostNetworkGroup(items) => {
-                let mut input = InputHostNetworkGroup::default();
-                for item in items {
-                    match parse_host_network(item) {
-                        Some(HostNetwork::Host(host)) => input.hosts.push(host),
-                        Some(HostNetwork::Network(network)) => input.networks.push(network),
-                        Some(HostNetwork::Range(range)) => input.ranges.push(range),
-                        _ => (),
-                    }
-                }
-                Self::HostNetworkGroup(input)
-            }
-            Column::SelectSingle(value) => Self::SelectSingle(value.as_ref().map(|d| d.0.clone())),
-            Column::SelectMultiple(list) => {
-                Self::SelectMultiple(list.keys().map(Clone::clone).collect::<HashSet<String>>())
-            }
-            Column::VecSelect(list) => {
-                let list = list
-                    .iter()
-                    .map(|l| l.keys().map(Clone::clone).collect::<HashSet<String>>())
-                    .collect::<Vec<_>>();
-                Self::VecSelect(list)
-            }
-            Column::Tag(tags) => Self::Tag(InputTagGroup {
-                old: tags.clone(),
-                new: None,
-                edit: None,
-                delete: None,
-            }),
-            Column::Unsigned32(value) => Self::Unsigned32(*value),
-            Column::Float64(value) => Self::Float64(*value),
-            Column::Percentage(f, _) => Self::Percentage(*f),
-            Column::Nic(nics) => Self::Nic(nics.clone()),
-            Column::CheckBox(status, children, _) => Self::CheckBox(
-                *status,
-                children
-                    .iter()
-                    .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
-                    .collect::<Vec<Rc<RefCell<InputItem>>>>(),
-            ),
-            Column::Radio(option, children_group, _) => Self::Radio(
-                option.to_string(),
-                children_group
-                    .iter()
-                    .map(|(_, children)| {
-                        children
-                            .iter()
-                            .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
-                            .collect::<Vec<Rc<RefCell<InputItem>>>>()
-                    })
-                    .collect::<_>(),
-            ),
-            Column::Group(group) => {
-                let mut input: Vec<Vec<Rc<RefCell<InputItem>>>> = Vec::new();
-                for g in group {
-                    let mut input_row: Vec<Rc<RefCell<InputItem>>> = Vec::new();
-                    for c in g {
-                        match c {
-                            Column::Text(..)
-                            | Column::Unsigned32(..)
-                            | Column::Float64(..)
-                            | Column::SelectSingle(..)
-                            | Column::VecSelect(..)
-                            | Column::Comparison(..) => {
-                                input_row.push(Rc::new(RefCell::new(c.into())));
-                            }
-                            _ => {}
-                        }
-                    }
-                    input.push(input_row);
-                }
-                Self::Group(input)
-            }
-            Column::Comparison(value) => Self::Comparison(value.clone()),
         }
     }
 }
