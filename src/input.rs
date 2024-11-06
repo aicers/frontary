@@ -83,7 +83,7 @@ pub struct Essential {
     pub title: String,
     pub notice: &'static str,
     pub required: bool,
-    pub unique: bool, // for InputType::Text only. In other cases, this is meaningless.
+    pub unique: bool, // for InputConfig::Text only. In other cases, this is meaningless.
     pub default: Option<InputItem>, // in CheckBox, CheckStatus only should be set properly in hierarchical meaning
                                     // e.g. `default: Some(InputItem::CheckBox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
                                     // as for VecSelect, default should be like the below
@@ -228,7 +228,7 @@ pub struct GroupConfig {
     pub all_in_one_row: bool,
     /// The list of width for each column. Some if fixed, None if not fixed.
     pub widths: Vec<Option<u32>>,
-    pub items: Vec<Rc<InputType>>,
+    pub items: Vec<Rc<InputConfig>>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -238,7 +238,7 @@ pub struct CheckBoxConfig {
     /// `Some(CheckStatus::{Checked|Unchecked|Indeterminate})` means this is always that status.
     /// This should not contradict with the result of all the configured status of children.
     pub always: Option<CheckStatus>,
-    pub children: Option<(ChildrenPosition, Vec<Rc<InputType>>)>,
+    pub children: Option<(ChildrenPosition, Vec<Rc<InputConfig>>)>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -246,11 +246,11 @@ pub struct RadioConfig {
     pub ess: Essential,
     pub options: Vec<ViewString>,
     /// The list of children group. Each option corresponds to one children of the group.
-    pub children_group: Vec<Option<Vec<Rc<InputType>>>>,
+    pub children_group: Vec<Option<Vec<Rc<InputConfig>>>>,
 }
 
 #[derive(Clone, PartialEq)]
-pub enum InputType {
+pub enum InputConfig {
     Text(TextConfig),
     Password(PasswordConfig),
     HostNetworkGroup(HostNetworkGroupConfig),
@@ -269,7 +269,7 @@ pub enum InputType {
     Radio(RadioConfig),
 }
 
-impl InputType {
+impl InputConfig {
     #[must_use]
     pub fn required(&self) -> bool {
         match self {
