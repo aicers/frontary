@@ -29,6 +29,12 @@ pub enum CheckStatus {
     Unchecked,
 }
 
+impl CheckStatus {
+    pub fn get_mut(&mut self) -> &mut CheckStatus {
+        self
+    }
+}
+
 #[derive(Clone, PartialEq, Eq, Properties)]
 pub struct Props {
     #[prop_or(CheckStatus::Unchecked)]

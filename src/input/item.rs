@@ -528,6 +528,122 @@ impl ComparisonItem {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct VecSelectItem {
+    /// The list of groups of selected items. Each group corresponds to one Select component. Each
+    /// item in the group is the key of the selected item. This must be initialized as the same
+    /// number of `HashSet::new()` as the number of Select components.
+    list: Vec<HashSet<String>>,
+}
+
+impl Deref for VecSelectItem {
+    type Target = Vec<HashSet<String>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.list
+    }
+}
+
+impl DerefMut for VecSelectItem {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.list
+    }
+}
+
+impl VecSelectItem {
+    #[must_use]
+    pub fn new(list: Vec<HashSet<String>>) -> Self {
+        Self { list }
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.list.is_empty()
+    }
+
+    #[must_use]
+    pub fn into_inner(&self) -> Vec<HashSet<String>> {
+        self.list.clone()
+    }
+
+    pub fn clear(&mut self) {
+        self.list.clear();
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct GroupItem {
+    group: Vec<Vec<Rc<RefCell<InputItem>>>>,
+}
+
+impl Deref for GroupItem {
+    type Target = Vec<Vec<Rc<RefCell<InputItem>>>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.group
+    }
+}
+
+impl DerefMut for GroupItem {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.group
+    }
+}
+
+impl GroupItem {
+    #[must_use]
+    pub fn new(group: Vec<Vec<Rc<RefCell<InputItem>>>>) -> Self {
+        Self { group }
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.group.is_empty()
+    }
+
+    #[must_use]
+    pub fn into_inner(&self) -> Vec<Vec<Rc<RefCell<InputItem>>>> {
+        self.group.clone()
+    }
+
+    pub fn clear(&mut self) {
+        self.group.clear();
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct CheckboxItem {
+    status: CheckStatus,
+    children: Vec<Rc<RefCell<InputItem>>>,
+}
+
+impl CheckboxItem {
+    #[must_use]
+    pub fn new(status: CheckStatus, children: Vec<Rc<RefCell<InputItem>>>) -> Self {
+        Self { status, children }
+    }
+
+    #[must_use]
+    pub fn status(&self) -> CheckStatus {
+        self.status
+    }
+
+    #[must_use]
+    pub fn children(&self) -> &[Rc<RefCell<InputItem>>] {
+        &self.children
+    }
+
+    pub fn clear(&mut self) {
+        self.status = CheckStatus::Unchecked;
+        for child in &self.children {
+            if let Ok(mut child) = child.try_borrow_mut() {
+                child.clear();
+            }
+        }
+        self.children.clear();
+    }
+}
+
+#[derive(Clone, PartialEq)]
 pub enum InputItem {
     Text(TextItem),
     Password(PasswordItem),
@@ -541,9 +657,9 @@ pub enum InputItem {
     Nic(NicItem),
     File(FileItem),
     Comparison(ComparisonItem),
-    VecSelect(Vec<HashSet<String>>), // key, this must be initialized as the same number of `HashSet::new()` as the number of `Select`
-    Group(Vec<Vec<Rc<RefCell<InputItem>>>>),
-    CheckBox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
+    VecSelect(VecSelectItem),
+    Group(GroupItem),
+    CheckBox(CheckboxItem),
     Radio(String, Vec<Vec<Rc<RefCell<InputItem>>>>),
 }
 
@@ -564,16 +680,7 @@ impl InputItem {
             InputItem::Comparison(cmp) => cmp.clear(),
             InputItem::VecSelect(list) => list.clear(),
             InputItem::Group(group) => group.clear(),
-            InputItem::CheckBox(value, children) => {
-                *value = CheckStatus::Unchecked;
-                // if let Some(children) = children {
-                for child in children {
-                    if let Ok(mut child) = child.try_borrow_mut() {
-                        child.clear();
-                    }
-                }
-                // }
-            }
+            InputItem::CheckBox(checkbox) => checkbox.clear(),
             InputItem::Radio(value, children_group) => {
                 *value = String::new();
                 for children in children_group {
@@ -615,7 +722,7 @@ impl From<&Column> for InputItem {
                     .iter()
                     .map(|l| l.keys().map(Clone::clone).collect::<HashSet<String>>())
                     .collect::<Vec<_>>();
-                Self::VecSelect(list)
+                Self::VecSelect(VecSelectItem::new(list))
             }
             Column::Tag(tags) => Self::Tag(TagItem::new(InputTagGroup {
                 old: tags.clone(),
@@ -627,13 +734,13 @@ impl From<&Column> for InputItem {
             Column::Float64(value) => Self::Float64(Float64Item::new(*value)),
             Column::Percentage(f, _) => Self::Percentage(PercentageItem::new(*f)),
             Column::Nic(nics) => Self::Nic(NicItem::new(nics.clone())),
-            Column::CheckBox(status, children, _) => Self::CheckBox(
+            Column::CheckBox(status, children, _) => Self::CheckBox(CheckboxItem::new(
                 *status,
                 children
                     .iter()
                     .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                     .collect::<Vec<Rc<RefCell<InputItem>>>>(),
-            ),
+            )),
             Column::Radio(option, children_group, _) => Self::Radio(
                 option.to_string(),
                 children_group
@@ -665,7 +772,7 @@ impl From<&Column> for InputItem {
                     }
                     input.push(input_row);
                 }
-                Self::Group(input)
+                Self::Group(GroupItem::new(input))
             }
             Column::Comparison(value) => Self::Comparison(ComparisonItem::new(value.clone())),
         }
