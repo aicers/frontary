@@ -33,9 +33,9 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsCast;
 use yew::Properties;
 
-pub use crate::checkbox::{CheckStatus, Model as CheckBox};
+pub use crate::checkbox::{CheckStatus, Model as Checkbox};
 pub use crate::input::{
-    view_asterisk, CheckBoxConfig, ChildrenPosition, Comparison, ComparisonConfig, ComparisonItem,
+    view_asterisk, CheckboxConfig, ChildrenPosition, Comparison, ComparisonConfig, ComparisonItem,
     ComparisonKind, Essential as InputEssential, FileConfig, FileItem, Float64Config, Float64Item,
     GroupConfig, GroupItem, HostNetworkGroupConfig, HostNetworkGroupItem, HostNetworkHtml,
     HostNetworkKind, InputConfig, InputHostNetworkGroup, InputItem, InputNic, InputTag,

@@ -16,7 +16,7 @@ use std::{collections::HashSet, fmt};
 use bincode::Options;
 pub use component::{InputSecondId, Model};
 pub use config::{
-    CheckBoxConfig, ChildrenPosition, ComparisonConfig, Essential, FileConfig, Float64Config,
+    CheckboxConfig, ChildrenPosition, ComparisonConfig, Essential, FileConfig, Float64Config,
     GroupConfig, HostNetworkGroupConfig, InputConfig, NicConfig, PasswordConfig, PercentageConfig,
     RadioConfig, SelectMultipleConfig, SelectSingleConfig, TagConfig, TextConfig, Unsigned32Config,
     VecSelectConfig,

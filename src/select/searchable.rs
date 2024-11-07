@@ -10,7 +10,7 @@ use yew::virtual_dom::AttrValue;
 use yew::{classes, events::InputEvent, html, Component, Context, Html, Properties};
 
 use crate::{
-    language::Language, shorten_text, text, text_width, toggle_visibility, CheckBox, CheckStatus,
+    language::Language, shorten_text, text, text_width, toggle_visibility, Checkbox, CheckStatus,
     Item, Texts,
 };
 
@@ -521,7 +521,7 @@ where
                                         <tr>
                                             <td class="searchable-select-list-checkbox">
                                                 <div onclick={onclick_all}>
-                                                    <CheckBox status={check_status} />
+                                                    <Checkbox status={check_status} />
                                                 </div>
                                             </td>
                                             <td class="searchable-select-list-item">
@@ -565,7 +565,7 @@ where
                                         <tr>
                                             <td class="searchable-select-list-checkbox">
                                                 <div onclick={onclick_item(item.id().clone())}>
-                                                    <CheckBox status={check_status} />
+                                                    <Checkbox status={check_status} />
                                                 </div>
                                             </td>
                                             <td class="searchable-select-list-item">
@@ -595,7 +595,7 @@ where
                                             <tr>
                                                 <td class="searchable-select-list-checkbox">
                                                     <div onclick={onclick_item(item.id().clone())}>
-                                                        <CheckBox status={check_status} />
+                                                        <Checkbox status={check_status} />
                                                     </div>
                                                 </td>
                                                 <td class="searchable-select-list-item">
