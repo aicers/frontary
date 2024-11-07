@@ -188,7 +188,7 @@ pub enum Message {
     UserInputHostNetworkGroup(usize),
     WrongHostNetworkGroup(usize),
     RightHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
-    ClickCheckBox(usize, Rc<RefCell<InputItem>>),
+    ClickCheckbox(usize, Rc<RefCell<InputItem>>),
     InputNicName(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicInterface(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicGateway(usize, usize, String, Rc<RefCell<InputItem>>),
@@ -233,7 +233,7 @@ impl Clone for Message {
             Self::UserInputHostNetworkGroup(a) => Self::UserInputHostNetworkGroup(*a),
             Self::RightHostNetworkGroup(a, b) => Self::RightHostNetworkGroup(*a, b.clone()),
             Self::WrongHostNetworkGroup(a) => Self::WrongHostNetworkGroup(*a),
-            Self::ClickCheckBox(a, b) => Self::ClickCheckBox(*a, b.clone()),
+            Self::ClickCheckbox(a, b) => Self::ClickCheckbox(*a, b.clone()),
             Self::InputNicName(a, b, c, d) => Self::InputNicName(*a, *b, c.clone(), d.clone()),
             Self::InputNicInterface(a, b, c, d) => {
                 Self::InputNicInterface(*a, *b, c.clone(), d.clone())
@@ -292,7 +292,7 @@ impl PartialEq for Message {
             (Self::InputPercentage(s1, s2, s3), Self::InputPercentage(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::ClickCheckBox(s1, s2), Self::ClickCheckBox(o1, o2))
+            (Self::ClickCheckbox(s1, s2), Self::ClickCheckbox(o1, o2))
             | (Self::InputRadio(s1, s2), Self::InputRadio(o1, o2))
             | (Self::InputTagGroup(s1, s2), Self::InputTagGroup(o1, o2))
             | (Self::InputComparisonValueKind(s1, s2), Self::InputComparisonValueKind(o1, o2))
@@ -724,7 +724,7 @@ where
 
                 return false; // HIGHLIGHT: DO NOT return true
             }
-            Message::ClickCheckBox(data_id, item) => {
+            Message::ClickCheckbox(data_id, item) => {
                 self.radio_buffer_after_checkbox(data_id, &item);
                 self.propagate_checkbox(ctx, &item);
             }
@@ -1071,9 +1071,9 @@ where
                         self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths,
                             &config.items, input_data, index, 1)
                     }
-                    InputConfig::CheckBox(config) => {
+                    InputConfig::Checkbox(config) => {
                         let both = ctx.props().input_conf.get(index + 1).map_or(Some(false),|next| {
-                            if let InputConfig::CheckBox(_) = &**next {
+                            if let InputConfig::Checkbox(_) = &**next {
                                 Some(false)
                             } else {
                                 Some(true)
@@ -1134,7 +1134,7 @@ where
     }
 
     fn decide_unique_all(&mut self, ctx: &Context<Self>) -> bool {
-        // no need to check CheckBox's children because CheckBox and its children don't need to be unique
+        // no need to check Checkbox's children because Checkbox and its children don't need to be unique
         let mut unique = Vec::<bool>::new();
         let id = ctx.props().input_second_id.as_ref().map_or_else(
             || ctx.props().input_id.as_deref(),
@@ -1180,7 +1180,7 @@ where
 
     fn radio_buffer_after_checkbox(&mut self, data_id: usize, item: &Rc<RefCell<InputItem>>) {
         if let Ok(item) = item.try_borrow() {
-            if let InputItem::CheckBox(_, children) = &*item {
+            if let InputItem::Checkbox(_, children) = &*item {
                 for (sub_index, child) in children.iter().enumerate() {
                     if let Ok(child) = child.try_borrow() {
                         if let InputItem::Radio(option, _) = &*child {

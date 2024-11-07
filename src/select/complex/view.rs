@@ -8,7 +8,7 @@ use yew::{events::InputEvent, html, Context, Html};
 
 use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
-    text, window_inner_height, CheckBox, CheckStatus, EndpointKind, NetworkItem, SelectComplexKind,
+    text, window_inner_height, Checkbox, CheckStatus, EndpointKind, NetworkItem, SelectComplexKind,
     SelectMini, SelectMiniKind, SelectionExtraInfo, ViewString, NBSP,
 };
 
@@ -188,7 +188,7 @@ impl Model {
                                             <td class="complex-select-pop-list-list-all-checkbox">
                                                 // All for the below list
                                                 <div onclick={onclick_all}>
-                                                    <CheckBox status={check_status} />
+                                                    <Checkbox status={check_status} />
                                                 </div>
                                             </td>
                                             <td class="complex-select-pop-list-list-all-item">
@@ -309,7 +309,7 @@ impl Model {
                 <tr>
                     <td class="complex-select-pop-list-list-items-checkbox">
                         <div onclick={onclick_item(key)}>
-                            <CheckBox status={checked} />
+                            <Checkbox status={checked} />
                         </div>
                     </td>
                     <td class="complex-select-pop-list-list-items-item" style={style_item_width}>

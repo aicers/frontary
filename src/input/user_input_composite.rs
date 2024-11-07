@@ -10,7 +10,7 @@ use super::{
     InputItem,
 };
 use crate::{
-    text, CheckBox, CheckStatus, ChildrenPosition, InputConfig, InputEssential, Radio, ViewString,
+    text, Checkbox, CheckStatus, ChildrenPosition, InputConfig, InputEssential, Radio, ViewString,
 };
 
 impl<T> Model<T>
@@ -148,10 +148,10 @@ where
         let txt = ctx.props().txt.txt.clone();
         let input_data_msg = input_data.clone();
         let onclick = ctx.link().callback(move |_| {
-            Message::ClickCheckBox(base_index + layer_index, input_data_msg.clone())
+            Message::ClickCheckbox(base_index + layer_index, input_data_msg.clone())
         });
         let checked = if let Ok(data) = input_data.try_borrow() {
-            if let InputItem::CheckBox(checked, _) = (*data).clone() {
+            if let InputItem::Checkbox(checked, _) = (*data).clone() {
                 Some(checked)
             } else {
                 None
@@ -198,7 +198,7 @@ where
                         if always == Some(CheckStatus::Checked) || always == Some(CheckStatus::Unchecked) {
                             html! {
                                 <div class={classes!("input-checkbox-me", class_me)}>
-                                    <CheckBox
+                                    <Checkbox
                                         status={checked}
                                         always={always}
                                     />
@@ -211,7 +211,7 @@ where
                             html! {
                                 <div class={classes!("input-checkbox-me", class_me)}>
                                     <div class="input-checkbox-me-checkbox" onclick={onclick}>
-                                        <CheckBox
+                                        <Checkbox
                                             status={checked}
                                         />
                                     </div>
@@ -229,7 +229,7 @@ where
                             } else if let (Some((position, children)), Ok(input_data)) = (children, input_data.try_borrow()) {
                                 html! {
                                     for children.iter().enumerate().map(|(sub_index, child)| {
-                                        let child_data = if let InputItem::CheckBox(_, childs) = input_data.clone() {
+                                        let child_data = if let InputItem::Checkbox(_, childs) = input_data.clone() {
                                             childs.get(sub_index).cloned()
                                         } else {
                                             None
@@ -277,7 +277,7 @@ where
         class_line: &'static str,
     ) -> Html {
         match &**child {
-            InputConfig::CheckBox(config) => {
+            InputConfig::Checkbox(config) => {
                 html! {
                     <div class={class_child}>
                         <div class={class_line}> // TODO: remove this empty div

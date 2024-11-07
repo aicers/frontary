@@ -11,7 +11,7 @@ use super::{
 };
 use crate::{
     list::{ColWidths, Column, DataType, Kind, ListItem},
-    text, CheckBox, CheckStatus, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
+    text, CheckStatus, Checkbox, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
     SortStatus, ViewString, WholeList, NBSP,
 };
 
@@ -33,7 +33,7 @@ where
                 <tr class="list-whole-head">
                     <td class="list-whole-head-check" rowspan={rowspan.clone()}>
                         <div onclick={onclick_all}>
-                            <CheckBox
+                            <Checkbox
                                 status={check_status}
                             />
                         </div>
@@ -46,7 +46,7 @@ where
                             html! {
                                 <td class="list-whole-head-check">
                                     <div onclick={onclick_all_second}>
-                                        <CheckBox
+                                        <Checkbox
                                             status={check_status_second}
                                         />
                                     </div>
@@ -237,7 +237,7 @@ where
                                                 <tr class="list-whole-first-layer">
                                                     <td class="list-whole-list-first-check">
                                                         <div onclick={onclick_item(key.clone())}>
-                                                            <CheckBox
+                                                            <Checkbox
                                                                 status={check_status}
                                                             />
                                                         </div>
@@ -306,7 +306,7 @@ where
                                                     }
                                                     <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
                                                         <div onclick={onclick_item(key.clone())}>
-                                                            <CheckBox
+                                                            <Checkbox
                                                                 status={check_status}
                                                             />
                                                         </div>
@@ -658,7 +658,7 @@ where
                     elem.to_string_txt(&txt, ctx.props().language)
                 }
             }
-            Column::CheckBox(_, _, _) => {
+            Column::Checkbox(_, _, _) => {
                 if let Some(sep) = ctx.props().br_separator {
                     let display = col.to_string();
                     let display = display

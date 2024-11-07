@@ -9,8 +9,8 @@ pub struct Essential {
     pub notice: &'static str,
     pub required: bool,
     pub unique: bool, // for InputConfig::Text only. In other cases, this is meaningless.
-    pub default: Option<InputItem>, // in CheckBox, CheckStatus only should be set properly in hierarchical meaning
-                                    // e.g. `default: Some(InputItem::CheckBox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
+    pub default: Option<InputItem>, // in Checkbox, CheckStatus only should be set properly in hierarchical meaning
+                                    // e.g. `default: Some(InputItem::Checkbox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
                                     // as for VecSelect, default should be like the below
                                     // let v = vec![HashSet::new(), HashSet::new()];
                                     // ess.default = Some(InputItem::VecSelect(v));
@@ -149,7 +149,7 @@ pub struct GroupConfig {
 }
 
 #[derive(Clone, PartialEq)]
-pub struct CheckBoxConfig {
+pub struct CheckboxConfig {
     pub ess: Essential,
     // TODO: Check if the below second line is guaranteed.
     /// `Some(CheckStatus::{Checked|Unchecked|Indeterminate})` means this is always that status.
@@ -182,7 +182,7 @@ pub enum InputConfig {
     File(FileConfig),
     Comparison(ComparisonConfig),
     Group(GroupConfig),
-    CheckBox(CheckBoxConfig),
+    Checkbox(CheckboxConfig),
     Radio(RadioConfig),
 }
 
@@ -204,7 +204,7 @@ impl InputConfig {
             Self::File(config) => config.ess.required,
             Self::Comparison(config) => config.ess.required,
             Self::Group(config) => config.ess.required,
-            Self::CheckBox(config) => config.ess.required,
+            Self::Checkbox(config) => config.ess.required,
             Self::Radio(config) => config.ess.required,
         }
     }
@@ -226,7 +226,7 @@ impl InputConfig {
             Self::File(config) => config.ess.unique,
             Self::Comparison(config) => config.ess.unique,
             Self::Group(config) => config.ess.unique,
-            Self::CheckBox(config) => config.ess.unique,
+            Self::Checkbox(config) => config.ess.unique,
             Self::Radio(config) => config.ess.unique,
         }
     }
@@ -248,7 +248,7 @@ impl InputConfig {
             Self::File(config) => config.ess.title(),
             Self::Comparison(config) => config.ess.title(),
             Self::Group(config) => config.ess.title(),
-            Self::CheckBox(config) => config.ess.title(),
+            Self::Checkbox(config) => config.ess.title(),
             Self::Radio(config, ..) => config.ess.title(),
         }
     }

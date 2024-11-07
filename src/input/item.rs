@@ -633,7 +633,7 @@ pub enum InputItem {
     Comparison(ComparisonItem),
     VecSelect(VecSelectItem),
     Group(GroupItem),
-    CheckBox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
+    Checkbox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
     Radio(String, Vec<Vec<Rc<RefCell<InputItem>>>>),
 }
 
@@ -654,7 +654,7 @@ impl InputItem {
             InputItem::Comparison(cmp) => cmp.clear(),
             InputItem::VecSelect(list) => list.clear(),
             InputItem::Group(group) => group.clear(),
-            InputItem::CheckBox(value, children) => {
+            InputItem::Checkbox(value, children) => {
                 *value = CheckStatus::Unchecked;
                 // if let Some(children) = children {
                 for child in children {
@@ -717,7 +717,7 @@ impl From<&Column> for InputItem {
             Column::Float64(value) => Self::Float64(Float64Item::new(*value)),
             Column::Percentage(f, _) => Self::Percentage(PercentageItem::new(*f)),
             Column::Nic(nics) => Self::Nic(NicItem::new(nics.clone())),
-            Column::CheckBox(status, children, _) => Self::CheckBox(
+            Column::Checkbox(status, children, _) => Self::Checkbox(
                 *status,
                 children
                     .iter()
