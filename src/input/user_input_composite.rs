@@ -10,7 +10,7 @@ use super::{
     InputItem,
 };
 use crate::{
-    text, Checkbox, CheckStatus, ChildrenPosition, InputConfig, InputEssential, Radio, ViewString,
+    text, CheckStatus, Checkbox, ChildrenPosition, InputConfig, InputEssential, Radio, ViewString,
 };
 
 impl<T> Model<T>
@@ -151,8 +151,8 @@ where
             Message::ClickCheckbox(base_index + layer_index, input_data_msg.clone())
         });
         let checked = if let Ok(data) = input_data.try_borrow() {
-            if let InputItem::Checkbox(checked, _) = (*data).clone() {
-                Some(checked)
+            if let InputItem::Checkbox(data) = (*data).clone() {
+                Some(data.status())
             } else {
                 None
             }
@@ -229,8 +229,8 @@ where
                             } else if let (Some((position, children)), Ok(input_data)) = (children, input_data.try_borrow()) {
                                 html! {
                                     for children.iter().enumerate().map(|(sub_index, child)| {
-                                        let child_data = if let InputItem::Checkbox(_, childs) = input_data.clone() {
-                                            childs.get(sub_index).cloned()
+                                        let child_data = if let InputItem::Checkbox(data) = input_data.clone() {
+                                            data.children().get(sub_index).cloned()
                                         } else {
                                             None
                                         };

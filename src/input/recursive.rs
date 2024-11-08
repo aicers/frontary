@@ -89,11 +89,11 @@ where
                                 }
                             }
                         }
-                        (InputItem::Checkbox(_, data_children), InputConfig::Checkbox(config)) => {
+                        (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
                             if let Some((_, config_children)) = config.children.as_ref() {
-                                if !data_children.is_empty() {
+                                if !data.children().is_empty() {
                                     self.prepare_buffer_recursive(
-                                        data_children,
+                                        data.children(),
                                         config_children,
                                         this_index * MAX_PER_LAYER,
                                     );
@@ -293,22 +293,21 @@ where
                                 }
                             }
                         }
-                        (
-                            InputItem::Checkbox(checked, data_children),
-                            InputConfig::Checkbox(config),
-                        ) => {
-                            if let Some(InputItem::Checkbox(c, _)) = &config.ess.default {
+                        (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
+                            if let Some(InputItem::Checkbox(d)) = &config.ess.default {
                                 if parent_checked {
-                                    *checked = *c;
+                                    data.set_status(d.status());
                                 }
                             }
                             if let Some((_, config_children)) = config.children.as_ref() {
-                                if !data_children.is_empty() && *checked != CheckStatus::Unchecked {
+                                if !data.children().is_empty()
+                                    && data.status() != CheckStatus::Unchecked
+                                {
                                     self.prepare_default_recursive(
-                                        data_children,
+                                        data.children(),
                                         config_children,
-                                        *checked == CheckStatus::Checked
-                                            || *checked == CheckStatus::Indeterminate,
+                                        data.status() == CheckStatus::Checked
+                                            || data.status() == CheckStatus::Indeterminate,
                                         (base_index + index) * MAX_PER_LAYER,
                                     );
                                 }
@@ -489,7 +488,7 @@ where
                             InputItem::Unsigned32(v) => v.is_none(),
                             InputItem::Float64(v) => v.is_none(),
                             InputItem::Percentage(v) => v.is_none(),
-                            InputItem::Checkbox(s, _) => *s == CheckStatus::Unchecked,
+                            InputItem::Checkbox(c) => c.status() == CheckStatus::Unchecked,
                             InputItem::Nic(n) => n
                                 .iter()
                                 .find_map(|n| {
@@ -599,19 +598,17 @@ where
                                 }
                             }
                         }
-                    } else if let (
-                        InputItem::Checkbox(checked, data_children),
-                        InputConfig::Checkbox(config),
-                    ) = (&(*item), &**input_conf)
+                    } else if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
+                        (&(*item), &**input_conf)
                     {
                         if let Some((_, config_children)) = config.children.as_ref() {
-                            if !data_children.is_empty()
+                            if !data.children().is_empty()
                                 && self.decide_required_all_recursive(
                                     ctx,
-                                    data_children,
+                                    data.children(),
                                     config_children,
                                     (base_index + index) * MAX_PER_LAYER,
-                                    *checked == CheckStatus::Checked,
+                                    data.status() == CheckStatus::Checked,
                                 )
                             {
                                 required.push(true);
@@ -768,18 +765,15 @@ where
                                 }
                             }
                         }
-                        (
-                            InputItem::Checkbox(checked, data_children),
-                            InputConfig::Checkbox(config),
-                        ) => {
+                        (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
                             if let Some((_, config_children)) = config.children.as_ref() {
-                                if *checked != CheckStatus::Unchecked
-                                    && !data_children.is_empty()
+                                if data.status() != CheckStatus::Unchecked
+                                    && !data.children().is_empty()
                                     && !self.verify_recursive(
-                                        data_children,
+                                        data.children(),
                                         config_children,
                                         (base_index + index) * MAX_PER_LAYER,
-                                        *checked == CheckStatus::Checked,
+                                        data.status() == CheckStatus::Checked,
                                     )
                                 {
                                     rtn = false;
@@ -814,14 +808,14 @@ where
                     }
                 }
                 if let Ok(input_data) = input_data.try_borrow() {
-                    if let (
-                        InputItem::Checkbox(checked, data_children),
-                        InputConfig::Checkbox(config),
-                    ) = (&*input_data, &**input_conf)
+                    if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
+                        (&*input_data, &**input_conf)
                     {
                         if let Some((_, config_children)) = config.children.as_ref() {
-                            if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
-                                Self::trim_nic_recursive(data_children, config_children);
+                            if data.status() != CheckStatus::Unchecked
+                                && !data.children().is_empty()
+                            {
+                                Self::trim_nic_recursive(data.children(), config_children);
                             }
                         }
                     }
@@ -843,7 +837,7 @@ where
             .zip(ctx.props().input_conf.iter())
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(item) = input_data.try_borrow() {
-                    if let (InputItem::Checkbox(_, _), InputConfig::Checkbox(_))
+                    if let (InputItem::Checkbox(_), InputConfig::Checkbox(_))
                     | (InputItem::Radio(_, _), InputConfig::Radio(_)) = (&(*item), &**input_conf)
                     {
                         propagate.push((index, Rc::clone(input_data), Rc::clone(input_conf)));
@@ -871,23 +865,23 @@ where
     ) -> Option<CheckStatus> {
         let this_checked = if Rc::ptr_eq(click, pos) {
             if let Ok(mut click) = click.try_borrow_mut() {
-                if let (InputItem::Checkbox(status, _), InputConfig::Checkbox(config)) =
+                if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
                     (&mut *click, &**input_conf)
                 {
-                    match *status {
+                    match data.status() {
                         CheckStatus::Checked => {
                             if config.always != Some(CheckStatus::Checked)
                                 && config.always != Some(CheckStatus::Indeterminate)
                             {
-                                *status = checked.unwrap_or(CheckStatus::Unchecked);
+                                data.set_status(checked.unwrap_or(CheckStatus::Unchecked));
                             }
-                            Some(*status)
+                            Some(data.status())
                         }
                         CheckStatus::Indeterminate | CheckStatus::Unchecked => {
                             if config.always != Some(CheckStatus::Unchecked) {
-                                *status = checked.unwrap_or(CheckStatus::Checked);
+                                data.set_status(checked.unwrap_or(CheckStatus::Checked));
                             }
-                            Some(*status)
+                            Some(data.status())
                         }
                     }
                 } else if let (InputItem::Radio(option, _), InputConfig::Radio(_)) =
@@ -906,10 +900,10 @@ where
             }
         } else if let Some(checked) = checked {
             if let Ok(mut pos) = pos.try_borrow_mut() {
-                if let (InputItem::Checkbox(status, _), InputConfig::Checkbox(_)) =
+                if let (InputItem::Checkbox(data), InputConfig::Checkbox(_)) =
                     (&mut *pos, &**input_conf)
                 {
-                    *status = checked;
+                    data.set_status(checked);
                     Some(checked)
                 } else if let (InputItem::Radio(option, _), InputConfig::Radio(_)) =
                     (&*pos, &**input_conf)
@@ -931,37 +925,33 @@ where
 
         let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)> = Vec::new();
         if let Ok(pos) = pos.try_borrow_mut() {
-            let children =
-                if let (InputItem::Checkbox(_, children), InputConfig::Checkbox(config)) =
-                    (&*pos, &**input_conf)
-                {
-                    if let Some((_, config_children)) = config.children.as_ref() {
-                        Some((children, config_children))
-                    } else {
-                        None
-                    }
-                } else if let (
-                    InputItem::Radio(option, children_group),
-                    InputConfig::Radio(config),
-                ) = (&*pos, &**input_conf)
-                {
-                    let checked_index =
-                        config.options.iter().position(|o| option == &o.to_string());
-                    if let Some(checked_index) = checked_index {
-                        if let (Some(children), Some(Some(config_children))) = (
-                            children_group.get(checked_index),
-                            config.children_group.get(checked_index),
-                        ) {
-                            Some((children, config_children))
-                        } else {
-                            None
-                        }
+            let children = if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
+                (&*pos, &**input_conf)
+            {
+                if let Some((_, config_children)) = config.children.as_ref() {
+                    Some((data.children(), config_children))
+                } else {
+                    None
+                }
+            } else if let (InputItem::Radio(option, children_group), InputConfig::Radio(config)) =
+                (&*pos, &**input_conf)
+            {
+                let checked_index = config.options.iter().position(|o| option == &o.to_string());
+                if let Some(checked_index) = checked_index {
+                    if let (Some(children), Some(Some(config_children))) = (
+                        children_group.get(checked_index),
+                        config.children_group.get(checked_index),
+                    ) {
+                        Some((children.as_ref(), config_children))
                     } else {
                         None
                     }
                 } else {
                     None
-                };
+                }
+            } else {
+                None
+            };
 
             if let Some((children, config_children)) = children {
                 for (index, child) in children.iter().enumerate() {
@@ -969,7 +959,7 @@ where
                         (child.try_borrow_mut(), config_children.get(index))
                     {
                         match (&(*c), &**t) {
-                            (InputItem::Checkbox(_, _), InputConfig::Checkbox(_)) => {
+                            (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
                                 propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
                             (InputItem::Text(user), InputConfig::Text(config)) => {
@@ -1108,11 +1098,11 @@ where
         };
 
         let final_checked = if let Ok(mut pos) = pos.try_borrow_mut() {
-            if let InputItem::Checkbox(status, _) = &mut (*pos) {
+            if let InputItem::Checkbox(data) = &mut (*pos) {
                 if let Some(updated_checked) = updated_checked {
-                    *status = updated_checked;
+                    data.set_status(updated_checked);
                 }
-                Some(*status)
+                Some(data.status())
             } else {
                 None
             }
@@ -1161,18 +1151,18 @@ where
                         }
                     }
 
-                    if let (
-                        InputItem::Checkbox(checked, data_children),
-                        InputConfig::Checkbox(config),
-                    ) = (&*input_data, &**input_conf)
+                    if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
+                        (&*input_data, &**input_conf)
                     {
                         if let Some((_, config_children)) = config.children.as_ref() {
-                            if *checked != CheckStatus::Unchecked && !data_children.is_empty() {
+                            if data.status() != CheckStatus::Unchecked
+                                && !data.children().is_empty()
+                            {
                                 self.reset_veri_host_network_recursive(
-                                    data_children,
+                                    data.children(),
                                     config_children,
                                     (base_index + index) * MAX_PER_LAYER,
-                                    *checked == CheckStatus::Checked,
+                                    data.status() == CheckStatus::Checked,
                                 );
                             }
                         }

@@ -24,9 +24,9 @@ pub use config::{
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
 pub use item::{
-    ComparisonItem, FileItem, Float64Item, GroupItem, HostNetworkGroupItem, InputItem, NicItem,
-    PasswordItem, PercentageItem, SelectMultipleItem, SelectSingleItem, TagItem, TextItem,
-    Unsigned32Item, VecSelectItem,
+    CheckboxItem, ComparisonItem, FileItem, Float64Item, GroupItem, HostNetworkGroupItem,
+    InputItem, NicItem, PasswordItem, PercentageItem, SelectMultipleItem, SelectSingleItem,
+    TagItem, TextItem, Unsigned32Item, VecSelectItem,
 };
 use strum_macros::{Display, EnumIter, EnumString};
 pub use tag::Model as Tag;
