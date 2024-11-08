@@ -217,7 +217,7 @@ where
                                         if ctx.props().data_type == Some(DataType::Customer) {
                                             let cols = ctx.props().display_info.titles.len().to_string();
                                             let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
-                                                ("clumit-", "svg")
+                                                ("pumpkin/", "svg")
                                             } else {
                                                 ("", "png")
                                             };
@@ -820,12 +820,12 @@ where
                         <tr>
                             <td class="list-whole-delete-checked-trash">
                                 <div class="list-whole-delete-checked-trash" onclick={onclick_delete}>
-                                    <img src={if cfg!(feature = "pumpkin-dark") { "/frontary/clumit-delete-trash.svg" } else { "/frontary/delete-trash-white.png" }} class="list-whole-delete-trash-white" />
+                                    <img src={if cfg!(feature = "pumpkin-dark") { "/frontary/pumpkin/delete-trash.svg" } else { "/frontary/delete-trash-white.png" }} class="list-whole-delete-trash-white" />
                                 </div>
                             </td>
                             <td class="list-whole-delete-checked-close">
                                 <div class="list-whole-delete-checked-close" onclick={onclick_cancel}>
-                                    <img src={if cfg! (feature = "pumpkin-dark") {"/frontary/clumit-close-white.svg"} else {"/frontary/close-white.png"} } class="list-whole-close-white" />
+                                    <img src={if cfg! (feature = "pumpkin-dark") {"/frontary/pumpkin/close-white.svg"} else {"/frontary/close-white.png"} } class="list-whole-close-white" />
                                 </div>
                             </td>
                         </tr>

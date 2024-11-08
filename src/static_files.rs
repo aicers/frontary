@@ -6,166 +6,163 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
     let mut rtn: Vec<(&'static str, &'static [u8])> = Vec::new();
 
     if cfg!(feature = "pumpkin-dark") {
-        let theme = include_bytes!("../static/frontary/clumit-theme.css");
-        rtn.push(("clumit-theme.css", theme));
+        let theme = include_bytes!("../static/frontary/pumpkin/theme.css");
+        rtn.push(("theme.css", theme));
 
-        let enabled_unchecked = include_bytes!("../static/frontary/clumit-enabled-unchecked.svg");
-        rtn.push(("clumit-enabled-unchecked.svg", enabled_unchecked));
+        let enabled_unchecked = include_bytes!("../static/frontary/pumpkin/enabled-unchecked.svg");
+        rtn.push(("enabled-unchecked.svg", enabled_unchecked));
 
-        let disabled_unchecked = include_bytes!("../static/frontary/clumit-disabled-unchecked.svg");
-        rtn.push(("clumit-disabled-unchecked.svg", disabled_unchecked));
+        let disabled_unchecked =
+            include_bytes!("../static/frontary/pumpkin/disabled-unchecked.svg");
+        rtn.push(("disabled-unchecked.svg", disabled_unchecked));
 
         let enabled_indeterminate =
-            include_bytes!("../static/frontary/clumit-enabled-indeterminate.svg");
-        rtn.push(("clumit-enabled-indeterminate.svg", enabled_indeterminate));
+            include_bytes!("../static/frontary/pumpkin/enabled-indeterminate.svg");
+        rtn.push(("enabled-indeterminate.svg", enabled_indeterminate));
 
         let disabled_indeterminate =
-            include_bytes!("../static/frontary/clumit-disabled-indeterminate.svg");
-        rtn.push(("clumit-disabled-indeterminate.svg", disabled_indeterminate));
+            include_bytes!("../static/frontary/pumpkin/disabled-indeterminate.svg");
+        rtn.push(("disabled-indeterminate.svg", disabled_indeterminate));
 
-        let enabled_checked = include_bytes!("../static/frontary/clumit-enabled-checked.svg");
-        rtn.push(("clumit-enabled-checked.svg", enabled_checked));
+        let enabled_checked = include_bytes!("../static/frontary/pumpkin/enabled-checked.svg");
+        rtn.push(("enabled-checked.svg", enabled_checked));
 
-        let disabled_checked = include_bytes!("../static/frontary/clumit-disabled-checked.svg");
-        rtn.push(("clumit-disabled-checked.svg", disabled_checked));
+        let disabled_checked = include_bytes!("../static/frontary/pumpkin/disabled-checked.svg");
+        rtn.push(("disabled-checked.svg", disabled_checked));
 
-        let radio_unchecked = include_bytes!("../static/frontary/clumit-radio-unchecked.svg");
-        rtn.push(("clumit-radio-unchecked.svg", radio_unchecked));
+        let radio_unchecked = include_bytes!("../static/frontary/pumpkin/radio-unchecked.svg");
+        rtn.push(("radio-unchecked.svg", radio_unchecked));
 
-        let radio_checked = include_bytes!("../static/frontary/clumit-radio-checked.svg");
-        rtn.push(("clumit-radio-checked.svg", radio_checked));
+        let radio_checked = include_bytes!("../static/frontary/pumpkin/radio-checked.svg");
+        rtn.push(("radio-checked.svg", radio_checked));
 
-        let modal_divider = include_bytes!("../static/frontary/clumit-modal-divider.svg");
-        rtn.push(("clumit-modal-divider.svg", modal_divider));
+        let modal_divider = include_bytes!("../static/frontary/pumpkin/modal-divider.svg");
+        rtn.push(("modal-divider.svg", modal_divider));
 
-        let modal_close = include_bytes!("../static/frontary/clumit-modal-close.svg");
-        rtn.push(("clumit-modal-close.svg", modal_close));
+        let modal_close = include_bytes!("../static/frontary/pumpkin/modal-close.svg");
+        rtn.push(("modal-close.svg", modal_close));
 
-        let list_add = include_bytes!("../static/frontary/clumit-list-add.svg");
-        rtn.push(("clumit-list-add.svg", list_add));
+        let list_add = include_bytes!("../static/frontary/pumpkin/list-add.svg");
+        rtn.push(("list-add.svg", list_add));
 
-        let list_sort_recently = include_bytes!("../static/frontary/clumit-list-sort-recently.svg");
-        rtn.push(("clumit-list-sort-recently.svg", list_sort_recently));
+        let list_sort_recently =
+            include_bytes!("../static/frontary/pumpkin/list-sort-recently.svg");
+        rtn.push(("list-sort-recently.svg", list_sort_recently));
 
-        let sort_unsorted = include_bytes!("../static/frontary/clumit-sort-unsorted.svg");
-        rtn.push(("clumit-sort-unsorted.svg", sort_unsorted));
+        let sort_unsorted = include_bytes!("../static/frontary/pumpkin/sort-unsorted.svg");
+        rtn.push(("sort-unsorted.svg", sort_unsorted));
 
-        let sort_ascending = include_bytes!("../static/frontary/clumit-sort-ascending.svg");
-        rtn.push(("clumit-sort-ascending.svg", sort_ascending));
+        let sort_ascending = include_bytes!("../static/frontary/pumpkin/sort-ascending.svg");
+        rtn.push(("sort-ascending.svg", sort_ascending));
 
-        let sort_descending = include_bytes!("../static/frontary/clumit-sort-descending.svg");
-        rtn.push(("clumit-sort-descending.svg", sort_descending));
+        let sort_descending = include_bytes!("../static/frontary/pumpkin/sort-descending.svg");
+        rtn.push(("sort-descending.svg", sort_descending));
 
         let sort_unsorted_hover =
-            include_bytes!("../static/frontary/clumit-sort-unsorted-hover.svg");
-        rtn.push(("clumit-sort-unsorted-hover.svg", sort_unsorted_hover));
+            include_bytes!("../static/frontary/pumpkin/sort-unsorted-hover.svg");
+        rtn.push(("sort-unsorted-hover.svg", sort_unsorted_hover));
 
-        let input_close = include_bytes!("../static/frontary/clumit-input-close.svg");
-        rtn.push(("clumit-input-close.svg", input_close));
+        let input_close = include_bytes!("../static/frontary/pumpkin/input-close.svg");
+        rtn.push(("input-close.svg", input_close));
 
-        let select_down = include_bytes!("../static/frontary/clumit-select-down.svg");
-        rtn.push(("clumit-select-down.svg", select_down));
+        let select_down = include_bytes!("../static/frontary/pumpkin/select-down.svg");
+        rtn.push(("select-down.svg", select_down));
 
-        let magnifier = include_bytes!("../static/frontary/clumit-magnifier.svg");
-        rtn.push(("clumit-magnifier.svg", magnifier));
+        let magnifier = include_bytes!("../static/frontary/pumpkin/magnifier.svg");
+        rtn.push(("magnifier.svg", magnifier));
 
-        let collapse_list = include_bytes!("../static/frontary/clumit-collapse-list.svg");
-        rtn.push(("clumit-collapse-list.svg", collapse_list));
+        let collapse_list = include_bytes!("../static/frontary/pumpkin/collapse-list.svg");
+        rtn.push(("collapse-list.svg", collapse_list));
 
-        let expand_list = include_bytes!("../static/frontary/clumit-expand-list.svg");
-        rtn.push(("clumit-expand-list.svg", expand_list));
+        let expand_list = include_bytes!("../static/frontary/pumpkin/expand-list.svg");
+        rtn.push(("expand-list.svg", expand_list));
 
         let more_action_dots_hover =
-            include_bytes!("../static/frontary/clumit-more-action-dots-hover.svg");
-        rtn.push(("clumit-more-action-dots-hover.svg", more_action_dots_hover));
+            include_bytes!("../static/frontary/pumpkin/more-action-dots-hover.svg");
+        rtn.push(("more-action-dots-hover.svg", more_action_dots_hover));
 
-        let more_action_dots = include_bytes!("../static/frontary/clumit-more-action-dots.svg");
-        rtn.push(("clumit-more-action-dots.svg", more_action_dots));
+        let more_action_dots = include_bytes!("../static/frontary/pumpkin/more-action-dots.svg");
+        rtn.push(("more-action-dots.svg", more_action_dots));
 
-        let edit = include_bytes!("../static/frontary/clumit-edit.svg");
-        rtn.push(("clumit-edit.svg", edit));
+        let edit = include_bytes!("../static/frontary/pumpkin/edit.svg");
+        rtn.push(("edit.svg", edit));
 
-        let delete_trash = include_bytes!("../static/frontary/clumit-delete-trash.svg");
-        rtn.push(("clumit-delete-trash.svg", delete_trash));
+        let delete_trash = include_bytes!("../static/frontary/pumpkin/delete-trash.svg");
+        rtn.push(("delete-trash.svg", delete_trash));
 
-        let delete_x = include_bytes!("../static/frontary/clumit-delete-x.svg");
-        rtn.push(("clumit-delete-x.svg", delete_x));
+        let delete_x = include_bytes!("../static/frontary/pumpkin/delete-x.svg");
+        rtn.push(("delete-x.svg", delete_x));
 
         let mini_select_list_down =
-            include_bytes!("../static/frontary/clumit-mini-select-list-down.svg");
-        rtn.push(("clumit-mini-select-list-down.svg", mini_select_list_down));
+            include_bytes!("../static/frontary/pumpkin/mini-select-list-down.svg");
+        rtn.push(("mini-select-list-down.svg", mini_select_list_down));
 
-        let notification_error = include_bytes!("../static/frontary/clumit-notification-error.svg");
-        rtn.push(("clumit-notification-error.svg", notification_error));
+        let notification_error =
+            include_bytes!("../static/frontary/pumpkin/notification-error.svg");
+        rtn.push(("notification-error.svg", notification_error));
 
-        let select_down_alert = include_bytes!("../static/frontary/clumit-select-down-alert.svg");
-        rtn.push(("clumit-select-down-alert.svg", select_down_alert));
+        let select_down_alert = include_bytes!("../static/frontary/pumpkin/select-down-alert.svg");
+        rtn.push(("select-down-alert.svg", select_down_alert));
 
         let checkbox_link_up_line =
-            include_bytes!("../static/frontary/clumit-checkbox-link-up-line.svg");
-        rtn.push(("clumit-checkbox-link-up-line.svg", checkbox_link_up_line));
+            include_bytes!("../static/frontary/pumpkin/checkbox-link-up-line.svg");
+        rtn.push(("checkbox-link-up-line.svg", checkbox_link_up_line));
 
-        let collapse_contents = include_bytes!("../static/frontary/clumit-collapse-contents.svg");
-        rtn.push(("clumit-collapse-contents.svg", collapse_contents));
+        let collapse_contents = include_bytes!("../static/frontary/pumpkin/collapse-contents.svg");
+        rtn.push(("collapse-contents.svg", collapse_contents));
 
-        let expand_contents = include_bytes!("../static/frontary/clumit-expand-contents.svg");
-        rtn.push(("clumit-expand-contents.svg", expand_contents));
+        let expand_contents = include_bytes!("../static/frontary/pumpkin/expand-contents.svg");
+        rtn.push(("expand-contents.svg", expand_contents));
 
-        let complex_select_pop = include_bytes!("../static/frontary/clumit-complex-select-pop.svg");
-        rtn.push(("clumit-complex-select-pop.svg", complex_select_pop));
+        let complex_select_pop =
+            include_bytes!("../static/frontary/pumpkin/complex-select-pop.svg");
+        rtn.push(("complex-select-pop.svg", complex_select_pop));
 
         let complex_select_pop_alert =
-            include_bytes!("../static/frontary/clumit-complex-select-pop-alert.svg");
-        rtn.push((
-            "clumit-complex-select-pop-alert.svg",
-            complex_select_pop_alert,
-        ));
+            include_bytes!("../static/frontary/pumpkin/complex-select-pop-alert.svg");
+        rtn.push(("complex-select-pop-alert.svg", complex_select_pop_alert));
 
-        let tag_input_close = include_bytes!("../static/frontary/clumit-tag-input-close.svg");
-        rtn.push(("clumit-tag-input-close.svg", tag_input_close));
+        let tag_input_close = include_bytes!("../static/frontary/pumpkin/tag-input-close.svg");
+        rtn.push(("tag-input-close.svg", tag_input_close));
 
         let tag_select_edit_done_dim =
-            include_bytes!("../static/frontary/clumit-tag-select-edit-done-dim.svg");
-        rtn.push((
-            "clumit-tag-select-edit-done-dim.svg",
-            tag_select_edit_done_dim,
-        ));
+            include_bytes!("../static/frontary/pumpkin/tag-select-edit-done-dim.svg");
+        rtn.push(("tag-select-edit-done-dim.svg", tag_select_edit_done_dim));
 
         let tag_select_edit_done =
-            include_bytes!("../static/frontary/clumit-tag-select-edit-done.svg");
-        rtn.push(("clumit-tag-select-edit-done.svg", tag_select_edit_done));
+            include_bytes!("../static/frontary/pumpkin/tag-select-edit-done.svg");
+        rtn.push(("tag-select-edit-done.svg", tag_select_edit_done));
+
         let radio_opener_checked =
-            include_bytes!("../static/frontary/clumit-radio-opener-checked.svg");
-        rtn.push(("clumit-radio-opener-checked.svg", radio_opener_checked));
+            include_bytes!("../static/frontary/pumpkin/radio-opener-checked.svg");
+        rtn.push(("radio-opener-checked.svg", radio_opener_checked));
 
         let radio_opener_unchecked =
-            include_bytes!("../static/frontary/clumit-radio-opener-unchecked.svg");
-        rtn.push(("clumit-radio-opener-unchecked.svg", radio_opener_unchecked));
+            include_bytes!("../static/frontary/pumpkin/radio-opener-unchecked.svg");
+        rtn.push(("radio-opener-unchecked.svg", radio_opener_unchecked));
 
         let traffic_direction_dim =
-            include_bytes!("../static/frontary/clumit-traffic-direction-dim.svg");
-        rtn.push(("clumit-traffic-direction-dim.svg", traffic_direction_dim));
+            include_bytes!("../static/frontary/pumpkin/traffic-direction-dim.svg");
+        rtn.push(("traffic-direction-dim.svg", traffic_direction_dim));
 
-        let traffic_direction = include_bytes!("../static/frontary/clumit-traffic-direction.svg");
-        rtn.push(("clumit-traffic-direction.svg", traffic_direction));
+        let traffic_direction = include_bytes!("../static/frontary/pumpkin/traffic-direction.svg");
+        rtn.push(("traffic-direction.svg", traffic_direction));
 
         let traffic_direction_hover =
-            include_bytes!("../static/frontary/clumit-traffic-direction-hover.svg");
-        rtn.push((
-            "clumit-traffic-direction-hover.svg",
-            traffic_direction_hover,
-        ));
-        let plus_for_add = include_bytes!("../static/frontary/clumit-plus-for-add.svg");
-        rtn.push(("clumit-plus-for-add.svg", plus_for_add));
+            include_bytes!("../static/frontary/pumpkin/traffic-direction-hover.svg");
+        rtn.push(("traffic-direction-hover.svg", traffic_direction_hover));
+        let plus_for_add = include_bytes!("../static/frontary/pumpkin/plus-for-add.svg");
+        rtn.push(("plus-for-add.svg", plus_for_add));
 
-        let nic_delete = include_bytes!("../static/frontary/clumit-nic-delete.svg");
-        rtn.push(("clumit-nic-delete.svg", nic_delete));
+        let nic_delete = include_bytes!("../static/frontary/pumpkin/nic-delete.svg");
+        rtn.push(("nic-delete.svg", nic_delete));
 
-        let notification_close = include_bytes!("../static/frontary/clumit-notification-close.svg");
-        rtn.push(("clumit-notification-close.svg", notification_close));
+        let notification_close =
+            include_bytes!("../static/frontary/pumpkin/notification-close.svg");
+        rtn.push(("notification-close.svg", notification_close));
 
-        let close_white = include_bytes!("../static/frontary/clumit-close-white.svg");
-        rtn.push(("clumit-close-white.svg", close_white));
+        let close_white = include_bytes!("../static/frontary/pumpkin/close-white.svg");
+        rtn.push(("close-white.svg", close_white));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));

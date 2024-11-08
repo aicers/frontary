@@ -151,7 +151,7 @@ input[type=text].searchable-select-top-input:hover {
 input[type=text].searchable-select-input {
     height: 40px;
     border: none;
-    background-image: url('/frontary/clumit-select-down.svg');
+    background-image: url('/frontary/pumpkin/select-down.svg');
     background-size: 32px 32px;
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
@@ -167,7 +167,7 @@ input[type=text].searchable-select-input {
 input[type=text].searchable-select-input-empty {
     height: 40px;
     border: none;
-    background-image: url('/frontary/clumit-select-down.svg');
+    background-image: url('/frontary/pumpkin/select-down.svg');
     background-size: 32px 32px;
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
@@ -185,7 +185,7 @@ input[type=text].searchable-select-input-empty-alert {
     padding: 8px 12px;
     font-size: 16px;
     border-radius: 8px;
-    background-image: url(/frontary/clumit-select-down-alert.svg);
+    background-image: url(/frontary/pumpkin/select-down-alert.svg);
     background-size: 32px 32px;
     background-position: right 7px top 3px;
     background-color: var(--Transparent-Mid-Grey);
@@ -212,7 +212,7 @@ div.searchable-select-list-search {
     margin-top: 6px;
     padding: 8px;
     height: 48px;
-    background-image: url('/frontary/clumit-magnifier.svg');
+    background-image: url('/frontary/pumpkin/magnifier.svg');
     background-size: 32px 32px;
     background-position: 12px 10px;
     background-repeat: no-repeat;
@@ -336,7 +336,7 @@ input[type=text].complex-select-input {
     color: var(--Text-Primary);
     border-radius: 8px;
     background-color: var(--Transparent-Mid-Grey);
-    background-image: url('/frontary/clumit-complex-select-pop.svg');
+    background-image: url('/frontary/pumpkin/complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -352,7 +352,7 @@ input[type=text].complex-select-input-empty {
     color: var(--Dark-20);
     border-radius: 8px;
     background-color: var(--Transparent-Mid-Grey);
-    background-image: url('/frontary/clumit-complex-select-pop.svg');
+    background-image: url('/frontary/pumpkin/complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -369,7 +369,7 @@ input[type=text].complex-select-input-empty-alert {
     background-color: var(--Transparent-Mid-Grey);
     border: 2px solid var(--Red-60);
     border-radius: 8px;
-    background-image: url('/frontary/clumit-complex-select-pop-alert.svg');
+    background-image: url('/frontary/pumpkin/complex-select-pop.-alert.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -420,7 +420,7 @@ td.complex-select-pop-head-close {
 div.complex-select-pop-head-close-icon {
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-modal-close.svg');
+    background-image: url('/frontary/pumpkin/modal-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
 }
@@ -564,7 +564,7 @@ input[type=text].complex-select-search {
     background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
-    background-image: url(/frontary/clumit-magnifier.svg);
+    background-image: url(/frontary/pumpkin/magnifier.svg);
     background-size: 32px 32px;
     background-position: right 12px top 5px;
     background-repeat: no-repeat;
@@ -601,7 +601,7 @@ div.complex-select-pop-input-input-plus {
     float: right;
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-plus-for-add.svg');
+    background-image: url('/frontary/pumpkin/plus-for-add.svg');
     background-size: 40px 40px;
     background-position: center;
     background-repeat: no-repeat;
@@ -671,7 +671,7 @@ div.complex-select-pop-input-list-delete {
     width: 24px;
     height: 24px;
     float: right;
-    background-image: url('/frontary/clumit-delete-x.svg');
+    background-image: url('/frontary/pumpkin/delete-x.svg');
     background-position: 2px 2px;
     background-repeat: no-repeat;
 }
@@ -815,7 +815,7 @@ div.mini-select-top-direction-icon {
     height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/frontary/clumit-traffic-direction.svg');
+    background-image: url('/frontary/pumpkin/traffic-direction.svg');
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -825,13 +825,13 @@ div.mini-select-top-direction-icon-deactive {
     height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/frontary/clumit-traffic-direction-dim.svg');
+    background-image: url('/frontary/pumpkin/traffic-direction-dim.svg');
     background-position: center;
     background-repeat: no-repeat;
 }
 
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
-    background-image: url('/frontary/clumit-traffic-direction-hover.svg');
+    background-image: url('/frontary/pumpkin/traffic-direction-hover.svg');
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -888,11 +888,11 @@ div.mini-select-basic-icon {
 }
 
 div.mini-select-basic-icon-basic {
-    background-image: url('/frontary/clumit-mini-select-list-down.svg');
+    background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
 }
 
 div.mini-select-basic-icon-square {
-    background-image: url('/frontary/clumit-mini-select-list-down.svg');
+    background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
     background-size: 24px 24px;
 }
 
@@ -921,7 +921,7 @@ td.mini-select-item-direction {
 td.mini-select-item-direction-icon {
     width: 24px;
     height: 24px;
-    background-image: url('/frontary/clumit-mini-select-list-down.svg');
+    background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
     background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
@@ -930,7 +930,7 @@ td.mini-select-item-direction-icon {
 div.mini-select-list-sort-recently-icon {
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-list-sort-recently.svg');
+    background-image: url('/frontary/pumpkin/list-sort-recently.svg');
     background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
@@ -950,7 +950,7 @@ div.mini-select-list-sort-recently-text {
 div.mini-select-list-sort-recently-text-icon {
     width: 24px;
     height: 24px;
-    background-image: url('/frontary/clumit-list-sort-recently.svg');
+    background-image: url('/frontary/pumpkin/list-sort-recently.svg');
     background-size: 24px 24px;
     background-repeat: no-repeat;
     margin-right: 4px;
@@ -978,7 +978,7 @@ div.mini-select-list-sort-recently-text:hover {
 div.mini-select-more-action {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots.svg');
+    background-image: url('/frontary/pumpkin/more-action-dots.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
 }
@@ -986,7 +986,7 @@ div.mini-select-more-action {
 div.mini-select-more-action:hover {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots-hover.svg');
+    background-image: url('/frontary/pumpkin/more-action-dots-hover.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -995,7 +995,7 @@ div.mini-select-more-action:hover {
 div.mini-select-on-off-action {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots.svg');
+    background-image: url('/frontary/pumpkin/more-action-dots.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
 }
@@ -1003,7 +1003,7 @@ div.mini-select-on-off-action {
 div.mini-select-on-off-action:hover {
     width: 32px;
     height: 32px;
-    background-image: url('/frontary/clumit-more-action-dots-hover.svg');
+    background-image: url('/frontary/pumpkin/more-action-dots-hover.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1382,7 +1382,7 @@ div.list-whole-tag-item {
 div.basic-sort-unsorted {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/clumit-sort-unsorted.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
@@ -1391,7 +1391,7 @@ div.basic-sort-unsorted {
 div.basic-sort-ascending {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/clumit-sort-ascending.svg');
+    background-image: url('/frontary/pumpkin/sort-ascending.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
@@ -1400,40 +1400,40 @@ div.basic-sort-ascending {
 div.basic-sort-descending {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/clumit-sort-descending.svg');
+    background-image: url('/frontary/pumpkin/sort-descending.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
 }
 
 div.basic-sort-unsorted:hover {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
 
 div.basic-sort-ascending:hover {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
 
 div.basic-sort-descending:hover {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
 
 td.list-whole-head-title:hover div.basic-sort-unsorted {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
 }
 
 td.list-whole-head-title:hover div.basic-sort-ascending {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
 }
 
 td.list-whole-head-title:hover div.basic-sort-descending {
-    background-image: url('/frontary/clumit-sort-unsorted-hover.svg');
+    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
 }
 
 table.list-whole-group {
@@ -1593,7 +1593,7 @@ td.input-title {
 td.input-close-x {
     width: 40px;
     height: 40px;
-    background-image: url('/frontary/clumit-input-close.svg');
+    background-image: url('/frontary/pumpkin/input-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
     background-position: 0px 0px;
@@ -2345,7 +2345,7 @@ div.input-checkbox-link-line {
     top: -10px;
     width: 30px;
     height: 25px;
-    background-image: url('/frontary/clumit-checkbox-link-up-line.svg');
+    background-image: url('/frontary/pumpkin/checkbox-link-up-line.svg');
     background-size: 25px 25px;
     background-repeat: no-repeat;
 }
@@ -2434,7 +2434,7 @@ div.input-nic-delete {
     width: 32px;
     height: 32px;
     display: inline-block;
-    background-image: url('/frontary/clumit-nic-delete.svg');
+    background-image: url('/frontary/pumpkin/nic-delete.svg');
     background-size: 32px 32px;
     background-position: center;
     background-repeat: no-repeat;

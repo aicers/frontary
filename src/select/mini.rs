@@ -284,13 +284,13 @@ where
                                             ViewString::Key(key) => {
                                                 let icon = if key == "Edit" {
                                                     if cfg!(feature = "pumpkin-dark") {
-                                                        "/frontary/clumit-edit.svg"
+                                                        "/frontary/pumpkin/edit.svg"
                                                     } else {
                                                         "/frontary/edit.png"
                                                     }
                                                 } else if key == "Delete" {
                                                     if cfg!(feature = "pumpkin-dark") {
-                                                        "/frontary/clumit-delete-trash.svg"
+                                                        "/frontary/pumpkin/delete-trash.svg"
                                                     } else {
                                                         "/frontary/delete-trash.png"
                                                     }

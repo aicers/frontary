@@ -160,7 +160,7 @@ impl Model {
         let onclick_close = ctx.link().callback(move |_| Message::Close(serial));
         let onclick_done = ctx.link().callback(move |_| Message::Close(serial));
         let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
-            ("clumit-", "svg")
+            ("pumpkin/", "svg")
         } else {
             ("", "png")
         };
@@ -175,7 +175,7 @@ impl Model {
                                 if noti.time.is_none() {
                                     html! {
                                         <div class="clumit-notification-error">
-                                            <img src="/frontary/clumit-notification-error.svg" class="clumit-notification-error"/>
+                                            <img src="/frontary/pumpkin/notification-error.svg" class="clumit-notification-error"/>
                                             { text!(txt, ctx.props().language, "Error") }
                                             if cfg!(feature = "pumpkin-dark") {
                                                 <td class="notification-contents-text-close">

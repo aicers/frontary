@@ -816,7 +816,7 @@ where
                         </div>
                         <div class="list-add" onclick={onclick_add}>
                             if cfg!(feature = "pumpkin-dark") {
-                                <img src="/frontary/clumit-list-add.svg" class="list-add" />
+                                <img src="/frontary/pumpkin/list-add.svg" class="list-add" />
                             } else {
                                 <img src="/frontary/list-add.png" class="list-add" />
                             }
