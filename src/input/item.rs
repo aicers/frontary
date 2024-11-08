@@ -1,3 +1,4 @@
+use core::str;
 use std::{
     cell::RefCell,
     collections::HashSet,
@@ -630,11 +631,6 @@ impl CheckboxItem {
     }
 
     #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.children.is_empty()
-    }
-
-    #[must_use]
     pub fn status(&self) -> CheckStatus {
         self.status
     }
@@ -653,6 +649,48 @@ impl CheckboxItem {
         for child in &self.children {
             if let Ok(mut child) = child.try_borrow_mut() {
                 child.clear();
+            }
+        }
+        // DO NOT self.children.clear()
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct RadioItem {
+    selected: String,
+    children_group: Vec<Vec<Rc<RefCell<InputItem>>>>,
+}
+
+impl RadioItem {
+    #[must_use]
+    pub fn new(selected: String, children_group: Vec<Vec<Rc<RefCell<InputItem>>>>) -> Self {
+        Self {
+            selected,
+            children_group,
+        }
+    }
+
+    #[must_use]
+    pub fn selected(&self) -> &str {
+        &self.selected
+    }
+
+    pub fn set_selected(&mut self, selected: String) {
+        self.selected = selected;
+    }
+
+    #[must_use]
+    pub fn children_group(&self) -> &[Vec<Rc<RefCell<InputItem>>>] {
+        &self.children_group
+    }
+
+    pub fn clear(&mut self) {
+        self.selected.clear();
+        for children in &self.children_group {
+            for child in children {
+                if let Ok(mut child) = child.try_borrow_mut() {
+                    child.clear();
+                }
             }
         }
     }
@@ -675,7 +713,7 @@ pub enum InputItem {
     VecSelect(VecSelectItem),
     Group(GroupItem),
     Checkbox(CheckboxItem),
-    Radio(String, Vec<Vec<Rc<RefCell<InputItem>>>>),
+    Radio(RadioItem),
 }
 
 impl InputItem {
@@ -696,16 +734,7 @@ impl InputItem {
             InputItem::VecSelect(list) => list.clear(),
             InputItem::Group(group) => group.clear(),
             InputItem::Checkbox(cb) => cb.clear(),
-            InputItem::Radio(value, children_group) => {
-                *value = String::new();
-                for children in children_group {
-                    for child in children {
-                        if let Ok(mut child) = child.try_borrow_mut() {
-                            child.clear();
-                        }
-                    }
-                }
-            }
+            InputItem::Radio(radio) => radio.clear(),
         }
     }
 }
@@ -756,7 +785,7 @@ impl From<&Column> for InputItem {
                     .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                     .collect::<Vec<Rc<RefCell<InputItem>>>>(),
             )),
-            Column::Radio(option, children_group, _) => Self::Radio(
+            Column::Radio(option, children_group, _) => Self::Radio(RadioItem::new(
                 option.to_string(),
                 children_group
                     .iter()
@@ -767,7 +796,7 @@ impl From<&Column> for InputItem {
                             .collect::<Vec<Rc<RefCell<InputItem>>>>()
                     })
                     .collect::<_>(),
-            ),
+            )),
             Column::Group(group) => {
                 let mut input: Vec<Vec<Rc<RefCell<InputItem>>>> = Vec::new();
                 for g in group {

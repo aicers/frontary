@@ -46,10 +46,9 @@ where
             });
 
             let checked_children_group_data = input_data.try_borrow().ok().and_then(|input_data| {
-                if let (Some(checked_index), InputItem::Radio(_, children_group)) =
-                    (checked_index, &*input_data)
+                if let (Some(checked_index), InputItem::Radio(data)) = (checked_index, &*input_data)
                 {
-                    children_group.get(checked_index).cloned()
+                    data.children_group().get(checked_index).cloned()
                 } else {
                     None
                 }

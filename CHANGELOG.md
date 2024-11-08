@@ -14,6 +14,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Renamed `CheckBox` to `Checkbox` across all related types
 - Renamed `InputType` to `InputConfig`, and changed the variants of
   `InputConfig` to be composed of the corresponding structs.
+- Changed the variants of `InputItem` to be composed of the corresponding
+  structs.
+- Enabled the radio component have child items recursively.
 
 ### Fixed
 

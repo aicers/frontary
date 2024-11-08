@@ -65,20 +65,19 @@ where
                             self.tag_buffer
                                 .insert(this_index, Rc::new(RefCell::new(data.into_inner())));
                         }
-                        (
-                            InputItem::Radio(data_option, data_children_group),
-                            InputConfig::Radio(config),
-                        ) => {
-                            self.radio_buffer
-                                .insert(this_index, Rc::new(RefCell::new(data_option.clone())));
+                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
+                            self.radio_buffer.insert(
+                                this_index,
+                                Rc::new(RefCell::new(data.selected().to_string())),
+                            );
 
                             if let Some(index) = config
                                 .options
                                 .iter()
-                                .position(|vs| data_option == &vs.to_string())
+                                .position(|vs| data.selected() == vs.to_string())
                             {
                                 if let (Some(data_children), Some(Some(config_children))) = (
-                                    data_children_group.get(index),
+                                    data.children_group().get(index),
                                     config.children_group.get(index),
                                 ) {
                                     self.prepare_buffer_recursive(
@@ -259,24 +258,21 @@ where
                                 }
                             }
                         }
-                        (
-                            InputItem::Radio(option, data_children_group),
-                            InputConfig::Radio(config),
-                        ) => {
+                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
                             if let Some(default) = &config.ess.default {
                                 if parent_checked {
-                                    if let InputItem::Radio(default_option, _) = default {
-                                        option.clone_from(default_option);
+                                    if let InputItem::Radio(default) = default {
+                                        data.set_selected(default.selected().to_string());
                                         let checked_index = config
                                             .options
                                             .iter()
-                                            .position(|o| &o.to_string() == default_option);
+                                            .position(|o| o.to_string() == default.selected());
                                         if let Some(checked_index) = checked_index {
                                             if let (
                                                 Some(data_children),
                                                 Some(Some(config_children)),
                                             ) = (
-                                                data_children_group.get(checked_index),
+                                                data.children_group().get(checked_index),
                                                 config.children_group.get(checked_index),
                                             ) {
                                                 self.prepare_default_recursive(
@@ -382,10 +378,9 @@ where
     }
 
     pub(super) fn default_to_buffer_radio(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::Radio(default, _), Some(buffer)) = (default, self.radio_buffer.get(&id))
-        {
+        if let (InputItem::Radio(default), Some(buffer)) = (default, self.radio_buffer.get(&id)) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                buffer.clone_from(default);
+                buffer.clone_from(&default.selected().to_string());
             }
         }
     }
@@ -460,7 +455,6 @@ where
                     if parent_checked && (*input_conf).required() {
                         let empty = match &(*item) {
                             InputItem::Text(data) => data.is_empty(),
-                            InputItem::Radio(option, _) => option.is_empty(),
                             InputItem::Password(pw) => {
                                 // HIGHLIGHT: In case of Edit, empty means no change of passwords
                                 ctx.props().input_id.is_none() && pw.is_empty()
@@ -475,20 +469,9 @@ where
                             }
                             InputItem::SelectSingle(s) => s.is_none(),
                             InputItem::SelectMultiple(s) => s.is_empty(),
-                            InputItem::VecSelect(s) => {
-                                s.is_empty()
-                                    || if let InputConfig::VecSelect(config) = &**input_conf {
-                                        s.iter().zip(config.items_ess_list.iter()).any(
-                                            |(selected, ess)| selected.is_empty() && ess.required,
-                                        )
-                                    } else {
-                                        true
-                                    }
-                            }
                             InputItem::Unsigned32(v) => v.is_none(),
                             InputItem::Float64(v) => v.is_none(),
                             InputItem::Percentage(v) => v.is_none(),
-                            InputItem::Checkbox(c) => c.status() == CheckStatus::Unchecked,
                             InputItem::Nic(n) => n
                                 .iter()
                                 .find_map(|n| {
@@ -505,6 +488,18 @@ where
                             InputItem::File(file) => file.content().is_empty(),
                             InputItem::Comparison(cmp) => cmp.is_none(),
                             InputItem::Tag(_) | InputItem::Group(_) => false,
+                            InputItem::VecSelect(s) => {
+                                s.is_empty()
+                                    || if let InputConfig::VecSelect(config) = &**input_conf {
+                                        s.iter().zip(config.items_ess_list.iter()).any(
+                                            |(selected, ess)| selected.is_empty() && ess.required,
+                                        )
+                                    } else {
+                                        true
+                                    }
+                            }
+                            InputItem::Checkbox(c) => c.status() == CheckStatus::Unchecked,
+                            InputItem::Radio(data) => data.selected().is_empty(),
                         };
                         if empty {
                             self.required_msg.insert(base_index + index);
@@ -838,7 +833,7 @@ where
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(item) = input_data.try_borrow() {
                     if let (InputItem::Checkbox(_), InputConfig::Checkbox(_))
-                    | (InputItem::Radio(_, _), InputConfig::Radio(_)) = (&(*item), &**input_conf)
+                    | (InputItem::Radio(_), InputConfig::Radio(_)) = (&(*item), &**input_conf)
                     {
                         propagate.push((index, Rc::clone(input_data), Rc::clone(input_conf)));
                     }
@@ -884,10 +879,10 @@ where
                             Some(data.status())
                         }
                     }
-                } else if let (InputItem::Radio(option, _), InputConfig::Radio(_)) =
+                } else if let (InputItem::Radio(data), InputConfig::Radio(_)) =
                     (&*click, &**input_conf)
                 {
-                    if option.is_empty() {
+                    if data.selected().is_empty() {
                         Some(CheckStatus::Unchecked)
                     } else {
                         Some(CheckStatus::Checked)
@@ -905,10 +900,10 @@ where
                 {
                     data.set_status(checked);
                     Some(checked)
-                } else if let (InputItem::Radio(option, _), InputConfig::Radio(_)) =
+                } else if let (InputItem::Radio(data), InputConfig::Radio(_)) =
                     (&*pos, &**input_conf)
                 {
-                    if option.is_empty() {
+                    if data.selected().is_empty() {
                         Some(CheckStatus::Unchecked)
                     } else {
                         Some(CheckStatus::Checked)
@@ -933,13 +928,16 @@ where
                 } else {
                     None
                 }
-            } else if let (InputItem::Radio(option, children_group), InputConfig::Radio(config)) =
+            } else if let (InputItem::Radio(data), InputConfig::Radio(config)) =
                 (&*pos, &**input_conf)
             {
-                let checked_index = config.options.iter().position(|o| option == &o.to_string());
+                let checked_index = config
+                    .options
+                    .iter()
+                    .position(|o| data.selected() == o.to_string());
                 if let Some(checked_index) = checked_index {
                     if let (Some(children), Some(Some(config_children))) = (
-                        children_group.get(checked_index),
+                        data.children_group().get(checked_index),
                         config.children_group.get(checked_index),
                     ) {
                         Some((children.as_ref(), config_children))
@@ -969,15 +967,16 @@ where
                                     }
                                 }
                             }
-                            (InputItem::Radio(option, _), InputConfig::Radio(config)) => {
-                                if option.is_empty() || this_checked == Some(CheckStatus::Unchecked)
+                            (InputItem::Radio(data), InputConfig::Radio(config)) => {
+                                if data.selected().is_empty()
+                                    || this_checked == Some(CheckStatus::Unchecked)
                                 {
                                     if let (
-                                        Some(InputItem::Radio(default_option, _)),
-                                        InputItem::Radio(option, _),
+                                        Some(InputItem::Radio(default)),
+                                        InputItem::Radio(data),
                                     ) = (&config.ess.default, &mut *c)
                                     {
-                                        option.clone_from(default_option);
+                                        data.set_selected(default.selected().to_string());
                                     }
                                 }
                                 propa_children.push((index, Rc::clone(child), Rc::clone(t)));
