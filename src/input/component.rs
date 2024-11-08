@@ -1180,8 +1180,8 @@ where
 
     fn radio_buffer_after_checkbox(&mut self, data_id: usize, item: &Rc<RefCell<InputItem>>) {
         if let Ok(item) = item.try_borrow() {
-            if let InputItem::Checkbox(_, children) = &*item {
-                for (sub_index, child) in children.iter().enumerate() {
+            if let InputItem::Checkbox(cb) = &*item {
+                for (sub_index, child) in cb.children().iter().enumerate() {
                     if let Ok(child) = child.try_borrow() {
                         if let InputItem::Radio(option, _) = &*child {
                             let id = data_id * MAX_PER_LAYER + sub_index;

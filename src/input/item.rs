@@ -606,14 +606,55 @@ impl GroupItem {
     }
 
     pub fn clear(&mut self) {
-        // for group in &mut self.groups {
-        //     for item in group {
-        //         if let Ok(mut item) = item.try_borrow_mut() {
-        //             item.clear();
-        //         }
-        //     }
-        // }
+        for group in &mut self.groups {
+            for item in group {
+                if let Ok(mut item) = item.try_borrow_mut() {
+                    item.clear();
+                }
+            }
+        }
         self.groups.clear();
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct CheckboxItem {
+    status: CheckStatus,
+    children: Vec<Rc<RefCell<InputItem>>>,
+}
+
+impl CheckboxItem {
+    #[must_use]
+    pub fn new(status: CheckStatus, children: Vec<Rc<RefCell<InputItem>>>) -> Self {
+        Self { status, children }
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.children.is_empty()
+    }
+
+    #[must_use]
+    pub fn status(&self) -> CheckStatus {
+        self.status
+    }
+
+    #[must_use]
+    pub fn children(&self) -> &[Rc<RefCell<InputItem>>] {
+        &self.children
+    }
+
+    pub fn set_status(&mut self, status: CheckStatus) {
+        self.status = status;
+    }
+
+    pub fn clear(&mut self) {
+        self.status = CheckStatus::Unchecked;
+        for child in &self.children {
+            if let Ok(mut child) = child.try_borrow_mut() {
+                child.clear();
+            }
+        }
     }
 }
 
@@ -633,7 +674,7 @@ pub enum InputItem {
     Comparison(ComparisonItem),
     VecSelect(VecSelectItem),
     Group(GroupItem),
-    Checkbox(CheckStatus, Vec<Rc<RefCell<InputItem>>>), // Vec = children
+    Checkbox(CheckboxItem),
     Radio(String, Vec<Vec<Rc<RefCell<InputItem>>>>),
 }
 
@@ -654,16 +695,7 @@ impl InputItem {
             InputItem::Comparison(cmp) => cmp.clear(),
             InputItem::VecSelect(list) => list.clear(),
             InputItem::Group(group) => group.clear(),
-            InputItem::Checkbox(value, children) => {
-                *value = CheckStatus::Unchecked;
-                // if let Some(children) = children {
-                for child in children {
-                    if let Ok(mut child) = child.try_borrow_mut() {
-                        child.clear();
-                    }
-                }
-                // }
-            }
+            InputItem::Checkbox(cb) => cb.clear(),
             InputItem::Radio(value, children_group) => {
                 *value = String::new();
                 for children in children_group {
@@ -717,13 +749,13 @@ impl From<&Column> for InputItem {
             Column::Float64(value) => Self::Float64(Float64Item::new(*value)),
             Column::Percentage(f, _) => Self::Percentage(PercentageItem::new(*f)),
             Column::Nic(nics) => Self::Nic(NicItem::new(nics.clone())),
-            Column::Checkbox(status, children, _) => Self::Checkbox(
+            Column::Checkbox(status, children, _) => Self::Checkbox(CheckboxItem::new(
                 *status,
                 children
                     .iter()
                     .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                     .collect::<Vec<Rc<RefCell<InputItem>>>>(),
-            ),
+            )),
             Column::Radio(option, children_group, _) => Self::Radio(
                 option.to_string(),
                 children_group
