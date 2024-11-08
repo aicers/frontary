@@ -40,7 +40,7 @@ pub use crate::input::{
     Float64Config, Float64Item, GroupConfig, GroupItem, HostNetworkGroupConfig,
     HostNetworkGroupItem, HostNetworkHtml, HostNetworkKind, InputConfig, InputHostNetworkGroup,
     InputItem, InputNic, InputTag, InputTagGroup, Model as Input, NicConfig, NicItem,
-    PasswordConfig, PasswordItem, PercentageConfig, PercentageItem, RadioConfig,
+    PasswordConfig, PasswordItem, PercentageConfig, PercentageItem, RadioConfig, RadioItem,
     SelectMultipleConfig, SelectMultipleItem, SelectSingleConfig, SelectSingleItem, Tag, TagConfig,
     TagItem, TextConfig, TextItem, Unsigned32Config, Unsigned32Item, Value as ComparisonValue,
     ValueKind, VecSelectConfig, VecSelectItem,

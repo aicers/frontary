@@ -562,8 +562,8 @@ where
                 if let Some(buffer_option) = self.radio_buffer.get(&id) {
                     let empty = if let Ok(buffer_option) = buffer_option.try_borrow() {
                         if let Ok(mut item) = input_data.try_borrow_mut() {
-                            if let InputItem::Radio(option, _) = &mut *item {
-                                option.clone_from(&buffer_option);
+                            if let InputItem::Radio(data) = &mut *item {
+                                data.set_selected(buffer_option.clone());
                             }
                         }
                         buffer_option.is_empty()
@@ -1183,11 +1183,11 @@ where
             if let InputItem::Checkbox(cb) = &*item {
                 for (sub_index, child) in cb.children().iter().enumerate() {
                     if let Ok(child) = child.try_borrow() {
-                        if let InputItem::Radio(option, _) = &*child {
+                        if let InputItem::Radio(data) = &*child {
                             let id = data_id * MAX_PER_LAYER + sub_index;
                             if let Some(buffer_option) = self.radio_buffer.get(&id) {
                                 if let Ok(mut buffer_option) = buffer_option.try_borrow_mut() {
-                                    (*buffer_option).clone_from(option);
+                                    (*buffer_option).clone_from(&data.selected().to_string());
                                 }
                             }
                         }
