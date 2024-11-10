@@ -1,6 +1,9 @@
-use std::{collections::HashMap, rc::Rc};
+use std::{
+    collections::{HashMap, HashSet},
+    rc::Rc,
+};
 
-use super::{user_input_select::VecSelectListMap, HostNetworkKind, InputItem};
+use super::{user_input_select::VecSelectListMap, HostNetworkKind};
 use crate::{CheckStatus, ViewString};
 
 #[derive(Clone, PartialEq)]
@@ -9,11 +12,12 @@ pub struct Essential {
     pub notice: &'static str,
     pub required: bool,
     pub unique: bool, // for InputConfig::Text only. In other cases, this is meaningless.
-    pub default: Option<InputItem>, // in Checkbox, CheckStatus only should be set properly in hierarchical meaning
-                                    // e.g. `default: Some(InputItem::Checkbox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
-                                    // as for VecSelect, default should be like the below
-                                    // let v = vec![HashSet::new(), HashSet::new()];
-                                    // ess.default = Some(InputItem::VecSelect(v));
+
+                      // pub default: Option<InputItem>, // in Checkbox, CheckStatus only should be set properly in hierarchical meaning
+                      //                                 // e.g. `default: Some(InputItem::Checkbox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
+                      //                                 // as for VecSelect, default should be like the below
+                      //                                 // let v = vec![HashSet::new(), HashSet::new()];
+                      //                                 // ess.default = Some(InputItem::VecSelect(v));
 }
 
 impl Essential {
@@ -34,6 +38,7 @@ pub struct TextConfig {
     pub ess: Essential,
     pub length: Option<usize>,
     pub width: Option<u32>,
+    pub preset: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -57,6 +62,7 @@ pub struct SelectSingleConfig {
     /// The list of options for user selection. Each element is a tuple of key and display string.
     pub options: Vec<(String, ViewString)>,
     pub width: Option<u32>,
+    pub preset: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -69,6 +75,57 @@ pub struct SelectMultipleConfig {
     pub width: Option<u32>,
     /// This represents whether all options are selected by default.
     pub all: bool,
+    pub preset: Option<Vec<String>>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct TagConfig {
+    pub ess: Essential,
+    /// The map of tag's key and name.
+    pub name_map: HashMap<String, String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Unsigned32Config {
+    pub ess: Essential,
+    pub min: u32,
+    pub max: u32,
+    pub width: Option<u32>,
+    pub preset: Option<u32>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Float64Config {
+    pub ess: Essential,
+    pub step: Option<f64>,
+    pub width: Option<u32>,
+    pub preset: Option<f64>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct PercentageConfig {
+    pub ess: Essential,
+    pub min: Option<f32>,
+    pub max: Option<f32>,
+    /// The number of decimal places.
+    pub num_decimals: Option<usize>,
+    pub width: Option<u32>,
+    pub preset: Option<f32>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct NicConfig {
+    pub ess: Essential,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct FileConfig {
+    pub ess: Essential,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct ComparisonConfig {
+    pub ess: Essential,
 }
 
 #[derive(Clone, PartialEq)]
@@ -85,53 +142,7 @@ pub struct VecSelectConfig {
     pub max_widths: Vec<u32>,
     /// The list of max height for each item.
     pub max_heights: Vec<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct TagConfig {
-    pub ess: Essential,
-    /// The map of tag's key and name.
-    pub name_map: HashMap<String, String>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Unsigned32Config {
-    pub ess: Essential,
-    pub min: u32,
-    pub max: u32,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Float64Config {
-    pub ess: Essential,
-    pub step: Option<f64>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct PercentageConfig {
-    pub ess: Essential,
-    pub min: Option<f32>,
-    pub max: Option<f32>,
-    /// The number of decimal places.
-    pub num_decimals: Option<usize>,
-    pub width: Option<u32>,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct NicConfig {
-    pub ess: Essential,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct FileConfig {
-    pub ess: Essential,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct ComparisonConfig {
-    pub ess: Essential,
+    pub preset: Option<Vec<HashSet<String>>>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -162,6 +173,7 @@ pub struct CheckboxConfig {
     /// This should not contradict with the result of all the configured status of children.
     pub always: Option<CheckStatus>,
     pub children: Option<CheckboxChildrenConfig>,
+    pub preset: Option<CheckStatus>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -170,6 +182,7 @@ pub struct RadioConfig {
     pub options: Vec<ViewString>,
     /// The list of children group. Each option corresponds to one children of the group.
     pub children_group: Vec<Option<Vec<Rc<InputConfig>>>>,
+    pub preset: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -179,7 +192,6 @@ pub enum InputConfig {
     HostNetworkGroup(HostNetworkGroupConfig),
     SelectSingle(SelectSingleConfig),
     SelectMultiple(SelectMultipleConfig),
-    VecSelect(VecSelectConfig),
     Tag(TagConfig),
     Unsigned32(Unsigned32Config),
     Float64(Float64Config),
@@ -187,6 +199,7 @@ pub enum InputConfig {
     Nic(NicConfig),
     File(FileConfig),
     Comparison(ComparisonConfig),
+    VecSelect(VecSelectConfig),
     Group(GroupConfig),
     Checkbox(CheckboxConfig),
     Radio(RadioConfig),
@@ -201,7 +214,6 @@ impl InputConfig {
             Self::HostNetworkGroup(config) => config.ess.required,
             Self::SelectSingle(config) => config.ess.required,
             Self::SelectMultiple(config) => config.ess.required,
-            Self::VecSelect(config) => config.ess.required,
             Self::Tag(config) => config.ess.required,
             Self::Unsigned32(config) => config.ess.required,
             Self::Float64(config) => config.ess.required,
@@ -209,6 +221,7 @@ impl InputConfig {
             Self::Nic(config) => config.ess.required,
             Self::File(config) => config.ess.required,
             Self::Comparison(config) => config.ess.required,
+            Self::VecSelect(config) => config.ess.required,
             Self::Group(config) => config.ess.required,
             Self::Checkbox(config) => config.ess.required,
             Self::Radio(config) => config.ess.required,
@@ -223,7 +236,6 @@ impl InputConfig {
             Self::HostNetworkGroup(config) => config.ess.unique,
             Self::SelectSingle(config) => config.ess.unique,
             Self::SelectMultiple(config) => config.ess.unique,
-            Self::VecSelect(config) => config.ess.unique,
             Self::Tag(config) => config.ess.unique,
             Self::Unsigned32(config) => config.ess.unique,
             Self::Float64(config) => config.ess.unique,
@@ -231,6 +243,7 @@ impl InputConfig {
             Self::Nic(config) => config.ess.unique,
             Self::File(config) => config.ess.unique,
             Self::Comparison(config) => config.ess.unique,
+            Self::VecSelect(config) => config.ess.unique,
             Self::Group(config) => config.ess.unique,
             Self::Checkbox(config) => config.ess.unique,
             Self::Radio(config) => config.ess.unique,
@@ -245,7 +258,6 @@ impl InputConfig {
             Self::HostNetworkGroup(config) => config.ess.title(),
             Self::SelectSingle(config) => config.ess.title(),
             Self::SelectMultiple(config) => config.ess.title(),
-            Self::VecSelect(config) => config.ess.title(),
             Self::Tag(config) => config.ess.title(),
             Self::Unsigned32(config) => config.ess.title(),
             Self::Float64(config) => config.ess.title(),
@@ -253,6 +265,7 @@ impl InputConfig {
             Self::Nic(config) => config.ess.title(),
             Self::File(config) => config.ess.title(),
             Self::Comparison(config) => config.ess.title(),
+            Self::VecSelect(config) => config.ess.title(),
             Self::Group(config) => config.ess.title(),
             Self::Checkbox(config) => config.ess.title(),
             Self::Radio(config, ..) => config.ess.title(),

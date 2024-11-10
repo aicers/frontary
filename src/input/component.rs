@@ -11,10 +11,10 @@ use json_gettext::get_text;
 use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 use super::{
-    user_input::MAX_PER_LAYER, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
-    InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
-    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
-    Value as ComparisonValue,
+    user_input::MAX_PER_LAYER, ComparisonItem, FileItem, Float64Item, HostNetworkGroupItem,
+    InputConfig, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem,
+    PercentageItem, SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
+    Value as ComparisonValue, VecSelectItem,
 };
 use crate::{
     language::Language,
@@ -62,15 +62,19 @@ type CompValueBuf = HashMap<
     ),
 >;
 
+// TODO: isn't this Option necessary?
 type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
 
 pub struct Model<T> {
     pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
+    // TODO: isn't this Option necessary?
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) vec_select_buffer: VecSelectBuf,
     pub(super) tag_buffer: HashMap<usize, Rc<RefCell<InputTagGroup>>>,
+    // TODO: isn't this Option necessary?
     pub(super) comparison_value_kind_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
+    // TODO: isn't this Option necessary?
     pub(super) comparison_value_cmp_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) comparison_value_buffer: CompValueBuf,
 
@@ -194,8 +198,8 @@ pub enum Message {
     InputNicGateway(usize, usize, String, Rc<RefCell<InputItem>>),
     InputNicAdd(usize, usize, Rc<RefCell<InputItem>>),
     InputNicDelete(usize, usize, Rc<RefCell<InputItem>>),
-    InputGroupAdd(usize, Rc<RefCell<InputItem>>, Option<InputItem>),
-    InputGroupDelete(usize, usize, Rc<RefCell<InputItem>>, Option<InputItem>),
+    InputGroupAdd(usize, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
+    InputGroupDelete(usize, usize, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
     InputComparisonValueKind(usize, Rc<RefCell<InputItem>>),
     InputComparisonComparisionKind(usize, Rc<RefCell<InputItem>>),
     InputComparisonValue(usize, usize, ComparisonValue, Rc<RefCell<InputItem>>),
@@ -406,7 +410,7 @@ where
         };
         Self::prepare_nic(ctx);
         if ctx.props().input_id.is_none() {
-            s.prepare_default(ctx);
+            s.prepare_preset(ctx);
         }
         s.prepare_buffer(ctx);
         s
@@ -414,7 +418,7 @@ where
 
     fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         Self::prepare_nic(ctx);
-        self.prepare_default(ctx);
+        self.prepare_preset(ctx);
 
         ctx.props()
             .input_data
@@ -780,17 +784,15 @@ where
                 }
                 self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
             }
-            Message::InputGroupAdd(sub_base_index, input_data, default) => {
-                if let (Ok(mut input_data), Some(InputItem::Group(default))) =
-                    (input_data.try_borrow_mut(), default)
-                {
-                    let Some(default) = default.first() else {
-                        return false;
-                    };
-                    if let (InputItem::Group(data), Some(copy_default)) =
-                        (&mut *input_data, Self::copy_default(default))
-                    {
-                        data.push(copy_default);
+            Message::InputGroupAdd(sub_base_index, input_data, items_conf) => {
+                if let Ok(mut input_data) = input_data.try_borrow_mut() {
+                    if let InputItem::Group(data) = &mut *input_data {
+                        let new_row = items_conf
+                            .iter()
+                            .map(|conf| Rc::new(RefCell::new(group_item(conf))))
+                            .collect::<Vec<_>>();
+
+                        data.push(new_row);
                         if let Some(d) = data.last() {
                             for (col, d) in d.iter().enumerate() {
                                 if let Ok(d) = d.try_borrow() {
@@ -834,7 +836,7 @@ where
                     }
                 }
             }
-            Message::InputGroupDelete(sub_base_index, row_index, input_data, default) => {
+            Message::InputGroupDelete(sub_base_index, row_index, input_data, items_conf) => {
                 let empty = if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Group(data) = &mut *input_data {
                         if let Some(d) = data.get(row_index) {
@@ -905,7 +907,7 @@ where
                     ctx.link().send_message(Message::InputGroupAdd(
                         sub_base_index,
                         input_data,
-                        default,
+                        items_conf,
                     ));
                 }
             }
@@ -1194,6 +1196,44 @@ where
                     }
                 }
             }
+        }
+    }
+}
+
+fn group_item(conf: &Rc<InputConfig>) -> InputItem {
+    match &**conf {
+        InputConfig::Text(conf) => InputItem::Text(TextItem::new(
+            conf.preset.as_ref().map_or_else(String::new, Clone::clone),
+        )),
+        InputConfig::HostNetworkGroup(_) => {
+            InputItem::HostNetworkGroup(HostNetworkGroupItem::new(InputHostNetworkGroup::default()))
+        }
+        InputConfig::SelectSingle(conf) => {
+            InputItem::SelectSingle(SelectSingleItem::new(conf.preset.clone()))
+        }
+        InputConfig::SelectMultiple(conf) => InputItem::SelectMultiple(SelectMultipleItem::new(
+            conf.preset.as_ref().map_or_else(HashSet::new, |p| {
+                p.iter().map(Clone::clone).collect::<HashSet<String>>()
+            }),
+        )),
+        InputConfig::Unsigned32(conf) => InputItem::Unsigned32(Unsigned32Item::new(conf.preset)),
+        InputConfig::Float64(conf) => InputItem::Float64(Float64Item::new(conf.preset)),
+        InputConfig::Percentage(conf) => InputItem::Percentage(PercentageItem::new(conf.preset)),
+        InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::new(None)),
+        InputConfig::VecSelect(config) => {
+            InputItem::VecSelect(VecSelectItem::new(config.preset.as_ref().map_or_else(
+                || vec![HashSet::new(); config.items_ess_list.len()],
+                Clone::clone,
+            )))
+        }
+        InputConfig::Password(_)
+        | InputConfig::Tag(_)
+        | InputConfig::Nic(_)
+        | InputConfig::File(_)
+        | InputConfig::Group(_)
+        | InputConfig::Checkbox(_)
+        | InputConfig::Radio(_) => {
+            unimplemented!("InputConfig::Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
         }
     }
 }

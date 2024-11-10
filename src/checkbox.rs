@@ -29,6 +29,12 @@ pub enum CheckStatus {
     Unchecked,
 }
 
+impl Default for CheckStatus {
+    fn default() -> Self {
+        CheckStatus::Unchecked
+    }
+}
+
 #[derive(Clone, PartialEq, Eq, Properties)]
 pub struct Props {
     #[prop_or(CheckStatus::Unchecked)]

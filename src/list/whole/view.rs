@@ -767,18 +767,27 @@ where
                                         for g.iter().map(|c|
                                             match c {
                                                 Column::Text(..)
+                                                | Column::HostNetworkGroup(..)
+                                                | Column::SelectSingle(..)
+                                                | Column::SelectMultiple(..)
                                                 | Column::Unsigned32(..)
                                                 | Column::Float64(..)
-                                                | Column::SelectSingle(..)
+                                                | Column::Percentage(..)
                                                 | Column::Comparison(..)
                                                 | Column::VecSelect(..)
-                                                | Column::Radio(..)
                                                 => html! {
                                                     <td class="list-whole-group">
                                                         { Self::view_column(ctx, index, c) }
                                                     </td>
                                                 },
-                                                _ => html! {}
+                                                Column::Tag(..)
+                                                | Column::Nic(..)
+                                                | Column::Group(..)
+                                                | Column::Checkbox(..)
+                                                | Column::Radio(..)
+                                                => {
+                                                    unimplemented!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
+                                                }
                                             }
 
                                         )

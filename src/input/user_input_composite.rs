@@ -275,6 +275,69 @@ where
         class_line: &'static str,
     ) -> Html {
         match &**child {
+            InputConfig::Text(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, base_index, false, false) }
+                    </div>
+                }
+            }
+            InputConfig::HostNetworkGroup(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                    </div>
+                }
+            }
+            InputConfig::SelectSingle(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth, false) }
+                    </div>
+                }
+            }
+            InputConfig::SelectMultiple(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
+                    </div>
+                }
+            }
+            InputConfig::Unsigned32(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
+                    </div>
+                }
+            }
+            InputConfig::Float64(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_float_64(ctx, &config.ess, config.step, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
+                    </div>
+                }
+            }
+            InputConfig::Percentage(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_percentage(ctx, &config.ess, config.min, config.max, config.num_decimals, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false) }
+                    </div>
+                }
+            }
             InputConfig::Checkbox(config) => {
                 html! {
                     <div class={class_child}>
@@ -293,43 +356,15 @@ where
                     </div>
                 }
             }
-            InputConfig::HostNetworkGroup(config) => {
-                html! {
-                    <div class={class_child}>
-                        <div class={class_line}>
-                        </div>
-                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
-                    </div>
-                }
+            InputConfig::Password(_)
+            | InputConfig::Tag(_)
+            | InputConfig::VecSelect(_)
+            | InputConfig::Nic(_)
+            | InputConfig::File(_)
+            | InputConfig::Comparison(_)
+            | InputConfig::Group(_) => {
+                unimplemented!("Checkbox does not support Password, Tag, VecSelect, Nic, File, Comparison, and Group for children.")
             }
-            InputConfig::Unsigned32(config) => {
-                html! {
-                    <div class={class_child}>
-                        <div class={class_line}>
-                        </div>
-                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
-                    </div>
-                }
-            }
-            InputConfig::SelectMultiple(config) => {
-                html! {
-                    <div class={class_child}>
-                        <div class={class_line}>
-                        </div>
-                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
-                    </div>
-                }
-            }
-            InputConfig::Text(config) => {
-                html! {
-                    <div class={class_child}>
-                        <div class={class_line}>
-                        </div>
-                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, base_index, false, false) }
-                    </div>
-                }
-            }
-            _ => html! {},
         }
     }
 
@@ -341,13 +376,16 @@ where
         ess: &InputEssential,
         one_row: bool,
         widths: &[Option<u32>],
-        group_type: &[Rc<InputConfig>],
+        items_conf: &[Rc<InputConfig>],
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
     ) -> Html {
         let input_data_clone = input_data.clone();
-        let input_data_clone_1 = &(input_data.clone());
+        let input_data_clone_ref = &(input_data.clone());
+        let items_conf_clone = items_conf.to_vec();
+        let items_conf_clone_ref = &(items_conf_clone.clone());
+
         let Ok(input_data) = input_data.try_borrow() else {
             return html! {};
         };
@@ -356,9 +394,13 @@ where
         };
         let txt = ctx.props().txt.txt.clone();
         let sub_base_index = (base_index + layer_index) * MAX_PER_LAYER;
-        let default = ess.default.clone();
+        // let default = ess.default.clone();
         let onclick_add = ctx.link().callback(move |_| {
-            Message::InputGroupAdd(sub_base_index, input_data_clone.clone(), default.clone())
+            Message::InputGroupAdd(
+                sub_base_index,
+                input_data_clone.clone(),
+                items_conf_clone.clone(),
+            )
         });
 
         html! {
@@ -371,7 +413,7 @@ where
                         <table class="input-group">
                             <tr>
                                 {
-                                    for group_type.iter().enumerate().map(|(col_index, each)| {
+                                    for items_conf.iter().enumerate().map(|(col_index, each)| {
                                         let style = if let Some(Some(width)) = widths.get(col_index) {
                                             format!("width: {}px;", *width)
                                         } else {
@@ -388,15 +430,15 @@ where
                                 </th>
                             </tr>
                             {
-                                for input_data.iter().enumerate().map(|(row_index, row)| {
-                                    let input_data_clone_1 = input_data_clone_1.clone();
-                                    let default = ess.default.clone();
+                                for input_data.iter().enumerate().map(move |(row_index, row)| {
+                                    let input_data_callback = input_data_clone_ref.clone();
+                                    let items_conf_callback = items_conf_clone_ref.clone();
                                     let onclick_delete = ctx.link().callback(move |_| {
                                         Message::InputGroupDelete(
                                             sub_base_index,
                                             row_index,
-                                            input_data_clone_1.clone(),
-                                            default.clone(),
+                                            input_data_callback.clone(),
+                                            items_conf_callback.clone(),
                                         )
                                     });
 
@@ -404,7 +446,7 @@ where
                                         html! {
                                             <tr>
                                                 {
-                                                    for group_type.iter().enumerate().map(|(col_index, each)| {
+                                                    for items_conf.iter().enumerate().map(|(col_index, each)| {
                                                         let Some(input_data) = row.get(col_index) else {
                                                             return html! {};
                                                         };
