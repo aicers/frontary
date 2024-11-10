@@ -12,7 +12,7 @@ use super::{
 };
 use crate::list::Column;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct TextItem {
     text: String,
 }
@@ -71,9 +71,13 @@ impl TextItem {
     pub fn new(text: String) -> Self {
         Self { text }
     }
+
+    pub fn set(&mut self, text: &str) {
+        self.text = text.to_string();
+    }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct PasswordItem {
     password: String,
 }
@@ -129,7 +133,7 @@ impl PasswordItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct HostNetworkGroupItem {
     host_network_group: InputHostNetworkGroup,
 }
@@ -160,7 +164,7 @@ impl HostNetworkGroupItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct SelectSingleItem {
     selected: Option<String>, // key
 }
@@ -185,6 +189,10 @@ impl SelectSingleItem {
         Self { selected }
     }
 
+    pub fn set(&mut self, selected: &str) {
+        self.selected = Some(selected.to_string());
+    }
+
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.selected.is_none()
@@ -205,7 +213,7 @@ impl SelectSingleItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct SelectMultipleItem {
     selected_list: HashSet<String>, // keys
 }
@@ -230,6 +238,10 @@ impl SelectMultipleItem {
         Self { selected_list }
     }
 
+    pub fn set(&mut self, selected_list: &[String]) {
+        self.selected_list = selected_list.iter().cloned().collect();
+    }
+
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.selected_list.is_empty()
@@ -249,7 +261,7 @@ impl SelectMultipleItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct TagItem {
     tag_group: InputTagGroup,
 }
@@ -294,7 +306,7 @@ impl TagItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct Unsigned32Item {
     value: Option<u32>,
 }
@@ -319,6 +331,10 @@ impl Unsigned32Item {
         Self { value }
     }
 
+    pub fn set(&mut self, value: u32) {
+        self.value = Some(value);
+    }
+
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.value.is_none()
@@ -334,7 +350,7 @@ impl Unsigned32Item {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct Float64Item {
     value: Option<f64>,
 }
@@ -359,6 +375,10 @@ impl Float64Item {
         Self { value }
     }
 
+    pub fn set(&mut self, value: f64) {
+        self.value = Some(value);
+    }
+
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.value.is_none()
@@ -374,7 +394,7 @@ impl Float64Item {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct PercentageItem {
     value: Option<f32>,
 }
@@ -399,6 +419,10 @@ impl PercentageItem {
         Self { value }
     }
 
+    pub fn set(&mut self, value: f32) {
+        self.value = Some(value);
+    }
+
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.value.is_none()
@@ -414,7 +438,7 @@ impl PercentageItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct NicItem {
     nics: Vec<InputNic>,
 }
@@ -454,7 +478,7 @@ impl NicItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct FileItem {
     // TODO: document this properly
     name: String,    // file name
@@ -488,7 +512,7 @@ impl FileItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct ComparisonItem {
     comparison: Option<Comparison>,
 }
@@ -528,7 +552,7 @@ impl ComparisonItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct VecSelectItem {
     /// The list of groups of selected keys. This `list` must be initialized having the same number
     /// of `HashSet::new()` as the number of the `<Select*>` components.
@@ -555,6 +579,10 @@ impl VecSelectItem {
         Self { list }
     }
 
+    pub fn set(&mut self, preset: &[HashSet<String>]) {
+        self.list = preset.to_vec();
+    }
+
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.list.is_empty()
@@ -570,7 +598,7 @@ impl VecSelectItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct GroupItem {
     // TODO: Define a Group like Vec<Group> ?
     groups: Vec<Vec<Rc<RefCell<InputItem>>>>,
@@ -618,7 +646,7 @@ impl GroupItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct CheckboxItem {
     status: CheckStatus,
     children: Vec<Rc<RefCell<InputItem>>>,
@@ -655,7 +683,7 @@ impl CheckboxItem {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct RadioItem {
     selected: String,
     children_group: Vec<Vec<Rc<RefCell<InputItem>>>>,
@@ -804,14 +832,23 @@ impl From<&Column> for InputItem {
                     for c in g {
                         match c {
                             Column::Text(..)
+                            | Column::HostNetworkGroup(..)
+                            | Column::SelectSingle(..)
+                            | Column::SelectMultiple(..)
                             | Column::Unsigned32(..)
                             | Column::Float64(..)
-                            | Column::SelectSingle(..)
-                            | Column::VecSelect(..)
-                            | Column::Comparison(..) => {
+                            | Column::Percentage(..)
+                            | Column::Comparison(..)
+                            | Column::VecSelect(..) => {
                                 input_row.push(Rc::new(RefCell::new(c.into())));
                             }
-                            _ => {}
+                            Column::Tag(..)
+                            | Column::Nic(..)
+                            | Column::Group(..)
+                            | Column::Checkbox(..)
+                            | Column::Radio(..) => {
+                                unimplemented!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
+                            }
                         }
                     }
                     input.push(input_row);

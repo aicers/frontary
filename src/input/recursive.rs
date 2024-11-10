@@ -8,7 +8,7 @@ use super::{
     super::CheckStatus,
     component::{InvalidMessage, Model, Verification},
     user_input::MAX_PER_LAYER,
-    GroupItem, InputConfig, InputItem,
+    InputConfig, InputItem,
 };
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
@@ -163,7 +163,22 @@ where
                                                         .collect::<Vec<_>>(),
                                                 );
                                             }
-                                            _ => {}
+                                            (InputItem::Text(_), InputConfig::Text(_))
+                                            | (InputItem::Password(_), InputConfig::Password(_))
+                                            | (InputItem::HostNetworkGroup(_), InputConfig::HostNetworkGroup(_))
+                                            | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_)) // TODO: why not needed?
+                                            | (InputItem::Tag(_), InputConfig::Tag(_))
+                                            | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
+                                            | (InputItem::Float64(_), InputConfig::Float64(_))
+                                            | (InputItem::Percentage(_), InputConfig::Percentage(_))
+                                            | (InputItem::Nic(_), InputConfig::Nic(_))
+                                            | (InputItem::File(_), InputConfig::File(_))
+                                            | (InputItem::Group(_), InputConfig::Group(_))
+                                            | (InputItem::Checkbox(_), InputConfig::Checkbox(_))
+                                            | (InputItem::Radio(_), InputConfig::Radio(_)) => (), // do not have buffer
+                                            _ => {
+                                                panic!("InputItem and InputConfig is not matched");
+                                            },
                                         }
                                     }
                                 }
@@ -176,12 +191,12 @@ where
             });
     }
 
-    pub(super) fn prepare_default(&mut self, ctx: &Context<Self>) {
-        self.prepare_default_recursive(&ctx.props().input_data, &ctx.props().input_conf, true, 1);
+    pub(super) fn prepare_preset(&mut self, ctx: &Context<Self>) {
+        self.prepare_preset_recursive(&ctx.props().input_data, &ctx.props().input_conf, true, 1);
     }
 
     #[allow(clippy::too_many_lines)]
-    pub(super) fn prepare_default_recursive(
+    pub(super) fn prepare_preset_recursive(
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
@@ -195,111 +210,72 @@ where
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     match (&mut *item, &**input_conf) {
-                        (InputItem::Text(_), InputConfig::Text(config)) => {
-                            if let Some(default) = &config.ess.default {
+                        (InputItem::Text(item), InputConfig::Text(config)) => {
+                            if let Some(preset) = &config.preset {
                                 if parent_checked {
-                                    *item = default.clone();
+                                    item.set(preset);
                                 }
                             }
                         }
-                        (InputItem::Password(_), InputConfig::Password(config)) => {
-                            if let Some(default) = &config.ess.default {
+                        (InputItem::SelectSingle(item), InputConfig::SelectSingle(config)) => {
+                            if let Some(preset) = &config.preset {
                                 if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::HostNetworkGroup(_), InputConfig::HostNetworkGroup(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Tag(_), InputConfig::Tag(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Unsigned32(_), InputConfig::Unsigned32(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Float64(_), InputConfig::Float64(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Percentage(_), InputConfig::Percentage(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Nic(_), InputConfig::Nic(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::File(_), InputConfig::File(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                }
-                            }
-                        }
-                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    if let InputItem::Radio(default) = default {
-                                        data.set_selected(default.selected().to_string());
-                                        let checked_index = config
-                                            .options
-                                            .iter()
-                                            .position(|o| o.to_string() == default.selected());
-                                        if let Some(checked_index) = checked_index {
-                                            if let (
-                                                Some(data_children),
-                                                Some(Some(config_children)),
-                                            ) = (
-                                                data.children_group().get(checked_index),
-                                                config.children_group.get(checked_index),
-                                            ) {
-                                                self.prepare_default_recursive(
-                                                    data_children,
-                                                    config_children,
-                                                    parent_checked,
-                                                    (base_index + index) * MAX_PER_LAYER,
-                                                );
-                                            }
-                                        }
-                                    }
+                                    item.set(preset);
                                     let id = base_index + index;
-                                    self.default_to_buffer_radio(id, default);
+                                    self.preset_to_buffer_select_single(id, preset);
+                                }
+                            }
+                        }
+                        (InputItem::SelectMultiple(item), InputConfig::SelectMultiple(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(preset);
+                                    let id = base_index + index;
+                                    self.preset_to_buffer_select_multiple(id, preset);
+                                }
+                            }
+                        }
+                        (InputItem::Unsigned32(item), InputConfig::Unsigned32(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(*preset);
+                                }
+                            }
+                        }
+                        (InputItem::Float64(item), InputConfig::Float64(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(*preset);
+                                }
+                            }
+                        }
+                        (InputItem::Percentage(item), InputConfig::Percentage(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(*preset);
+                                }
+                            }
+                        }
+                        (InputItem::VecSelect(item), InputConfig::VecSelect(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(preset);
+                                    let id = base_index + index;
+                                    self.preset_to_buffer_vec_select(id, preset);
                                 }
                             }
                         }
                         (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
-                            if let Some(InputItem::Checkbox(d)) = &config.ess.default {
+                            if let Some(preset) = config.preset {
                                 if parent_checked {
-                                    data.set_status(d.status());
+                                    data.set_status(preset);
                                 }
                             }
                             if let Some(config_children) = config.children.as_ref() {
                                 if !data.children().is_empty()
                                     && data.status() != CheckStatus::Unchecked
                                 {
-                                    self.prepare_default_recursive(
+                                    self.prepare_preset_recursive(
                                         data.children(),
                                         &config_children.children,
                                         data.status() == CheckStatus::Checked
@@ -309,117 +285,86 @@ where
                                 }
                             }
                         }
-                        (InputItem::SelectSingle(_), InputConfig::SelectSingle(config)) => {
-                            if let Some(default) = &config.ess.default {
+                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
+                            if let Some(preset) = &config.preset {
                                 if parent_checked {
-                                    *item = default.clone();
-                                    let id = base_index + index;
-                                    self.default_to_buffer_select_single(id, default);
-                                }
-                            }
-                        }
-                        (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                    let id = base_index + index;
-                                    self.default_to_buffer_select_multiple(id, default);
-                                }
-                            }
-                        }
-                        (InputItem::VecSelect(_), InputConfig::VecSelect(config)) => {
-                            if let Some(default) = &config.ess.default {
-                                if parent_checked {
-                                    *item = default.clone();
-                                    let id = base_index + index;
-                                    self.default_to_buffer_vec_select(id, default);
-                                }
-                            }
-                        }
-                        (InputItem::Group(_), InputConfig::Group(config)) => {
-                            if let Some(InputItem::Group(default)) = &config.ess.default {
-                                if let Some(default) = default.first() {
-                                    if let Some(copy_default) = Self::copy_default(default) {
-                                        if parent_checked {
-                                            *item = InputItem::Group(GroupItem::new(vec![
-                                                copy_default,
-                                            ]));
+                                    data.set_selected(preset.clone());
+                                    let checked_index = config
+                                        .options
+                                        .iter()
+                                        .position(|o| &o.to_string() == preset);
+                                    if let Some(checked_index) = checked_index {
+                                        if let (
+                                            Some(data_children),
+                                            Some(Some(config_children)),
+                                        ) = (
+                                            data.children_group().get(checked_index),
+                                            config.children_group.get(checked_index),
+                                        ) {
+                                            self.prepare_preset_recursive(
+                                                data_children,
+                                                config_children,
+                                                parent_checked,
+                                                (base_index + index) * MAX_PER_LAYER,
+                                            );
                                         }
                                     }
+                                    let id = base_index + index;
+                                    self.preset_to_buffer_radio(id, preset);
                                 }
                             }
                         }
+                        (InputItem::Password(_), InputConfig::Password(_))
+                        | (InputItem::HostNetworkGroup(_), InputConfig::HostNetworkGroup(_))
+                        | (InputItem::Tag(_), InputConfig::Tag(_))
+                        | (InputItem::Nic(_), InputConfig::Nic(_))
+                        | (InputItem::File(_), InputConfig::File(_))
                         // TODO: InputItem::Comparison isn't implemented yet
-                        _ => (),
+                        | (InputItem::Comparison(_), InputConfig::Comparison(_))
+                        | (InputItem::Group(_), InputConfig::Group(_)) => (), // do not have preset
+                        _ => {
+                            panic!("InputItem and InputConfig is not matched");
+                        },
                     }
                 }
             });
     }
 
-    pub(super) fn copy_default(
-        default: &[Rc<RefCell<InputItem>>],
-    ) -> Option<Vec<Rc<RefCell<InputItem>>>> {
-        let copy_default = default
-            .iter()
-            .filter_map(|d| {
-                if let Ok(d) = d.try_borrow() {
-                    Some(d.clone())
-                } else {
-                    None
-                }
-            })
-            .map(|d| Rc::new(RefCell::new(d)))
-            .collect::<Vec<Rc<RefCell<InputItem>>>>();
-        if default.len() == copy_default.len() {
-            Some(copy_default)
-        } else {
-            None
-        }
-    }
-
-    pub(super) fn default_to_buffer_radio(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::Radio(default), Some(buffer)) = (default, self.radio_buffer.get(&id)) {
+    pub(super) fn preset_to_buffer_radio(&mut self, id: usize, preset: &String) {
+        if let Some(buffer) = self.radio_buffer.get(&id) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                buffer.clone_from(&default.selected().to_string());
+                buffer.clone_from(preset);
             }
         }
     }
 
-    pub(super) fn default_to_buffer_select_single(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::SelectSingle(default), Some(buffer)) =
-            (default, self.select_searchable_buffer.get(&id))
-        {
-            if let Some(default) = default.selected() {
-                if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                    if !default.is_empty() {
-                        let mut value: HashSet<String> = HashSet::new();
-                        value.insert(default.to_string());
-                        *buffer = Some(value);
-                    }
-                }
-            }
-        }
-    }
-
-    pub(super) fn default_to_buffer_select_multiple(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::SelectMultiple(default), Some(buffer)) =
-            (default, self.select_searchable_buffer.get(&id))
-        {
+    pub(super) fn preset_to_buffer_select_single(&mut self, id: usize, preset: &str) {
+        if let Some(buffer) = self.select_searchable_buffer.get(&id) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                if !default.is_empty() {
-                    *buffer = Some(default.into_inner());
+                if !preset.is_empty() {
+                    let mut value: HashSet<String> = HashSet::new();
+                    value.insert(preset.to_string());
+                    *buffer = Some(value);
                 }
             }
         }
     }
 
-    pub(super) fn default_to_buffer_vec_select(&mut self, id: usize, default: &InputItem) {
-        if let (InputItem::VecSelect(default), Some(buffer)) =
-            (default, self.vec_select_buffer.get(&id))
-        {
-            for (b, d) in buffer.iter().zip(default.iter()) {
+    pub(super) fn preset_to_buffer_select_multiple(&mut self, id: usize, preset: &[String]) {
+        if let Some(buffer) = self.select_searchable_buffer.get(&id) {
+            if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                if !preset.is_empty() {
+                    *buffer = Some(preset.iter().cloned().collect::<HashSet<String>>());
+                }
+            }
+        }
+    }
+
+    pub(super) fn preset_to_buffer_vec_select(&mut self, id: usize, preset: &[HashSet<String>]) {
+        if let Some(buffer) = self.vec_select_buffer.get(&id) {
+            for (b, p) in buffer.iter().zip(preset.iter()) {
                 if let Ok(mut b) = b.try_borrow_mut() {
-                    *b = Some(d.clone());
+                    *b = Some(p.clone());
                 }
             }
         }
@@ -958,45 +903,18 @@ where
                     if let (Ok(mut c), Some(t)) =
                         (child.try_borrow_mut(), config_children.get(index))
                     {
-                        match (&(*c), &**t) {
-                            (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
-                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
-                            }
+                        match (&mut (*c), &**t) {
                             (InputItem::Text(user), InputConfig::Text(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
-                                    }
-                                }
-                            }
-                            (InputItem::Radio(data), InputConfig::Radio(config)) => {
-                                if data.selected().is_empty()
-                                    || this_checked == Some(CheckStatus::Unchecked)
-                                {
-                                    if let (
-                                        Some(InputItem::Radio(default)),
-                                        InputItem::Radio(data),
-                                    ) = (&config.ess.default, &mut *c)
-                                    {
-                                        data.set_selected(default.selected().to_string());
-                                    }
-                                }
-                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
-                            }
-                            (
-                                InputItem::HostNetworkGroup(user),
-                                InputConfig::HostNetworkGroup(config),
-                            ) => {
-                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
+                                    if let Some(preset) = &config.preset {
+                                        user.set(preset);
                                     }
                                 }
                             }
                             (InputItem::SelectSingle(user), InputConfig::SelectSingle(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
+                                    if let Some(preset) = &config.preset {
+                                        user.set(preset);
                                     }
                                 }
                             }
@@ -1005,43 +923,45 @@ where
                                 InputConfig::SelectMultiple(config),
                             ) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
-                                    }
-                                }
-                            }
-                            (InputItem::Tag(user), InputConfig::Tag(config)) => {
-                                if (user.old.is_empty()
-                                    && user.new.is_none()
-                                    && user.edit.is_none()
-                                    && user.delete.is_none())
-                                    || this_checked == Some(CheckStatus::Unchecked)
-                                {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
+                                    if let Some(preset) = &config.preset {
+                                        user.set(preset);
                                     }
                                 }
                             }
                             (InputItem::Unsigned32(user), InputConfig::Unsigned32(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
+                                    if let Some(preset) = &config.preset {
+                                        user.set(*preset);
                                     }
                                 }
                             }
-                            (InputItem::Percentage(user), InputConfig::Percentage(config)) => {
+                            (InputItem::Float64(user), InputConfig::Float64(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
+                                    if let Some(preset) = &config.preset {
+                                        user.set(*preset);
                                     }
                                 }
                             }
-                            (InputItem::Nic(user), InputConfig::Nic(config)) => {
+
+                            (InputItem::VecSelect(user), InputConfig::VecSelect(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    if let Some(value) = &config.ess.default {
-                                        *c = value.clone();
+                                    if let Some(preset) = &config.preset {
+                                        user.set(preset);
                                     }
                                 }
+                            }
+                            (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
+                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                            }
+                            (InputItem::Radio(user), InputConfig::Radio(config)) => {
+                                if user.selected().is_empty()
+                                    || this_checked == Some(CheckStatus::Unchecked)
+                                {
+                                    if let Some(preset) = &config.preset {
+                                        user.set_selected(preset.clone());
+                                    }
+                                }
+                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
                             (_, _) => (),
                         }
