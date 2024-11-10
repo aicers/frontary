@@ -7,11 +7,10 @@ use yew::{classes, html, Component, Context, Html};
 use super::{
     component::{Message, Model},
     user_input::{view_asterisk, MAX_PER_LAYER},
-    InputItem,
+    CheckStatus, CheckboxChildrenConfig, ChildrenPosition, Essential as InputEssential,
+    InputConfig, InputItem,
 };
-use crate::{
-    text, CheckStatus, Checkbox, ChildrenPosition, InputConfig, InputEssential, Radio, ViewString,
-};
+use crate::{text, Checkbox, Radio, ViewString};
 
 impl<T> Model<T>
 where
@@ -137,7 +136,7 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         always: Option<CheckStatus>,
-        children: &Option<(ChildrenPosition, Vec<Rc<InputConfig>>)>,
+        children_config: Option<&CheckboxChildrenConfig>,
         input_data: &Rc<RefCell<InputItem>>,
         layer_index: usize,
         base_index: usize,
@@ -165,13 +164,13 @@ where
                 "input-checkbox-top"
             }
         });
-        let (class_align, class_me, class_child) = children.as_ref().map_or(
+        let (class_align, class_me, class_child) = children_config.map_or(
             (
                 "input-checkbox-children-nextline",
                 "input-checkbox-me-nextline",
                 "input-checkbox-child",
             ),
-            |c| match c.0 {
+            |cc| match cc.position {
                 ChildrenPosition::NextLine => (
                     "input-checkbox-children-nextline",
                     "input-checkbox-me-nextline",
@@ -225,15 +224,15 @@ where
                         {
                             if checked == CheckStatus::Unchecked {
                                 html! {}
-                            } else if let (Some((position, children)), Ok(input_data)) = (children, input_data.try_borrow()) {
+                            } else if let (Some(children_config), Ok(input_data)) = (children_config, input_data.try_borrow()) {
                                 html! {
-                                    for children.iter().enumerate().map(|(sub_index, child)| {
+                                    for children_config.children.iter().enumerate().map(|(sub_index, child)| {
                                         let child_data = if let InputItem::Checkbox(data) = input_data.clone() {
                                             data.children().get(sub_index).cloned()
                                         } else {
                                             None
                                         };
-                                        let class_line = if *position == ChildrenPosition::Right {
+                                        let class_line = if children_config.position == ChildrenPosition::Right {
                                             if sub_index == 0 {
                                                 "input-checkbox-link-line-right"
                                             } else {
@@ -281,7 +280,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}> // TODO: remove this empty div
                         </div>
-                        { self.view_checkbox(ctx, &config.ess, config.always, &config.children, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
+                        { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
                     </div>
                 }
             }

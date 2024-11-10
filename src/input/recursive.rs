@@ -89,11 +89,11 @@ where
                             }
                         }
                         (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
-                            if let Some((_, config_children)) = config.children.as_ref() {
+                            if let Some(config_children) = config.children.as_ref() {
                                 if !data.children().is_empty() {
                                     self.prepare_buffer_recursive(
                                         data.children(),
-                                        config_children,
+                                        &config_children.children,
                                         this_index * MAX_PER_LAYER,
                                     );
                                 }
@@ -295,13 +295,13 @@ where
                                     data.set_status(d.status());
                                 }
                             }
-                            if let Some((_, config_children)) = config.children.as_ref() {
+                            if let Some(config_children) = config.children.as_ref() {
                                 if !data.children().is_empty()
                                     && data.status() != CheckStatus::Unchecked
                                 {
                                     self.prepare_default_recursive(
                                         data.children(),
-                                        config_children,
+                                        &config_children.children,
                                         data.status() == CheckStatus::Checked
                                             || data.status() == CheckStatus::Indeterminate,
                                         (base_index + index) * MAX_PER_LAYER,
@@ -596,12 +596,12 @@ where
                     } else if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
                         (&(*item), &**input_conf)
                     {
-                        if let Some((_, config_children)) = config.children.as_ref() {
+                        if let Some(config_children) = config.children.as_ref() {
                             if !data.children().is_empty()
                                 && self.decide_required_all_recursive(
                                     ctx,
                                     data.children(),
-                                    config_children,
+                                    &config_children.children,
                                     (base_index + index) * MAX_PER_LAYER,
                                     data.status() == CheckStatus::Checked,
                                 )
@@ -761,12 +761,12 @@ where
                             }
                         }
                         (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
-                            if let Some((_, config_children)) = config.children.as_ref() {
+                            if let Some(config_children) = config.children.as_ref() {
                                 if data.status() != CheckStatus::Unchecked
                                     && !data.children().is_empty()
                                     && !self.verify_recursive(
                                         data.children(),
-                                        config_children,
+                                        &config_children.children,
                                         (base_index + index) * MAX_PER_LAYER,
                                         data.status() == CheckStatus::Checked,
                                     )
@@ -806,11 +806,14 @@ where
                     if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
                         (&*input_data, &**input_conf)
                     {
-                        if let Some((_, config_children)) = config.children.as_ref() {
+                        if let Some(config_children) = config.children.as_ref() {
                             if data.status() != CheckStatus::Unchecked
                                 && !data.children().is_empty()
                             {
-                                Self::trim_nic_recursive(data.children(), config_children);
+                                Self::trim_nic_recursive(
+                                    data.children(),
+                                    &config_children.children,
+                                );
                             }
                         }
                     }
@@ -923,11 +926,10 @@ where
             let children = if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
                 (&*pos, &**input_conf)
             {
-                if let Some((_, config_children)) = config.children.as_ref() {
-                    Some((data.children(), config_children))
-                } else {
-                    None
-                }
+                config
+                    .children
+                    .as_ref()
+                    .map(|config_children| (data.children(), &config_children.children))
             } else if let (InputItem::Radio(data), InputConfig::Radio(config)) =
                 (&*pos, &**input_conf)
             {
@@ -1153,13 +1155,13 @@ where
                     if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
                         (&*input_data, &**input_conf)
                     {
-                        if let Some((_, config_children)) = config.children.as_ref() {
+                        if let Some(config_children) = config.children.as_ref() {
                             if data.status() != CheckStatus::Unchecked
                                 && !data.children().is_empty()
                             {
                                 self.reset_veri_host_network_recursive(
                                     data.children(),
-                                    config_children,
+                                    &config_children.children,
                                     (base_index + index) * MAX_PER_LAYER,
                                     data.status() == CheckStatus::Checked,
                                 );
