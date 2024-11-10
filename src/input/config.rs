@@ -149,13 +149,19 @@ pub struct GroupConfig {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct CheckboxChildrenConfig {
+    pub position: ChildrenPosition,
+    pub children: Vec<Rc<InputConfig>>,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct CheckboxConfig {
     pub ess: Essential,
     // TODO: Check if the below second line is guaranteed.
     /// `Some(CheckStatus::{Checked|Unchecked|Indeterminate})` means this is always that status.
     /// This should not contradict with the result of all the configured status of children.
     pub always: Option<CheckStatus>,
-    pub children: Option<(ChildrenPosition, Vec<Rc<InputConfig>>)>,
+    pub children: Option<CheckboxChildrenConfig>,
 }
 
 #[derive(Clone, PartialEq)]
