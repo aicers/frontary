@@ -1147,10 +1147,10 @@ where
         );
 
         for (index, t) in ctx.props().input_conf.iter().enumerate() {
-            if let InputConfig::Text(..) = &(**t) {
+            if let InputConfig::Text(conf) = &(**t) {
                 if let Some(data) = ctx.props().input_data.get(index) {
                     if let Ok(input) = data.try_borrow() {
-                        if t.unique() {
+                        if conf.unique {
                             let mut different = true;
                             for (key, item) in &*ctx.props().data {
                                 if id.as_ref().map_or(true, |id| id != key) {

@@ -11,13 +11,6 @@ pub struct Essential {
     pub title: String,
     pub notice: &'static str,
     pub required: bool,
-    pub unique: bool, // for InputConfig::Text only. In other cases, this is meaningless.
-
-                      // pub default: Option<InputItem>, // in Checkbox, CheckStatus only should be set properly in hierarchical meaning
-                      //                                 // e.g. `default: Some(InputItem::Checkbox(CheckStatus::Checked, None))` where `children` is always set to `None` and `CheckStatus` only is set to a value
-                      //                                 // as for VecSelect, default should be like the below
-                      //                                 // let v = vec![HashSet::new(), HashSet::new()];
-                      //                                 // ess.default = Some(InputItem::VecSelect(v));
 }
 
 impl Essential {
@@ -39,6 +32,7 @@ pub struct TextConfig {
     pub length: Option<usize>,
     pub width: Option<u32>,
     pub preset: Option<String>,
+    pub unique: bool,
 }
 
 #[derive(Clone, PartialEq)]
@@ -225,28 +219,6 @@ impl InputConfig {
             Self::Group(config) => config.ess.required,
             Self::Checkbox(config) => config.ess.required,
             Self::Radio(config) => config.ess.required,
-        }
-    }
-
-    #[must_use]
-    pub fn unique(&self) -> bool {
-        match self {
-            Self::Text(config) => config.ess.unique,
-            Self::Password(config) => config.ess.unique,
-            Self::HostNetworkGroup(config) => config.ess.unique,
-            Self::SelectSingle(config) => config.ess.unique,
-            Self::SelectMultiple(config) => config.ess.unique,
-            Self::Tag(config) => config.ess.unique,
-            Self::Unsigned32(config) => config.ess.unique,
-            Self::Float64(config) => config.ess.unique,
-            Self::Percentage(config) => config.ess.unique,
-            Self::Nic(config) => config.ess.unique,
-            Self::File(config) => config.ess.unique,
-            Self::Comparison(config) => config.ess.unique,
-            Self::VecSelect(config) => config.ess.unique,
-            Self::Group(config) => config.ess.unique,
-            Self::Checkbox(config) => config.ess.unique,
-            Self::Radio(config) => config.ess.unique,
         }
     }
 
