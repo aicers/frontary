@@ -685,6 +685,7 @@ impl CheckboxItem {
 
 #[derive(Clone, PartialEq, Default)]
 pub struct RadioItem {
+    /// The selected key of the radio items.
     selected: String,
     children_group: Vec<Vec<Rc<RefCell<InputItem>>>>,
 }
