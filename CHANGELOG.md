@@ -17,6 +17,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Changed the variants of `InputItem` to be composed of the corresponding
   structs.
 - Enabled the radio component have child items recursively.
+- Remove `Essential::default`
+  - Some `InputConfig` variants, that need preset values for users, now have the
+    `preset` field.
+- Remove `Essential::unique` because it is required in `TextConfig` only.
 
 ### Fixed
 
