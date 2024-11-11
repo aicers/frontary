@@ -8,7 +8,8 @@ use super::{
     super::CheckStatus,
     component::{InvalidMessage, Model, Verification},
     user_input::MAX_PER_LAYER,
-    InputConfig, InputItem,
+    ComparisonItem, HostNetworkGroupItem, InputConfig, InputItem, RadioConfig, RadioItem,
+    SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem, VecSelectItem,
 };
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
@@ -39,54 +40,25 @@ where
                 if let Ok(data) = input_data.try_borrow() {
                     match (&*data, &**input_conf) {
                         (InputItem::HostNetworkGroup(data), InputConfig::HostNetworkGroup(_)) => {
-                            self.host_network_buffer
-                                .insert(this_index, Rc::new(RefCell::new(data.into_inner())));
-                        }
-                        (InputItem::SelectMultiple(data), InputConfig::SelectMultiple(config)) => {
-                            if config.all {
-                                self.select_searchable_buffer
-                                    .insert(this_index, Rc::new(RefCell::new(None)));
-                            } else {
-                                self.select_searchable_buffer.insert(
-                                    this_index,
-                                    Rc::new(RefCell::new(Some(data.into_inner()))),
-                                );
-                            }
+                            self.host_network_to_buffer(this_index, data);
                         }
                         (InputItem::SelectSingle(data), InputConfig::SelectSingle(_)) => {
-                            let mut buf = HashSet::new();
-                            if let Some(data) = data.as_ref() {
-                                buf.insert(data.clone());
-                            }
-                            self.select_searchable_buffer
-                                .insert(this_index, Rc::new(RefCell::new(Some(buf))));
+                            self.select_searchable_to_buffer(this_index, data);
+                        }
+                        (InputItem::SelectMultiple(data), InputConfig::SelectMultiple(config)) => {
+                            self.select_multiple_to_buffer(this_index, data, config);
                         }
                         (InputItem::Tag(data), InputConfig::Tag(_)) => {
-                            self.tag_buffer
-                                .insert(this_index, Rc::new(RefCell::new(data.into_inner())));
+                            self.tag_to_buffer(this_index, data);
+                        }
+                        (InputItem::Comparison(data), InputConfig::Comparison(_)) => {
+                            self.comparison_to_buffer(this_index, data);
+                        }
+                        (InputItem::VecSelect(data), InputConfig::VecSelect(_)) => {
+                            self.vec_select_to_buffer(this_index, data);
                         }
                         (InputItem::Radio(data), InputConfig::Radio(config)) => {
-                            self.radio_buffer.insert(
-                                this_index,
-                                Rc::new(RefCell::new(data.selected().to_string())),
-                            );
-
-                            if let Some(index) = config
-                                .options
-                                .iter()
-                                .position(|vs| data.selected() == vs.to_string())
-                            {
-                                if let (Some(data_children), Some(Some(config_children))) = (
-                                    data.children_group().get(index),
-                                    config.children_group.get(index),
-                                ) {
-                                    self.prepare_buffer_recursive(
-                                        data_children,
-                                        config_children,
-                                        this_index * MAX_PER_LAYER,
-                                    );
-                                }
-                            }
+                            self.radio_to_buffer(this_index, data, config);
                         }
                         (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
                             if let Some(config_children) = config.children.as_ref() {
@@ -104,81 +76,62 @@ where
                                 for ((col, d), t) in d.iter().enumerate().zip(config.items.iter()) {
                                     if let Ok(d) = d.try_borrow() {
                                         let sub_base_index = this_index * MAX_PER_LAYER;
+                                        let item_index =
+                                            col + (row + sub_base_index) * MAX_PER_LAYER;
 
                                         match (&*d, &**t) {
+                                            (
+                                                InputItem::HostNetworkGroup(data),
+                                                InputConfig::HostNetworkGroup(..),
+                                            ) => {
+                                                self.host_network_to_buffer(item_index, data);
+                                            }
                                             (
                                                 InputItem::SelectSingle(data),
                                                 InputConfig::SelectSingle(..),
                                             ) => {
-                                                let mut buf = HashSet::new();
-                                                if let Some(data) = data.as_ref() {
-                                                    buf.insert(data.clone());
-                                                }
-                                                self.select_searchable_buffer.insert(
-                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
-                                                    Rc::new(RefCell::new(Some(buf))),
+                                                self.select_searchable_to_buffer(item_index, data);
+                                            }
+                                            (
+                                                InputItem::SelectMultiple(data),
+                                                InputConfig::SelectMultiple(config),
+                                            ) => {
+                                                self.select_multiple_to_buffer(
+                                                    item_index, data, config,
                                                 );
                                             }
                                             (
                                                 InputItem::Comparison(data),
                                                 InputConfig::Comparison(..),
                                             ) => {
-                                                let (mut buf, mut kind) =
-                                                    (HashSet::new(), HashSet::new());
-                                                let (first, second) = if let Some(data) =
-                                                    data.as_ref()
-                                                {
-                                                    buf.insert(data.value_kind().to_string());
-                                                    kind.insert(data.comparison_kind().to_string());
-                                                    (Some(data.first()), data.second())
-                                                } else {
-                                                    (None, None)
-                                                };
-                                                self.comparison_value_kind_buffer.insert(
-                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
-                                                    Rc::new(RefCell::new(Some(buf))),
-                                                );
-                                                self.comparison_value_cmp_buffer.insert(
-                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
-                                                    Rc::new(RefCell::new(Some(kind))),
-                                                );
-                                                self.comparison_value_buffer.insert(
-                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
-                                                    (
-                                                        Rc::new(RefCell::new(first)),
-                                                        Rc::new(RefCell::new(second)),
-                                                    ),
-                                                );
+                                                self.comparison_to_buffer(item_index, data);
                                             }
                                             (
                                                 InputItem::VecSelect(data),
                                                 InputConfig::VecSelect(..),
                                             ) => {
-                                                self.vec_select_buffer.insert(
-                                                    col + (row + sub_base_index) * MAX_PER_LAYER,
-                                                    data.iter()
-                                                        .map(|d| {
-                                                            Rc::new(RefCell::new(Some(d.clone())))
-                                                        })
-                                                        .collect::<Vec<_>>(),
-                                                );
+                                                self.vec_select_to_buffer(item_index, data);
                                             }
                                             (InputItem::Text(_), InputConfig::Text(_))
                                             | (InputItem::Password(_), InputConfig::Password(_))
-                                            | (InputItem::HostNetworkGroup(_), InputConfig::HostNetworkGroup(_))
-                                            | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_)) // TODO: why not needed?
                                             | (InputItem::Tag(_), InputConfig::Tag(_))
-                                            | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
+                                            | (
+                                                InputItem::Unsigned32(_),
+                                                InputConfig::Unsigned32(_),
+                                            )
                                             | (InputItem::Float64(_), InputConfig::Float64(_))
-                                            | (InputItem::Percentage(_), InputConfig::Percentage(_))
+                                            | (
+                                                InputItem::Percentage(_),
+                                                InputConfig::Percentage(_),
+                                            )
                                             | (InputItem::Nic(_), InputConfig::Nic(_))
                                             | (InputItem::File(_), InputConfig::File(_))
                                             | (InputItem::Group(_), InputConfig::Group(_))
                                             | (InputItem::Checkbox(_), InputConfig::Checkbox(_))
-                                            | (InputItem::Radio(_), InputConfig::Radio(_)) => (), // do not have buffer
+                                            | (InputItem::Radio(_), InputConfig::Radio(_)) => (), // These don't have buffers.
                                             _ => {
                                                 panic!("InputItem and InputConfig is not matched");
-                                            },
+                                            }
                                         }
                                     }
                                 }
@@ -319,9 +272,8 @@ where
                         | (InputItem::Tag(_), InputConfig::Tag(_))
                         | (InputItem::Nic(_), InputConfig::Nic(_))
                         | (InputItem::File(_), InputConfig::File(_))
-                        // TODO: InputItem::Comparison isn't implemented yet
                         | (InputItem::Comparison(_), InputConfig::Comparison(_))
-                        | (InputItem::Group(_), InputConfig::Group(_)) => (), // do not have preset
+                        | (InputItem::Group(_), InputConfig::Group(_)) => (), // These don't have presets
                         _ => {
                             panic!("InputItem and InputConfig is not matched");
                         },
@@ -1090,6 +1042,90 @@ where
                     }
                 }
             });
+    }
+
+    fn host_network_to_buffer(&mut self, index: usize, data: &HostNetworkGroupItem) {
+        self.host_network_buffer
+            .insert(index, Rc::new(RefCell::new(data.into_inner())));
+    }
+
+    fn select_searchable_to_buffer(&mut self, index: usize, data: &SelectSingleItem) {
+        let mut buf = HashSet::new();
+        if let Some(data) = data.as_ref() {
+            buf.insert(data.clone());
+        }
+        self.select_searchable_buffer
+            .insert(index, Rc::new(RefCell::new(Some(buf))));
+    }
+
+    fn select_multiple_to_buffer(
+        &mut self,
+        index: usize,
+        data: &SelectMultipleItem,
+        config: &SelectMultipleConfig,
+    ) {
+        if config.all {
+            self.select_searchable_buffer
+                .insert(index, Rc::new(RefCell::new(None)));
+        } else {
+            self.select_searchable_buffer
+                .insert(index, Rc::new(RefCell::new(Some(data.into_inner()))));
+        }
+    }
+
+    fn tag_to_buffer(&mut self, index: usize, data: &TagItem) {
+        self.tag_buffer
+            .insert(index, Rc::new(RefCell::new(data.into_inner())));
+    }
+
+    fn comparison_to_buffer(&mut self, index: usize, data: &ComparisonItem) {
+        let (mut buf, mut kind) = (HashSet::new(), HashSet::new());
+        let (first, second) = if let Some(data) = data.as_ref() {
+            buf.insert(data.value_kind().to_string());
+            kind.insert(data.comparison_kind().to_string());
+            (Some(data.first()), data.second())
+        } else {
+            (None, None)
+        };
+        self.comparison_value_kind_buffer
+            .insert(index, Rc::new(RefCell::new(Some(buf))));
+        self.comparison_value_cmp_buffer
+            .insert(index, Rc::new(RefCell::new(Some(kind))));
+        self.comparison_value_buffer.insert(
+            index,
+            (Rc::new(RefCell::new(first)), Rc::new(RefCell::new(second))),
+        );
+    }
+
+    fn vec_select_to_buffer(&mut self, index: usize, data: &VecSelectItem) {
+        self.vec_select_buffer.insert(
+            index,
+            data.iter()
+                .map(|d| Rc::new(RefCell::new(Some(d.clone()))))
+                .collect::<Vec<_>>(),
+        );
+    }
+
+    fn radio_to_buffer(&mut self, index: usize, data: &RadioItem, config: &RadioConfig) {
+        self.radio_buffer
+            .insert(index, Rc::new(RefCell::new(data.selected().to_string())));
+
+        if let Some(index) = config
+            .options
+            .iter()
+            .position(|vs| data.selected() == vs.to_string())
+        {
+            if let (Some(data_children), Some(Some(config_children))) = (
+                data.children_group().get(index),
+                config.children_group.get(index),
+            ) {
+                self.prepare_buffer_recursive(
+                    data_children,
+                    config_children,
+                    index * MAX_PER_LAYER,
+                );
+            }
+        }
     }
 }
 

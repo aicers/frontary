@@ -198,7 +198,7 @@ where
                                 <div class={classes!("input-checkbox-me", class_me)}>
                                     <Checkbox
                                         status={checked}
-                                        always={always}
+                                        {always}
                                     />
                                     <div class="input-checkbox-me-title">
                                         { title }{ view_asterisk(ess.required) }

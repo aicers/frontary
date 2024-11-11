@@ -120,6 +120,7 @@ pub struct FileConfig {
 #[derive(Clone, PartialEq)]
 pub struct ComparisonConfig {
     pub ess: Essential,
+    // TODO: `preset` might be required.
 }
 
 #[derive(Clone, PartialEq)]
