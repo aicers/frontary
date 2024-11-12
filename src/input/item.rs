@@ -7,8 +7,8 @@ use std::{
 };
 
 use super::{
-    parse_host_network, CheckStatus, Comparison, HostNetwork, InputHostNetworkGroup, InputNic,
-    InputTagGroup,
+    parse_host_network, CheckStatus, Comparison, HostNetwork, InputConfig, InputHostNetworkGroup,
+    InputNic, InputTagGroup,
 };
 use crate::list::Column;
 
@@ -480,9 +480,8 @@ impl NicItem {
 
 #[derive(Clone, PartialEq, Default)]
 pub struct FileItem {
-    // TODO: document this properly
-    name: String,    // file name
-    content: String, // base64 encoded content
+    name: String,
+    content: String,
 }
 
 impl FileItem {
@@ -600,7 +599,7 @@ impl VecSelectItem {
 
 #[derive(Clone, PartialEq, Default)]
 pub struct GroupItem {
-    // TODO: Define a Group like Vec<Group> ?
+    // TODO: Define a Group like Vec<Group>?
     groups: Vec<Vec<Rc<RefCell<InputItem>>>>,
 }
 
@@ -659,6 +658,14 @@ impl CheckboxItem {
     }
 
     #[must_use]
+    pub fn default_with_children(children: Vec<Rc<RefCell<InputItem>>>) -> Self {
+        Self {
+            status: CheckStatus::Unchecked,
+            children,
+        }
+    }
+
+    #[must_use]
     pub fn status(&self) -> CheckStatus {
         self.status
     }
@@ -668,8 +675,17 @@ impl CheckboxItem {
         &self.children
     }
 
+    #[must_use]
+    pub fn children_mut(&mut self) -> &mut Vec<Rc<RefCell<InputItem>>> {
+        &mut self.children
+    }
+
     pub fn set_status(&mut self, status: CheckStatus) {
         self.status = status;
+    }
+
+    pub fn set_children(&mut self, children: Vec<Rc<RefCell<InputItem>>>) {
+        self.children = children;
     }
 
     pub fn clear(&mut self) {
@@ -700,6 +716,19 @@ impl RadioItem {
     }
 
     #[must_use]
+    pub fn default_with_children(children_group: Vec<Vec<Rc<RefCell<InputItem>>>>) -> Self {
+        Self {
+            selected: String::new(),
+            children_group,
+        }
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.selected.is_empty()
+    }
+
+    #[must_use]
     pub fn selected(&self) -> &str {
         &self.selected
     }
@@ -711,6 +740,11 @@ impl RadioItem {
     #[must_use]
     pub fn children_group(&self) -> &[Vec<Rc<RefCell<InputItem>>>] {
         &self.children_group
+    }
+
+    #[must_use]
+    pub fn children_get_mut(&mut self, index: usize) -> Option<&mut Vec<Rc<RefCell<InputItem>>>> {
+        self.children_group.get_mut(index)
     }
 
     pub fn clear(&mut self) {
@@ -765,6 +799,37 @@ impl InputItem {
             InputItem::Checkbox(cb) => cb.clear(),
             InputItem::Radio(radio) => radio.clear(),
         }
+    }
+
+    fn default_from_conf(conf: &InputConfig) -> Self {
+        match conf {
+            InputConfig::Text(_) => Self::Text(TextItem::default()),
+            InputConfig::Password(_) => Self::Password(PasswordItem::default()),
+            InputConfig::HostNetworkGroup(_) => {
+                Self::HostNetworkGroup(HostNetworkGroupItem::default())
+            }
+            InputConfig::SelectSingle(_) => Self::SelectSingle(SelectSingleItem::default()),
+            InputConfig::SelectMultiple(_) => Self::SelectMultiple(SelectMultipleItem::default()),
+            InputConfig::Tag(_) => Self::Tag(TagItem::default()),
+            InputConfig::Unsigned32(_) => Self::Unsigned32(Unsigned32Item::default()),
+            InputConfig::Float64(_) => Self::Float64(Float64Item::default()),
+            InputConfig::Percentage(_) => Self::Percentage(PercentageItem::default()),
+            InputConfig::Nic(_) => Self::Nic(NicItem::default()),
+            InputConfig::File(_) => Self::File(FileItem::default()),
+            InputConfig::Comparison(_) => Self::Comparison(ComparisonItem::default()),
+            InputConfig::VecSelect(_) => Self::VecSelect(VecSelectItem::default()),
+            InputConfig::Group(_) => Self::Group(GroupItem::default()),
+            InputConfig::Checkbox(_) => Self::Checkbox(CheckboxItem::default()),
+            InputConfig::Radio(_) => Self::Radio(RadioItem::default()),
+        }
+    }
+
+    #[must_use]
+    pub fn default_items_from_config(config: &[Rc<InputConfig>]) -> Vec<Rc<RefCell<InputItem>>> {
+        config
+            .iter()
+            .map(|c| Rc::new(RefCell::new(InputItem::default_from_conf(c))))
+            .collect::<Vec<Rc<RefCell<InputItem>>>>()
     }
 }
 
@@ -848,7 +913,7 @@ impl From<&Column> for InputItem {
                             | Column::Group(..)
                             | Column::Checkbox(..)
                             | Column::Radio(..) => {
-                                unimplemented!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
+                                panic!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
                             }
                         }
                     }

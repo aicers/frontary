@@ -672,10 +672,15 @@ where
                     html! { col.to_string() }
                 }
             }
-            // TODO Radio
-            Column::Radio(option, _, _) => html! {
-                option.to_string_txt(&txt, ctx.props().language)
-            },
+            Column::Radio(option, _, display) => {
+                if display.is_some() {
+                    html! { col.to_string() }
+                } else {
+                    html! {
+                        option.to_string_txt(&txt, ctx.props().language)
+                    }
+                }
+            }
             Column::Nic(nics) => {
                 html! {
                     for nics.iter().map(|n| html! {
@@ -774,8 +779,7 @@ where
                                                 | Column::Float64(..)
                                                 | Column::Percentage(..)
                                                 | Column::Comparison(..)
-                                                | Column::VecSelect(..)
-                                                => html! {
+                                                | Column::VecSelect(..) => html! {
                                                     <td class="list-whole-group">
                                                         { Self::view_column(ctx, index, c) }
                                                     </td>
@@ -784,9 +788,8 @@ where
                                                 | Column::Nic(..)
                                                 | Column::Group(..)
                                                 | Column::Checkbox(..)
-                                                | Column::Radio(..)
-                                                => {
-                                                    unimplemented!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
+                                                | Column::Radio(..) => {
+                                                    panic!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
                                                 }
                                             }
 
