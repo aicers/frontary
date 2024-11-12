@@ -404,22 +404,29 @@ where
             "4".to_string() // 4 is for left shadow
         };
 
-        let (style, style_inner, style_inner_width, style_inner_width_search) =
-            if cfg!(feature = "pumpkin-dark") {
-                (
-                    format!("height: {height}px;"),
-                    format!("width: 100%; height: {height}px;"),
-                    "width: 100%;".to_string(),
-                    "width: 100%;".to_string(),
-                )
-            } else {
-                (
-                    format!("width: {width}px; height: {height}px; left: {left}px;"),
-                    format!("width: {}px; height: {height}px;", width - 10),
-                    format!("width: {}px;", width - 10),
-                    format!("width: {}px", width - 10 - 28),
-                )
-            };
+        let (
+            style,
+            style_inner,
+            style_inner_width,
+            style_inner_width_search,
+            style_scrollable_table,
+        ) = if cfg!(feature = "pumpkin-dark") {
+            (
+                format!("height: {height}px;"),
+                format!("width: 100%; height: {height}px;"),
+                "width: 100%;".to_string(),
+                "width: 100%;".to_string(),
+                format!("height: {}px;", height - 48),
+            )
+        } else {
+            (
+                format!("width: {width}px; height: {height}px; left: {left}px;"),
+                format!("width: {}px; height: {height}px;", width - 10),
+                format!("width: {}px;", width - 10),
+                format!("width: {}px", width - 10 - 28),
+                String::new(),
+            )
+        };
         let oninput_search = ctx.link().callback(|e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
@@ -503,6 +510,7 @@ where
                             oninput={oninput_search}
                         />
                     </div>
+                    <div class="scrollable-table-wrapper" style={style_scrollable_table}>
                     <div class="searchable-select-list-search-space" style={style_inner_width.clone()}>
                     </div>
                     {
@@ -533,6 +541,7 @@ where
                             html! {}
                         }
                     }
+
                     <table style={style_inner_width}>
                     {
                         if let Some(search_result) = self.search_result.as_ref() {
@@ -617,6 +626,7 @@ where
                         }
                     }
                     </table>
+                    </div>
                 </div>
             </div>
         }
