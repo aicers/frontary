@@ -55,15 +55,16 @@ impl std::fmt::Display for Column {
                 }
             }
             Self::SelectMultiple(d) => {
+                // Since the language is not known here, keys are used.
                 let values = d
                     .values()
                     .map(ToString::to_string)
                     .collect::<Vec<_>>()
                     .join(",");
-                write!(formatter, "{values}")?;
-                Ok(())
+                write!(formatter, "{values}")
             }
             Self::VecSelect(d) => {
+                // Since the language is not known here, keys are used.
                 let values = d
                     .iter()
                     .map(|s| {
@@ -74,13 +75,11 @@ impl std::fmt::Display for Column {
                     })
                     .collect::<Vec<_>>()
                     .join(" | ");
-                write!(formatter, "{values}")?;
-                Ok(())
+                write!(formatter, "{values}")
             }
             Self::Tag(d) => {
                 let values = d.iter().map(String::as_str).collect::<Vec<_>>().join(",");
-                write!(formatter, "{values}")?;
-                Ok(())
+                write!(formatter, "{values}")
             }
             Self::Unsigned32(d) => {
                 let value = d.map_or_else(String::new, |d| d.to_string());
@@ -106,19 +105,11 @@ impl std::fmt::Display for Column {
                 }
                 write!(formatter, "{display}")
             }
-            Self::Checkbox(_, _, display) => {
+            Self::Checkbox(_, _, display) | Self::Radio(_, _, display) => {
                 if let Some(display) = display {
                     write!(formatter, "{display}")
                 } else {
                     Ok(())
-                }
-            }
-            Self::Radio(option, _, display) => {
-                // TODO Radio
-                if let Some(display) = display {
-                    write!(formatter, "{display}")
-                } else {
-                    write!(formatter, "{option}")
                 }
             }
             Self::Group(_) => Ok(()),

@@ -22,17 +22,12 @@ define_str_consts! {
     ALWAYS_UNCHECKED_URL => "/frontary/checkbox-unchecked-always.png"
 }
 
-#[derive(Clone, Copy, Display, PartialEq, Eq)]
+#[derive(Clone, Copy, Display, PartialEq, Eq, Default)]
 pub enum CheckStatus {
     Checked,
     Indeterminate,
+    #[default]
     Unchecked,
-}
-
-impl Default for CheckStatus {
-    fn default() -> Self {
-        CheckStatus::Unchecked
-    }
 }
 
 #[derive(Clone, PartialEq, Eq, Properties)]
@@ -60,7 +55,7 @@ pub fn model(props: &Props) -> Html {
     let style = format!("background-image: url({url});");
 
     html! {
-        <div role="checkbox" class="basic-checkbox" style={style}>
+        <div role="checkbox" class="basic-checkbox" {style}>
         </div>
     }
 }

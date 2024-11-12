@@ -363,7 +363,7 @@ where
             | InputConfig::File(_)
             | InputConfig::Comparison(_)
             | InputConfig::Group(_) => {
-                unimplemented!("Checkbox does not support Password, Tag, VecSelect, Nic, File, Comparison, and Group for children.")
+                panic!("Checkbox does not support Password, Tag, VecSelect, Nic, File, Comparison, and Group for children.")
             }
         }
     }

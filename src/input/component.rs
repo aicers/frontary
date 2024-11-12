@@ -951,11 +951,12 @@ where
                 }
                 self.file_reader = None;
             }
+            // TODO: issue #5
             Message::FailLoadFile => {
-                // TODO: show a message for users
                 return false;
             }
-            Message::InputError => {} // TODO: issue #5 in case of InputError
+            // TODO: issue #5
+            Message::InputError => {}
         }
         true
     }
@@ -1233,7 +1234,7 @@ fn group_item(conf: &Rc<InputConfig>) -> InputItem {
         | InputConfig::Group(_)
         | InputConfig::Checkbox(_)
         | InputConfig::Radio(_) => {
-            unimplemented!("InputConfig::Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+            panic!("InputConfig::Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
         }
     }
 }

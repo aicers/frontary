@@ -163,9 +163,8 @@ pub struct CheckboxChildrenConfig {
 #[derive(Clone, PartialEq)]
 pub struct CheckboxConfig {
     pub ess: Essential,
-    // TODO: Check if the below second line is guaranteed.
     /// `Some(CheckStatus::{Checked|Unchecked|Indeterminate})` means this is always that status.
-    /// This should not contradict with the result of all the configured status of children.
+    /// This `always` always shows but might contradict with the result of children.
     pub always: Option<CheckStatus>,
     pub children: Option<CheckboxChildrenConfig>,
     pub preset: Option<CheckStatus>,

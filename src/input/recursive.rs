@@ -57,20 +57,6 @@ where
                         (InputItem::VecSelect(data), InputConfig::VecSelect(_)) => {
                             self.vec_select_to_buffer(this_index, data);
                         }
-                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
-                            self.radio_to_buffer(this_index, data, config);
-                        }
-                        (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
-                            if let Some(config_children) = config.children.as_ref() {
-                                if !data.children().is_empty() {
-                                    self.prepare_buffer_recursive(
-                                        data.children(),
-                                        &config_children.children,
-                                        this_index * MAX_PER_LAYER,
-                                    );
-                                }
-                            }
-                        }
                         (InputItem::Group(data), InputConfig::Group(config)) => {
                             for (row, d) in data.iter().enumerate() {
                                 for ((col, d), t) in d.iter().enumerate().zip(config.items.iter()) {
@@ -137,8 +123,30 @@ where
                                 }
                             }
                         }
-                        // TODO: implement if necessary
-                        (_, _) => (),
+                        (InputItem::Checkbox(data), InputConfig::Checkbox(config)) => {
+                            if let Some(config_children) = config.children.as_ref() {
+                                if !data.children().is_empty() {
+                                    self.prepare_buffer_recursive(
+                                        data.children(),
+                                        &config_children.children,
+                                        this_index * MAX_PER_LAYER,
+                                    );
+                                }
+                            }
+                        }
+                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
+                            self.radio_to_buffer(this_index, data, config);
+                        }
+                        (InputItem::Text(_), InputConfig::Text(_))
+                        | (InputItem::Password(_), InputConfig::Password(_))
+                        | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
+                        | (InputItem::Float64(_), InputConfig::Float64(_))
+                        | (InputItem::Percentage(_), InputConfig::Percentage(_))
+                        | (InputItem::Nic(_), InputConfig::Nic(_))
+                        | (InputItem::File(_), InputConfig::File(_)) => (), // These don't have buffers.
+                        _ => {
+                            panic!("InputItem and InputConfig is not matched")
+                        }
                     }
                 }
             });
@@ -242,26 +250,12 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     data.set_selected(preset.clone());
-                                    let checked_index = config
-                                        .options
-                                        .iter()
-                                        .position(|o| &o.to_string() == preset);
-                                    if let Some(checked_index) = checked_index {
-                                        if let (
-                                            Some(data_children),
-                                            Some(Some(config_children)),
-                                        ) = (
-                                            data.children_group().get(checked_index),
-                                            config.children_group.get(checked_index),
-                                        ) {
-                                            self.prepare_preset_recursive(
-                                                data_children,
-                                                config_children,
-                                                parent_checked,
-                                                (base_index + index) * MAX_PER_LAYER,
-                                            );
-                                        }
-                                    }
+                                    self.radio_prepare_preset(
+                                        data,
+                                        config,
+                                        parent_checked,
+                                        (base_index + index) * MAX_PER_LAYER,
+                                    );
                                     let id = base_index + index;
                                     self.preset_to_buffer_radio(id, preset);
                                 }
@@ -276,10 +270,37 @@ where
                         | (InputItem::Group(_), InputConfig::Group(_)) => (), // These don't have presets
                         _ => {
                             panic!("InputItem and InputConfig is not matched");
-                        },
+                        }
                     }
                 }
             });
+    }
+
+    pub fn radio_prepare_preset(
+        &mut self,
+        data: &mut RadioItem,
+        config: &RadioConfig,
+        parent_checked: bool,
+        index: usize,
+    ) {
+        let checked_index = config
+            .options
+            .iter()
+            .position(|o| o.to_string() == data.selected());
+
+        if let Some(checked_index) = checked_index {
+            if let (Some(data_children), Some(Some(config_children))) = (
+                data.children_get_mut(checked_index),
+                config.children_group.get(checked_index),
+            ) {
+                self.prepare_preset_recursive(
+                    data_children,
+                    config_children,
+                    parent_checked,
+                    index,
+                );
+            }
+        }
     }
 
     pub(super) fn preset_to_buffer_radio(&mut self, id: usize, preset: &String) {
@@ -396,7 +417,7 @@ where
                                     }
                             }
                             InputItem::Checkbox(c) => c.status() == CheckStatus::Unchecked,
-                            InputItem::Radio(data) => data.selected().is_empty(),
+                            InputItem::Radio(data) => data.is_empty(),
                         };
                         if empty {
                             self.required_msg.insert(base_index + index);
@@ -409,16 +430,25 @@ where
                         let required = config
                             .items
                             .iter()
-                            .filter_map(|t| match &(**t) {
-                                InputConfig::Text(config) => Some(config.ess.required),
-                                InputConfig::SelectSingle(config) => Some(config.ess.required),
-                                // TODO: SelectMultiple isn't needed?
-                                InputConfig::VecSelect(config) => Some(config.ess.required),
-                                InputConfig::Unsigned32(config) => Some(config.ess.required),
-                                InputConfig::Float64(config) => Some(config.ess.required),
-                                InputConfig::Comparison(config) => Some(config.ess.required),
-                                // TODO: If not supported, how about a panic?
-                                _ => None,
+                            .map(|t| match &(**t) {
+                                InputConfig::Text(config) => config.ess.required,
+                                InputConfig::HostNetworkGroup(config) => config.ess.required,
+                                InputConfig::SelectSingle(config) => config.ess.required,
+                                InputConfig::SelectMultiple(config) => config.ess.required,
+                                InputConfig::Unsigned32(config) => config.ess.required,
+                                InputConfig::Float64(config) => config.ess.required,
+                                InputConfig::Percentage(config) => config.ess.required,
+                                InputConfig::Comparison(config) => config.ess.required,
+                                InputConfig::VecSelect(config) => config.ess.required,
+                                InputConfig::Password(_)
+                                | InputConfig::Tag(_)
+                                | InputConfig::Nic(_)
+                                | InputConfig::File(_)
+                                | InputConfig::Group(_)
+                                | InputConfig::Checkbox(_)
+                                | InputConfig::Radio(_) => {
+                                    panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+                                }
                             })
                             .collect::<Vec<bool>>();
                         // in the case of VecSelect or Comparison
@@ -434,6 +464,7 @@ where
                                     .filter_map(|(col_index, col)| {
                                         if let Ok(col) = col.try_borrow() {
                                             match &*col {
+                                                // TODO: All cases covered?
                                                 InputItem::Text(v) => Some(Some(v.is_empty())),
                                                 InputItem::Unsigned32(v) => Some(Some(v.is_none())),
                                                 InputItem::Float64(v) => Some(Some(v.is_none())),
@@ -754,7 +785,7 @@ where
         click: &Rc<RefCell<InputItem>>,
         pos: &Rc<RefCell<InputItem>>,
         input_conf: &Rc<InputConfig>,
-        checked: Option<CheckStatus>,
+        checked: Option<CheckStatus>, // parent of `this_checked`, that is, `pos`
         layer_index: usize,
         base_index: usize,
     ) -> Option<CheckStatus> {
@@ -764,7 +795,7 @@ where
                     (&mut *click, &**input_conf)
                 {
                     match data.status() {
-                        CheckStatus::Checked => {
+                        CheckStatus::Checked | CheckStatus::Indeterminate => {
                             if config.always != Some(CheckStatus::Checked)
                                 && config.always != Some(CheckStatus::Indeterminate)
                             {
@@ -772,17 +803,27 @@ where
                             }
                             Some(data.status())
                         }
-                        CheckStatus::Indeterminate | CheckStatus::Unchecked => {
+                        CheckStatus::Unchecked => {
                             if config.always != Some(CheckStatus::Unchecked) {
-                                data.set_status(checked.unwrap_or(CheckStatus::Checked));
+                                if let Some(always) = config.always {
+                                    data.set_status(always);
+                                } else {
+                                    data.set_status(checked.unwrap_or(CheckStatus::Checked));
+                                }
                             }
                             Some(data.status())
                         }
                     }
-                } else if let (InputItem::Radio(data), InputConfig::Radio(_)) =
-                    (&*click, &**input_conf)
+                } else if let (InputItem::Radio(data), InputConfig::Radio(config)) =
+                    (&mut *click, &**input_conf)
                 {
-                    if data.selected().is_empty() {
+                    self.radio_prepare_preset(
+                        data,
+                        config,
+                        true,
+                        (base_index + layer_index) * MAX_PER_LAYER,
+                    );
+                    if data.is_empty() {
                         Some(CheckStatus::Unchecked)
                     } else {
                         Some(CheckStatus::Checked)
@@ -795,15 +836,24 @@ where
             }
         } else if let Some(checked) = checked {
             if let Ok(mut pos) = pos.try_borrow_mut() {
-                if let (InputItem::Checkbox(data), InputConfig::Checkbox(_)) =
+                if let (InputItem::Checkbox(data), InputConfig::Checkbox(conf)) =
                     (&mut *pos, &**input_conf)
                 {
-                    data.set_status(checked);
-                    Some(checked)
+                    if let Some(always) = conf.always {
+                        data.set_status(always);
+                    } else if let Some(preset) = conf.preset {
+                        data.set_status(preset);
+                    } else {
+                        data.set_status(checked);
+                    }
+                    Some(data.status())
                 } else if let (InputItem::Radio(data), InputConfig::Radio(_)) =
-                    (&*pos, &**input_conf)
+                    (&mut *pos, &**input_conf)
                 {
-                    if data.selected().is_empty() {
+                    if checked == CheckStatus::Unchecked {
+                        data.set_selected(String::new());
+                    }
+                    if data.is_empty() {
                         Some(CheckStatus::Unchecked)
                     } else {
                         Some(CheckStatus::Checked)
@@ -819,16 +869,22 @@ where
         };
 
         let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)> = Vec::new();
-        if let Ok(pos) = pos.try_borrow_mut() {
+        if let Ok(mut pos) = pos.try_borrow_mut() {
             let children = if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
-                (&*pos, &**input_conf)
+                (&mut *pos, &**input_conf)
             {
-                config
-                    .children
-                    .as_ref()
-                    .map(|config_children| (data.children(), &config_children.children))
+                if data.status() == CheckStatus::Checked
+                    || data.status() == CheckStatus::Indeterminate
+                {
+                    config
+                        .children
+                        .as_ref()
+                        .map(|config_children| (data.children_mut(), &config_children.children))
+                } else {
+                    None
+                }
             } else if let (InputItem::Radio(data), InputConfig::Radio(config)) =
-                (&*pos, &**input_conf)
+                (&mut *pos, &**input_conf)
             {
                 let checked_index = config
                     .options
@@ -836,10 +892,10 @@ where
                     .position(|o| data.selected() == o.to_string());
                 if let Some(checked_index) = checked_index {
                     if let (Some(children), Some(Some(config_children))) = (
-                        data.children_group().get(checked_index),
+                        data.children_get_mut(checked_index),
                         config.children_group.get(checked_index),
                     ) {
-                        Some((children.as_ref(), config_children))
+                        Some((children, config_children))
                     } else {
                         None
                     }
@@ -851,11 +907,17 @@ where
             };
 
             if let Some((children, config_children)) = children {
+                if children.is_empty() {
+                    *children = InputItem::default_items_from_config(config_children);
+                }
                 for (index, child) in children.iter().enumerate() {
                     if let (Ok(mut c), Some(t)) =
                         (child.try_borrow_mut(), config_children.get(index))
                     {
                         match (&mut (*c), &**t) {
+                            // HIGHLIGHT: `preset` should be set even when `this_checked` is
+                            // `Unchecked`, because `this_checked`` may be changed later depending
+                            // on its children.
                             (InputItem::Text(user), InputConfig::Text(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
@@ -894,7 +956,6 @@ where
                                     }
                                 }
                             }
-
                             (InputItem::VecSelect(user), InputConfig::VecSelect(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
@@ -903,17 +964,37 @@ where
                                 }
                             }
                             (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
+                                // HIGHLIGHT: This should be called regardless of the user.status(),
+                                // because it might be changed according to the status of children.
                                 propa_children.push((index, Rc::clone(child), Rc::clone(t)));
                             }
                             (InputItem::Radio(user), InputConfig::Radio(config)) => {
-                                if user.selected().is_empty()
-                                    || this_checked == Some(CheckStatus::Unchecked)
+                                // HIGHLIGHT: Should this be handled after propagation? I don't
+                                // think so. But, recheck this later.
+                                if user.is_empty()
+                                    && (this_checked == Some(CheckStatus::Checked)
+                                        || this_checked == Some(CheckStatus::Indeterminate))
                                 {
                                     if let Some(preset) = &config.preset {
-                                        user.set_selected(preset.clone());
+                                        if user.selected() != preset {
+                                            user.set_selected(preset.clone());
+                                            self.radio_prepare_preset(
+                                                user,
+                                                config,
+                                                true,
+                                                (base_index + layer_index) * MAX_PER_LAYER,
+                                            );
+                                        }
+                                        let buf_index =
+                                            (layer_index + base_index) * MAX_PER_LAYER + index;
+                                        self.radio_to_buffer(buf_index, user, config);
                                     }
                                 }
-                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                                // HIGHLIGHT: This CAN be called only if user.is_empty() is true,
+                                // because the radio status is not affected by the status of children.
+                                if !user.is_empty() {
+                                    propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                                }
                             }
                             (_, _) => (),
                         }
@@ -971,13 +1052,21 @@ where
         };
 
         let final_checked = if let Ok(mut pos) = pos.try_borrow_mut() {
-            if let InputItem::Checkbox(data) = &mut (*pos) {
-                if let Some(updated_checked) = updated_checked {
-                    data.set_status(updated_checked);
+            match &mut (*pos) {
+                InputItem::Checkbox(data) => {
+                    if let Some(updated_checked) = updated_checked {
+                        data.set_status(updated_checked);
+                    }
+                    Some(data.status())
                 }
-                Some(data.status())
-            } else {
-                None
+                InputItem::Radio(data) => {
+                    if data.is_empty() {
+                        Some(CheckStatus::Unchecked)
+                    } else {
+                        Some(CheckStatus::Checked)
+                    }
+                }
+                _ => None,
             }
         } else {
             None
