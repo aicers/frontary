@@ -25,6 +25,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
     `preset` field.
 - Remove `Essential::unique` because it is required in `TextConfig` only.
 
+### Removed
+
+- Removed `Svg`
+
 ### Fixed
 
 - Fixed `clumit-delete-trash` and `clumit-close-white` icon.

@@ -789,7 +789,7 @@ where
                                                 | Column::Group(..)
                                                 | Column::Checkbox(..)
                                                 | Column::Radio(..) => {
-                                                    panic!("Column::Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
+                                                    panic!("Column Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
                                                 }
                                             }
 

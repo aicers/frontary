@@ -8,7 +8,7 @@ use yew::{events::InputEvent, html, Context, Html};
 
 use super::{Message, Model, MIN_POP_HEIGHT};
 use crate::{
-    text, window_inner_height, Checkbox, CheckStatus, EndpointKind, NetworkItem, SelectComplexKind,
+    text, window_inner_height, CheckStatus, Checkbox, EndpointKind, NetworkItem, SelectComplexKind,
     SelectMini, SelectMiniKind, SelectionExtraInfo, ViewString, NBSP,
 };
 

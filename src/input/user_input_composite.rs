@@ -74,7 +74,6 @@ where
                             { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
                         <div class="input-radio-radio">
-                            // { format!("{}:{}", base_index, layer_index) }
                             <Radio::<Self>
                                 txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
@@ -395,7 +394,6 @@ where
         };
         let txt = ctx.props().txt.txt.clone();
         let sub_base_index = (base_index + layer_index) * MAX_PER_LAYER;
-        // let default = ess.default.clone();
         let onclick_add = ctx.link().callback(move |_| {
             Message::InputGroupAdd(
                 sub_base_index,

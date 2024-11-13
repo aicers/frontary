@@ -10,7 +10,7 @@ use yew::virtual_dom::AttrValue;
 use yew::{classes, events::InputEvent, html, Component, Context, Html, Properties};
 
 use crate::{
-    language::Language, shorten_text, text, text_width, toggle_visibility, Checkbox, CheckStatus,
+    language::Language, shorten_text, text, text_width, toggle_visibility, CheckStatus, Checkbox,
     Item, Texts,
 };
 
