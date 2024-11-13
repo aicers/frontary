@@ -761,20 +761,12 @@ where
         let onchange = ctx.link().callback(move |e: Event| {
             let mut result = Vec::new();
             let input: HtmlInputElement = e.target_unchecked_into();
-            // TODO: the below `expect` is inevitable? Refer the below example code.
-            // if let Some(files) = input.files() {
-            //     let files = js_sys::try_iter(&files)
-            //         .unwrap()
-            //         .unwrap()
-            //         .map(|v| web_sys::File::from(v.unwrap()))
-            //         .map(File::from);
-            //     result.extend(files);
-            // }
             if let Some(files) = input.files() {
                 let files = js_sys::try_iter(&files).ok().and_then(|x| x);
                 if let Some(files) = files {
                     let files = files
-                        .map(|v| web_sys::File::from(v.expect("convert to JsValue")))
+                        .filter_map(Result::ok)
+                        .map(web_sys::File::from)
                         .map(File::from);
                     result.extend(files);
                 }

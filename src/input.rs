@@ -247,7 +247,8 @@ impl fmt::Display for IncompletePairOfValues {
 impl std::error::Error for IncompletePairOfValues {}
 
 impl Comparison {
-    #[allow(clippy::missing_errors_doc)] // TODO: document later
+    // TODO: issue #183
+    #[allow(clippy::missing_errors_doc)]
     pub fn try_new(
         cmp: ComparisonKind,
         first: Value,

@@ -62,19 +62,15 @@ type CompValueBuf = HashMap<
     ),
 >;
 
-// TODO: isn't this Option necessary?
 type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
 
 pub struct Model<T> {
     pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
     pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
-    // TODO: isn't this Option necessary?
     pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) vec_select_buffer: VecSelectBuf,
     pub(super) tag_buffer: HashMap<usize, Rc<RefCell<InputTagGroup>>>,
-    // TODO: isn't this Option necessary?
     pub(super) comparison_value_kind_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
-    // TODO: isn't this Option necessary?
     pub(super) comparison_value_cmp_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) comparison_value_buffer: CompValueBuf,
 
@@ -204,7 +200,6 @@ pub enum Message {
     InputComparisonComparisionKind(usize, Rc<RefCell<InputItem>>),
     InputComparisonValue(usize, usize, ComparisonValue, Rc<RefCell<InputItem>>),
     InvalidInputComparisonValue,
-    // TODO: extend multiple files
     ChooseFile(usize, Vec<File>, Rc<RefCell<InputItem>>),
     FileLoaded(String, Vec<u8>),
     FailLoadFile,
