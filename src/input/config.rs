@@ -120,7 +120,6 @@ pub struct FileConfig {
 #[derive(Clone, PartialEq)]
 pub struct ComparisonConfig {
     pub ess: Essential,
-    // TODO: `preset` might be required.
 }
 
 #[derive(Clone, PartialEq)]
@@ -142,7 +141,7 @@ pub struct VecSelectConfig {
 
 #[derive(Clone, PartialEq)]
 pub struct GroupConfig {
-    // TODO: This comment should be clarified.
+    // TODO: issue #183 (This comment should be clarified.)
     /// If `Essesntial::required` is set true, one valid row should be included at least. If one or
     /// more of columns in a given row are not empty, all the columns with `Essential::required ==
     /// true` cannot be empty.

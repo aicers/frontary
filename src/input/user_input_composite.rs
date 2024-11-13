@@ -278,6 +278,7 @@ where
             InputConfig::Text(config) => {
                 html! {
                     <div class={class_child}>
+                        // TODO: issue #111
                         <div class={class_line}>
                         </div>
                         { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, base_index, false, false) }
@@ -341,7 +342,7 @@ where
             InputConfig::Checkbox(config) => {
                 html! {
                     <div class={class_child}>
-                        <div class={class_line}> // TODO: remove this empty div
+                        <div class={class_line}>
                         </div>
                         { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
                     </div>

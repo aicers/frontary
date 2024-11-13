@@ -372,7 +372,18 @@ where
                 if let Ok(item) = input_data.try_borrow() {
                     if parent_checked && (*input_conf).required() {
                         let empty = match &(*item) {
-                            InputItem::Text(data) => data.is_empty(),
+                            InputItem::Text(_)
+                            | InputItem::SelectSingle(_)
+                            | InputItem::SelectMultiple(_)
+                            | InputItem::Unsigned32(_)
+                            | InputItem::Float64(_)
+                            | InputItem::Percentage(_)
+                            | InputItem::File(_)
+                            | InputItem::Comparison(_)
+                            | InputItem::Tag(_)
+                            | InputItem::Group(_)
+                            | InputItem::Checkbox(_)
+                            | InputItem::Radio(_) => item.is_empty(),
                             InputItem::Password(pw) => {
                                 // HIGHLIGHT: In case of Edit, empty means no change of passwords
                                 ctx.props().input_id.is_none() && pw.is_empty()
@@ -385,11 +396,6 @@ where
                                         .get(&(base_index + index))
                                         .map_or(false, |v| v.map_or(true, |v| v))
                             }
-                            InputItem::SelectSingle(s) => s.is_none(),
-                            InputItem::SelectMultiple(s) => s.is_empty(),
-                            InputItem::Unsigned32(v) => v.is_none(),
-                            InputItem::Float64(v) => v.is_none(),
-                            InputItem::Percentage(v) => v.is_none(),
                             InputItem::Nic(n) => n
                                 .iter()
                                 .find_map(|n| {
@@ -403,9 +409,6 @@ where
                                     }
                                 })
                                 .is_none(),
-                            InputItem::File(file) => file.content().is_empty(),
-                            InputItem::Comparison(cmp) => cmp.is_none(),
-                            InputItem::Tag(_) | InputItem::Group(_) => false,
                             InputItem::VecSelect(s) => {
                                 s.is_empty()
                                     || if let InputConfig::VecSelect(config) = &**input_conf {
@@ -416,8 +419,6 @@ where
                                         true
                                     }
                             }
-                            InputItem::Checkbox(c) => c.status() == CheckStatus::Unchecked,
-                            InputItem::Radio(data) => data.is_empty(),
                         };
                         if empty {
                             self.required_msg.insert(base_index + index);
@@ -431,15 +432,15 @@ where
                             .items
                             .iter()
                             .map(|t| match &(**t) {
-                                InputConfig::Text(config) => config.ess.required,
-                                InputConfig::HostNetworkGroup(config) => config.ess.required,
-                                InputConfig::SelectSingle(config) => config.ess.required,
-                                InputConfig::SelectMultiple(config) => config.ess.required,
-                                InputConfig::Unsigned32(config) => config.ess.required,
-                                InputConfig::Float64(config) => config.ess.required,
-                                InputConfig::Percentage(config) => config.ess.required,
-                                InputConfig::Comparison(config) => config.ess.required,
-                                InputConfig::VecSelect(config) => config.ess.required,
+                                InputConfig::Text(_)
+                                | InputConfig::HostNetworkGroup(_)
+                                | InputConfig::SelectSingle(_)
+                                | InputConfig::SelectMultiple(_)
+                                | InputConfig::Unsigned32(_)
+                                | InputConfig::Float64(_)
+                                | InputConfig::Percentage(_)
+                                | InputConfig::Comparison(_)
+                                | InputConfig::VecSelect(_) => t.required(),
                                 InputConfig::Password(_)
                                 | InputConfig::Tag(_)
                                 | InputConfig::Nic(_)
@@ -464,22 +465,13 @@ where
                                     .filter_map(|(col_index, col)| {
                                         if let Ok(col) = col.try_borrow() {
                                             match &*col {
-                                                // TODO: All cases covered?
-                                                InputItem::Text(v) => Some(Some(v.is_empty())),
-                                                InputItem::Unsigned32(v) => Some(Some(v.is_none())),
-                                                InputItem::Float64(v) => Some(Some(v.is_none())),
-                                                InputItem::SelectSingle(v) => {
-                                                    Some(Some(v.is_none()))
-                                                }
-                                                InputItem::VecSelect(v) => {
-                                                    if v.iter().all(HashSet::is_empty) {
-                                                        Some(Some(true))
-                                                    } else if v.iter().all(|d| !d.is_empty()) {
-                                                        Some(Some(false))
-                                                    } else {
-                                                        Some(None)
-                                                    }
-                                                }
+                                                InputItem::Text(_)
+                                                | InputItem::HostNetworkGroup(_)
+                                                | InputItem::SelectSingle(_)
+                                                | InputItem::SelectMultiple(_)
+                                                | InputItem::Unsigned32(_)
+                                                | InputItem::Float64(_)
+                                                | InputItem::Percentage(_) => Some(Some(col.is_empty())),
                                                 InputItem::Comparison(v) => {
                                                     if v.is_some() {
                                                         Some(Some(false))
@@ -498,7 +490,24 @@ where
                                                         Some(Some(true))
                                                     }
                                                 }
-                                                _ => None,
+                                                InputItem::VecSelect(v) => {
+                                                    if v.iter().all(HashSet::is_empty) {
+                                                        Some(Some(true))
+                                                    } else if v.iter().all(|d| !d.is_empty()) {
+                                                        Some(Some(false))
+                                                    } else {
+                                                        Some(None)
+                                                    }
+                                                }
+                                                InputItem::Password(_)
+                                                | InputItem::Tag(_)
+                                                | InputItem::Nic(_)
+                                                | InputItem::File(_)
+                                                | InputItem::Group(_)
+                                                | InputItem::Checkbox(_)
+                                                | InputItem::Radio(_) => {
+                                                    panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+                                                },
                                             }
                                         } else {
                                             None

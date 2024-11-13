@@ -242,11 +242,6 @@ impl SelectMultipleItem {
         self.selected_list = selected_list.iter().cloned().collect();
     }
 
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.selected_list.is_empty()
-    }
-
     pub fn selected_list(&self) -> HashSet<&str> {
         self.selected_list.iter().map(String::as_str).collect()
     }
@@ -284,11 +279,6 @@ impl TagItem {
     #[must_use]
     pub fn new(tag_group: InputTagGroup) -> Self {
         Self { tag_group }
-    }
-
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.tag_group.is_empty()
     }
 
     #[must_use]
@@ -464,11 +454,6 @@ impl NicItem {
     }
 
     #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.nics.is_empty()
-    }
-
-    #[must_use]
     pub fn into_inner(&self) -> Vec<InputNic> {
         self.nics.clone()
     }
@@ -492,7 +477,7 @@ impl FileItem {
 
     #[must_use]
     pub fn is_empty(&self) -> bool {
-        self.name.is_empty() && self.content.is_empty()
+        self.name.is_empty()
     }
 
     #[must_use]
@@ -583,11 +568,6 @@ impl VecSelectItem {
     }
 
     #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.list.is_empty()
-    }
-
-    #[must_use]
     pub fn into_inner(&self) -> Vec<HashSet<String>> {
         self.list.clone()
     }
@@ -599,7 +579,6 @@ impl VecSelectItem {
 
 #[derive(Clone, PartialEq, Default)]
 pub struct GroupItem {
-    // TODO: Define a Group like Vec<Group>?
     groups: Vec<Vec<Rc<RefCell<InputItem>>>>,
 }
 
@@ -621,11 +600,6 @@ impl GroupItem {
     #[must_use]
     pub fn new(groups: Vec<Vec<Rc<RefCell<InputItem>>>>) -> Self {
         Self { groups }
-    }
-
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.groups.is_empty()
     }
 
     #[must_use]
@@ -655,6 +629,11 @@ impl CheckboxItem {
     #[must_use]
     pub fn new(status: CheckStatus, children: Vec<Rc<RefCell<InputItem>>>) -> Self {
         Self { status, children }
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.status == CheckStatus::Unchecked
     }
 
     #[must_use]
@@ -798,6 +777,28 @@ impl InputItem {
             InputItem::Group(group) => group.clear(),
             InputItem::Checkbox(cb) => cb.clear(),
             InputItem::Radio(radio) => radio.clear(),
+        }
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        match self {
+            InputItem::Text(txt) => txt.is_empty(),
+            InputItem::Password(pw) => pw.is_empty(),
+            InputItem::HostNetworkGroup(group) => group.is_empty(),
+            InputItem::SelectSingle(selected) => selected.is_empty(),
+            InputItem::SelectMultiple(selected_list) => selected_list.is_empty(),
+            InputItem::Tag(tag) => tag.is_empty(),
+            InputItem::Unsigned32(value) => value.is_empty(),
+            InputItem::Float64(value) => value.is_empty(),
+            InputItem::Percentage(value) => value.is_empty(),
+            InputItem::Nic(nics) => nics.is_empty(),
+            InputItem::File(file) => file.is_empty(),
+            InputItem::Comparison(cmp) => cmp.is_empty(),
+            InputItem::VecSelect(list) => list.is_empty(),
+            InputItem::Group(group) => group.is_empty(),
+            InputItem::Checkbox(cb) => cb.is_empty(),
+            InputItem::Radio(radio) => radio.is_empty(),
         }
     }
 
