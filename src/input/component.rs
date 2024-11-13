@@ -1229,7 +1229,7 @@ fn group_item(conf: &Rc<InputConfig>) -> InputItem {
         | InputConfig::Group(_)
         | InputConfig::Checkbox(_)
         | InputConfig::Radio(_) => {
-            panic!("InputConfig::Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+            panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
         }
     }
 }
