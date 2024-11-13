@@ -7,6 +7,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Enabled the radio component have child items recursively.
+
 ### Changed
 
 - Adjusted Clumit notification component's styling for consistency with the
@@ -16,7 +20,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `InputConfig` to be composed of the corresponding structs.
 - Changed the variants of `InputItem` to be composed of the corresponding
   structs.
-- Enabled the radio component have child items recursively.
 - Remove `Essential::default`
   - Some `InputConfig` variants, that need preset values for users, now have the
     `preset` field.
