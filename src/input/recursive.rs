@@ -14,6 +14,7 @@ use super::{
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
 const PASSWORD_MIN_FORBID_ADJACENT_LEN: usize = 4; // adjacent keyboard characters
+type PropaChildren = Vec<(usize, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
 
 impl<T> Model<T>
 where
@@ -250,14 +251,23 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     data.set_selected(preset.clone());
-                                    self.radio_prepare_preset(
-                                        data,
-                                        config,
-                                        parent_checked,
-                                        (base_index + index) * MAX_PER_LAYER,
-                                    );
-                                    let id = base_index + index;
-                                    self.preset_to_buffer_radio(id, preset);
+                                    for (sub_index, (data, config)) in data
+                                        .children_group()
+                                        .iter()
+                                        .zip(config.children_group.iter())
+                                        .enumerate()
+                                    {
+                                        if let Some(config) = config {
+                                            self.prepare_preset_recursive(
+                                                data,
+                                                config,
+                                                parent_checked,
+                                                ((base_index + index) * MAX_PER_LAYER + sub_index)
+                                                    * MAX_PER_LAYER,
+                                            );
+                                        }
+                                    }
+                                    self.preset_to_buffer_radio(base_index + index, preset);
                                 }
                             }
                         }
@@ -274,33 +284,6 @@ where
                     }
                 }
             });
-    }
-
-    pub fn radio_prepare_preset(
-        &mut self,
-        data: &mut RadioItem,
-        config: &RadioConfig,
-        parent_checked: bool,
-        index: usize,
-    ) {
-        let checked_index = config
-            .options
-            .iter()
-            .position(|o| o.to_string() == data.selected());
-
-        if let Some(checked_index) = checked_index {
-            if let (Some(data_children), Some(Some(config_children))) = (
-                data.children_get_mut(checked_index),
-                config.children_group.get(checked_index),
-            ) {
-                self.prepare_preset_recursive(
-                    data_children,
-                    config_children,
-                    parent_checked,
-                    index,
-                );
-            }
-        }
     }
 
     pub(super) fn preset_to_buffer_radio(&mut self, id: usize, preset: &String) {
@@ -823,15 +806,9 @@ where
                             Some(data.status())
                         }
                     }
-                } else if let (InputItem::Radio(data), InputConfig::Radio(config)) =
+                } else if let (InputItem::Radio(data), InputConfig::Radio(_)) =
                     (&mut *click, &**input_conf)
                 {
-                    self.radio_prepare_preset(
-                        data,
-                        config,
-                        true,
-                        (base_index + layer_index) * MAX_PER_LAYER,
-                    );
                     if data.is_empty() {
                         Some(CheckStatus::Unchecked)
                     } else {
@@ -877,7 +854,7 @@ where
             None
         };
 
-        let mut propa_children: Vec<(usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)> = Vec::new();
+        let mut propa_children: PropaChildren = Vec::new();
         if let Ok(mut pos) = pos.try_borrow_mut() {
             let children = if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
                 (&mut *pos, &**input_conf)
@@ -885,10 +862,9 @@ where
                 if data.status() == CheckStatus::Checked
                     || data.status() == CheckStatus::Indeterminate
                 {
-                    config
-                        .children
-                        .as_ref()
-                        .map(|config_children| (data.children_mut(), &config_children.children))
+                    config.children.as_ref().map(|config_children| {
+                        (None, data.children_mut(), &config_children.children)
+                    })
                 } else {
                     None
                 }
@@ -904,7 +880,7 @@ where
                         data.children_get_mut(checked_index),
                         config.children_group.get(checked_index),
                     ) {
-                        Some((children, config_children))
+                        Some((Some(checked_index), children, config_children))
                     } else {
                         None
                     }
@@ -915,7 +891,7 @@ where
                 None
             };
 
-            if let Some((children, config_children)) = children {
+            if let Some((radio, children, config_children)) = children {
                 if children.is_empty() {
                     *children = InputItem::default_items_from_config(config_children);
                 }
@@ -923,6 +899,11 @@ where
                     if let (Ok(mut c), Some(t)) =
                         (child.try_borrow_mut(), config_children.get(index))
                     {
+                        let propa_index = if let Some(radio) = radio {
+                            (layer_index + base_index) * MAX_PER_LAYER + radio
+                        } else {
+                            layer_index + base_index
+                        };
                         match (&mut (*c), &**t) {
                             // HIGHLIGHT: `preset` should be set even when `this_checked` is
                             // `Unchecked`, because `this_checked`` may be changed later depending
@@ -934,10 +915,26 @@ where
                                     }
                                 }
                             }
+                            (
+                                InputItem::HostNetworkGroup(user),
+                                InputConfig::HostNetworkGroup(_),
+                            ) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    *user = HostNetworkGroupItem::default();
+                                    self.host_network_to_buffer(
+                                        (propa_index) * MAX_PER_LAYER + index,
+                                        user,
+                                    );
+                                }
+                            }
                             (InputItem::SelectSingle(user), InputConfig::SelectSingle(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
+                                        self.select_searchable_to_buffer(
+                                            (propa_index) * MAX_PER_LAYER + index,
+                                            user,
+                                        );
                                     }
                                 }
                             }
@@ -948,6 +945,11 @@ where
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
+                                        self.select_multiple_to_buffer(
+                                            (propa_index) * MAX_PER_LAYER + index,
+                                            user,
+                                            config,
+                                        );
                                     }
                                 }
                             }
@@ -965,17 +967,33 @@ where
                                     }
                                 }
                             }
+                            (InputItem::Percentage(user), InputConfig::Percentage(config)) => {
+                                if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(preset) = &config.preset {
+                                        user.set(*preset);
+                                    }
+                                }
+                            }
                             (InputItem::VecSelect(user), InputConfig::VecSelect(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
                                     }
+                                    self.vec_select_to_buffer(
+                                        (propa_index) * MAX_PER_LAYER + index,
+                                        user,
+                                    );
                                 }
                             }
                             (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
                                 // HIGHLIGHT: This should be called regardless of the user.status(),
                                 // because it might be changed according to the status of children.
-                                propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                                propa_children.push((
+                                    propa_index,
+                                    index,
+                                    Rc::clone(child),
+                                    Rc::clone(t),
+                                ));
                             }
                             (InputItem::Radio(user), InputConfig::Radio(config)) => {
                                 // HIGHLIGHT: Should this be handled after propagation? I don't
@@ -987,25 +1005,36 @@ where
                                     if let Some(preset) = &config.preset {
                                         if user.selected() != preset {
                                             user.set_selected(preset.clone());
-                                            self.radio_prepare_preset(
+                                            self.radio_to_buffer(
+                                                propa_index * MAX_PER_LAYER + index,
                                                 user,
                                                 config,
-                                                true,
-                                                (base_index + layer_index) * MAX_PER_LAYER,
                                             );
                                         }
-                                        let buf_index =
-                                            (layer_index + base_index) * MAX_PER_LAYER + index;
-                                        self.radio_to_buffer(buf_index, user, config);
                                     }
                                 }
                                 // HIGHLIGHT: This CAN be called only if user.is_empty() is true,
                                 // because the radio status is not affected by the status of children.
                                 if !user.is_empty() {
-                                    propa_children.push((index, Rc::clone(child), Rc::clone(t)));
+                                    propa_children.push((
+                                        propa_index,
+                                        index,
+                                        Rc::clone(child),
+                                        Rc::clone(t),
+                                    ));
                                 }
                             }
-                            (_, _) => (),
+                            (InputItem::Password(_), InputConfig::Password(_))
+                            | (InputItem::Tag(_), InputConfig::Tag(_))
+                            | (InputItem::Nic(_), InputConfig::Nic(_))
+                            | (InputItem::File(_), InputConfig::File(_))
+                            | (InputItem::Comparison(_), InputConfig::Comparison(_))
+                            | (InputItem::Group(_), InputConfig::Group(_)) => {
+                                panic!("Children items do not include Password, Tag, Nic, File, Comparison, and Group.")
+                            }
+                            (_, _) => {
+                                panic!("InputItem and InputConfig is not matched");
+                            }
                         }
                     }
                 }
@@ -1013,14 +1042,14 @@ where
         }
         let mut rtn_checked: Vec<Option<CheckStatus>> = Vec::new();
 
-        for (index, child, config_child) in &propa_children {
+        for (index, sub_index, child, config_child) in &propa_children {
             rtn_checked.push(self.propagate_checkbox_recursive(
                 click,
                 child,
                 config_child,
                 this_checked,
-                *index,
-                (base_index + layer_index) * MAX_PER_LAYER,
+                *sub_index,
+                *index * MAX_PER_LAYER,
             ));
         }
 
@@ -1204,26 +1233,9 @@ where
         );
     }
 
-    fn radio_to_buffer(&mut self, index: usize, data: &RadioItem, config: &RadioConfig) {
+    fn radio_to_buffer(&mut self, index: usize, data: &RadioItem, _: &RadioConfig) {
         self.radio_buffer
             .insert(index, Rc::new(RefCell::new(data.selected().to_string())));
-
-        if let Some(index) = config
-            .options
-            .iter()
-            .position(|vs| data.selected() == vs.to_string())
-        {
-            if let (Some(data_children), Some(Some(config_children))) = (
-                data.children_group().get(index),
-                config.children_group.get(index),
-            ) {
-                self.prepare_buffer_recursive(
-                    data_children,
-                    config_children,
-                    index * MAX_PER_LAYER,
-                );
-            }
-        }
     }
 }
 

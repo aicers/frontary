@@ -96,7 +96,7 @@ where
                         </div>
                     </div>
                     {
-                        if let Some(children) = children {
+                        if let (Some(children), Some(checked_index)) = (children, checked_index) {
                             if children_data.is_empty() {
                                 html! {}
                             } else {
@@ -105,7 +105,7 @@ where
                                     {
                                         for children.iter().enumerate().map(|(sub_index, child)|
                                             if let Some(child_data) = children_data.get(sub_index) {
-                                                self.view_child(ctx, child, child_data, layer_index, base_index, sub_index, depth, class_child, class_line)
+                                                self.view_child(ctx, child, child_data, (layer_index + base_index) * MAX_PER_LAYER, checked_index, sub_index, depth, class_child, class_line)
                                             } else {
                                                 html! {}
                                             }
