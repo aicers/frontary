@@ -101,7 +101,7 @@ div.radio-item {
     display: flex;
     flex-direction: row;
     align-items: center;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -156,12 +156,12 @@ input[type=text].searchable-select-input {
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
     padding: 8px 12px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 input[type=text].searchable-select-input-empty {
@@ -172,12 +172,12 @@ input[type=text].searchable-select-input-empty {
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
     padding: 8px 12px;
-    color: #616974;
+    color: var(--Dark-50);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 input[type=text].searchable-select-input-empty-alert {
@@ -188,11 +188,11 @@ input[type=text].searchable-select-input-empty-alert {
     background-image: url(/frontary/clumit-select-down-alert.svg);
     background-size: 32px 32px;
     background-position: right 7px top 3px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     background-repeat: no-repeat;
     border: none;
     line-height: 24px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     font-weight: 400;
 }
 
@@ -223,14 +223,14 @@ input[type=text].searchable-select-search {
     outline: none;
     border: none;
     border-radius: 8px;
-    background: var(--Transparent-Mid-Grey, rgba(97, 105, 116, 0.24));
+    background: var(--Transparent-Mid-Grey);
     padding-left: 48px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=text].searchable-select-search::placeholder {
     font-size: 16px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
 }
 
 div.searchable-select-list-search-space {
@@ -252,7 +252,7 @@ td.searchable-select-list-item {
     height: auto;
     font-size: 16px;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 tr.searchable-select-list-item-single {
@@ -260,17 +260,17 @@ tr.searchable-select-list-item-single {
 }
 
 tr.searchable-select-list-item-single:hover {
-    background-color: #474C55;
+    background-color: var(--Dark-60);
 }
 
 td.searchable-select-list-item-single-selected {
     width: 100%;
     height: 48px;
     font-size: 16px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     font-weight: 400;
     line-height: 24px;
-    background: #474C55;
+    background: var(--Dark-60);
     padding: 8px 12px;
 }
 
@@ -279,7 +279,7 @@ td.searchable-select-list-item-single {
     padding: 8px 12px;
     height: 48px;
     font-size: 16px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     font-weight: 400;
     line-height: 24px;
     height: 48px;
@@ -289,7 +289,7 @@ div.scrollable-table-wrapper {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: #474C55 transparent;
+    scrollbar-color: var(--Dark-50) transparent;
 }
 
 div.scrollable-table-wrapper::-webkit-scrollbar {
@@ -301,14 +301,14 @@ div.scrollable-table-wrapper::-webkit-scrollbar-track {
 }
 
 div.scrollable-table-wrapper::-webkit-scrollbar-thumb {
-    background-color: #474C55;
+    background-color: var(--Dark-50);
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
 }
 
 div.scrollable-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background-color: #5a5f69;
+    background-color: var(--Dark-40);
 }
 
 div.complex-select {
@@ -333,9 +333,9 @@ input[type=text].complex-select-input {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     border-radius: 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     background-image: url('/frontary/clumit-complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
@@ -349,9 +349,9 @@ input[type=text].complex-select-input-empty {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     border-radius: 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     background-image: url('/frontary/clumit-complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
@@ -365,9 +365,9 @@ input[type=text].complex-select-input-empty-alert {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #B4BBC6;
-    background-color: rgba(97, 105, 116, 0.24);
-    border: 2px solid #FB2C10;
+    color: var(--Dark-20);
+    background-color: var(--Transparent-Mid-Grey);
+    border: 2px solid var(--Red-60);
     border-radius: 8px;
     background-image: url('/frontary/clumit-complex-select-pop-alert.svg');
     background-size: 32px 32px;
@@ -382,7 +382,7 @@ div.complex-select-pop {
     height: 100%;
     right: 0px;
     top: 0px;
-    background-color: #212428;
+    background-color: var(--Dark-80);
     box-shadow: -10px 0px 50px 0px rgba(0, 0, 0, 0.25);
 }
 
@@ -396,14 +396,14 @@ td.complex-select-pop-head-text {
     height: 70px;
     padding-left: 24px;
     padding-right: 20px;
-    background-color: #212428;
+    background-color: var(--Dark-80);
     vertical-align: middle;
     font-size: 16px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 span.complex-select-pop-head-color {
-    color: var(--title-text-color);
+    color: var(--Text-Primary);
 }
 
 td.complex-select-pop-head-close {
@@ -411,7 +411,7 @@ td.complex-select-pop-head-close {
     width: 34px;
     padding-top: 10px;
     padding-right: 10px;
-    background-color: #212428;
+    background-color: var(--Dark-80);
     vertical-align: top;
     font-size: 16px;
     color: #000000;
@@ -439,7 +439,7 @@ div.complex-select-pop-all-text {
     font-size: 16px;
     font-weight: 500;
     line-height: 20px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.complex-select-pop-all-button {
@@ -455,7 +455,7 @@ div.complex-select-pop-list-head {
     width: 100%;
     font-size: 16px;
     font-weight: 500;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     line-height: 24px;
 }
 
@@ -464,7 +464,7 @@ div.complex-select-pop-input-head {
     width: 100%;
     font-size: 16px;
     font-weight: 500;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     line-height: 24px;
 }
 
@@ -476,7 +476,7 @@ div.complex-select-pop-input-head-bottom {
     font-size: 14px;
     font-weight: 500;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 td.complex-select-pop-head-1st {
@@ -507,7 +507,7 @@ div.complex-select-pop-list-list-all {
 table.complex-select-pop-list-list-all {
     height: 42px;
     width: 100%;
-    border-bottom: 1px solid #2F333A;
+    border-bottom: 1px solid var(--Dark-70);
 }
 
 div.complex-select-pop-list-list-items {
@@ -523,7 +523,7 @@ td.complex-select-pop-list-list-all-checkbox {
 
 td.complex-select-pop-list-list-all-item {
     padding-top: 2px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -540,7 +540,7 @@ td.complex-select-pop-list-list-items-item {
     font-size: 16px;
     font-weight: 400;
     line-height: 20px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     vertical-align: top;
 }
 
@@ -554,26 +554,26 @@ div.complex-select-pop-list-networks {
     font-size: 12px;
     font-weight: 400;
     line-height: 16px;
-    color: #CFD6EA;
+    color: var(--Text-Secondary);
 }
 
 input[type=text].complex-select-search {
     height: 40px;
     margin-left: 24px;
     padding: 4px 12px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
     background-image: url(/frontary/clumit-magnifier.svg);
     background-size: 32px 32px;
     background-position: right 12px top 5px;
     background-repeat: no-repeat;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=text].complex-select-search::placeholder {
     font-size: 16px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
 }
 
 input[type=text].complex-select-search:focus {
@@ -613,7 +613,7 @@ div.complex-select-pop-input-input-message {
     padding-right: 26px;
     padding-top: 15px;
     height: 30px;
-    color: #FB2C10;
+    color: var(--Red-60);
 }
 
 input[type=text].complex-select-pop-input {
@@ -622,17 +622,17 @@ input[type=text].complex-select-pop-input {
     font-weight: 400;
     line-height: 24px;
     padding: 8px 12px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=text].complex-select-pop-input::placeholder {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
 }
 
 input[type=text].complex-select-pop-input:focus {
@@ -649,9 +649,9 @@ div.complex-select-pop-input-list {
 }
 
 td.complex-select-pop-input-list-networks {
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border-radius: 8px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.complex-select-pop-input-list-text {
@@ -685,7 +685,7 @@ div.mini-select-list-down {
     right: 0px;
     top: 32px;
     z-index: 99;
-    background-color: #2F333A;
+    background-color: var(--Dark-70);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
     padding: 5px 0px;
@@ -703,7 +703,7 @@ table.mini-select-list-down-table {
     width: 100%;
     vertical-align: middle;
     white-space: nowrap;
-    background-color: #2F333A;
+    background-color: var(--Dark-70);
     border-radius: 8px;
 }
 
@@ -713,7 +713,7 @@ td.mini-select-list-down-item {
     padding: 10px 12px;
     vertical-align: middle;
     white-space: nowrap;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     font-weight: 400;
     font-size: 16px;
     line-height: 20px;
@@ -725,8 +725,8 @@ td.mini-select-list-down-item-selected {
     padding: 10px 12px;
     vertical-align: middle;
     white-space: nowrap;
-    background-color: #474C55;
-    color: #FFFFFF;
+    background-color: var(--Dark-60);
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 20px;
@@ -741,8 +741,8 @@ td.mini-select-list-down-item-left {
 }
 
 td.mini-select-list-down-item:hover {
-    background-color: #474C55;
-    color: #FFFFFF;
+    background-color: var(--Dark-60);
+    color: var(--Text-Primary);
     cursor: pointer;
 }
 
@@ -781,7 +781,7 @@ div.mini-select-top-direction {
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.mini-select-top-direction-deactive {
@@ -790,11 +790,11 @@ div.mini-select-top-direction-deactive {
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
-    color: #616974;
+    color: var(--Dark-50);
 }
 
 div.mini-select-top-direction:hover {
-    color: #46A6FF;
+    color: var(--Blue-40);
     cursor: pointer;
 }
 
@@ -855,7 +855,7 @@ div.mini-select-basic:hover {
 
 div.mini-select-basic-basic {
     border-radius: 8px;
-    background: rgba(97, 105, 116, 0.24);
+    background: var(--Transparent-Mid-Grey);
     display: inline-flex;
     padding: 8px 12px;
     justify-content: center;
@@ -871,7 +871,7 @@ div.mini-select-basic-square {
 
 div.mini-select-basic-value {
     display: flex;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -913,7 +913,7 @@ td.mini-select-item-direction {
     text-align: center;
     font-size: 14px;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-weight: 400;
     padding-right: 5px;
 }
@@ -935,12 +935,12 @@ div.mini-select-list-sort-recently-icon {
     background-position: center;
     background-repeat: no-repeat;
     border-radius: 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.mini-select-list-sort-recently-text {
     height: 40px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     display: flex;
     flex-direction: row;
     border-radius: 8px;
@@ -960,7 +960,7 @@ div.mini-select-list-sort-recently-text-text {
     white-space: nowrap;
     font-weight: 400;
     font-size: 16px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     padding-right: 6px;
     display: flex;
     justify-content: center;
@@ -1011,7 +1011,7 @@ div.mini-select-on-off-action:hover {
 
 div.list-title {
     float: left;
-    color: var(--title-text-color);
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: bold;
     margin-top: 14px;
@@ -1029,7 +1029,7 @@ div.list-table {
     overflow-x: auto;
     padding-bottom: 50px;
     border-radius: 10px;
-    background: rgba(97, 105, 116, 0.08);
+    background: var(--Transparent-Light-Grey);
 }
 
 table.list-table {
@@ -1045,14 +1045,14 @@ div.list-add {
     height: 40px;
     font-size: 16px;
     font-weight: 500;
-    color: #FFFFFF;
-    background-color: #156EF2;
+    color: var(--Text-Primary);
+    background-color: var(--Blue-70);
     border-radius: 8px;
     padding: 8px 24px;
 }
 
 div.list-add:hover {
-    box-shadow: var(--submit-button-bg-hover-color);
+    box-shadow: 0px 2px 8px 0px rgba(35, 125, 245, 0.40);
     cursor: pointer;
 }
 
@@ -1076,7 +1076,7 @@ td.list-whole-head-check {
 td.list-whole-head-title {
     height: 30px;
     font-size: 14px;
-    color: #CFD6E0;
+    color: var(--Dark-10);
     text-align: center;
     vertical-align: middle;
     font-weight: 500;
@@ -1162,7 +1162,7 @@ td.list-whole-list-first-layer {
     font-size: 14px;
     line-height: 22px;
     font-weight: 400;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     padding: 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
     -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
@@ -1195,7 +1195,7 @@ td.list-whole-list-flat-check {
 td.list-whole-list-flat {
     font-size: 14px;
     font-weight: 400;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     text-align: center;
     vertical-align: middle;
     padding: 12px 16px;
@@ -1256,15 +1256,15 @@ div.list-whole-list-second-add {
     font-weight: 500;
     font-size: 16px;
     border-radius: 8px;
-    border: 2px solid rgba(97, 105, 116, 0.48);
-    color: #46A6FF;
+    border: 2px solid var(--Transparent-Dark-Grey);
+    color: var(--Blue-40);
     padding: 8px 24px;
 }
 
 div.list-whole-list-second-add:hover {
-    border: 2px solid #46A6FF;
+    border: 2px solid var(--Blue-40);
     border-radius: 8px;
-    color: #46A6FF;
+    color: var(--Blue-40);
     font-weight: 500;
     font-size: 16px;
     padding: 8px 24px;
@@ -1284,7 +1284,7 @@ div.list-whole-delete-checked {
     height: 52px;
     padding-left: 60px;
     padding-right: 60px;
-    background-color: #424955;
+    background-color: var(--Dark-60);
     border-radius: 26px;
     display: flex;
     flex-direction: row;
@@ -1296,7 +1296,7 @@ div.list-whole-delete-checked-text {
     margin-right: 24px;
     font-weight: normal;
     font-size: 14px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.list-whole-delete-checked-trash {
@@ -1326,7 +1326,7 @@ div.list-whole-delete-checked-close:hover {
 td.list-whole-delete-checked-trash {
     width: 48px;
     height: 24px;
-    border-right: 1px solid #727272;
+    border-right: 1px solid var(--Dark-30);
 }
 
 td.list-whole-delete-checked-close {
@@ -1365,9 +1365,9 @@ div.list-whole-tag-item {
     /* HIGHLIGHT
     if border-radius is greater than max(width, height),
     it makes half size of min(width, height) */
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     border-radius: 48px;
-    background: rgba(97, 105, 116, 0.24);
+    background: var(--Transparent-Mid-Grey);
     display: flex;
     padding: 4px 8px;
     justify-content: center;
@@ -1447,7 +1447,7 @@ th.list-whole-group-heading {
     background-color: rgba(95, 104, 118, 0.24);
     font-weight: normal;
     font-size: 11px;
-    color: #CFD6E0;
+    color: var(--Dark-10);
     font-weight: 400;
 }
 
@@ -1461,7 +1461,6 @@ div.page-outer {
     font-size: 13px;
     font-weight: normal;
     line-height: 16px;
-    color: #959595;
     vertical-align: middle;
 }
 
@@ -1477,7 +1476,7 @@ div.page-unselected {
     padding-right: 9px;
     padding-left: 9px;
     padding-top: 5px;
-    color: #959595;
+    color: var(--Text-Secondary)
 }
 
 div.page-selected {
@@ -1486,9 +1485,9 @@ div.page-selected {
     padding-right: 9px;
     padding-left: 9px;
     padding-top: 5px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 14px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border-radius: 15px;
 }
 
@@ -1552,7 +1551,7 @@ input[type=text].page-input {
     font-size: 13px;
     border: 0;
     color: #000000;
-    background-color: #FFFFFF;
+    background-color: var(--White);
 }
 
 input[type=text].page-input::placeholder {
@@ -1574,7 +1573,7 @@ div.input-outer {
 
 div.input-inner {
     padding: 24px;
-    background-color: #212428;
+    background-color: var(--Dark-80);
     border-radius: 8px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
 }
@@ -1585,7 +1584,7 @@ table.input-head {
 }
 
 td.input-title {
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 18px;
     font-weight: 500;
     line-height: 24px;
@@ -1630,14 +1629,14 @@ div.input-contents-item-title {
     width: 100%;
     font-weight: 500;
     font-size: 16px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     line-height: 24px;
     padding-bottom: 4px;
 }
 
 div.input-required-asterisk {
     display: inline-block;
-    color: #DB1D03;
+    color: var(--Red-70);
 }
 
 input[type=text].frontary-input-text {
@@ -1647,29 +1646,29 @@ input[type=text].frontary-input-text {
     outline: none;
     border: none;
     border-radius: 8px;
-    background: rgba(97, 105, 116, 0.24);
+    background: var(--Transparent-Mid-Grey);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=text].frontary-input-text::placeholder {
-    color: #616974;
+    color: var(--Dark-50);
 }
 
 input[type=text].frontary-input-text-alert {
     height: 40px;
     width: 100%;
     padding: 8px 12px;
-    color: #B4BBC6;
+    color: var(--Text-Primary);
     outline: none;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    border: 2px solid #FB2C10;
-    background-color: rgba(97, 105, 116, 0.24);
+    border: 2px solid var(--Red-60);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.input-text-message {
@@ -1680,7 +1679,7 @@ div.input-required-message {
     margin-top: 5px;
     font-size: 12px;
     line-height: 15px;
-    color: var(--alert-text-color);
+    color: var(--Red-50);
 }
 
 div.input-contents-item-alert-message {
@@ -1690,7 +1689,7 @@ div.input-contents-item-alert-message {
     font-size: 12px;
     display: flex;
     align-items: center;
-    color: var(--alert-text-color);
+    color: var(--Red-50);
 }
 
 div.input-password-notice {
@@ -1704,7 +1703,7 @@ div.input-password-notice {
 }
 
 div.input-reenter-password-title {
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 500;
     line-height: 24px;
@@ -1717,29 +1716,29 @@ input[type=password].input-password {
     outline: none;
     border: none;
     border-radius: 8px;
-    background: rgba(97, 105, 116, 0.24);
+    background: var(--Transparent-Mid-Grey);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=password].input-password::placeholder {
-    color: #616974;
+    color: var(--Dark-50);
 }
 
 input[type=password].input-password-alert {
     height: 40px;
     width: 100%;
     padding: 8px 12px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     outline: none;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    border: 2px solid #FB2C10;
-    background-color: rgba(97, 105, 116, 0.24);
+    border: 2px solid var(--Red-60);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 input[type=number].input-number {
@@ -1749,29 +1748,29 @@ input[type=number].input-number {
     outline: none;
     border: none;
     border-radius: 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=number].input-number::placeholder {
-    color: #616974;
+    color: var(--Dark-50);
 }
 
 input[type=number].input-number-alert {
     height: 40px;
     width: 100%;
     padding: 8px 12px;
-    color: #B4BBC6;
+    color: var(--Dark-20);
     outline: none;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    border: 2px solid #FB2C10;
-    background-color: rgba(97, 105, 116, 0.24);
+    border: 2px solid var(--Red-60);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.input-cancel-save {
@@ -1793,15 +1792,15 @@ div.input-cancel {
     font-weight: 500;
     font-size: 16px;
     border-radius: 8px;
-    border: 2px solid rgba(97, 105, 116, 0.48);
+    border: 2px solid var(--Transparent-Dark-Grey);
     line-height: 24px;
-    color: #46A6FF;
+    color: var(--Blue-40);
 }
 
 div.input-cancel:hover {
     border-radius: 8px;
-    border: 2px solid #46A6FF;
-    background: #212428;
+    border: 2px solid var(--Blue-40);
+    background: var(--Dark-80);
     cursor: pointer;
 }
 
@@ -1812,17 +1811,17 @@ div.input-save {
     align-items: center;
     padding: 12px 24px;
     height: 40px;
-    background-color: var(--submit-button-bg-color);
+    background-color: var(--Blue-70);
     border-radius: 8px;
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.input-save:hover {
-    background-color: var(--submit-button-bg-color);
-    box-shadow: var(--submit-button-bg-hover-color);
+    background-color: var(--Blue-70);
+    box-shadow: 0px 2px 8px 0px rgba(35, 125, 245, 0.40);
     border-radius: 8px;
     cursor: pointer;
 }
@@ -1850,7 +1849,7 @@ div.input-radio-title {
     font-size: 16px;
     font-weight: 500;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.input-radio-radio {
@@ -1878,7 +1877,7 @@ div.input-select-searchable {
 
 div.input-select-searchable-required {
     width: fit-content;
-    border: 2px solid var(--alert-text-color);
+    border: 2px solid var(--Red-70);
     border-radius: 8px;
 }
 
@@ -1897,11 +1896,11 @@ div.input-select-vector-vec-required {
     align-items: center;
     justify-content: center;
     background-color: #FFE9E9;
-    border: 2px solid var(--alert-text-color);
+    border: 2px solid var(--Red-50);
 }
 
 div.input-contents-item-general-title {
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -1914,7 +1913,7 @@ div.input-host-network-group {
 
 div.input-host-network-group-required {
     width: fit-content;
-    border: 2px solid var(--alert-text-color);
+    border: 2px solid var(--Red-70);
     border-radius: 8px;
 }
 
@@ -1924,7 +1923,7 @@ div.host-network-group-input {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
     padding: 2px 12px;
@@ -1938,11 +1937,11 @@ div.host-network-group-input-item {
     padding: 4px 8px;
     flex-direction: row;
     align-items: center;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     border-radius: 48px;
     text-align: center;
     margin-bottom: 2px;
@@ -1971,11 +1970,11 @@ input[type=text].host-network-group-input-input-input {
     display: flex;
     flex-direction: row;
     align-items: center;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=text].host-network-group-input-input-input::placeholder {
-    color: #616974;
+    color: var(--Dark-50);
 }
 
 div.host-network-group-input-input-message {
@@ -1985,7 +1984,7 @@ div.host-network-group-input-input-message {
     font-size: 12px;
     display: flex;
     align-items: center;
-    color: var(--alert-text-color);
+    color: var(--Red-50);
 }
 
 div.host-network-group-input-input-notice {
@@ -2002,7 +2001,7 @@ div.simple-input-input-notice {
     width: 100%;
     display: flex;
     align-items: center;
-    color: #CFD6E0;
+    color: var(--Dark-10);
     font-size: 12px;
     font-weight: 400;
     line-height: 16px;
@@ -2025,7 +2024,7 @@ div.tag-group-input {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
     padding: 2px 12px;
@@ -2039,7 +2038,7 @@ div.tag-group-message-text {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: var(--alert-text-color);
+    color: var(--Red-50);
 }
 
 div.tag-group-input-item {
@@ -2052,8 +2051,8 @@ div.tag-group-input-item {
     if border-radius is greater than max(width, height),
     it makes half size of min(width, height) */
     border-radius: 48px;
-    background-color: rgba(97, 105, 116, 0.24);
-    color: #FFFFFF;
+    background-color: var(--Transparent-Mid-Grey);
+    color: var(--Text-Primary);
     text-align: center;
     font-size: 14px;
     font-weight: 400;
@@ -2078,11 +2077,11 @@ input[type=text].tag-group-input-input-input {
     display: flex;
     flex-direction: row;
     align-items: center;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 input[type=text].tag-group-input-input-input::placeholder {
-    color: #616974;
+    color: var(--Dark-50);
     background-color: transparent;
     font-size: 16px;
 }
@@ -2098,14 +2097,14 @@ div.tag-group-input-select {
     display: flex;
     flex-direction: column;
     border-radius: 8px;
-    background-color: #2F333A;
+    background-color: var(--Dark-70);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     z-index: 399;
 }
 
 div.tag-group-input-select-item-outer-edit {
     width: 100%;
-    background-color: #2F333A;
+    background-color: var(--Dark-70);
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 11px;
@@ -2116,21 +2115,21 @@ div.tag-group-input-select-item-outer-edit {
 div.tag-group-input-select-item-outer {
     width: 100%;
     height: 40px;
-    background-color: #2F333A;
+    background-color: var(--Dark-70);
     padding: 4px 12px;
     border-radius: 8px;
 }
 
 div.tag-group-input-select-item-outer-cursor {
     width: 100%;
-    background-color: #2F333A;
+    background-color: var(--Dark-70);
     padding: 4px 12px;
     height: 40px;
     border-radius: 8px;
 }
 
 div.tag-group-input-select-item-outer:hover {
-    background-color: #3B4048;
+    background-color: var(--Transparent-Mid-Grey);
     border-radius: 0px;
 }
 
@@ -2142,12 +2141,12 @@ div.tag-group-input-select-item {
     flex-wrap: wrap;
     width: fit-content;
     padding: 4px 8px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     /* HIGHLIGHT
     if border-radius is greater than max(width, height),
     it makes half size of min(width, height) */
     border-radius: 48px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     text-align: center;
     font-size: 14px;
     font-weight: 400;
@@ -2167,10 +2166,10 @@ div.tag-group-input-select-item-edit {
     padding-left: 8px;
     padding-right: 8px;
     font-size: 11px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     height: 32px;
     border-radius: 48px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.tag-group-input-select-item-edit-text {
@@ -2228,14 +2227,14 @@ input[type=text].tag-select-edit-tag {
     width: 100%;
     background: transparent;
     border: 0px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
 }
 
 input[type=text].tag-select-edit-tag::placeholder {
-    color: #B4BBC6;
+    color: var(--Dark-20);
 }
 
 img.tag-select-edit-done {
@@ -2257,7 +2256,7 @@ div.tag-edit-message {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: var(--alert-text-color);
+    color: var(--Red-50);
 }
 
 div.input-checkbox {
@@ -2305,7 +2304,7 @@ div.input-checkbox-me-title {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 div.input-checkbox-child {
@@ -2341,7 +2340,7 @@ div.input-checkbox-link-line-right {
     height: 1px;
     margin-left: 5px;
     margin-right: 5px;
-    background: #8E97A5;
+    background: var(--Dark-30);
 }
 
 th.input-nic-heading {
@@ -2380,7 +2379,7 @@ th.input-nic-heading-add {
 
 td.input-nic-input {
     height: 40px;
-    background-color: #FFFFFF;
+    background-color: var(--White);
     color: #000000;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -2388,7 +2387,7 @@ td.input-nic-input {
 
 td.input-nic-input-last {
     height: 40px;
-    background-color: #FFFFFF;
+    background-color: var(--White);
     color: #000000;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -2438,8 +2437,8 @@ div.input-add-item {
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    border: 2px solid rgba(97, 105, 116, 0.48);
-    color: #46A6FF;
+    border: 2px solid var(--Transparent-Dark-Grey);
+    color: var(--Blue-40);
     text-align: center;
     font-size: 16px;
     font-weight: 500;
@@ -2449,8 +2448,8 @@ div.input-add-item {
 
 div.input-add-item:hover {
     cursor: pointer;
-    border: 2px solid #46A6FF;
-    background-color: #212428;
+    border: 2px solid var(--Blue-40);
+    background-color: var(--Dark-80);
 }
 
 input[type=text].input-nic {
@@ -2459,7 +2458,7 @@ input[type=text].input-nic {
     padding-left: 8px;
     padding-right: 8px;
     color: #000000;
-    background-color: #FFFFFF;
+    background-color: var(--White);
     border: 1px solid #CECECE;
     border-radius: 2px;
 }
@@ -2469,7 +2468,7 @@ div.input-nic-msg {
     font-size: 12px;
     font-weight: normal;
     line-height: 15px;
-    color: var(--title-text-color);
+    color: var(--Text-Primary);
     text-align: left;
     margin-top: 4px;
 }
@@ -2534,33 +2533,33 @@ div.input-file {
 input.input-file-file-name {
     width: 100%;
     height: 40px;
-    background-color: rgba(97, 105, 116, 0.24);
+    background-color: var(--Transparent-Mid-Grey);
     border-radius: 8px;
     border: none;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     padding: 12px 24px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
 }
 
 label.input-file-choose-file {
     width: 150px;
     height: 40px;
     border-radius: 8px;
-    border: 2px solid rgba(97, 105, 116, 0.48);
+    border: 2px solid var(--Transparent-Dark-Grey);
     font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #46A6FF;
+    color: var(--Blue-40);
 }
 
 label.input-file-choose-file:hover {
     cursor: pointer;
     border-radius: 8px;
-    border: 2px solid #46A6FF;
-    background-color: #212428;
+    border: 2px solid var(--Blue-40);
+    background-color: var(--Dark-80);
 }
 
 div.input-group {
@@ -2578,7 +2577,7 @@ th.input-group-heading {
     background-color: rgba(95, 104, 118, 0.24);
     font-weight: normal;
     font-size: 11px;
-    color: #CFD6E0;
+    color: var(--Dark-10);
     font-weight: 400;
 }
 
@@ -2654,14 +2653,14 @@ table.notification {
 
 td.notification-contents {
     padding: 16px 15px 16px 24px;
-    background-color: #F0F1F3;
+    background-color: var(--Dark-5);
     border-radius: 8px;
     gap: 10px;
     display: grid;
 }
 
 div.clumit-notification {
-    color: #2F333A;
+    color: var(--Dark-70);
     text-align: center;
     font-size: 14px;
     font-weight: 500;
@@ -2681,7 +2680,7 @@ img.clumit-notification-error {
 
 table.notification-contents-text-table {
     width: 100%;
-    color: #474C55;
+    color: var(--Dark-60);
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
@@ -2721,23 +2720,23 @@ div.notification-contents-done {
 
 div.notification-contents-done-button {
     height: 26px;
-    background-color: #FFFFFF;
+    background-color: var(--White);
     font-weight: 500;
     font-size: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #2F333A;
+    color: var(--Dark-70);
     border-radius: 8px;
-    border: 2px solid #CFD6E0;
+    border: 2px solid var(--Dark-10);
     padding: 12px 24px;
 
 }
 
 div.notification-contents-done-button:hover {
     cursor: pointer;
-    border-color: #C5E4F7;
-    color: #0D5FD8;
+    border-color: var(--Blue-20);
+    color: var(--Blue-80);
 }
 
 div.modal-outer {
@@ -2756,7 +2755,7 @@ div.modal-outer {
 div.modal-contents {
     overflow: auto;
     padding: 24px;
-    background-color: #212428;
+    background-color: var(--Dark-80);
     border-radius: 8px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     display: inline-flex;
@@ -2775,7 +2774,7 @@ div.modal-icon {
     width: 100%;
     display: flex;
     align-items: flex-end;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 18px;
     font-weight: 500;
     line-height: 24px;
@@ -2825,7 +2824,7 @@ div.modal-message-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
@@ -2855,8 +2854,8 @@ div.modal-button-item-recommendation {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #46A6FF;
-    border: 2px solid rgba(97, 105, 116, 0.48);
+    color: var(--Blue-40);
+    border: 2px solid var(--Transparent-Dark-Grey);
     border-radius: 8px;
     text-align: center;
     font-size: 16px;
@@ -2870,16 +2869,16 @@ div.modal-button-item-recommendation {
 div.modal-button-item-recommendation:hover {
     cursor: pointer;
     border-radius: 8px;
-    border: 2px solid #46A6FF;
-    background: #212428;
+    border: 2px solid var(--Blue-40);
+    background: var(--Dark-80);
 }
 
 div.modal-button-item-option {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #FFFFFF;
-    background-color: var(--submit-button-bg-color);
+    color: var(--Text-Primary);
+    background-color: var(--Blue-70);
     border-radius: 8px;
     text-align: center;
     font-size: 16px;
@@ -2891,7 +2890,7 @@ div.modal-button-item-option {
 
 div.modal-button-item-option:hover {
     border-radius: 8px;
-    background: var(--submit-button-bg-color);
+    background: var(--Blue-70);
     box-shadow: 0px 2px 8px 0px rgba(35, 125, 245, 0.40);
     cursor: pointer;
 }
@@ -2915,7 +2914,7 @@ td.tab-menu-selected {
     font-weight: 500;
     line-height: 24px;
     font-size: 16px;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     position: relative;
     overflow: hidden;
 }
@@ -2932,7 +2931,7 @@ div.selected-background {
     top: 0;
     left: 0;
     z-index: 0;
-    color: #FFFFFF;
+    color: var(--Text-Primary);
     height: 48px;
     margin-bottom: 12px;
 }
@@ -2940,7 +2939,7 @@ div.selected-background {
 div.selected-bar {
     height: 2px;
     border-radius: 1px;
-    background: #158CFA;
+    background: var(--Blue-60);
     width: 100%;
     position: absolute;
     left: 0;
@@ -2956,7 +2955,7 @@ td.tab-menu-unselected {
     vertical-align: middle;
     font-weight: 500;
     font-size: 16px;
-    color: #CFD6E0;
+    color: var(--Dark-10);
     padding: 8px 16px;
 }
 
