@@ -1,3 +1,4 @@
+use core::panic;
 use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
 
 use ipnet::Ipv4Net;
@@ -8,8 +9,9 @@ use super::{
     super::CheckStatus,
     component::{InvalidMessage, Model, Verification},
     user_input::MAX_PER_LAYER,
-    ComparisonItem, HostNetworkGroupItem, InputConfig, InputItem, RadioConfig, RadioItem,
-    SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem, VecSelectItem,
+    ComparisonItem, GroupConfig, GroupItem, HostNetworkGroupItem, InputConfig, InputItem,
+    RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem,
+    VecSelectItem,
 };
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
@@ -137,6 +139,22 @@ where
                         }
                         (InputItem::Radio(data), InputConfig::Radio(config)) => {
                             self.radio_to_buffer(this_index, data, config);
+                            for (index, (data_children, config_children)) in data
+                                .children_group()
+                                .iter()
+                                .zip(config.children_group.iter())
+                                .enumerate()
+                            {
+                                if let Some(config_children) = config_children {
+                                    if !data_children.is_empty() {
+                                        self.prepare_buffer_recursive(
+                                            data_children,
+                                            config_children,
+                                            (this_index * MAX_PER_LAYER + index) * MAX_PER_LAYER,
+                                        );
+                                    }
+                                }
+                            }
                         }
                         (InputItem::Text(_), InputConfig::Text(_))
                         | (InputItem::Password(_), InputConfig::Password(_))
@@ -347,193 +365,235 @@ where
     ) -> bool {
         let mut required = Vec::<bool>::new();
 
-        input_data
-            .iter()
-            .enumerate()
-            .zip(input_conf.iter())
-            .for_each(|((index, input_data), input_conf)| {
-                if let Ok(item) = input_data.try_borrow() {
-                    if parent_checked && (*input_conf).required() {
-                        let empty = match &(*item) {
-                            InputItem::Text(_)
-                            | InputItem::SelectSingle(_)
-                            | InputItem::SelectMultiple(_)
-                            | InputItem::Unsigned32(_)
-                            | InputItem::Float64(_)
-                            | InputItem::Percentage(_)
-                            | InputItem::File(_)
-                            | InputItem::Comparison(_)
-                            | InputItem::Tag(_)
-                            | InputItem::Group(_)
-                            | InputItem::Checkbox(_)
-                            | InputItem::Radio(_) => item.is_empty(),
-                            InputItem::Password(pw) => {
-                                // HIGHLIGHT: In case of Edit, empty means no change of passwords
-                                ctx.props().input_id.is_none() && pw.is_empty()
-                            }
-                            InputItem::HostNetworkGroup(n) => {
-                                // HIGHTLIGHT: if empty, HostNetworkHtml may return Message::RightHostNetworkGroup
-                                n.is_empty()
-                                    && self
-                                        .verification_host_network
-                                        .get(&(base_index + index))
-                                        .map_or(false, |v| v.map_or(true, |v| v))
-                            }
-                            InputItem::Nic(n) => n
-                                .iter()
-                                .find_map(|n| {
-                                    if !n.name.is_empty()
-                                        || !n.interface.is_empty()
-                                        || !n.gateway.is_empty()
-                                    {
-                                        Some(true)
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .is_none(),
-                            InputItem::VecSelect(s) => {
-                                s.is_empty()
-                                    || if let InputConfig::VecSelect(config) = &**input_conf {
-                                        s.iter().zip(config.items_ess_list.iter()).any(
-                                            |(selected, ess)| selected.is_empty() && ess.required,
-                                        )
-                                    } else {
-                                        true
-                                    }
-                            }
-                        };
-                        if empty {
-                            self.required_msg.insert(base_index + index);
-                            required.push(true);
+        for (index, (input_data, input_conf)) in
+            input_data.iter().zip(input_conf.iter()).enumerate()
+        {
+            if let Ok(item) = input_data.try_borrow() {
+                if parent_checked {
+                    let empty = match (&(*item), &**input_conf) {
+                        (InputItem::Text(_), InputConfig::Text(_))
+                        | (InputItem::SelectSingle(_), InputConfig::SelectSingle(_))
+                        | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_))
+                        | (InputItem::Tag(_), InputConfig::Tag(_))
+                        | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
+                        | (InputItem::Float64(_), InputConfig::Float64(_))
+                        | (InputItem::Percentage(_), InputConfig::Percentage(_))
+                        | (InputItem::File(_), InputConfig::File(_))
+                        | (InputItem::Comparison(_), InputConfig::Comparison(_)) => {
+                            input_conf.required() && item.is_empty()
                         }
-                    }
-                    if let (InputItem::Group(group), InputConfig::Group(config)) =
-                        (&(*item), &**input_conf)
-                    {
-                        let required = config
-                            .items
-                            .iter()
-                            .map(|t| match &(**t) {
-                                InputConfig::Text(_)
-                                | InputConfig::HostNetworkGroup(_)
-                                | InputConfig::SelectSingle(_)
-                                | InputConfig::SelectMultiple(_)
-                                | InputConfig::Unsigned32(_)
-                                | InputConfig::Float64(_)
-                                | InputConfig::Percentage(_)
-                                | InputConfig::Comparison(_)
-                                | InputConfig::VecSelect(_) => t.required(),
-                                InputConfig::Password(_)
-                                | InputConfig::Tag(_)
-                                | InputConfig::Nic(_)
-                                | InputConfig::File(_)
-                                | InputConfig::Group(_)
-                                | InputConfig::Checkbox(_)
-                                | InputConfig::Radio(_) => {
-                                    panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
-                                }
-                            })
-                            .collect::<Vec<bool>>();
-                        // in the case of VecSelect or Comparison
-                        // Some(true) means all of sub elements empty
-                        // Some(false) means all of sub elements not empty
-                        // None means not all of any of sub elements empty but at least one empty
-                        let empty = group
-                            .iter()
-                            .enumerate()
-                            .map(|(row_index, row)| {
-                                row.iter()
-                                    .enumerate()
-                                    .filter_map(|(col_index, col)| {
-                                        if let Ok(col) = col.try_borrow() {
-                                            match &*col {
-                                                InputItem::Text(_)
-                                                | InputItem::HostNetworkGroup(_)
-                                                | InputItem::SelectSingle(_)
-                                                | InputItem::SelectMultiple(_)
-                                                | InputItem::Unsigned32(_)
-                                                | InputItem::Float64(_)
-                                                | InputItem::Percentage(_) => Some(Some(col.is_empty())),
-                                                InputItem::Comparison(v) => {
-                                                    if v.is_some() {
-                                                        Some(Some(false))
-                                                    } else if self
-                                                        .comparison_kind(
-                                                            col_index
-                                                                + (row_index
-                                                                    + (base_index + index)
-                                                                        * MAX_PER_LAYER)
-                                                                    * MAX_PER_LAYER,
-                                                        )
-                                                        .is_some()
-                                                    {
-                                                        Some(None)
-                                                    } else {
-                                                        Some(Some(true))
-                                                    }
-                                                }
-                                                InputItem::VecSelect(v) => {
-                                                    if v.iter().all(HashSet::is_empty) {
-                                                        Some(Some(true))
-                                                    } else if v.iter().all(|d| !d.is_empty()) {
-                                                        Some(Some(false))
-                                                    } else {
-                                                        Some(None)
-                                                    }
-                                                }
-                                                InputItem::Password(_)
-                                                | InputItem::Tag(_)
-                                                | InputItem::Nic(_)
-                                                | InputItem::File(_)
-                                                | InputItem::Group(_)
-                                                | InputItem::Checkbox(_)
-                                                | InputItem::Radio(_) => {
-                                                    panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
-                                                },
-                                            }
+                        (InputItem::Password(pw), InputConfig::Password(_)) => {
+                            // HIGHLIGHT: In case of Edit, empty means no change of passwords
+                            input_conf.required() && ctx.props().input_id.is_none() && pw.is_empty()
+                        }
+                        (InputItem::HostNetworkGroup(n), InputConfig::HostNetworkGroup(_)) => {
+                            // HIGHTLIGHT: if empty, HostNetworkHtml may return
+                            // Message::RightHostNetworkGroup
+                            input_conf.required()
+                                && n.is_empty()
+                                && self
+                                    .verification_host_network
+                                    .get(&(base_index + index))
+                                    .map_or(false, |v| v.map_or(true, |v| v))
+                        }
+                        (InputItem::Nic(n), InputConfig::Nic(_)) => {
+                            input_conf.required()
+                                && n.iter()
+                                    .find_map(|n| {
+                                        if !n.name.is_empty()
+                                            || !n.interface.is_empty()
+                                            || !n.gateway.is_empty()
+                                        {
+                                            Some(true)
                                         } else {
                                             None
                                         }
                                     })
-                                    .collect::<Vec<Option<bool>>>()
-                            })
-                            .collect::<Vec<Vec<Option<bool>>>>();
-                        let sub_base_index = (base_index + index) * MAX_PER_LAYER;
-                        for (row_index, row) in empty.iter().enumerate() {
-                            let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
-                            if !all_empty || config.ess.required && row_index == 0 {
-                                let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
-                                for ((col_index, data_empty), data_required) in
-                                    row.iter().enumerate().zip(required.iter())
-                                {
-                                    if data_empty.map_or(true, |x| x) && *data_required {
-                                        self.required_msg.insert(base_index + col_index);
+                                    .is_none()
+                        }
+                        (InputItem::VecSelect(s), InputConfig::VecSelect(config)) => {
+                            input_conf.required() && s.is_empty()
+                                || s.iter()
+                                    .zip(config.items_ess_list.iter())
+                                    .any(|(selected, ess)| selected.is_empty() && ess.required)
+                        }
+                        (InputItem::Group(item), InputConfig::Group(conf)) => {
+                            if !item.is_empty() {
+                                self.group_required_all_recursive(item, conf, base_index, index);
+                            }
+                            input_conf.required() && item.is_empty()
+                        }
+                        (InputItem::Checkbox(data), InputConfig::Checkbox(conf)) => {
+                            if !data.is_empty() {
+                                if let Some(config_children) = conf.children.as_ref() {
+                                    if !data.children().is_empty()
+                                        && self.decide_required_all_recursive(
+                                            ctx,
+                                            data.children(),
+                                            &config_children.children,
+                                            (base_index + index) * MAX_PER_LAYER,
+                                            true,
+                                        )
+                                    {
+                                        required.push(true);
                                     }
                                 }
                             }
+                            input_conf.required() && data.is_empty()
                         }
-                    } else if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
-                        (&(*item), &**input_conf)
-                    {
-                        if let Some(config_children) = config.children.as_ref() {
-                            if !data.children().is_empty()
-                                && self.decide_required_all_recursive(
-                                    ctx,
-                                    data.children(),
-                                    &config_children.children,
-                                    (base_index + index) * MAX_PER_LAYER,
-                                    data.status() == CheckStatus::Checked,
-                                )
-                            {
-                                required.push(true);
+                        (InputItem::Radio(data), InputConfig::Radio(conf)) => {
+                            if !data.is_empty() {
+                                let checked_index = conf
+                                    .options
+                                    .iter()
+                                    .position(|o| data.selected() == o.to_string());
+                                if let Some(checked_index) = checked_index {
+                                    if let (Some(data_children), Some(Some(config_children))) = (
+                                        data.children_group().get(checked_index),
+                                        conf.children_group.get(checked_index),
+                                    ) {
+                                        if !data_children.is_empty()
+                                            && self.decide_required_all_recursive(
+                                                ctx,
+                                                data_children,
+                                                config_children,
+                                                (((base_index + index) * MAX_PER_LAYER)
+                                                    + checked_index)
+                                                    * MAX_PER_LAYER,
+                                                true,
+                                            )
+                                        {
+                                            required.push(true);
+                                        }
+                                    }
+                                }
                             }
+                            input_conf.required() && data.is_empty()
                         }
+                        _ => {
+                            panic!("InputItem and InputConfig is not matched");
+                        }
+                    };
+                    if empty {
+                        self.required_msg.insert(base_index + index);
+                        required.push(true);
                     }
                 }
-            });
+            }
+        }
 
         !required.is_empty() || !self.required_msg.is_empty()
+    }
+
+    fn group_required_all_recursive(
+        &mut self,
+        group: &GroupItem,
+        config: &GroupConfig,
+        base_index: usize,
+        index: usize,
+    ) {
+        let required = config
+        .items
+        .iter()
+        .map(|t| match &(**t) {
+            InputConfig::Text(_)
+            | InputConfig::HostNetworkGroup(_)
+            | InputConfig::SelectSingle(_)
+            | InputConfig::SelectMultiple(_)
+            | InputConfig::Unsigned32(_)
+            | InputConfig::Float64(_)
+            | InputConfig::Percentage(_)
+            | InputConfig::Comparison(_)
+            | InputConfig::VecSelect(_) => t.required(),
+            InputConfig::Password(_)
+            | InputConfig::Tag(_)
+            | InputConfig::Nic(_)
+            | InputConfig::File(_)
+            | InputConfig::Group(_)
+            | InputConfig::Checkbox(_)
+            | InputConfig::Radio(_) => {
+                panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+            }
+        })
+        .collect::<Vec<bool>>();
+        // in the case of VecSelect or Comparison
+        // Some(true) means all of sub elements empty
+        // Some(false) means all of sub elements not empty
+        // None means not all of any of sub elements empty but at least one empty
+        let empty = group
+        .iter()
+        .enumerate()
+        .map(|(row_index, row)| {
+            row.iter()
+                .enumerate()
+                .filter_map(|(col_index, col)| {
+                    if let Ok(col) = col.try_borrow() {
+                        match &*col {
+                            InputItem::Text(_)
+                            | InputItem::HostNetworkGroup(_)
+                            | InputItem::SelectSingle(_)
+                            | InputItem::SelectMultiple(_)
+                            | InputItem::Unsigned32(_)
+                            | InputItem::Float64(_)
+                            | InputItem::Percentage(_) => Some(Some(col.is_empty())),
+                            InputItem::Comparison(v) => {
+                                if v.is_some() {
+                                    Some(Some(false))
+                                } else if self
+                                    .comparison_kind(
+                                        col_index
+                                            + (row_index
+                                                + (base_index + index)
+                                                    * MAX_PER_LAYER)
+                                                * MAX_PER_LAYER,
+                                    )
+                                    .is_some()
+                                {
+                                    Some(None)
+                                } else {
+                                    Some(Some(true))
+                                }
+                            }
+                            InputItem::VecSelect(v) => {
+                                if v.iter().all(HashSet::is_empty) {
+                                    Some(Some(true))
+                                } else if v.iter().all(|d| !d.is_empty()) {
+                                    Some(Some(false))
+                                } else {
+                                    Some(None)
+                                }
+                            }
+                            InputItem::Password(_)
+                            | InputItem::Tag(_)
+                            | InputItem::Nic(_)
+                            | InputItem::File(_)
+                            | InputItem::Group(_)
+                            | InputItem::Checkbox(_)
+                            | InputItem::Radio(_) => {
+                                panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+                            },
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<Option<bool>>>()
+        })
+        .collect::<Vec<Vec<Option<bool>>>>();
+        let sub_base_index = (base_index + index) * MAX_PER_LAYER;
+        for (row_index, row) in empty.iter().enumerate() {
+            let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
+            if !all_empty || config.ess.required && row_index == 0 {
+                let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
+                for ((col_index, data_empty), data_required) in
+                    row.iter().enumerate().zip(required.iter())
+                {
+                    if data_empty.map_or(true, |x| x) && *data_required {
+                        self.required_msg.insert(base_index + col_index);
+                    }
+                }
+            }
+        }
     }
 
     pub(super) fn verify(&mut self, ctx: &Context<Self>) -> bool {
@@ -692,6 +752,31 @@ where
                                     )
                                 {
                                     rtn = false;
+                                }
+                            }
+                        }
+                        (InputItem::Radio(data), InputConfig::Radio(config)) => {
+                            let checked_index = config
+                                .options
+                                .iter()
+                                .position(|o| data.selected() == o.to_string());
+                            if let Some(checked_index) = checked_index {
+                                if let (Some(data_children), Some(Some(config_children))) = (
+                                    data.children_group().get(checked_index),
+                                    config.children_group.get(checked_index),
+                                ) {
+                                    if !data_children.is_empty()
+                                        && !self.verify_recursive(
+                                            data_children,
+                                            config_children,
+                                            (((base_index + index) * MAX_PER_LAYER)
+                                                + checked_index)
+                                                * MAX_PER_LAYER,
+                                            true,
+                                        )
+                                    {
+                                        rtn = false;
+                                    }
                                 }
                             }
                         }
@@ -1164,6 +1249,29 @@ where
                                     (base_index + index) * MAX_PER_LAYER,
                                     data.status() == CheckStatus::Checked,
                                 );
+                            }
+                        }
+                    } else if let (InputItem::Radio(data), InputConfig::Radio(config)) =
+                        (&*input_data, &**input_conf)
+                    {
+                        if !data.is_empty() {
+                            for (radio_index, (data_children, config_children)) in data
+                                .children_group()
+                                .iter()
+                                .zip(config.children_group.iter())
+                                .enumerate()
+                            {
+                                if let Some(config_children) = config_children {
+                                    if !data_children.is_empty() {
+                                        self.reset_veri_host_network_recursive(
+                                            data_children,
+                                            config_children,
+                                            ((base_index + index) * MAX_PER_LAYER + radio_index)
+                                                * MAX_PER_LAYER,
+                                            true,
+                                        );
+                                    }
+                                }
                             }
                         }
                     }

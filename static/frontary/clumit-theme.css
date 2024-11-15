@@ -1911,6 +1911,12 @@ div.input-host-network-group {
     margin-bottom: 20px;
 }
 
+div.input-host-network-group-required {
+    width: fit-content;
+    border: 2px solid var(--alert-text-color);
+    border-radius: 8px;
+}
+
 div.host-network-group-input {
     overflow: auto;
     display: flex;
