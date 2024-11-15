@@ -191,34 +191,34 @@ where
             html! {
                 <div class={class}>
                     <div class={class_align}>
-                    {
-                        if always == Some(CheckStatus::Checked) || always == Some(CheckStatus::Unchecked) {
-                            html! {
-                                <div class={classes!("input-checkbox-me", class_me)}>
-                                    <Checkbox
-                                        status={checked}
-                                        {always}
-                                    />
-                                    <div class="input-checkbox-me-title">
-                                        { title }{ view_asterisk(ess.required) }
-                                    </div>
-                                </div>
-                            }
-                        } else {
-                            html! {
-                                <div class={classes!("input-checkbox-me", class_me)}>
-                                    <div class="input-checkbox-me-checkbox" onclick={onclick}>
+                        {
+                            if always == Some(CheckStatus::Checked) || always == Some(CheckStatus::Unchecked) {
+                                html! {
+                                    <div class={classes!("input-checkbox-me", class_me)}>
                                         <Checkbox
                                             status={checked}
+                                            {always}
                                         />
+                                        <div class="input-checkbox-me-title">
+                                            { title }{ view_asterisk(ess.required) }
+                                        </div>
                                     </div>
-                                    <div class="input-checkbox-me-title">
-                                        { title }{ view_asterisk(ess.required) }
+                                }
+                            } else {
+                                html! {
+                                    <div class={classes!("input-checkbox-me", class_me)}>
+                                        <div class="input-checkbox-me-checkbox" onclick={onclick}>
+                                            <Checkbox
+                                                status={checked}
+                                            />
+                                        </div>
+                                        <div class="input-checkbox-me-title">
+                                            { title }{ view_asterisk(ess.required) }
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             }
                         }
-                    }
                         <div class="input-checkbox-children">
                         {
                             if checked == CheckStatus::Unchecked {
@@ -273,6 +273,7 @@ where
         class_child: &'static str,
         class_line: &'static str,
     ) -> Html {
+        let child_base_index = (base_index + layer_index) * MAX_PER_LAYER;
         match &**child {
             InputConfig::Text(config) => {
                 html! {
@@ -280,7 +281,7 @@ where
                         // TODO: issue #111
                         <div class={class_line}>
                         </div>
-                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, base_index, false, false) }
+                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, child_base_index, false, false) }
                     </div>
                 }
             }
@@ -289,7 +290,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER) }
+                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, sub_index, child_base_index) }
                     </div>
                 }
             }
@@ -298,7 +299,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth, false) }
+                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, sub_index, child_base_index, depth, false) }
                     </div>
                 }
             }
@@ -307,7 +308,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth) }
+                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, sub_index, child_base_index, depth) }
                     </div>
                 }
             }
@@ -316,7 +317,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
+                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, sub_index, child_base_index, false, false) }
                     </div>
                 }
             }
@@ -325,7 +326,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_float_64(ctx, &config.ess, config.step, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false, false) }
+                        { self.view_float_64(ctx, &config.ess, config.step, config.width, child_data, sub_index, child_base_index, false, false) }
                     </div>
                 }
             }
@@ -334,7 +335,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_percentage(ctx, &config.ess, config.min, config.max, config.num_decimals, config.width, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, false) }
+                        { self.view_percentage(ctx, &config.ess, config.min, config.max, config.num_decimals, config.width, child_data, sub_index, child_base_index, false) }
                     </div>
                 }
             }
@@ -343,7 +344,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, None, depth + 1) }
+                        { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, sub_index, child_base_index, None, depth + 1) }
                     </div>
                 }
             }
@@ -352,7 +353,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, sub_index, (base_index + layer_index) * MAX_PER_LAYER, depth + 1) }
+                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, sub_index, child_base_index, depth + 1) }
                     </div>
                 }
             }
