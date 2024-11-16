@@ -2,13 +2,14 @@ use core::panic;
 use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
 
 use ipnet::Ipv4Net;
+use num_traits::ToPrimitive;
 use passwords::analyzer;
 use yew::{Component, Context};
 
 use super::{
     super::CheckStatus,
+    cal_index,
     component::{InvalidMessage, Model, Verification},
-    user_input::MAX_PER_LAYER,
     ComparisonItem, GroupConfig, GroupItem, HostNetworkGroupItem, InputConfig, InputItem,
     RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem,
     VecSelectItem,
@@ -24,7 +25,7 @@ where
     <T as Component>::Message: Clone + PartialEq,
 {
     pub(super) fn prepare_buffer(&mut self, ctx: &Context<Self>) {
-        self.prepare_buffer_recursive(&ctx.props().input_data, &ctx.props().input_conf, 1);
+        self.prepare_buffer_recursive(&ctx.props().input_data, &ctx.props().input_conf, None);
     }
 
     #[allow(clippy::too_many_lines)]
@@ -32,14 +33,14 @@ where
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: usize,
+        base_index: Option<usize>,
     ) {
         input_data
             .iter()
             .enumerate()
             .zip(input_conf.iter())
             .for_each(|((index, input_data), input_conf)| {
-                let this_index = base_index + index;
+                let this_index = cal_index(base_index, index);
                 if let Ok(data) = input_data.try_borrow() {
                     match (&*data, &**input_conf) {
                         (InputItem::HostNetworkGroup(data), InputConfig::HostNetworkGroup(_)) => {
@@ -64,9 +65,8 @@ where
                             for (row, d) in data.iter().enumerate() {
                                 for ((col, d), t) in d.iter().enumerate().zip(config.items.iter()) {
                                     if let Ok(d) = d.try_borrow() {
-                                        let sub_base_index = this_index * MAX_PER_LAYER;
-                                        let item_index =
-                                            col + (row + sub_base_index) * MAX_PER_LAYER;
+                                        let row_rep_index = cal_index(Some(this_index), row);
+                                        let item_index = cal_index(Some(row_rep_index), col);
 
                                         match (&*d, &**t) {
                                             (
@@ -132,7 +132,7 @@ where
                                     self.prepare_buffer_recursive(
                                         data.children(),
                                         &config_children.children,
-                                        this_index * MAX_PER_LAYER,
+                                        Some(this_index),
                                     );
                                 }
                             }
@@ -150,7 +150,7 @@ where
                                         self.prepare_buffer_recursive(
                                             data_children,
                                             config_children,
-                                            (this_index * MAX_PER_LAYER + index) * MAX_PER_LAYER,
+                                            Some(cal_index(Some(this_index), index)),
                                         );
                                     }
                                 }
@@ -172,7 +172,7 @@ where
     }
 
     pub(super) fn prepare_preset(&mut self, ctx: &Context<Self>) {
-        self.prepare_preset_recursive(&ctx.props().input_data, &ctx.props().input_conf, true, 1);
+        self.prepare_preset_recursive(&ctx.props().input_data, &ctx.props().input_conf, true, None);
     }
 
     #[allow(clippy::too_many_lines)]
@@ -181,7 +181,7 @@ where
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
         parent_checked: bool,
-        base_index: usize,
+        base_index: Option<usize>,
     ) {
         input_data
             .iter()
@@ -189,6 +189,7 @@ where
             .zip(input_conf.iter())
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
+                    let this_index = cal_index(base_index, index);
                     match (&mut *item, &**input_conf) {
                         (InputItem::Text(item), InputConfig::Text(config)) => {
                             if let Some(preset) = &config.preset {
@@ -201,8 +202,7 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
-                                    let id = base_index + index;
-                                    self.preset_to_buffer_select_single(id, preset);
+                                    self.preset_to_buffer_select_single(this_index, preset);
                                 }
                             }
                         }
@@ -210,8 +210,7 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
-                                    let id = base_index + index;
-                                    self.preset_to_buffer_select_multiple(id, preset);
+                                    self.preset_to_buffer_select_multiple(this_index, preset);
                                 }
                             }
                         }
@@ -240,8 +239,7 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
-                                    let id = base_index + index;
-                                    self.preset_to_buffer_vec_select(id, preset);
+                                    self.preset_to_buffer_vec_select(this_index, preset);
                                 }
                             }
                         }
@@ -260,7 +258,7 @@ where
                                         &config_children.children,
                                         data.status() == CheckStatus::Checked
                                             || data.status() == CheckStatus::Indeterminate,
-                                        (base_index + index) * MAX_PER_LAYER,
+                                        Some(this_index),
                                     );
                                 }
                             }
@@ -280,12 +278,11 @@ where
                                                 data,
                                                 config,
                                                 parent_checked,
-                                                ((base_index + index) * MAX_PER_LAYER + sub_index)
-                                                    * MAX_PER_LAYER,
+                                                Some(cal_index(Some(this_index), sub_index)),
                                             );
                                         }
                                     }
-                                    self.preset_to_buffer_radio(base_index + index, preset);
+                                    self.preset_to_buffer_radio(this_index, preset);
                                 }
                             }
                         }
@@ -349,7 +346,7 @@ where
             ctx,
             &ctx.props().input_data,
             &ctx.props().input_conf,
-            1,
+            None,
             true,
         )
     }
@@ -360,7 +357,7 @@ where
         ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: usize,
+        base_index: Option<usize>,
         parent_checked: bool,
     ) -> bool {
         let mut required = Vec::<bool>::new();
@@ -369,6 +366,7 @@ where
             input_data.iter().zip(input_conf.iter()).enumerate()
         {
             if let Ok(item) = input_data.try_borrow() {
+                let this_index = cal_index(base_index, index);
                 if parent_checked {
                     let empty = match (&(*item), &**input_conf) {
                         (InputItem::Text(_), InputConfig::Text(_))
@@ -393,7 +391,7 @@ where
                                 && n.is_empty()
                                 && self
                                     .verification_host_network
-                                    .get(&(base_index + index))
+                                    .get(&this_index)
                                     .map_or(false, |v| v.map_or(true, |v| v))
                         }
                         (InputItem::Nic(n), InputConfig::Nic(_)) => {
@@ -419,7 +417,7 @@ where
                         }
                         (InputItem::Group(item), InputConfig::Group(conf)) => {
                             if !item.is_empty() {
-                                self.group_required_all_recursive(item, conf, base_index, index);
+                                self.group_required_all_recursive(item, conf, this_index);
                             }
                             input_conf.required() && item.is_empty()
                         }
@@ -431,7 +429,7 @@ where
                                             ctx,
                                             data.children(),
                                             &config_children.children,
-                                            (base_index + index) * MAX_PER_LAYER,
+                                            Some(this_index),
                                             true,
                                         )
                                     {
@@ -457,9 +455,7 @@ where
                                                 ctx,
                                                 data_children,
                                                 config_children,
-                                                (((base_index + index) * MAX_PER_LAYER)
-                                                    + checked_index)
-                                                    * MAX_PER_LAYER,
+                                                Some(cal_index(Some(this_index), checked_index)),
                                                 true,
                                             )
                                         {
@@ -475,9 +471,12 @@ where
                         }
                     };
                     if empty {
-                        self.required_msg.insert(base_index + index);
+                        self.required_msg.insert(this_index);
                         required.push(true);
                     }
+                    // else {
+                    //     self.required_msg.remove(&this_index);
+                    // }
                 }
             }
         }
@@ -490,7 +489,6 @@ where
         group: &GroupItem,
         config: &GroupConfig,
         base_index: usize,
-        index: usize,
     ) {
         let required = config
         .items
@@ -541,11 +539,7 @@ where
                                     Some(Some(false))
                                 } else if self
                                     .comparison_kind(
-                                        col_index
-                                            + (row_index
-                                                + (base_index + index)
-                                                    * MAX_PER_LAYER)
-                                                * MAX_PER_LAYER,
+                                        cal_index(Some(cal_index(Some(base_index), row_index)), col_index)
                                     )
                                     .is_some()
                                 {
@@ -580,16 +574,17 @@ where
                 .collect::<Vec<Option<bool>>>()
         })
         .collect::<Vec<Vec<Option<bool>>>>();
-        let sub_base_index = (base_index + index) * MAX_PER_LAYER;
         for (row_index, row) in empty.iter().enumerate() {
             let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
             if !all_empty || config.ess.required && row_index == 0 {
-                let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
                 for ((col_index, data_empty), data_required) in
                     row.iter().enumerate().zip(required.iter())
                 {
                     if data_empty.map_or(true, |x| x) && *data_required {
-                        self.required_msg.insert(base_index + col_index);
+                        self.required_msg.insert(cal_index(
+                            Some(cal_index(Some(base_index), row_index)),
+                            col_index,
+                        ));
                     }
                 }
             }
@@ -597,7 +592,7 @@ where
     }
 
     pub(super) fn verify(&mut self, ctx: &Context<Self>) -> bool {
-        self.verify_recursive(&ctx.props().input_data, &ctx.props().input_conf, 1, true)
+        self.verify_recursive(&ctx.props().input_data, &ctx.props().input_conf, None, true)
     }
 
     #[allow(clippy::too_many_lines)]
@@ -605,7 +600,7 @@ where
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: usize,
+        base_index: Option<usize>,
         parent_checked: bool,
     ) -> bool {
         let mut rtn = true;
@@ -616,18 +611,18 @@ where
             .zip(input_conf.iter())
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(input_data) = input_data.try_borrow() {
+                    let item_index = cal_index(base_index, index);
                     // HIGHTLIGHT: All kinds are not necessarily to be verified.
-                    // HIGHTLIGHT: Since HostNetworkGroup items were verified yet, they don't need to be verified here.
+                    // HIGHTLIGHT: Since HostNetworkGroup items were verified, they don't need to be verified here.
                     match (&*input_data, &**input_conf) {
                         (InputItem::Unsigned32(value), InputConfig::Unsigned32(config)) => {
                             if let Some(value) = value.as_ref() {
                                 if parent_checked {
                                     if *value >= config.min && *value <= config.max {
-                                        self.verification
-                                            .insert(base_index + index, Verification::Valid);
+                                        self.verification.insert(item_index, Verification::Valid);
                                     } else {
                                         self.verification.insert(
-                                            base_index + index,
+                                            item_index,
                                             Verification::Invalid(InvalidMessage::InvalidInput),
                                         );
                                         rtn = false;
@@ -641,11 +636,10 @@ where
                                     if *value >= config.min.unwrap_or(0.0)
                                         && *value <= config.max.unwrap_or(1.0)
                                     {
-                                        self.verification
-                                            .insert(base_index + index, Verification::Valid);
+                                        self.verification.insert(item_index, Verification::Valid);
                                     } else {
                                         self.verification.insert(
-                                            base_index + index,
+                                            item_index,
                                             Verification::Invalid(InvalidMessage::InvalidInput),
                                         );
                                         rtn = false;
@@ -655,23 +649,19 @@ where
                         }
                         (InputItem::Password(pwd), InputConfig::Password(_)) => {
                             if parent_checked {
-                                if let Some(cnf_pwd) =
-                                    self.confirm_password.get(&(base_index + index))
-                                {
+                                if let Some(cnf_pwd) = self.confirm_password.get(&(item_index)) {
                                     if pwd == cnf_pwd {
                                         if let Some(v) = invalid_password(pwd) {
-                                            self.verification.insert(
-                                                base_index + index,
-                                                Verification::Invalid(v),
-                                            );
+                                            self.verification
+                                                .insert(item_index, Verification::Invalid(v));
                                             rtn = false;
                                         } else {
                                             self.verification
-                                                .insert(base_index + index, Verification::Valid);
+                                                .insert(item_index, Verification::Valid);
                                         }
                                     } else {
                                         self.verification.insert(
-                                            base_index + index,
+                                            item_index,
                                             Verification::Invalid(InvalidMessage::PasswordNotMatch),
                                         );
                                         rtn = false;
@@ -682,10 +672,11 @@ where
                         (InputItem::Nic(nics), InputConfig::Nic(_)) => {
                             if parent_checked {
                                 for (i, nic) in nics.iter().enumerate() {
+                                    let nic_index = cal_index(Some(item_index), i);
                                     if !nic.interface.is_empty() || !nic.gateway.is_empty() {
                                         if nic.name.is_empty() {
                                             self.verification_nic.insert(
-                                                ((base_index + index) * MAX_PER_LAYER + i, 0),
+                                                (nic_index, 0),
                                                 Verification::Invalid(
                                                     InvalidMessage::InterfaceNameRequired,
                                                 ),
@@ -694,7 +685,7 @@ where
                                         }
                                         if nic.interface.is_empty() {
                                             self.verification_nic.insert(
-                                                ((base_index + index) * MAX_PER_LAYER + i, 1),
+                                                (nic_index, 1),
                                                 Verification::Invalid(
                                                     InvalidMessage::InterfaceRequired,
                                                 ),
@@ -702,7 +693,7 @@ where
                                             rtn = false;
                                         } else if Ipv4Net::from_str(&nic.interface).is_err() {
                                             self.verification_nic.insert(
-                                                ((base_index + index) * MAX_PER_LAYER + i, 1),
+                                                (nic_index, 1),
                                                 Verification::Invalid(
                                                     InvalidMessage::WrongInterface,
                                                 ),
@@ -711,7 +702,7 @@ where
                                         }
                                         if nic.gateway.is_empty() {
                                             self.verification_nic.insert(
-                                                ((base_index + index) * MAX_PER_LAYER + i, 2),
+                                                (nic_index, 2),
                                                 Verification::Invalid(
                                                     InvalidMessage::GatewayRequired,
                                                 ),
@@ -719,20 +710,20 @@ where
                                             rtn = false;
                                         } else if Ipv4Addr::from_str(&nic.gateway).is_err() {
                                             self.verification_nic.insert(
-                                                ((base_index + index) * MAX_PER_LAYER + i, 2),
+                                                (nic_index, 2),
                                                 Verification::Invalid(InvalidMessage::WrongGateway),
                                             );
                                             rtn = false;
                                         }
                                     } else if !nic.name.is_empty() {
                                         self.verification_nic.insert(
-                                            ((base_index + index) * MAX_PER_LAYER + i, 1),
+                                            (nic_index, 1),
                                             Verification::Invalid(
                                                 InvalidMessage::InterfaceRequired,
                                             ),
                                         );
                                         self.verification_nic.insert(
-                                            ((base_index + index) * MAX_PER_LAYER + i, 2),
+                                            (nic_index, 2),
                                             Verification::Invalid(InvalidMessage::GatewayRequired),
                                         );
                                         rtn = false;
@@ -747,7 +738,7 @@ where
                                     && !self.verify_recursive(
                                         data.children(),
                                         &config_children.children,
-                                        (base_index + index) * MAX_PER_LAYER,
+                                        Some(item_index),
                                         data.status() == CheckStatus::Checked,
                                     )
                                 {
@@ -769,9 +760,7 @@ where
                                         && !self.verify_recursive(
                                             data_children,
                                             config_children,
-                                            (((base_index + index) * MAX_PER_LAYER)
-                                                + checked_index)
-                                                * MAX_PER_LAYER,
+                                            Some(cal_index(Some(item_index), checked_index)),
                                             true,
                                         )
                                     {
@@ -849,7 +838,7 @@ where
             });
 
         for (index, p, t) in &propagate {
-            self.propagate_checkbox_recursive(click, p, t, None, *index, 1);
+            self.propagate_checkbox_recursive(click, p, t, None, None, *index);
         }
 
         true
@@ -863,9 +852,10 @@ where
         pos: &Rc<RefCell<InputItem>>,
         input_conf: &Rc<InputConfig>,
         checked: Option<CheckStatus>, // parent of `this_checked`, that is, `pos`
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
     ) -> Option<CheckStatus> {
+        let this_index = cal_index(base_index, layer_index);
         let this_checked = if Rc::ptr_eq(click, pos) {
             if let Ok(mut click) = click.try_borrow_mut() {
                 if let (InputItem::Checkbox(data), InputConfig::Checkbox(config)) =
@@ -985,10 +975,11 @@ where
                         (child.try_borrow_mut(), config_children.get(index))
                     {
                         let propa_index = if let Some(radio) = radio {
-                            (layer_index + base_index) * MAX_PER_LAYER + radio
+                            cal_index(Some(this_index), radio)
                         } else {
-                            layer_index + base_index
+                            this_index
                         };
+                        let item_index = cal_index(Some(propa_index), index);
                         match (&mut (*c), &**t) {
                             // HIGHLIGHT: `preset` should be set even when `this_checked` is
                             // `Unchecked`, because `this_checked`` may be changed later depending
@@ -1006,20 +997,14 @@ where
                             ) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     *user = HostNetworkGroupItem::default();
-                                    self.host_network_to_buffer(
-                                        (propa_index) * MAX_PER_LAYER + index,
-                                        user,
-                                    );
+                                    self.host_network_to_buffer(item_index, user);
                                 }
                             }
                             (InputItem::SelectSingle(user), InputConfig::SelectSingle(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
-                                        self.select_searchable_to_buffer(
-                                            (propa_index) * MAX_PER_LAYER + index,
-                                            user,
-                                        );
+                                        self.select_searchable_to_buffer(item_index, user);
                                     }
                                 }
                             }
@@ -1030,11 +1015,7 @@ where
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
-                                        self.select_multiple_to_buffer(
-                                            (propa_index) * MAX_PER_LAYER + index,
-                                            user,
-                                            config,
-                                        );
+                                        self.select_multiple_to_buffer(item_index, user, config);
                                     }
                                 }
                             }
@@ -1064,10 +1045,7 @@ where
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
                                     }
-                                    self.vec_select_to_buffer(
-                                        (propa_index) * MAX_PER_LAYER + index,
-                                        user,
-                                    );
+                                    self.vec_select_to_buffer(item_index, user);
                                 }
                             }
                             (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
@@ -1090,11 +1068,7 @@ where
                                     if let Some(preset) = &config.preset {
                                         if user.selected() != preset {
                                             user.set_selected(preset.clone());
-                                            self.radio_to_buffer(
-                                                propa_index * MAX_PER_LAYER + index,
-                                                user,
-                                                config,
-                                            );
+                                            self.radio_to_buffer(item_index, user, config);
                                         }
                                     }
                                 }
@@ -1127,14 +1101,14 @@ where
         }
         let mut rtn_checked: Vec<Option<CheckStatus>> = Vec::new();
 
-        for (index, sub_index, child, config_child) in &propa_children {
+        for (propa_index, sub_index, child, config_child) in &propa_children {
             rtn_checked.push(self.propagate_checkbox_recursive(
                 click,
                 child,
                 config_child,
                 this_checked,
+                Some(*propa_index),
                 *sub_index,
-                *index * MAX_PER_LAYER,
             ));
         }
 
@@ -1196,8 +1170,16 @@ where
         };
 
         if let Some(CheckStatus::Unchecked) = final_checked {
-            self.required_msg
-                .retain(|x| *x / MAX_PER_LAYER != (base_index + layer_index));
+            let this_index_float = this_index.to_f64().expect("usize to f64 is safe.");
+            let this_level = this_index_float
+                .log(super::MAX_PER_LAYER.to_f64().expect("u32 to f64 is safe."))
+                .floor();
+            let Some(this_level) = this_level.to_u32() else {
+                panic!("Too many levels in hierarchy of input items");
+            };
+            let this_level = super::MAX_PER_LAYER.pow(this_level + 1);
+            let prefix = this_index / this_level * this_level;
+            self.required_msg.retain(|x| *x - prefix != this_index);
         }
 
         final_checked
@@ -1209,7 +1191,7 @@ where
         self.reset_veri_host_network_recursive(
             &ctx.props().input_data,
             &ctx.props().input_conf,
-            1,
+            None,
             true,
         );
     }
@@ -1218,7 +1200,7 @@ where
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: usize,
+        base_index: Option<usize>,
         parent_checked: bool,
     ) {
         input_data
@@ -1226,13 +1208,13 @@ where
             .enumerate()
             .zip(input_conf.iter())
             .for_each(|((index, input_data), input_conf)| {
+                let item_index = cal_index(base_index, index);
                 if let Ok(input_data) = input_data.try_borrow() {
                     if parent_checked {
                         if let (InputItem::HostNetworkGroup(_), InputConfig::HostNetworkGroup(_)) =
                             (&*input_data, &**input_conf)
                         {
-                            self.verification_host_network
-                                .insert(base_index + index, None);
+                            self.verification_host_network.insert(item_index, None);
                         }
                     }
 
@@ -1246,7 +1228,7 @@ where
                                 self.reset_veri_host_network_recursive(
                                     data.children(),
                                     &config_children.children,
-                                    (base_index + index) * MAX_PER_LAYER,
+                                    Some(item_index),
                                     data.status() == CheckStatus::Checked,
                                 );
                             }
@@ -1255,19 +1237,20 @@ where
                         (&*input_data, &**input_conf)
                     {
                         if !data.is_empty() {
-                            for (radio_index, (data_children, config_children)) in data
-                                .children_group()
+                            let checked_index = config
+                                .options
                                 .iter()
-                                .zip(config.children_group.iter())
-                                .enumerate()
-                            {
-                                if let Some(config_children) = config_children {
+                                .position(|o| data.selected() == o.to_string());
+                            if let Some(checked_index) = checked_index {
+                                if let (Some(data_children), Some(Some(radio_children))) = (
+                                    data.children_group().get(checked_index),
+                                    config.children_group.get(checked_index),
+                                ) {
                                     if !data_children.is_empty() {
                                         self.reset_veri_host_network_recursive(
                                             data_children,
-                                            config_children,
-                                            ((base_index + index) * MAX_PER_LAYER + radio_index)
-                                                * MAX_PER_LAYER,
+                                            radio_children,
+                                            Some(cal_index(Some(item_index), checked_index)),
                                             true,
                                         );
                                     }

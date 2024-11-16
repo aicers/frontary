@@ -5,8 +5,9 @@ use json_gettext::get_text;
 use yew::{classes, html, Component, Context, Html};
 
 use super::{
+    cal_index,
     component::{Message, Model},
-    user_input::{view_asterisk, MAX_PER_LAYER},
+    user_input::view_asterisk,
     CheckStatus, CheckboxChildrenConfig, ChildrenPosition, Essential as InputEssential,
     InputConfig, InputItem,
 };
@@ -25,8 +26,8 @@ where
         options: &[ViewString],
         children_group: &[Option<Vec<Rc<InputConfig>>>],
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         depth: u32,
     ) -> Html {
         let list = Rc::new(options.to_vec());
@@ -36,8 +37,9 @@ where
                 .collect::<Vec<String>>(),
         );
         let txt = ctx.props().txt.txt.clone();
+        let my_index = cal_index(base_index, layer_index);
 
-        if let Some(buffer_option) = self.radio_buffer.get(&(base_index + layer_index)) {
+        if let Some(buffer_option) = self.radio_buffer.get(&(my_index)) {
             let checked_index = buffer_option.try_borrow().ok().and_then(|buffer_option| {
                 options
                     .iter()
@@ -77,7 +79,7 @@ where
                             <Radio::<Self>
                                 txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
-                                parent_message={Some(Message::InputRadio(base_index + layer_index, input_data.clone()))}
+                                parent_message={Some(Message::InputRadio(my_index, input_data.clone()))}
                                 list={Rc::clone(&list)}
                                 candidate_values={Rc::clone(&candidates)}
                                 selected_value={Rc::clone(buffer_option)}
@@ -105,7 +107,7 @@ where
                                     {
                                         for children.iter().enumerate().map(|(sub_index, child)|
                                             if let Some(child_data) = children_data.get(sub_index) {
-                                                self.view_child(ctx, child, child_data, (layer_index + base_index) * MAX_PER_LAYER, checked_index, sub_index, depth, class_child, class_line)
+                                                self.view_child(ctx, child, child_data, cal_index(Some(my_index), checked_index), sub_index, depth, class_child, class_line)
                                             } else {
                                                 html! {}
                                             }
@@ -119,7 +121,7 @@ where
                         }
                     }
                     <div class="input-radio-message">
-                        { self.view_required_msg(ctx, base_index + layer_index) }
+                        { self.view_required_msg(ctx, my_index) }
                     </div>
                 </div>
             }
@@ -137,16 +139,17 @@ where
         always: Option<CheckStatus>,
         children_config: Option<&CheckboxChildrenConfig>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         both_border: Option<bool>,
         depth: u32,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let input_data_msg = input_data.clone();
-        let onclick = ctx.link().callback(move |_| {
-            Message::ClickCheckbox(base_index + layer_index, input_data_msg.clone())
-        });
+        let onclick = ctx
+            .link()
+            .callback(move |_| Message::ClickCheckbox(my_index, input_data_msg.clone()));
         let checked = if let Ok(data) = input_data.try_borrow() {
             if let InputItem::Checkbox(data) = (*data).clone() {
                 Some(data.status())
@@ -241,7 +244,7 @@ where
                                             "input-checkbox-link-line"
                                         };
                                         if let Some(child_data) = child_data {
-                                            self.view_child(ctx, child, &child_data, layer_index, base_index, sub_index, depth, class_child, class_line)
+                                            self.view_child(ctx, child, &child_data, my_index, sub_index, depth, class_child, class_line)
                                         } else {
                                             html! {}
                                         }
@@ -266,14 +269,12 @@ where
         ctx: &Context<Self>,
         child: &Rc<InputConfig>,
         child_data: &Rc<RefCell<InputItem>>,
-        layer_index: usize,
         base_index: usize,
-        sub_index: usize,
+        layer_index: usize,
         depth: u32,
         class_child: &'static str,
         class_line: &'static str,
     ) -> Html {
-        let child_base_index = (base_index + layer_index) * MAX_PER_LAYER;
         match &**child {
             InputConfig::Text(config) => {
                 html! {
@@ -281,7 +282,7 @@ where
                         // TODO: issue #111
                         <div class={class_line}>
                         </div>
-                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, sub_index, child_base_index, false, false) }
+                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, Some(base_index), layer_index, false, false) }
                     </div>
                 }
             }
@@ -290,7 +291,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, sub_index, child_base_index) }
+                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, Some(base_index), layer_index) }
                     </div>
                 }
             }
@@ -299,7 +300,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, sub_index, child_base_index, depth, false) }
+                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, Some(base_index), layer_index, depth, false) }
                     </div>
                 }
             }
@@ -308,7 +309,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, sub_index, child_base_index, depth) }
+                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, Some(base_index), layer_index, depth) }
                     </div>
                 }
             }
@@ -317,7 +318,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, sub_index, child_base_index, false, false) }
+                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, Some(base_index), layer_index, false, false) }
                     </div>
                 }
             }
@@ -326,7 +327,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_float_64(ctx, &config.ess, config.step, config.width, child_data, sub_index, child_base_index, false, false) }
+                        { self.view_float_64(ctx, &config.ess, config.step, config.width, child_data, Some(base_index), layer_index, false, false) }
                     </div>
                 }
             }
@@ -335,7 +336,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_percentage(ctx, &config.ess, config.min, config.max, config.num_decimals, config.width, child_data, sub_index, child_base_index, false) }
+                        { self.view_percentage(ctx, &config.ess, config.min, config.max, config.num_decimals, config.width, child_data, Some(base_index), layer_index, false) }
                     </div>
                 }
             }
@@ -344,7 +345,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, sub_index, child_base_index, None, depth + 1) }
+                        { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, Some(base_index), layer_index, None, depth + 1) }
                     </div>
                 }
             }
@@ -353,7 +354,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, sub_index, child_base_index, depth + 1) }
+                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, Some(base_index), layer_index, depth + 1) }
                     </div>
                 }
             }
@@ -379,9 +380,10 @@ where
         widths: &[Option<u32>],
         items_conf: &[Rc<InputConfig>],
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
     ) -> Html {
+        let base_index = cal_index(base_index, layer_index); // == my_index
         let input_data_clone = input_data.clone();
         let input_data_clone_ref = &(input_data.clone());
         let items_conf_clone = items_conf.to_vec();
@@ -394,10 +396,9 @@ where
             return html! {};
         };
         let txt = ctx.props().txt.txt.clone();
-        let sub_base_index = (base_index + layer_index) * MAX_PER_LAYER;
         let onclick_add = ctx.link().callback(move |_| {
             Message::InputGroupAdd(
-                sub_base_index,
+                base_index,
                 input_data_clone.clone(),
                 items_conf_clone.clone(),
             )
@@ -435,7 +436,7 @@ where
                                     let items_conf_callback = items_conf_clone_ref.clone();
                                     let onclick_delete = ctx.link().callback(move |_| {
                                         Message::InputGroupDelete(
-                                            sub_base_index,
+                                            base_index,
                                             row_index,
                                             input_data_callback.clone(),
                                             items_conf_callback.clone(),
@@ -443,6 +444,7 @@ where
                                     });
 
                                     if one_row {
+                                        let row_rep_index = cal_index(Some(base_index), row_index);
                                         html! {
                                             <tr>
                                                 {
@@ -450,7 +452,6 @@ where
                                                         let Some(input_data) = row.get(col_index) else {
                                                             return html! {};
                                                         };
-                                                        let base_index = (row_index + sub_base_index) * MAX_PER_LAYER;
                                                         html! {
                                                             <td class="input-group">
                                                                 <div class="input-group-item-outer">
@@ -459,30 +460,30 @@ where
                                                                         InputConfig::Text(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_text(ctx, &ess, config.length, config.width, input_data, col_index, base_index, false, true)
+                                                                            self.view_text(ctx, &ess, config.length, config.width, input_data, Some(row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data, col_index, base_index, 1, true)
+                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data, Some(row_rep_index), col_index, 1, true)
                                                                         }
                                                                         InputConfig::VecSelect(config) => {
-                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths, &config.max_heights, &config.map_list, input_data, col_index, base_index, true)
+                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths, &config.max_heights, &config.map_list, input_data, Some(row_rep_index), col_index, true)
                                                                         }
                                                                         InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data, col_index, base_index, false, true)
+                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data, Some(row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Float64(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_float_64(ctx, &ess, config.step, config.width, input_data, col_index, base_index, false, true)
+                                                                            self.view_float_64(ctx, &ess, config.step, config.width, input_data, Some(row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Comparison(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_comparison(ctx, &ess, input_data, col_index, base_index, true)
+                                                                            self.view_comparison(ctx, &ess, input_data, Some(row_rep_index), col_index, true)
                                                                         }
                                                                         _ => html! {}
                                                                     }

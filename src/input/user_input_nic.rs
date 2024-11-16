@@ -7,8 +7,9 @@ use web_sys::HtmlInputElement;
 use yew::{classes, events::InputEvent, html, Component, Context, Html};
 
 use super::{
+    cal_index,
     component::{InvalidMessage, Message, Model},
-    user_input::{view_asterisk, MAX_PER_LAYER},
+    user_input::view_asterisk,
     InputItem,
 };
 use crate::{input::component::Verification, text, InputEssential, InputNic, ViewString};
@@ -26,8 +27,8 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
@@ -59,11 +60,11 @@ where
 
                         {
                             for input_data.iter().enumerate().map(|(index, d)| {
-                                self.view_nic_each(ctx, &input_data_clone, index, layer_index, base_index, index + 1 == num, d)
+                                self.view_nic_each(ctx, &input_data_clone, index, base_index, layer_index, index + 1 == num, d)
                             })
                         }
                         </table>
-                        { self.view_required_msg(ctx, base_index + layer_index) }
+                        { self.view_required_msg(ctx, cal_index(base_index, layer_index)) }
                     </div>
                 }
             } else {
@@ -82,8 +83,8 @@ where
         nics: Option<usize>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         depth: u32,
     ) -> Html {
         match (list, nics) {
@@ -94,8 +95,8 @@ where
                 None,
                 list,
                 input_data,
-                layer_index,
                 base_index,
+                layer_index,
                 depth,
                 false,
             ),
@@ -134,8 +135,8 @@ where
                         None,
                         &list,
                         input_data,
-                        layer_index,
                         base_index,
+                        layer_index,
                         depth,
                         false,
                     )
@@ -154,11 +155,12 @@ where
         ctx: &Context<Self>,
         input_data: &Rc<RefCell<InputItem>>,
         nic_index: usize,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         is_last: bool,
         nic: &InputNic,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index) + nic_index;
         let input_data_clone_1 = input_data.clone();
         let input_data_clone_2 = input_data.clone();
         let input_data_clone_3 = input_data.clone();
@@ -170,7 +172,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     Message::InputNicName(
-                        base_index + layer_index,
+                        my_index,
                         nic_index,
                         input.value(),
                         input_data_clone_1.clone(),
@@ -182,7 +184,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     Message::InputNicInterface(
-                        base_index + layer_index,
+                        my_index,
                         nic_index,
                         input.value(),
                         input_data_clone_2.clone(),
@@ -194,7 +196,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     Message::InputNicGateway(
-                        base_index + layer_index,
+                        my_index,
                         nic_index,
                         input.value(),
                         input_data_clone_3.clone(),
@@ -202,25 +204,21 @@ where
                 })
         });
         let onclick_delete = ctx.link().callback(move |_| {
-            Message::InputNicDelete(
-                base_index + layer_index,
-                nic_index,
-                input_data_clone_4.clone(),
-            )
+            Message::InputNicDelete(my_index, nic_index, input_data_clone_4.clone())
         });
         let onclick_add = ctx.link().callback(move |_| {
-            Message::InputNicAdd(base_index, layer_index, input_data_clone_5.clone())
+            Message::InputNicAdd(my_index, nic_index, input_data_clone_5.clone())
         });
         let txt = ctx.props().txt.txt.clone();
         let name_holder = text!(txt, ctx.props().language, "Name").to_string();
 
         let (name_msg, interface_msg, gateway_msg) = (
             self.verification_nic
-                .get(&((base_index + layer_index) * MAX_PER_LAYER + nic_index, 0)),
+                .get(&(cal_index(Some(my_index), nic_index), 0)),
             self.verification_nic
-                .get(&((base_index + layer_index) * MAX_PER_LAYER + nic_index, 1)),
+                .get(&(cal_index(Some(my_index), nic_index), 1)),
             self.verification_nic
-                .get(&((base_index + layer_index) * MAX_PER_LAYER + nic_index, 2)),
+                .get(&(cal_index(Some(my_index), nic_index), 2)),
         );
         let name_msg =
             if let Some(Verification::Invalid(InvalidMessage::InterfaceNameRequired)) = name_msg {

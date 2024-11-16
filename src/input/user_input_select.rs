@@ -4,6 +4,7 @@ use json_gettext::get_text;
 use yew::{html, Component, Context, Html};
 
 use super::{
+    cal_index,
     component::{Message, Model},
     user_input::view_asterisk,
     InputItem,
@@ -31,11 +32,12 @@ where
         width: Option<u32>,
         list: &[(String, ViewString)],
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         depth: u32,
         group: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let list_clone = Rc::new(list.to_vec());
         let mut list = list
@@ -64,10 +66,12 @@ where
             ctx.props().width - PADDING_SUM
         };
         let class_item = if group { "" } else { "input-select-searchable" };
-        if let Some(selected) = self
-            .select_searchable_buffer
-            .get(&(base_index + layer_index))
-        {
+        let class = if self.required_msg.contains(&(my_index)) {
+            "input-select-searchable-required"
+        } else {
+            ""
+        };
+        if let Some(selected) = self.select_searchable_buffer.get(&(my_index)) {
             html! {
                 <div class={class_item}>
                     {
@@ -81,13 +85,14 @@ where
                             }
                         }
                     }
+                    <div {class}>
                     {
                         if multiple {
                             html! {
                                 <SelectSearchable<Self>
                                     txt={ctx.props().txt.clone()}
                                     language={ctx.props().language}
-                                    id={format!("select-searchable-{base_index}-{layer_index}")}
+                                    id={format!("select-searchable-{}-{layer_index}", base_index.unwrap_or_default())}
                                     kind={SelectSearchableKind::Multi}
                                     title={ess.title.clone()}
                                     empty_msg={ess.notice}
@@ -97,7 +102,7 @@ where
                                     list={Rc::clone(&list)}
                                     selected={Rc::clone(selected)}
                                     allow_empty={!ess.required}
-                                    parent_message={Some(Message::InputMultipleSelect(base_index + layer_index, input_data.clone(), Rc::clone(&list_clone)))}
+                                    parent_message={Some(Message::InputMultipleSelect(my_index, input_data.clone(), Rc::clone(&list_clone)))}
                                 />
                             }
                         } else {
@@ -105,7 +110,7 @@ where
                                 <SelectSearchable<Self>
                                     txt={ctx.props().txt.clone()}
                                     language={ctx.props().language}
-                                    id={format!("select-searchable-{base_index}-{layer_index}")}
+                                    id={format!("select-searchable-{}-{layer_index}", base_index.unwrap_or_default())}
                                     kind={SelectSearchableKind::Single}
                                     title={ess.title.clone()}
                                     empty_msg={ess.notice}
@@ -115,12 +120,13 @@ where
                                     list={Rc::clone(&list)}
                                     selected={Rc::clone(selected)}
                                     allow_empty={!ess.required}
-                                    parent_message={Some(Message::InputSingleSelect(base_index + layer_index, input_data.clone(), Rc::clone(&list_clone)))}
+                                    parent_message={Some(Message::InputSingleSelect(my_index, input_data.clone(), Rc::clone(&list_clone)))}
                                 />
                             }
                         }
                     }
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    </div>
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
             }
         } else {
@@ -141,10 +147,11 @@ where
         max_height_list: &[u32],
         list: &[VecSelectListMap],
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         group: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let title = ess_list
             .iter()
             .map(|ess| ess.title().to_string())
@@ -183,18 +190,16 @@ where
                     .collect::<HashMap<Vec<String>, Rc<RefCell<Vec<Item>>>>>()
             })
             .collect::<Vec<_>>();
-        let Some(selected) = self.vec_select_buffer.get(&(base_index + layer_index)) else {
+        let Some(selected) = self.vec_select_buffer.get(&(my_index)) else {
             return html! {};
         };
         let parent_message = selected
             .iter()
             .enumerate()
-            .map(|(index, _)| {
-                Message::InputVecSelect(base_index + layer_index, index, input_data.clone())
-            })
+            .map(|(index, _)| Message::InputVecSelect(my_index, index, input_data.clone()))
             .collect::<Vec<_>>();
         let class_item = if group { "" } else { "input-select-vector" };
-        let class_vec = if self.required_msg.contains(&(base_index + layer_index)) {
+        let class_vec = if self.required_msg.contains(&(my_index)) {
             "input-select-vector-vec-required"
         } else {
             "input-select-vector-vec"
@@ -222,7 +227,7 @@ where
                     <VecSelect<Self>
                         txt={ctx.props().txt.clone()}
                         language={ctx.props().language}
-                        id={format!("VecSelect-{layer_index}-{base_index}")}
+                        id={format!("VecSelect-{}-{layer_index}", base_index.unwrap_or_default())}
                         title={title}
                         kind_last={kind_last}
                         empty_msg={empty_msg}
@@ -235,7 +240,7 @@ where
                         parent_message={parent_message}
                     />
                 </div>
-                { self.view_required_msg(ctx, base_index + layer_index) }
+                { self.view_required_msg(ctx, my_index) }
             </div>
         }
     }
