@@ -28,11 +28,30 @@ pub use item::{
     InputItem, NicItem, PasswordItem, PercentageItem, RadioItem, SelectMultipleItem,
     SelectSingleItem, TagItem, TextItem, Unsigned32Item, VecSelectItem,
 };
+use num_traits::ToPrimitive;
 use strum_macros::{Display, EnumIter, EnumString};
 pub use tag::Model as Tag;
 
 pub use self::user_input::view_asterisk;
 use crate::{parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange};
+
+const MAX_PER_LAYER: usize = 30;
+
+fn cal_index(base_index: Option<usize>, layer_index: usize) -> usize {
+    // `base_index` means parent's index
+    if let Some(base_index) = base_index {
+        let max = MAX_PER_LAYER.to_f64().expect("usize to f64 is safe.");
+        let base = base_index.to_f64().expect("usize to f64 is safe.");
+        let base = base.log(max).floor();
+        let Some(base) = base.to_u32() else {
+            panic!("Too many levels in hierarchy of input items");
+        };
+        let base = MAX_PER_LAYER.pow(base + 1);
+        base_index + base * (1 + layer_index)
+    } else {
+        layer_index
+    }
+}
 
 #[derive(Clone, PartialEq, Eq, Default)]
 pub struct InputHostNetworkGroup {

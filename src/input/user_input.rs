@@ -9,6 +9,7 @@ use web_sys::{Event, HtmlInputElement};
 use yew::{events::InputEvent, html, html::TargetCast, Component, Context, Html};
 
 use super::{
+    cal_index,
     component::{InvalidMessage, Message, Model},
     InputItem,
 };
@@ -39,7 +40,6 @@ const PASSWD_REQUIREMENT: &str = if cfg!(feature = "cc-password") {
     "no spaces, more than 7 characters, at least one number/uppercase/lowercase/special characters"
 };
 const FLOAT64_STEP_DEFAULT: f64 = 0.1;
-pub(super) const MAX_PER_LAYER: usize = 20;
 
 impl<T> Model<T>
 where
@@ -55,22 +55,19 @@ where
         length: Option<usize>,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         autofocus: bool,
         group: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    Message::InputText(
-                        base_index + layer_index,
-                        input.value(),
-                        input_data_clone.clone(),
-                    )
+                    Message::InputText(my_index, input.value(), input_data_clone.clone())
                 })
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
@@ -84,7 +81,7 @@ where
             String::new()
         };
 
-        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+        let class = if self.required_msg.contains(&(my_index)) {
             "frontary-input-text-alert"
         } else {
             "frontary-input-text"
@@ -145,10 +142,10 @@ where
                     }
                 }
                 <div class="input-text-message">
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
                 {
-                    if self.unique_msg.contains(&(base_index + layer_index)) {
+                    if self.unique_msg.contains(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, EXISTING_MSG)}
@@ -170,21 +167,18 @@ where
         ess: &InputEssential,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         autofocus: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    Message::InputPassword(
-                        base_index + layer_index,
-                        input.value(),
-                        input_data_clone.clone(),
-                    )
+                    Message::InputPassword(my_index, input.value(), input_data_clone.clone())
                 })
         });
         let oninput_confirm = |index: usize| {
@@ -214,7 +208,7 @@ where
             String::new()
         };
 
-        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+        let class = if self.required_msg.contains(&(my_index)) {
             "input-password-alert"
         } else {
             "input-password"
@@ -253,13 +247,13 @@ where
                 <input type="password" class={class} style={style}
                     placeholder={placeholder}
                     autocomplete="new-password"
-                    oninput={oninput_confirm(base_index + layer_index)}
+                    oninput={oninput_confirm(my_index)}
                 />
                 <div class="input-text-message">
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
                 {
-                    if let Some(Verification::Invalid(m)) = self.verification.get(&(base_index + layer_index)) {
+                    if let Some(Verification::Invalid(m)) = self.verification.get(&(my_index)) {
                         let msg = match m {
                             InvalidMessage::PasswordHasSpace => Some(PASSWD_HAS_SPACE_MSG),
                             InvalidMessage::PasswordHasControlCharacter => Some(PASSWD_HAS_CONTROL_CHARACTER_MSG),
@@ -300,11 +294,12 @@ where
         max: u32,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         autofocus: bool,
         group: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
@@ -312,11 +307,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     if let Ok(value) = input.value().parse::<u32>() {
-                        Message::InputUnsigned32(
-                            base_index + layer_index,
-                            value,
-                            input_data_clone.clone(),
-                        )
+                        Message::InputUnsigned32(my_index, value, input_data_clone.clone())
                     } else {
                         Message::InvalidInputUnsigned32
                     }
@@ -332,7 +323,7 @@ where
         } else {
             None
         };
-        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+        let class = if self.required_msg.contains(&(my_index)) {
             "input-number-alert"
         } else {
             "input-number"
@@ -391,10 +382,10 @@ where
                 }
                 </div>
                 <div class="input-text-message">
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
                 {
-                    if self.unique_msg.contains(&(base_index + layer_index)) {
+                    if self.unique_msg.contains(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, EXISTING_MSG) }
@@ -405,7 +396,7 @@ where
                     }
                 }
                 {
-                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(base_index + layer_index)) {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                { text!(txt, ctx.props().language, INVALID_MSG) }
@@ -430,11 +421,12 @@ where
         step: Option<f64>,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         autofocus: bool,
         group: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
@@ -442,11 +434,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     if let Ok(value) = input.value().parse::<f64>() {
-                        Message::InputFloat64(
-                            base_index + layer_index,
-                            value,
-                            input_data_clone.clone(),
-                        )
+                        Message::InputFloat64(my_index, value, input_data_clone.clone())
                     } else {
                         Message::InvalidInputFloat64
                     }
@@ -462,7 +450,7 @@ where
         } else {
             None
         };
-        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+        let class = if self.required_msg.contains(&(my_index)) {
             "input-number-alert"
         } else {
             "input-number"
@@ -516,10 +504,10 @@ where
                 }
                 </div>
                 <div class="input-text-message">
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
                 {
-                    if self.unique_msg.contains(&(base_index + layer_index)) {
+                    if self.unique_msg.contains(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, EXISTING_MSG) }
@@ -530,7 +518,7 @@ where
                     }
                 }
                 {
-                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(base_index + layer_index)) {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                { text!(txt, ctx.props().language, INVALID_MSG) }
@@ -557,10 +545,11 @@ where
         decimals: Option<usize>,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         autofocus: bool,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
@@ -568,11 +557,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     if let Ok(value) = input.value().parse::<f32>() {
-                        Message::InputPercentage(
-                            base_index + layer_index,
-                            value / 100.0,
-                            input_data_clone.clone(),
-                        )
+                        Message::InputPercentage(my_index, value / 100.0, input_data_clone.clone())
                     } else {
                         Message::InvalidInputPercentage
                     }
@@ -589,7 +574,7 @@ where
             None
         };
 
-        let class = if self.required_msg.contains(&(base_index + layer_index)) {
+        let class = if self.required_msg.contains(&(my_index)) {
             "input-number-alert"
         } else {
             "input-number"
@@ -644,10 +629,10 @@ where
                 }
                 </div>
                 <div class="input-text-message">
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
                 {
-                    if self.unique_msg.contains(&(base_index + layer_index)) {
+                    if self.unique_msg.contains(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, EXISTING_MSG) }
@@ -658,7 +643,7 @@ where
                     }
                 }
                 {
-                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(base_index + layer_index)) {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&(my_index)) {
                         html! {
                             <div class="input-contents-item-alert-message">
                                { text!(txt, ctx.props().language, INVALID_MSG) }
@@ -683,12 +668,13 @@ where
         num: Option<usize>,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
-        if let Some(buffer) = self.host_network_buffer.get(&(base_index + layer_index)) {
-            let class = if self.required_msg.contains(&(base_index + layer_index)) {
+        if let Some(buffer) = self.host_network_buffer.get(&(my_index)) {
+            let class = if self.required_msg.contains(&(my_index)) {
                 "input-host-network-group-required"
             } else {
                 ""
@@ -708,14 +694,14 @@ where
                             width={width}
                             input_data={Rc::clone(buffer)}
                             input_notice={Some(ess.notice)}
-                            parent_message={Some(Message::InputHostNetworkGroup(base_index + layer_index, input_data.clone()))}
-                            parent_message_save={Some(Message::RightHostNetworkGroup(base_index + layer_index, input_data.clone()))}
-                            parent_message_no_save={Some(Message::WrongHostNetworkGroup(base_index + layer_index))}
-                            parent_message_user_input={Some(Message::UserInputHostNetworkGroup(base_index + layer_index))}
+                            parent_message={Some(Message::InputHostNetworkGroup(my_index, input_data.clone()))}
+                            parent_message_save={Some(Message::RightHostNetworkGroup(my_index, input_data.clone()))}
+                            parent_message_no_save={Some(Message::WrongHostNetworkGroup(my_index))}
+                            parent_message_user_input={Some(Message::UserInputHostNetworkGroup(my_index))}
                             verify_to_save={self.verify_host_network_group}
                         />
                     </div>
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
             }
         } else {
@@ -729,11 +715,12 @@ where
         ess: &InputEssential,
         prev_list: &HashMap<String, String>,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
-        if let Some(buffer) = self.tag_buffer.get(&(base_index + layer_index)) {
+        if let Some(buffer) = self.tag_buffer.get(&(my_index)) {
             let prev_list = Rc::new(prev_list.clone());
             html! {
                 <div class="input-tag-group">
@@ -746,9 +733,9 @@ where
                         prev_list={Rc::clone(&prev_list)}
                         input_data={Rc::clone(buffer)}
                         input_notice={Some(ess.notice)}
-                        parent_message={Some(Message::InputTagGroup(base_index + layer_index, input_data.clone()))}
+                        parent_message={Some(Message::InputTagGroup(my_index, input_data.clone()))}
                     />
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
             }
         } else {
@@ -761,9 +748,10 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
     ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
         let input_data_clone = input_data.clone();
         let onchange = ctx.link().callback(move |e: Event| {
             let mut result = Vec::new();
@@ -778,7 +766,7 @@ where
                     result.extend(files);
                 }
             }
-            Message::ChooseFile(base_index + layer_index, result, input_data_clone.clone())
+            Message::ChooseFile(my_index, result, input_data_clone.clone())
         });
         let txt = ctx.props().txt.txt.clone();
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
@@ -809,7 +797,7 @@ where
                     />
                 </div>
                 <div class="input-text-message">
-                    { self.view_required_msg(ctx, base_index + layer_index) }
+                    { self.view_required_msg(ctx, my_index) }
                 </div>
             </div>
         }

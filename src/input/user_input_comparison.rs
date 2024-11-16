@@ -6,6 +6,7 @@ use web_sys::HtmlInputElement;
 use yew::{events::InputEvent, html, Component, Context, Html};
 
 use super::{
+    cal_index,
     component::{Message, Model},
     user_input::view_asterisk,
     Comparison, ComparisonItem, ComparisonKind, InputItem, Value as ComparisonValue, ValueKind,
@@ -23,15 +24,15 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<usize>,
         layer_index: usize,
-        base_index: usize,
         group: bool,
     ) -> Html {
-        let data_id = layer_index + base_index;
-        let Some(value_kind_selected) = self.comparison_value_kind_buffer.get(&data_id) else {
+        let my_index = cal_index(base_index, layer_index);
+        let Some(value_kind_selected) = self.comparison_value_kind_buffer.get(&my_index) else {
             return html! {};
         };
-        let Some(value_cmp_selected) = self.comparison_value_cmp_buffer.get(&data_id) else {
+        let Some(value_cmp_selected) = self.comparison_value_cmp_buffer.get(&my_index) else {
             return html! {};
         };
         let selected = vec![value_kind_selected.clone(), value_cmp_selected.clone()];
@@ -99,8 +100,8 @@ where
         );
         let list = Rc::new(vec![first, second]);
         let parent_message = vec![
-            Message::InputComparisonValueKind(data_id, input_data.clone()),
-            Message::InputComparisonComparisionKind(data_id, input_data.clone()),
+            Message::InputComparisonValueKind(my_index, input_data.clone()),
+            Message::InputComparisonComparisionKind(my_index, input_data.clone()),
         ];
         let txt = ctx.props().txt.txt.clone();
 
@@ -121,7 +122,7 @@ where
                     <VecSelect<Self>
                         txt={ctx.props().txt.clone()}
                         language={ctx.props().language}
-                        id={format!("VecSelect-{layer_index}-{base_index}")}
+                        id={format!("VecSelect-{}-{layer_index}", base_index.unwrap_or_default())}
                         title={title}
                         kind_last={SelectSearchableKind::Single}
                         empty_msg={empty_msg}
@@ -134,9 +135,9 @@ where
                         selected={selected}
                         parent_message={parent_message}
                     />
-                    { self.view_comparison_value(ctx, input_data, data_id) }
+                    { self.view_comparison_value(ctx, input_data, my_index) }
                 </div>
-                { self.view_required_msg(ctx, data_id) }
+                { self.view_required_msg(ctx, my_index) }
             </div>
         }
     }

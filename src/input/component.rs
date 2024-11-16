@@ -11,9 +11,9 @@ use json_gettext::get_text;
 use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 use super::{
-    user_input::MAX_PER_LAYER, ComparisonItem, FileItem, Float64Item, HostNetworkGroupItem,
-    InputConfig, InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem,
-    PercentageItem, SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
+    cal_index, ComparisonItem, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
+    InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
+    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
     Value as ComparisonValue, VecSelectItem,
 };
 use crate::{
@@ -475,7 +475,6 @@ where
                 self.increase_rerender_serial();
                 self.reset_veri_host_network(ctx);
                 self.verify_host_network_group = !self.verification_host_network.is_empty();
-
                 if !self.verify_host_network_group {
                     ctx.link().send_message(Message::Save);
                     return false;
@@ -483,7 +482,7 @@ where
             }
             Message::WrongHostNetworkGroup(id) => {
                 self.verification_host_network.insert(id, Some(false));
-                self.clear_required_msg(id, false);
+                self.remove_required_msg(id, false);
                 self.decide_required_all(ctx);
                 self.decide_unique_all(ctx);
             }
@@ -519,31 +518,31 @@ where
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Text(TextItem::new(txt.clone()));
                 }
-                self.clear_required_msg(id, txt.is_empty());
+                self.remove_required_msg(id, txt.is_empty());
                 self.unique_msg.remove(&id);
             }
             Message::InputPassword(id, txt, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Password(PasswordItem::new(txt.clone()));
                 }
-                self.clear_required_msg(id, txt.is_empty());
+                self.remove_required_msg(id, txt.is_empty());
             }
             Message::InputConfirmPassword(id, txt) => {
                 self.confirm_password.insert(id, txt.clone());
-                self.clear_required_msg(id, txt.is_empty());
+                self.remove_required_msg(id, txt.is_empty());
             }
             Message::InputUnsigned32(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Unsigned32(Unsigned32Item::new(Some(value)));
                 }
-                self.clear_required_msg(id, false);
+                self.remove_required_msg(id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InputFloat64(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Float64(Float64Item::new(Some(value)));
                 }
-                self.clear_required_msg(id, false);
+                self.remove_required_msg(id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InvalidInputUnsigned32
@@ -554,7 +553,7 @@ where
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Percentage(PercentageItem::new(Some(value)));
                 }
-                self.clear_required_msg(id, false);
+                self.remove_required_msg(id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InputRadio(id, input_data) => {
@@ -569,7 +568,7 @@ where
                     } else {
                         false
                     };
-                    self.clear_required_msg(id, empty);
+                    self.remove_required_msg(id, empty);
                 }
                 self.propagate_checkbox(ctx, &input_data);
             }
@@ -577,7 +576,7 @@ where
                 self.input_host_network_group(id, &input_data);
             }
             Message::UserInputHostNetworkGroup(id) => {
-                self.clear_required_msg(id, false);
+                self.remove_required_msg(id, false);
             }
             Message::InputMultipleSelect(id, input_data, list) => {
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
@@ -602,7 +601,7 @@ where
                     } else {
                         false
                     };
-                    self.clear_required_msg(id, empty);
+                    self.remove_required_msg(id, empty);
                 }
             }
             Message::InputSingleSelect(id, input_data, _) => {
@@ -623,7 +622,7 @@ where
                     } else {
                         false
                     };
-                    self.clear_required_msg(id, empty);
+                    self.remove_required_msg(id, empty);
                 }
             }
             Message::InputVecSelect(data_id, col_id, input_data) => {
@@ -662,7 +661,7 @@ where
                     } else {
                         (false, None, None, None)
                     };
-                    self.clear_required_msg(id, empty);
+                    self.remove_required_msg(id, empty);
 
                     (new, edit, delete)
                 } else {
@@ -735,8 +734,8 @@ where
                         }
                     }
                 }
-                self.clear_required_msg(data_id, name.is_empty());
-                self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
+                self.remove_required_msg(data_id, name.is_empty());
+                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
             }
             Message::InputNicInterface(data_id, nic_id, interface, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -746,8 +745,8 @@ where
                         }
                     }
                 }
-                self.clear_required_msg(data_id, interface.is_empty());
-                self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
+                self.remove_required_msg(data_id, interface.is_empty());
+                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
             }
             Message::InputNicGateway(data_id, nic_id, gateway, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -757,8 +756,8 @@ where
                         }
                     }
                 }
-                self.clear_required_msg(data_id, gateway.is_empty());
-                self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
+                self.remove_required_msg(data_id, gateway.is_empty());
+                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
             }
             Message::InputNicAdd(data_id, nic_id, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -766,7 +765,7 @@ where
                         data.push(InputNic::default());
                     }
                 }
-                self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
+                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
             }
             Message::InputNicDelete(data_id, nic_id, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -777,9 +776,9 @@ where
                         }
                     }
                 }
-                self.remove_verification_nic(data_id * MAX_PER_LAYER + nic_id);
+                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
             }
-            Message::InputGroupAdd(sub_base_index, input_data, items_conf) => {
+            Message::InputGroupAdd(base_index, input_data, items_conf) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Group(data) = &mut *input_data {
                         let new_row = items_conf
@@ -791,26 +790,26 @@ where
                         if let Some(d) = data.last() {
                             for (col, d) in d.iter().enumerate() {
                                 if let Ok(d) = d.try_borrow() {
+                                    let row_rep_index = cal_index(Some(base_index), data.len() - 1);
+                                    let item_index = cal_index(Some(row_rep_index), col);
                                     if let InputItem::SelectSingle(copied_default) = &*d {
                                         let mut buf = HashSet::new();
                                         if let Some(copied_default) = copied_default.as_ref() {
                                             buf.insert(copied_default.clone());
                                         }
-                                        self.select_searchable_buffer.insert(
-                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
-                                            Rc::new(RefCell::new(Some(buf))),
-                                        );
+                                        self.select_searchable_buffer
+                                            .insert(item_index, Rc::new(RefCell::new(Some(buf))));
                                     } else if let InputItem::Comparison(_) = &*d {
                                         self.comparison_value_kind_buffer.insert(
-                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            item_index,
                                             Rc::new(RefCell::new(Some(HashSet::new()))),
                                         );
                                         self.comparison_value_cmp_buffer.insert(
-                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            item_index,
                                             Rc::new(RefCell::new(Some(HashSet::new()))),
                                         );
                                         self.comparison_value_buffer.insert(
-                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            item_index,
                                             (
                                                 Rc::new(RefCell::new(None)),
                                                 Rc::new(RefCell::new(None)),
@@ -818,7 +817,7 @@ where
                                         );
                                     } else if let InputItem::VecSelect(copied_default) = &*d {
                                         self.vec_select_buffer.insert(
-                                            col + (data.len() - 1 + sub_base_index) * MAX_PER_LAYER,
+                                            item_index,
                                             copied_default
                                                 .iter()
                                                 .map(|d| Rc::new(RefCell::new(Some(d.clone()))))
@@ -831,7 +830,7 @@ where
                     }
                 }
             }
-            Message::InputGroupDelete(sub_base_index, row_index, input_data, items_conf) => {
+            Message::InputGroupDelete(base_index, row_index, input_data, items_conf) => {
                 let empty = if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Group(data) = &mut *input_data {
                         if let Some(d) = data.get(row_index) {
@@ -840,52 +839,54 @@ where
                                     if let InputItem::SelectSingle(_) = &*d {
                                         rearrange_buffer(
                                             &mut self.select_searchable_buffer,
-                                            sub_base_index,
-                                            col,
+                                            base_index,
                                             row_index,
+                                            col,
                                             data.len(),
                                         );
                                     } else if let InputItem::Comparison(_) = &*d {
                                         rearrange_buffer(
                                             &mut self.comparison_value_kind_buffer,
-                                            sub_base_index,
-                                            col,
+                                            base_index,
                                             row_index,
+                                            col,
                                             data.len(),
                                         );
                                         rearrange_buffer(
                                             &mut self.comparison_value_cmp_buffer,
-                                            sub_base_index,
-                                            col,
+                                            base_index,
                                             row_index,
+                                            col,
                                             data.len(),
                                         );
                                         rearrange_buffer(
                                             &mut self.comparison_value_buffer,
-                                            sub_base_index,
-                                            col,
+                                            base_index,
                                             row_index,
+                                            col,
                                             data.len(),
                                         );
                                     } else if let InputItem::VecSelect(_) = &*d {
                                         rearrange_buffer(
                                             &mut self.vec_select_buffer,
-                                            sub_base_index,
-                                            col,
+                                            base_index,
                                             row_index,
+                                            col,
                                             data.len(),
                                         );
                                     }
                                 }
-                                self.required_msg
-                                    .remove(&(col + (row_index + sub_base_index) * MAX_PER_LAYER));
+                                self.required_msg.remove(
+                                    &(cal_index(Some(cal_index(Some(base_index), row_index)), col)),
+                                );
                                 for r in row_index + 1..data.len() {
-                                    if self
-                                        .required_msg
-                                        .remove(&(col + (r + sub_base_index) * MAX_PER_LAYER))
-                                    {
-                                        self.required_msg
-                                            .insert(col + (r - 1 + sub_base_index) * MAX_PER_LAYER);
+                                    if self.required_msg.remove(
+                                        &(cal_index(Some(cal_index(Some(base_index), r)), col)),
+                                    ) {
+                                        self.required_msg.insert(cal_index(
+                                            Some(cal_index(Some(base_index), r - 1)),
+                                            col,
+                                        ));
                                     }
                                 }
                             }
@@ -899,11 +900,8 @@ where
                     false
                 };
                 if empty {
-                    ctx.link().send_message(Message::InputGroupAdd(
-                        sub_base_index,
-                        input_data,
-                        items_conf,
-                    ));
+                    ctx.link()
+                        .send_message(Message::InputGroupAdd(base_index, input_data, items_conf));
                 }
             }
             Message::InputComparisonValueKind(data_id, input_data) => {
@@ -1018,56 +1016,56 @@ where
                 match &**input_conf {
                     InputConfig::Text(config) => {
                         self.view_text(ctx, &config.ess, config.length, config.width, input_data,
-                            index, 1 , index == 0, false)
+                            None, index, index == 0, false)
                     }
                     InputConfig::Password(config) => {
-                        self.view_password(ctx, &config.ess, config.width, input_data, index, 1,
+                        self.view_password(ctx, &config.ess, config.width, input_data, None, index,
                             index == 0)
                     }
                     InputConfig::HostNetworkGroup(config) => {
                         self.view_host_network_group(ctx, &config.ess, config.kind, config.num,
-                            config.width, input_data, index, 1)
+                            config.width, input_data, None, index)
                     }
                     InputConfig::SelectSingle(config) => {
                         self.view_select_searchable(ctx, false, &config.ess, config.width,
-                            &config.options, input_data, index, 1, 0, false)
+                            &config.options, input_data, None, index, 0, false)
                     }
                     InputConfig::SelectMultiple(config) => {
                         self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess,
-                            input_data, index, 1, 0)
+                            input_data, None, index, 0)
                     }
                     InputConfig::Tag(config) => {
-                        self.view_tag_group(ctx, &config.ess, &config.name_map, input_data, index, 1)
+                        self.view_tag_group(ctx, &config.ess, &config.name_map, input_data, None, index)
                     }
                     InputConfig::VecSelect(config) => {
                         self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last,
                             config.full_width, &config.widths, &config.max_widths,
-                            &config.max_heights, &config.map_list, input_data, index, 1, false)
+                            &config.max_heights, &config.map_list, input_data, None, index, false)
                     }
                     InputConfig::Unsigned32(config) => {
                         self.view_unsigned_32(ctx, &config.ess, config.min, config.max,
-                            config.width, input_data, index, 1, index == 0, false)
+                            config.width, input_data, None, index, index == 0, false)
                     }
                     InputConfig::Float64(config) => {
                         self.view_float_64(ctx, &config.ess, config.step, config.width, input_data,
-                            index, 1, index == 0, false)
+                            None, index, index == 0, false)
                     }
                     InputConfig::Percentage(config) => {
                         self.view_percentage(ctx, &config.ess, config.min, config.max,
-                            config.num_decimals, config.width, input_data, index, 1, index == 0)
+                            config.num_decimals, config.width, input_data, None, index, index == 0)
                     }
                     InputConfig::Nic(config) => {
-                        self.view_nic(ctx, &config.ess, input_data, index, 1)
+                        self.view_nic(ctx, &config.ess, input_data, None, index)
                     }
                     InputConfig::File(config) => {
-                        self.view_file(ctx, &config.ess, input_data, index, 1)
+                        self.view_file(ctx, &config.ess, input_data, None, index)
                     }
                     InputConfig::Comparison(config) => {
-                        self.view_comparison(ctx, &config.ess, input_data, index, 1, false)
+                        self.view_comparison(ctx, &config.ess, input_data, None, index, false)
                     }
                     InputConfig::Group(config) => {
                         self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths,
-                            &config.items, input_data, index, 1)
+                            &config.items, input_data, None, index)
                     }
                     InputConfig::Checkbox(config) => {
                         let both = ctx.props().input_conf.get(index + 1).map_or(Some(false),|next| {
@@ -1078,11 +1076,11 @@ where
                             }
                         });
                         self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(),
-                            input_data, index, 1, both, 1)
+                            input_data, None, index, both, 1)
                     }
                     InputConfig::Radio(config) => {
                         self.view_radio(ctx, &config.ess, &config.options, &config.children_group,
-                            input_data, index, 1, 1)
+                            input_data, None, index, 1)
                     }
                 }
             })
@@ -1101,7 +1099,7 @@ where
         }
     }
 
-    fn clear_required_msg(&mut self, id: usize, empty: bool) {
+    fn remove_required_msg(&mut self, id: usize, empty: bool) {
         if !empty {
             self.required_msg.remove(&id);
         }
@@ -1121,7 +1119,7 @@ where
             } else {
                 false
             };
-            self.clear_required_msg(id, empty);
+            self.remove_required_msg(id, empty);
         }
     }
 
@@ -1182,7 +1180,7 @@ where
                 for (sub_index, child) in cb.children().iter().enumerate() {
                     if let Ok(child) = child.try_borrow() {
                         if let InputItem::Radio(data) = &*child {
-                            let id = data_id * MAX_PER_LAYER + sub_index;
+                            let id = cal_index(Some(data_id), sub_index);
                             if let Some(buffer_option) = self.radio_buffer.get(&id) {
                                 if let Ok(mut buffer_option) = buffer_option.try_borrow_mut() {
                                     (*buffer_option).clone_from(&data.selected().to_string());
@@ -1237,16 +1235,20 @@ fn group_item(conf: &Rc<InputConfig>) -> InputItem {
 fn rearrange_buffer<T>(
     buffer: &mut HashMap<usize, T>,
     base: usize,
-    col: usize,
     row: usize,
+    col: usize,
     len: usize,
 ) where
     T: Clone,
 {
-    for index in row + 1..len {
-        let Some(item) = buffer.remove(&(col + (index + base) * MAX_PER_LAYER)) else {
+    for row_index in row + 1..len {
+        let Some(item) = buffer.remove(&(cal_index(Some(cal_index(Some(base), row_index)), col)))
+        else {
             continue;
         };
-        buffer.insert(col + (index - 1 + base) * MAX_PER_LAYER, item.clone());
+        buffer.insert(
+            cal_index(Some(cal_index(Some(base), row_index - 1)), col),
+            item.clone(),
+        );
     }
 }

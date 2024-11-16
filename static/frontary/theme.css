@@ -1860,6 +1860,12 @@ div.input-select-searchable {
     margin-bottom: 24px;
 }
 
+div.input-select-searchable-required {
+    width: fit-content;
+    border: 2px solid var(--alert-text-color);
+    border-radius: 8px;
+}
+
 div.input-select-vector {
     margin-bottom: 24px;
 }
