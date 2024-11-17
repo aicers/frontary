@@ -8,6 +8,7 @@ use gloo_file::{
     File,
 };
 use json_gettext::get_text;
+use num_bigint::BigUint;
 use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 use super::{
@@ -55,35 +56,35 @@ pub enum InputSecondId {
 }
 
 type CompValueBuf = HashMap<
-    usize,
+    BigUint,
     (
         Rc<RefCell<Option<ComparisonValue>>>,
         Rc<RefCell<Option<ComparisonValue>>>,
     ),
 >;
 
-type VecSelectBuf = HashMap<usize, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
+type VecSelectBuf = HashMap<BigUint, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
 
 pub struct Model<T> {
-    pub(super) radio_buffer: HashMap<usize, Rc<RefCell<String>>>,
-    pub(super) host_network_buffer: HashMap<usize, Rc<RefCell<InputHostNetworkGroup>>>,
-    pub(super) select_searchable_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) radio_buffer: HashMap<BigUint, Rc<RefCell<String>>>,
+    pub(super) host_network_buffer: HashMap<BigUint, Rc<RefCell<InputHostNetworkGroup>>>,
+    pub(super) select_searchable_buffer: HashMap<BigUint, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) vec_select_buffer: VecSelectBuf,
-    pub(super) tag_buffer: HashMap<usize, Rc<RefCell<InputTagGroup>>>,
-    pub(super) comparison_value_kind_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
-    pub(super) comparison_value_cmp_buffer: HashMap<usize, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) tag_buffer: HashMap<BigUint, Rc<RefCell<InputTagGroup>>>,
+    pub(super) comparison_value_kind_buffer: HashMap<BigUint, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) comparison_value_cmp_buffer: HashMap<BigUint, Rc<RefCell<Option<HashSet<String>>>>>,
     pub(super) comparison_value_buffer: CompValueBuf,
 
-    pub(super) confirm_password: HashMap<usize, String>,
-    pub(super) unique_msg: HashSet<usize>,
-    pub(super) required_msg: HashSet<usize>,
+    pub(super) confirm_password: HashMap<BigUint, String>,
+    pub(super) unique_msg: HashSet<BigUint>,
+    pub(super) required_msg: HashSet<BigUint>,
 
-    pub(super) verification: HashMap<usize, Verification>,
-    pub(super) verification_nic: HashMap<(usize, usize), Verification>, // 2nd usize: 0 -> name, 1 -> interface ip, 2 -> gateway ip
-    pub(super) verification_host_network: HashMap<usize, Option<bool>>, // None means no checking done yet, Some(true) valid Some(false) invalid
+    pub(super) verification: HashMap<BigUint, Verification>,
+    pub(super) verification_nic: HashMap<(BigUint, usize), Verification>, // 2nd usize: 0 -> name, 1 -> interface ip, 2 -> gateway ip
+    pub(super) verification_host_network: HashMap<BigUint, Option<bool>>, // None means no checking done yet, Some(true) valid Some(false) invalid
     pub(super) verify_host_network_group: bool,
 
-    file_data_id: Option<usize>,
+    file_data_id: Option<BigUint>,
     file_input_data: Option<Rc<RefCell<InputItem>>>,
     file_name: Option<String>,
     file_content: Option<String>,
@@ -141,7 +142,7 @@ impl<T> Clone for Model<T> {
             verification_nic: self.verification_nic.clone(),
             verification_host_network: self.verification_host_network.clone(),
             verify_host_network_group: self.verify_host_network_group,
-            file_data_id: self.file_data_id,
+            file_data_id: self.file_data_id.clone(),
             file_input_data: self.file_input_data.clone(),
             file_name: self.file_name.clone(),
             file_content: self.file_content.clone(),
@@ -166,41 +167,49 @@ pub enum Message {
     Escape,
     Save,
     TrySave,
-    InputText(usize, String, Rc<RefCell<InputItem>>),
-    InputPassword(usize, String, Rc<RefCell<InputItem>>),
-    InputConfirmPassword(usize, String),
-    InputUnsigned32(usize, u32, Rc<RefCell<InputItem>>),
-    InputFloat64(usize, f64, Rc<RefCell<InputItem>>),
+    InputText(BigUint, String, Rc<RefCell<InputItem>>),
+    InputPassword(BigUint, String, Rc<RefCell<InputItem>>),
+    InputConfirmPassword(BigUint, String),
+    InputUnsigned32(BigUint, u32, Rc<RefCell<InputItem>>),
+    InputFloat64(BigUint, f64, Rc<RefCell<InputItem>>),
     InvalidInputUnsigned32,
     InvalidInputFloat64,
-    InputPercentage(usize, f32, Rc<RefCell<InputItem>>),
+    InputPercentage(BigUint, f32, Rc<RefCell<InputItem>>),
     InvalidInputPercentage,
-    InputRadio(usize, Rc<RefCell<InputItem>>),
-    InputHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
-    InputMultipleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
-    InputSingleSelect(usize, Rc<RefCell<InputItem>>, Rc<Vec<(String, ViewString)>>),
+    InputRadio(BigUint, Rc<RefCell<InputItem>>),
+    InputHostNetworkGroup(BigUint, Rc<RefCell<InputItem>>),
+    InputMultipleSelect(
+        BigUint,
+        Rc<RefCell<InputItem>>,
+        Rc<Vec<(String, ViewString)>>,
+    ),
+    InputSingleSelect(
+        BigUint,
+        Rc<RefCell<InputItem>>,
+        Rc<Vec<(String, ViewString)>>,
+    ),
     InputVecSelect(
-        usize, // data_id
-        usize, // col_id
+        BigUint, // data_id
+        usize,   // col_id
         Rc<RefCell<InputItem>>,
     ),
-    InputTagGroup(usize, Rc<RefCell<InputItem>>),
-    UserInputHostNetworkGroup(usize),
-    WrongHostNetworkGroup(usize),
-    RightHostNetworkGroup(usize, Rc<RefCell<InputItem>>),
-    ClickCheckbox(usize, Rc<RefCell<InputItem>>),
-    InputNicName(usize, usize, String, Rc<RefCell<InputItem>>),
-    InputNicInterface(usize, usize, String, Rc<RefCell<InputItem>>),
-    InputNicGateway(usize, usize, String, Rc<RefCell<InputItem>>),
-    InputNicAdd(usize, usize, Rc<RefCell<InputItem>>),
-    InputNicDelete(usize, usize, Rc<RefCell<InputItem>>),
-    InputGroupAdd(usize, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
-    InputGroupDelete(usize, usize, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
-    InputComparisonValueKind(usize, Rc<RefCell<InputItem>>),
-    InputComparisonComparisionKind(usize, Rc<RefCell<InputItem>>),
-    InputComparisonValue(usize, usize, ComparisonValue, Rc<RefCell<InputItem>>),
+    InputTagGroup(BigUint, Rc<RefCell<InputItem>>),
+    UserInputHostNetworkGroup(BigUint),
+    WrongHostNetworkGroup(BigUint),
+    RightHostNetworkGroup(BigUint, Rc<RefCell<InputItem>>),
+    ClickCheckbox(BigUint, Rc<RefCell<InputItem>>),
+    InputNicName(BigUint, usize, String, Rc<RefCell<InputItem>>),
+    InputNicInterface(BigUint, usize, String, Rc<RefCell<InputItem>>),
+    InputNicGateway(BigUint, usize, String, Rc<RefCell<InputItem>>),
+    InputNicAdd(BigUint, usize, Rc<RefCell<InputItem>>),
+    InputNicDelete(BigUint, usize, Rc<RefCell<InputItem>>),
+    InputGroupAdd(BigUint, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
+    InputGroupDelete(BigUint, usize, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
+    InputComparisonValueKind(BigUint, Rc<RefCell<InputItem>>),
+    InputComparisonComparisionKind(BigUint, Rc<RefCell<InputItem>>),
+    InputComparisonValue(BigUint, usize, ComparisonValue, Rc<RefCell<InputItem>>),
     InvalidInputComparisonValue,
-    ChooseFile(usize, Vec<File>, Rc<RefCell<InputItem>>),
+    ChooseFile(BigUint, Vec<File>, Rc<RefCell<InputItem>>),
     FileLoaded(String, Vec<u8>),
     FailLoadFile,
     InputError,
@@ -212,49 +221,55 @@ impl Clone for Message {
             Self::Escape => Self::Escape,
             Self::Save => Self::Save,
             Self::TrySave => Self::TrySave,
-            Self::InputText(a, b, c) => Self::InputText(*a, b.clone(), c.clone()),
-            Self::InputPassword(a, b, c) => Self::InputPassword(*a, b.clone(), c.clone()),
-            Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(*a, b.clone()),
-            Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(*a, *b, c.clone()),
-            Self::InputFloat64(a, b, c) => Self::InputFloat64(*a, *b, c.clone()),
+            Self::InputText(a, b, c) => Self::InputText(a.clone(), b.clone(), c.clone()),
+            Self::InputPassword(a, b, c) => Self::InputPassword(a.clone(), b.clone(), c.clone()),
+            Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(a.clone(), b.clone()),
+            Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(a.clone(), *b, c.clone()),
+            Self::InputFloat64(a, b, c) => Self::InputFloat64(a.clone(), *b, c.clone()),
             Self::InvalidInputUnsigned32 => Self::InvalidInputUnsigned32,
             Self::InvalidInputFloat64 => Self::InvalidInputFloat64,
-            Self::InputPercentage(a, b, c) => Self::InputPercentage(*a, *b, c.clone()),
+            Self::InputPercentage(a, b, c) => Self::InputPercentage(a.clone(), *b, c.clone()),
             Self::InvalidInputPercentage => Self::InvalidInputPercentage,
-            Self::InputRadio(a, b) => Self::InputRadio(*a, b.clone()),
-            Self::InputHostNetworkGroup(a, b) => Self::InputHostNetworkGroup(*a, b.clone()),
+            Self::InputRadio(a, b) => Self::InputRadio(a.clone(), b.clone()),
+            Self::InputHostNetworkGroup(a, b) => Self::InputHostNetworkGroup(a.clone(), b.clone()),
             Self::InputMultipleSelect(a, b, c) => {
-                Self::InputMultipleSelect(*a, b.clone(), c.clone())
+                Self::InputMultipleSelect(a.clone(), b.clone(), c.clone())
             }
-            Self::InputSingleSelect(a, b, c) => Self::InputSingleSelect(*a, b.clone(), c.clone()),
-            Self::InputVecSelect(a, b, c) => Self::InputVecSelect(*a, *b, c.clone()),
-            Self::InputTagGroup(a, b) => Self::InputTagGroup(*a, b.clone()),
-            Self::UserInputHostNetworkGroup(a) => Self::UserInputHostNetworkGroup(*a),
-            Self::RightHostNetworkGroup(a, b) => Self::RightHostNetworkGroup(*a, b.clone()),
-            Self::WrongHostNetworkGroup(a) => Self::WrongHostNetworkGroup(*a),
-            Self::ClickCheckbox(a, b) => Self::ClickCheckbox(*a, b.clone()),
-            Self::InputNicName(a, b, c, d) => Self::InputNicName(*a, *b, c.clone(), d.clone()),
+            Self::InputSingleSelect(a, b, c) => {
+                Self::InputSingleSelect(a.clone(), b.clone(), c.clone())
+            }
+            Self::InputVecSelect(a, b, c) => Self::InputVecSelect(a.clone(), *b, c.clone()),
+            Self::InputTagGroup(a, b) => Self::InputTagGroup(a.clone(), b.clone()),
+            Self::UserInputHostNetworkGroup(a) => Self::UserInputHostNetworkGroup(a.clone()),
+            Self::RightHostNetworkGroup(a, b) => Self::RightHostNetworkGroup(a.clone(), b.clone()),
+            Self::WrongHostNetworkGroup(a) => Self::WrongHostNetworkGroup(a.clone()),
+            Self::ClickCheckbox(a, b) => Self::ClickCheckbox(a.clone(), b.clone()),
+            Self::InputNicName(a, b, c, d) => {
+                Self::InputNicName(a.clone(), *b, c.clone(), d.clone())
+            }
             Self::InputNicInterface(a, b, c, d) => {
-                Self::InputNicInterface(*a, *b, c.clone(), d.clone())
+                Self::InputNicInterface(a.clone(), *b, c.clone(), d.clone())
             }
             Self::InputNicGateway(a, b, c, d) => {
-                Self::InputNicGateway(*a, *b, c.clone(), d.clone())
+                Self::InputNicGateway(a.clone(), *b, c.clone(), d.clone())
             }
-            Self::InputNicAdd(a, b, c) => Self::InputNicAdd(*a, *b, c.clone()),
-            Self::InputNicDelete(a, b, c) => Self::InputNicDelete(*a, *b, c.clone()),
-            Self::InputGroupAdd(a, b, c) => Self::InputGroupAdd(*a, b.clone(), c.clone()),
+            Self::InputNicAdd(a, b, c) => Self::InputNicAdd(a.clone(), *b, c.clone()),
+            Self::InputNicDelete(a, b, c) => Self::InputNicDelete(a.clone(), *b, c.clone()),
+            Self::InputGroupAdd(a, b, c) => Self::InputGroupAdd(a.clone(), b.clone(), c.clone()),
             Self::InputGroupDelete(a, b, c, d) => {
-                Self::InputGroupDelete(*a, *b, c.clone(), d.clone())
+                Self::InputGroupDelete(a.clone(), *b, c.clone(), d.clone())
             }
-            Self::InputComparisonValueKind(a, b) => Self::InputComparisonValueKind(*a, b.clone()),
+            Self::InputComparisonValueKind(a, b) => {
+                Self::InputComparisonValueKind(a.clone(), b.clone())
+            }
             Self::InputComparisonComparisionKind(a, b) => {
-                Self::InputComparisonComparisionKind(*a, b.clone())
+                Self::InputComparisonComparisionKind(a.clone(), b.clone())
             }
             Self::InputComparisonValue(a, b, c, d) => {
-                Self::InputComparisonValue(*a, *b, c.clone(), d.clone())
+                Self::InputComparisonValue(a.clone(), *b, c.clone(), d.clone())
             }
             Self::InvalidInputComparisonValue => Self::InvalidInputComparisonValue,
-            Self::ChooseFile(a, _, c) => Self::ChooseFile(*a, Vec::new(), c.clone()),
+            Self::ChooseFile(a, _, c) => Self::ChooseFile(a.clone(), Vec::new(), c.clone()),
             Self::FileLoaded(a, b) => Self::FileLoaded(a.clone(), b.clone()),
             Self::FailLoadFile => Self::FailLoadFile,
             Self::InputError => Self::InputError,
@@ -423,8 +438,10 @@ where
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     if let InputItem::Tag(_) = *item {
-                        if let (InputConfig::Tag(config), Some(buffer)) =
-                            (&**input_conf, self.tag_buffer.get(&(index + 1)))
+                        if let (InputConfig::Tag(config), Some(buffer)) = (
+                            &**input_conf,
+                            self.tag_buffer.get(&(BigUint::from(index + 1))),
+                        )
                         // HIGHLIGHT: Since Tag is always on the first layer, don't need to check recursively
                         {
                             let reverse = config
@@ -481,14 +498,16 @@ where
                 }
             }
             Message::WrongHostNetworkGroup(id) => {
-                self.verification_host_network.insert(id, Some(false));
-                self.remove_required_msg(id, false);
+                self.verification_host_network
+                    .insert(id.clone(), Some(false));
+                self.remove_required_msg(&id, false);
                 self.decide_required_all(ctx);
                 self.decide_unique_all(ctx);
             }
             Message::RightHostNetworkGroup(id, input_data) => {
-                self.verification_host_network.insert(id, Some(true));
-                self.input_host_network_group(id, &input_data);
+                self.verification_host_network
+                    .insert(id.clone(), Some(true));
+                self.input_host_network_group(&id, &input_data);
                 if !self
                     .verification_host_network
                     .values()
@@ -518,31 +537,31 @@ where
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Text(TextItem::new(txt.clone()));
                 }
-                self.remove_required_msg(id, txt.is_empty());
+                self.remove_required_msg(&id, txt.is_empty());
                 self.unique_msg.remove(&id);
             }
             Message::InputPassword(id, txt, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Password(PasswordItem::new(txt.clone()));
                 }
-                self.remove_required_msg(id, txt.is_empty());
+                self.remove_required_msg(&id, txt.is_empty());
             }
             Message::InputConfirmPassword(id, txt) => {
-                self.confirm_password.insert(id, txt.clone());
-                self.remove_required_msg(id, txt.is_empty());
+                self.confirm_password.insert(id.clone(), txt.clone());
+                self.remove_required_msg(&id, txt.is_empty());
             }
             Message::InputUnsigned32(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Unsigned32(Unsigned32Item::new(Some(value)));
                 }
-                self.remove_required_msg(id, false);
+                self.remove_required_msg(&id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InputFloat64(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Float64(Float64Item::new(Some(value)));
                 }
-                self.remove_required_msg(id, false);
+                self.remove_required_msg(&id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InvalidInputUnsigned32
@@ -553,7 +572,7 @@ where
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Percentage(PercentageItem::new(Some(value)));
                 }
-                self.remove_required_msg(id, false);
+                self.remove_required_msg(&id, false);
                 self.unique_msg.remove(&id);
             }
             Message::InputRadio(id, input_data) => {
@@ -568,15 +587,15 @@ where
                     } else {
                         false
                     };
-                    self.remove_required_msg(id, empty);
+                    self.remove_required_msg(&id, empty);
                 }
                 self.propagate_checkbox(ctx, &input_data);
             }
             Message::InputHostNetworkGroup(id, input_data) => {
-                self.input_host_network_group(id, &input_data);
+                self.input_host_network_group(&id, &input_data);
             }
             Message::UserInputHostNetworkGroup(id) => {
-                self.remove_required_msg(id, false);
+                self.remove_required_msg(&id, false);
             }
             Message::InputMultipleSelect(id, input_data, list) => {
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
@@ -601,7 +620,7 @@ where
                     } else {
                         false
                     };
-                    self.remove_required_msg(id, empty);
+                    self.remove_required_msg(&id, empty);
                 }
             }
             Message::InputSingleSelect(id, input_data, _) => {
@@ -622,7 +641,7 @@ where
                     } else {
                         false
                     };
-                    self.remove_required_msg(id, empty);
+                    self.remove_required_msg(&id, empty);
                 }
             }
             Message::InputVecSelect(data_id, col_id, input_data) => {
@@ -661,7 +680,7 @@ where
                     } else {
                         (false, None, None, None)
                     };
-                    self.remove_required_msg(id, empty);
+                    self.remove_required_msg(&id, empty);
 
                     (new, edit, delete)
                 } else {
@@ -723,7 +742,7 @@ where
                 return false; // HIGHLIGHT: DO NOT return true
             }
             Message::ClickCheckbox(data_id, item) => {
-                self.radio_buffer_after_checkbox(data_id, &item);
+                self.radio_buffer_after_checkbox(&data_id, &item);
                 self.propagate_checkbox(ctx, &item);
             }
             Message::InputNicName(data_id, nic_id, name, input_data) => {
@@ -734,8 +753,8 @@ where
                         }
                     }
                 }
-                self.remove_required_msg(data_id, name.is_empty());
-                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
+                self.remove_required_msg(&data_id, name.is_empty());
+                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicInterface(data_id, nic_id, interface, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -745,8 +764,8 @@ where
                         }
                     }
                 }
-                self.remove_required_msg(data_id, interface.is_empty());
-                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
+                self.remove_required_msg(&data_id, interface.is_empty());
+                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicGateway(data_id, nic_id, gateway, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -756,8 +775,8 @@ where
                         }
                     }
                 }
-                self.remove_required_msg(data_id, gateway.is_empty());
-                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
+                self.remove_required_msg(&data_id, gateway.is_empty());
+                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicAdd(data_id, nic_id, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -765,7 +784,7 @@ where
                         data.push(InputNic::default());
                     }
                 }
-                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
+                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicDelete(data_id, nic_id, input_data) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -776,7 +795,7 @@ where
                         }
                     }
                 }
-                self.remove_verification_nic(cal_index(Some(data_id), nic_id));
+                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputGroupAdd(base_index, input_data, items_conf) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
@@ -790,8 +809,10 @@ where
                         if let Some(d) = data.last() {
                             for (col, d) in d.iter().enumerate() {
                                 if let Ok(d) = d.try_borrow() {
-                                    let row_rep_index = cal_index(Some(base_index), data.len() - 1);
-                                    let item_index = cal_index(Some(row_rep_index), col);
+                                    let item_index = cal_index(
+                                        Some(&base_index),
+                                        (data.len() - 1) * items_conf.len() + col,
+                                    );
                                     if let InputItem::SelectSingle(copied_default) = &*d {
                                         let mut buf = HashSet::new();
                                         if let Some(copied_default) = copied_default.as_ref() {
@@ -801,11 +822,11 @@ where
                                             .insert(item_index, Rc::new(RefCell::new(Some(buf))));
                                     } else if let InputItem::Comparison(_) = &*d {
                                         self.comparison_value_kind_buffer.insert(
-                                            item_index,
+                                            item_index.clone(),
                                             Rc::new(RefCell::new(Some(HashSet::new()))),
                                         );
                                         self.comparison_value_cmp_buffer.insert(
-                                            item_index,
+                                            item_index.clone(),
                                             Rc::new(RefCell::new(Some(HashSet::new()))),
                                         );
                                         self.comparison_value_buffer.insert(
@@ -839,53 +860,61 @@ where
                                     if let InputItem::SelectSingle(_) = &*d {
                                         rearrange_buffer(
                                             &mut self.select_searchable_buffer,
-                                            base_index,
+                                            &base_index,
                                             row_index,
                                             col,
                                             data.len(),
+                                            items_conf.len(),
                                         );
                                     } else if let InputItem::Comparison(_) = &*d {
                                         rearrange_buffer(
                                             &mut self.comparison_value_kind_buffer,
-                                            base_index,
+                                            &base_index,
                                             row_index,
                                             col,
                                             data.len(),
+                                            items_conf.len(),
                                         );
                                         rearrange_buffer(
                                             &mut self.comparison_value_cmp_buffer,
-                                            base_index,
+                                            &base_index,
                                             row_index,
                                             col,
                                             data.len(),
+                                            items_conf.len(),
                                         );
                                         rearrange_buffer(
                                             &mut self.comparison_value_buffer,
-                                            base_index,
+                                            &base_index,
                                             row_index,
                                             col,
                                             data.len(),
+                                            items_conf.len(),
                                         );
                                     } else if let InputItem::VecSelect(_) = &*d {
                                         rearrange_buffer(
                                             &mut self.vec_select_buffer,
-                                            base_index,
+                                            &base_index,
                                             row_index,
                                             col,
                                             data.len(),
+                                            items_conf.len(),
                                         );
                                     }
                                 }
                                 self.required_msg.remove(
-                                    &(cal_index(Some(cal_index(Some(base_index), row_index)), col)),
+                                    &(cal_index(
+                                        Some(&base_index),
+                                        row_index * items_conf.len() + col,
+                                    )),
                                 );
                                 for r in row_index + 1..data.len() {
                                     if self.required_msg.remove(
-                                        &(cal_index(Some(cal_index(Some(base_index), r)), col)),
+                                        &(cal_index(Some(&base_index), r * items_conf.len() + col)),
                                     ) {
                                         self.required_msg.insert(cal_index(
-                                            Some(cal_index(Some(base_index), r - 1)),
-                                            col,
+                                            Some(&base_index),
+                                            (r - 1) * items_conf.len() + col,
                                         ));
                                     }
                                 }
@@ -905,13 +934,13 @@ where
                 }
             }
             Message::InputComparisonValueKind(data_id, input_data) => {
-                self.clear_comparison_value(data_id, &input_data);
+                self.clear_comparison_value(&data_id, &input_data);
             }
             Message::InputComparisonComparisionKind(data_id, input_data) => {
-                self.input_comparison_comparison_kind(data_id, &input_data);
+                self.input_comparison_comparison_kind(&data_id, &input_data);
             }
             Message::InputComparisonValue(data_id, value_index, value, input_data) => {
-                self.input_comparison_value(data_id, value_index, &value, &input_data);
+                self.input_comparison_value(&data_id, value_index, &value, &input_data);
             }
             Message::ChooseFile(data_id, files, input_data) => {
                 for file in files {
@@ -929,7 +958,7 @@ where
                         })
                     };
 
-                    self.file_data_id = Some(data_id);
+                    self.file_data_id = Some(data_id.clone());
                     self.file_input_data = Some(Rc::clone(&input_data));
                     self.file_name = Some(file_name);
                     self.file_reader = Some(task);
@@ -1099,14 +1128,14 @@ where
         }
     }
 
-    fn remove_required_msg(&mut self, id: usize, empty: bool) {
+    fn remove_required_msg(&mut self, id: &BigUint, empty: bool) {
         if !empty {
-            self.required_msg.remove(&id);
+            self.required_msg.remove(id);
         }
     }
 
-    fn input_host_network_group(&mut self, id: usize, input_data: &Rc<RefCell<InputItem>>) {
-        if let Some(buffer) = self.host_network_buffer.get(&id) {
+    fn input_host_network_group(&mut self, id: &BigUint, input_data: &Rc<RefCell<InputItem>>) {
+        if let Some(buffer) = self.host_network_buffer.get(id) {
             let empty = if let Ok(buffer) = buffer.try_borrow_mut() {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     let mut n = buffer.clone();
@@ -1123,9 +1152,9 @@ where
         }
     }
 
-    fn remove_verification_nic(&mut self, id: usize) {
-        self.verification_nic.remove(&(id, 0));
-        self.verification_nic.remove(&(id, 1));
+    fn remove_verification_nic(&mut self, id: BigUint) {
+        self.verification_nic.remove(&(id.clone(), 0));
+        self.verification_nic.remove(&(id.clone(), 1));
         self.verification_nic.remove(&(id, 2));
     }
 
@@ -1163,7 +1192,7 @@ where
                                 }
                             }
                             if !different {
-                                self.unique_msg.insert(index + 1);
+                                self.unique_msg.insert(BigUint::from(index + 1));
                                 unique.push(true);
                             }
                         }
@@ -1174,7 +1203,7 @@ where
         !unique.is_empty()
     }
 
-    fn radio_buffer_after_checkbox(&mut self, data_id: usize, item: &Rc<RefCell<InputItem>>) {
+    fn radio_buffer_after_checkbox(&mut self, data_id: &BigUint, item: &Rc<RefCell<InputItem>>) {
         if let Ok(item) = item.try_borrow() {
             if let InputItem::Checkbox(cb) = &*item {
                 for (sub_index, child) in cb.children().iter().enumerate() {
@@ -1194,7 +1223,7 @@ where
     }
 }
 
-fn group_item(conf: &Rc<InputConfig>) -> InputItem {
+pub(super) fn group_item(conf: &Rc<InputConfig>) -> InputItem {
     match &**conf {
         InputConfig::Text(conf) => InputItem::Text(TextItem::new(
             conf.preset.as_ref().map_or_else(String::new, Clone::clone),
@@ -1233,21 +1262,21 @@ fn group_item(conf: &Rc<InputConfig>) -> InputItem {
 }
 
 fn rearrange_buffer<T>(
-    buffer: &mut HashMap<usize, T>,
-    base: usize,
+    buffer: &mut HashMap<BigUint, T>,
+    base: &BigUint,
     row: usize,
     col: usize,
     len: usize,
+    len_cols: usize,
 ) where
     T: Clone,
 {
     for row_index in row + 1..len {
-        let Some(item) = buffer.remove(&(cal_index(Some(cal_index(Some(base), row_index)), col)))
-        else {
+        let Some(item) = buffer.remove(&(cal_index(Some(base), row_index * len_cols + col))) else {
             continue;
         };
         buffer.insert(
-            cal_index(Some(cal_index(Some(base), row_index - 1)), col),
+            cal_index(Some(base), (row_index - 1) * len_cols + col),
             item.clone(),
         );
     }

@@ -28,6 +28,7 @@ htmlescape = "0.3"
 ipnet = { version = "2", features = ["serde"] }
 js-sys = "0.3"
 json-gettext = "4"
+num-bigint = "0.4"
 num-traits = "0.2"
 passwords = { version = "3", features = ["common-password"] }
 reqwasm = "0.5"

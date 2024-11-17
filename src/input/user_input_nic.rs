@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use json_gettext::get_text;
+use num_bigint::BigUint;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{classes, events::InputEvent, html, Component, Context, Html};
@@ -27,7 +28,7 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
@@ -64,7 +65,7 @@ where
                             })
                         }
                         </table>
-                        { self.view_required_msg(ctx, cal_index(base_index, layer_index)) }
+                        { self.view_required_msg(ctx, &cal_index(base_index, layer_index)) }
                     </div>
                 }
             } else {
@@ -83,7 +84,7 @@ where
         nics: Option<usize>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
         depth: u32,
     ) -> Html {
@@ -155,7 +156,7 @@ where
         ctx: &Context<Self>,
         input_data: &Rc<RefCell<InputItem>>,
         nic_index: usize,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
         is_last: bool,
         nic: &InputNic,
@@ -166,13 +167,18 @@ where
         let input_data_clone_3 = input_data.clone();
         let input_data_clone_4 = input_data.clone();
         let input_data_clone_5 = input_data.clone();
+        let my_index_clone_1 = my_index.clone();
+        let my_index_clone_2 = my_index.clone();
+        let my_index_clone_3 = my_index.clone();
+        let my_index_clone_4 = my_index.clone();
+        let my_index_clone_5 = my_index.clone();
 
         let oninput_name = ctx.link().callback(move |e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     Message::InputNicName(
-                        my_index,
+                        my_index_clone_1.clone(),
                         nic_index,
                         input.value(),
                         input_data_clone_1.clone(),
@@ -184,7 +190,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     Message::InputNicInterface(
-                        my_index,
+                        my_index_clone_2.clone(),
                         nic_index,
                         input.value(),
                         input_data_clone_2.clone(),
@@ -196,7 +202,7 @@ where
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
                     Message::InputNicGateway(
-                        my_index,
+                        my_index_clone_3.clone(),
                         nic_index,
                         input.value(),
                         input_data_clone_3.clone(),
@@ -204,21 +210,29 @@ where
                 })
         });
         let onclick_delete = ctx.link().callback(move |_| {
-            Message::InputNicDelete(my_index, nic_index, input_data_clone_4.clone())
+            Message::InputNicDelete(
+                my_index_clone_4.clone(),
+                nic_index,
+                input_data_clone_4.clone(),
+            )
         });
         let onclick_add = ctx.link().callback(move |_| {
-            Message::InputNicAdd(my_index, nic_index, input_data_clone_5.clone())
+            Message::InputNicAdd(
+                my_index_clone_5.clone(),
+                nic_index,
+                input_data_clone_5.clone(),
+            )
         });
         let txt = ctx.props().txt.txt.clone();
         let name_holder = text!(txt, ctx.props().language, "Name").to_string();
 
         let (name_msg, interface_msg, gateway_msg) = (
             self.verification_nic
-                .get(&(cal_index(Some(my_index), nic_index), 0)),
+                .get(&(cal_index(Some(&my_index), nic_index), 0)),
             self.verification_nic
-                .get(&(cal_index(Some(my_index), nic_index), 1)),
+                .get(&(cal_index(Some(&my_index), nic_index), 1)),
             self.verification_nic
-                .get(&(cal_index(Some(my_index), nic_index), 2)),
+                .get(&(cal_index(Some(&my_index), nic_index), 2)),
         );
         let name_msg =
             if let Some(Verification::Invalid(InvalidMessage::InterfaceNameRequired)) = name_msg {
