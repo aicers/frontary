@@ -64,12 +64,10 @@ where
                         }
                         (InputItem::Group(data), InputConfig::Group(config)) => {
                             for (row, d) in data.iter().enumerate() {
+                                let row_rep_index = cal_index(Some(&this_index), row);
                                 for ((col, d), t) in d.iter().enumerate().zip(config.items.iter()) {
                                     if let Ok(d) = d.try_borrow() {
-                                        let item_index = cal_index(
-                                            Some(&this_index),
-                                            row * config.items.len() + col,
-                                        );
+                                        let item_index = cal_index(Some(&row_rep_index), col);
                                         match (&*d, &**t) {
                                             (
                                                 InputItem::HostNetworkGroup(data),

@@ -461,6 +461,7 @@ where
                                             items_conf_callback.clone(),
                                         )
                                     });
+                                    let row_rep_index = cal_index(Some(&this_index), row_index);
 
                                     if one_row {
                                         html! {
@@ -479,34 +480,34 @@ where
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_text(ctx, &ess, config.length, config.width, input_data,
-                                                                                Some(&this_index), row_index * items_conf.len() + col_index, false, true)
+                                                                                Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data,
-                                                                                Some(&this_index), row_index * items_conf.len() + col_index, 1, true)
+                                                                                Some(&row_rep_index), col_index, 1, true)
                                                                         }
                                                                         InputConfig::VecSelect(config) => {
                                                                             self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths,
-                                                                                &config.max_heights, &config.map_list, input_data, Some(&this_index), row_index * items_conf.len() + col_index, true)
+                                                                                &config.max_heights, &config.map_list, input_data, Some(&row_rep_index), col_index, true)
                                                                         }
                                                                         InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data,
-                                                                                Some(&this_index), row_index * items_conf.len() + col_index, false, true)
+                                                                                Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Float64(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_float_64(ctx, &ess, config.step, config.width, input_data,
-                                                                                Some(&this_index), row_index * items_conf.len() + col_index, false, true)
+                                                                                Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Comparison(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_comparison(ctx, &ess, input_data, Some(&this_index), row_index * items_conf.len() + col_index, true)
+                                                                            self.view_comparison(ctx, &ess, input_data, Some(&row_rep_index), col_index, true)
                                                                         }
                                                                         _ => html! {}
                                                                     }

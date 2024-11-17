@@ -360,6 +360,7 @@ where
 
         html! {
             <div class={class_item}>
+                { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index.clone()) }
                 {
                     if group {
                         html! {}
