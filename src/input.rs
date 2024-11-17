@@ -11,6 +11,8 @@ mod user_input_composite;
 mod user_input_nic;
 mod user_input_select;
 
+use core::panic;
+use std::sync::LazyLock;
 use std::{collections::HashSet, fmt};
 
 use bincode::Options;
@@ -28,6 +30,7 @@ pub use item::{
     InputItem, NicItem, PasswordItem, PercentageItem, RadioItem, SelectMultipleItem,
     SelectSingleItem, TagItem, TextItem, Unsigned32Item, VecSelectItem,
 };
+use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use strum_macros::{Display, EnumIter, EnumString};
 pub use tag::Model as Tag;
@@ -35,21 +38,94 @@ pub use tag::Model as Tag;
 pub use self::user_input::view_asterisk;
 use crate::{parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange};
 
-const MAX_PER_LAYER: usize = 30;
+const POWER_OF_MAX_NUM_OF_LAYER: u32 = 5; // 2^5 = 32 is the maximum number of items in a layer.
+static MAX_NUM_OF_LAYER: LazyLock<BigUint> =
+    LazyLock::new(|| BigUint::from(2_u32.pow(POWER_OF_MAX_NUM_OF_LAYER)));
 
-fn cal_index(base_index: Option<usize>, layer_index: usize) -> usize {
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn cal_index_test() {
+        assert_eq!(super::_cal_index_first_ver(Some(4), 0), 36);
+        assert_eq!(
+            super::_cal_index_first_ver(Some(3_277_860_usize), 1),
+            70_386_724_usize
+        );
+    }
+
+    #[test]
+    fn cal_index_bit_test() {
+        assert_eq!(super::_cal_index_with_bit_op(Some(4), 0), 36);
+        assert_eq!(
+            super::_cal_index_with_bit_op(Some(3_277_860_usize), 1),
+            70_386_724_usize
+        );
+    }
+
+    #[test]
+    fn cal_index_big_test() {
+        assert_eq!(
+            super::cal_index(Some(&num_bigint::BigUint::from(4_u32)), 0),
+            num_bigint::BigUint::from(36_u32)
+        );
+        assert_eq!(
+            super::cal_index(Some(&num_bigint::BigUint::from(1060_u32)), 3),
+            num_bigint::BigUint::from(132_132_u32)
+        );
+        assert_eq!(
+            super::cal_index(Some(&num_bigint::BigUint::from(3_277_860_u32)), 1),
+            num_bigint::BigUint::from(70_386_724_u32)
+        );
+    }
+}
+
+fn _cal_index_first_ver(base_index: Option<usize>, layer_index: usize) -> usize {
     // `base_index` means parent's index
     if let Some(base_index) = base_index {
-        let max = MAX_PER_LAYER.to_f64().expect("usize to f64 is safe.");
+        let max = 2_u32
+            .pow(POWER_OF_MAX_NUM_OF_LAYER)
+            .to_f64()
+            .expect("usize to f64 is safe.");
         let base = base_index.to_f64().expect("usize to f64 is safe.");
         let base = base.log(max).floor();
         let Some(base) = base.to_u32() else {
             panic!("Too many levels in hierarchy of input items");
         };
-        let base = MAX_PER_LAYER.pow(base + 1);
+        let base = 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER).pow(base + 1);
         base_index + base * (1 + layer_index)
     } else {
         layer_index
+    }
+}
+
+fn _cal_index_with_bit_op(base_index: Option<usize>, layer_index: usize) -> usize {
+    if let Some(base_index) = base_index {
+        let base = (63 - base_index.leading_zeros()) / POWER_OF_MAX_NUM_OF_LAYER;
+        let base = 1 << (POWER_OF_MAX_NUM_OF_LAYER * (base + 1));
+        base_index + base * (1 + layer_index)
+    } else {
+        layer_index
+    }
+}
+
+fn cal_index(base_index: Option<&BigUint>, layer_index: usize) -> BigUint {
+    if let Some(base_index) = base_index {
+        let bits = base_index.bits();
+        #[allow(clippy::manual_assert)] // intentional panic
+        if bits == 0 {
+            panic!("The index of parent base must not be zero.");
+        }
+        let base = (bits - 1)
+            / POWER_OF_MAX_NUM_OF_LAYER
+                .to_u64()
+                .expect("u32 to u64 is safe.");
+        let Some(base) = base.to_u32() else {
+            panic!("Too many levels in hierarchy of input items.");
+        };
+        let base = MAX_NUM_OF_LAYER.pow(base + 1);
+        base_index + base * (BigUint::from(1u32) + BigUint::from(layer_index))
+    } else {
+        BigUint::from(layer_index)
     }
 }
 

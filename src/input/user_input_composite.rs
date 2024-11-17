@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use json_gettext::get_text;
+use num_bigint::BigUint;
 use yew::{classes, html, Component, Context, Html};
 
 use super::{
@@ -26,7 +27,7 @@ where
         options: &[ViewString],
         children_group: &[Option<Vec<Rc<InputConfig>>>],
         input_data: &Rc<RefCell<InputItem>>,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
         depth: u32,
     ) -> Html {
@@ -72,6 +73,7 @@ where
             html! {
                 <div class="input-radio-outer">
                     <div class="input-radio">
+                        { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index) }
                         <div class="input-radio-title">
                             { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
@@ -79,7 +81,7 @@ where
                             <Radio::<Self>
                                 txt={ctx.props().txt.clone()}
                                 language={ctx.props().language}
-                                parent_message={Some(Message::InputRadio(my_index, input_data.clone()))}
+                                parent_message={Some(Message::InputRadio(my_index.clone(), input_data.clone()))}
                                 list={Rc::clone(&list)}
                                 candidate_values={Rc::clone(&candidates)}
                                 selected_value={Rc::clone(buffer_option)}
@@ -107,7 +109,7 @@ where
                                     {
                                         for children.iter().enumerate().map(|(sub_index, child)|
                                             if let Some(child_data) = children_data.get(sub_index) {
-                                                self.view_child(ctx, child, child_data, cal_index(Some(my_index), checked_index), sub_index, depth, class_child, class_line)
+                                                self.view_child(ctx, child, child_data, &cal_index(Some(&my_index), checked_index), sub_index, depth, class_child, class_line)
                                             } else {
                                                 html! {}
                                             }
@@ -121,7 +123,7 @@ where
                         }
                     }
                     <div class="input-radio-message">
-                        { self.view_required_msg(ctx, my_index) }
+                        { self.view_required_msg(ctx, &my_index) }
                     </div>
                 </div>
             }
@@ -139,17 +141,18 @@ where
         always: Option<CheckStatus>,
         children_config: Option<&CheckboxChildrenConfig>,
         input_data: &Rc<RefCell<InputItem>>,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
         both_border: Option<bool>,
         depth: u32,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
+        let my_index_clone = my_index.clone();
         let txt = ctx.props().txt.txt.clone();
         let input_data_msg = input_data.clone();
-        let onclick = ctx
-            .link()
-            .callback(move |_| Message::ClickCheckbox(my_index, input_data_msg.clone()));
+        let onclick = ctx.link().callback(move |_| {
+            Message::ClickCheckbox(my_index_clone.clone(), input_data_msg.clone())
+        });
         let checked = if let Ok(data) = input_data.try_borrow() {
             if let InputItem::Checkbox(data) = (*data).clone() {
                 Some(data.status())
@@ -194,6 +197,7 @@ where
             html! {
                 <div class={class}>
                     <div class={class_align}>
+                        { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index.clone()) }
                         {
                             if always == Some(CheckStatus::Checked) || always == Some(CheckStatus::Unchecked) {
                                 html! {
@@ -244,7 +248,7 @@ where
                                             "input-checkbox-link-line"
                                         };
                                         if let Some(child_data) = child_data {
-                                            self.view_child(ctx, child, &child_data, my_index, sub_index, depth, class_child, class_line)
+                                            self.view_child(ctx, child, &child_data, &my_index, sub_index, depth, class_child, class_line)
                                         } else {
                                             html! {}
                                         }
@@ -269,7 +273,7 @@ where
         ctx: &Context<Self>,
         child: &Rc<InputConfig>,
         child_data: &Rc<RefCell<InputItem>>,
-        base_index: usize,
+        base_index: &BigUint,
         layer_index: usize,
         depth: u32,
         class_child: &'static str,
@@ -340,6 +344,15 @@ where
                     </div>
                 }
             }
+            InputConfig::Group(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index) }
+                    </div>
+                }
+            }
             InputConfig::Checkbox(config) => {
                 html! {
                     <div class={class_child}>
@@ -363,9 +376,8 @@ where
             | InputConfig::VecSelect(_)
             | InputConfig::Nic(_)
             | InputConfig::File(_)
-            | InputConfig::Comparison(_)
-            | InputConfig::Group(_) => {
-                panic!("Checkbox does not support Password, Tag, VecSelect, Nic, File, Comparison, and Group for children.")
+            | InputConfig::Comparison(_) => {
+                panic!("Checkbox does not support Password, Tag, VecSelect, Nic, File, and Comparison for children.")
             }
         }
     }
@@ -380,10 +392,11 @@ where
         widths: &[Option<u32>],
         items_conf: &[Rc<InputConfig>],
         input_data: &Rc<RefCell<InputItem>>,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
     ) -> Html {
-        let base_index = cal_index(base_index, layer_index); // == my_index
+        let this_index = cal_index(base_index, layer_index); // == my_index
+        let this_index_clone = this_index.clone();
         let input_data_clone = input_data.clone();
         let input_data_clone_ref = &(input_data.clone());
         let items_conf_clone = items_conf.to_vec();
@@ -398,11 +411,13 @@ where
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(move |_| {
             Message::InputGroupAdd(
-                base_index,
+                this_index_clone.clone(),
                 input_data_clone.clone(),
                 items_conf_clone.clone(),
             )
         });
+        let display_titles =
+            !(items_conf.len() == 1 && items_conf.first().map_or(false, |x| x.title().is_empty()));
 
         html! {
             <div class="input-item">
@@ -412,31 +427,35 @@ where
                 <div class="input-group">
                     <div>
                         <table class="input-group">
-                            <tr>
-                                {
-                                    for items_conf.iter().enumerate().map(|(col_index, each)| {
-                                        let style = if let Some(Some(width)) = widths.get(col_index) {
-                                            format!("width: {}px;", *width)
-                                        } else {
-                                            String::new()
-                                        };
-                                        html! {
-                                            <th class="input-group-heading" style={style}>
-                                                { text!(txt, ctx.props().language, each.title()) }{ view_asterisk(each.required()) }
-                                            </th>
-                                        }
-                                    })
-                                }
-                                <th class="input-group-heading-delete">
-                                </th>
-                            </tr>
+                            { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, this_index.to_string()) }
+                            if display_titles {
+                                <tr>
+                                    {
+                                        for items_conf.iter().enumerate().map(|(col_index, each)| {
+                                            let style = if let Some(Some(width)) = widths.get(col_index) {
+                                                format!("width: {}px;", *width)
+                                            } else {
+                                                String::new()
+                                            };
+                                            html! {
+                                                <th class="input-group-heading" style={style}>
+                                                    { text!(txt, ctx.props().language, each.title()) }{ view_asterisk(each.required()) }
+                                                </th>
+                                            }
+                                        })
+                                    }
+                                    <th class="input-group-heading-delete">
+                                    </th>
+                                </tr>
+                            }
                             {
                                 for input_data.iter().enumerate().map(move |(row_index, row)| {
                                     let input_data_callback = input_data_clone_ref.clone();
                                     let items_conf_callback = items_conf_clone_ref.clone();
+                                    let this_index_clone = this_index.clone();
                                     let onclick_delete = ctx.link().callback(move |_| {
                                         Message::InputGroupDelete(
-                                            base_index,
+                                            this_index_clone.clone(),
                                             row_index,
                                             input_data_callback.clone(),
                                             items_conf_callback.clone(),
@@ -444,7 +463,6 @@ where
                                     });
 
                                     if one_row {
-                                        let row_rep_index = cal_index(Some(base_index), row_index);
                                         html! {
                                             <tr>
                                                 {
@@ -460,30 +478,35 @@ where
                                                                         InputConfig::Text(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_text(ctx, &ess, config.length, config.width, input_data, Some(row_rep_index), col_index, false, true)
+                                                                            self.view_text(ctx, &ess, config.length, config.width, input_data,
+                                                                                Some(&this_index), row_index * items_conf.len() + col_index, false, true)
                                                                         }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data, Some(row_rep_index), col_index, 1, true)
+                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data,
+                                                                                Some(&this_index), row_index * items_conf.len() + col_index, 1, true)
                                                                         }
                                                                         InputConfig::VecSelect(config) => {
-                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths, &config.max_heights, &config.map_list, input_data, Some(row_rep_index), col_index, true)
+                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths,
+                                                                                &config.max_heights, &config.map_list, input_data, Some(&this_index), row_index * items_conf.len() + col_index, true)
                                                                         }
                                                                         InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data, Some(row_rep_index), col_index, false, true)
+                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data,
+                                                                                Some(&this_index), row_index * items_conf.len() + col_index, false, true)
                                                                         }
                                                                         InputConfig::Float64(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_float_64(ctx, &ess, config.step, config.width, input_data, Some(row_rep_index), col_index, false, true)
+                                                                            self.view_float_64(ctx, &ess, config.step, config.width, input_data,
+                                                                                Some(&this_index), row_index * items_conf.len() + col_index, false, true)
                                                                         }
                                                                         InputConfig::Comparison(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_comparison(ctx, &ess, input_data, Some(row_rep_index), col_index, true)
+                                                                            self.view_comparison(ctx, &ess, input_data, Some(&this_index), row_index * items_conf.len() + col_index, true)
                                                                         }
                                                                         _ => html! {}
                                                                     }

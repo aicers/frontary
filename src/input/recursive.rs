@@ -2,6 +2,7 @@ use core::panic;
 use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
 
 use ipnet::Ipv4Net;
+use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use passwords::analyzer;
 use yew::{Component, Context};
@@ -17,7 +18,7 @@ use super::{
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
 const PASSWORD_MIN_FORBID_ADJACENT_LEN: usize = 4; // adjacent keyboard characters
-type PropaChildren = Vec<(usize, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
+type PropaChildren = Vec<(BigUint, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
 
 impl<T> Model<T>
 where
@@ -33,7 +34,7 @@ where
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
     ) {
         input_data
             .iter()
@@ -44,62 +45,65 @@ where
                 if let Ok(data) = input_data.try_borrow() {
                     match (&*data, &**input_conf) {
                         (InputItem::HostNetworkGroup(data), InputConfig::HostNetworkGroup(_)) => {
-                            self.host_network_to_buffer(this_index, data);
+                            self.host_network_to_buffer(&this_index, data);
                         }
                         (InputItem::SelectSingle(data), InputConfig::SelectSingle(_)) => {
-                            self.select_searchable_to_buffer(this_index, data);
+                            self.select_searchable_to_buffer(&this_index, data);
                         }
                         (InputItem::SelectMultiple(data), InputConfig::SelectMultiple(config)) => {
-                            self.select_multiple_to_buffer(this_index, data, config);
+                            self.select_multiple_to_buffer(&this_index, data, config);
                         }
                         (InputItem::Tag(data), InputConfig::Tag(_)) => {
-                            self.tag_to_buffer(this_index, data);
+                            self.tag_to_buffer(&this_index, data);
                         }
                         (InputItem::Comparison(data), InputConfig::Comparison(_)) => {
-                            self.comparison_to_buffer(this_index, data);
+                            self.comparison_to_buffer(&this_index, data);
                         }
                         (InputItem::VecSelect(data), InputConfig::VecSelect(_)) => {
-                            self.vec_select_to_buffer(this_index, data);
+                            self.vec_select_to_buffer(&this_index, data);
                         }
                         (InputItem::Group(data), InputConfig::Group(config)) => {
                             for (row, d) in data.iter().enumerate() {
                                 for ((col, d), t) in d.iter().enumerate().zip(config.items.iter()) {
                                     if let Ok(d) = d.try_borrow() {
-                                        let row_rep_index = cal_index(Some(this_index), row);
-                                        let item_index = cal_index(Some(row_rep_index), col);
-
+                                        let item_index = cal_index(
+                                            Some(&this_index),
+                                            row * config.items.len() + col,
+                                        );
                                         match (&*d, &**t) {
                                             (
                                                 InputItem::HostNetworkGroup(data),
-                                                InputConfig::HostNetworkGroup(..),
+                                                InputConfig::HostNetworkGroup(_),
                                             ) => {
-                                                self.host_network_to_buffer(item_index, data);
+                                                self.host_network_to_buffer(&item_index, data);
                                             }
                                             (
                                                 InputItem::SelectSingle(data),
-                                                InputConfig::SelectSingle(..),
+                                                InputConfig::SelectSingle(_),
                                             ) => {
-                                                self.select_searchable_to_buffer(item_index, data);
+                                                self.select_searchable_to_buffer(&item_index, data);
                                             }
                                             (
                                                 InputItem::SelectMultiple(data),
                                                 InputConfig::SelectMultiple(config),
                                             ) => {
                                                 self.select_multiple_to_buffer(
-                                                    item_index, data, config,
+                                                    &item_index,
+                                                    data,
+                                                    config,
                                                 );
                                             }
                                             (
                                                 InputItem::Comparison(data),
-                                                InputConfig::Comparison(..),
+                                                InputConfig::Comparison(_),
                                             ) => {
-                                                self.comparison_to_buffer(item_index, data);
+                                                self.comparison_to_buffer(&item_index, data);
                                             }
                                             (
                                                 InputItem::VecSelect(data),
-                                                InputConfig::VecSelect(..),
+                                                InputConfig::VecSelect(_),
                                             ) => {
-                                                self.vec_select_to_buffer(item_index, data);
+                                                self.vec_select_to_buffer(&item_index, data);
                                             }
                                             (InputItem::Text(_), InputConfig::Text(_))
                                             | (InputItem::Password(_), InputConfig::Password(_))
@@ -132,13 +136,13 @@ where
                                     self.prepare_buffer_recursive(
                                         data.children(),
                                         &config_children.children,
-                                        Some(this_index),
+                                        Some(&this_index),
                                     );
                                 }
                             }
                         }
                         (InputItem::Radio(data), InputConfig::Radio(config)) => {
-                            self.radio_to_buffer(this_index, data, config);
+                            self.radio_to_buffer(&this_index, data, config);
                             for (index, (data_children, config_children)) in data
                                 .children_group()
                                 .iter()
@@ -150,7 +154,7 @@ where
                                         self.prepare_buffer_recursive(
                                             data_children,
                                             config_children,
-                                            Some(cal_index(Some(this_index), index)),
+                                            Some(&cal_index(Some(&this_index), index)),
                                         );
                                     }
                                 }
@@ -181,7 +185,7 @@ where
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
         parent_checked: bool,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
     ) {
         input_data
             .iter()
@@ -202,7 +206,7 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
-                                    self.preset_to_buffer_select_single(this_index, preset);
+                                    self.preset_to_buffer_select_single(&this_index, preset);
                                 }
                             }
                         }
@@ -210,7 +214,7 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
-                                    self.preset_to_buffer_select_multiple(this_index, preset);
+                                    self.preset_to_buffer_select_multiple(&this_index, preset);
                                 }
                             }
                         }
@@ -239,7 +243,7 @@ where
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
-                                    self.preset_to_buffer_vec_select(this_index, preset);
+                                    self.preset_to_buffer_vec_select(&this_index, preset);
                                 }
                             }
                         }
@@ -258,7 +262,7 @@ where
                                         &config_children.children,
                                         data.status() == CheckStatus::Checked
                                             || data.status() == CheckStatus::Indeterminate,
-                                        Some(this_index),
+                                        Some(&this_index),
                                     );
                                 }
                             }
@@ -278,11 +282,11 @@ where
                                                 data,
                                                 config,
                                                 parent_checked,
-                                                Some(cal_index(Some(this_index), sub_index)),
+                                                Some(&cal_index(Some(&this_index), sub_index)),
                                             );
                                         }
                                     }
-                                    self.preset_to_buffer_radio(this_index, preset);
+                                    self.preset_to_buffer_radio(&this_index, preset);
                                 }
                             }
                         }
@@ -301,16 +305,16 @@ where
             });
     }
 
-    pub(super) fn preset_to_buffer_radio(&mut self, id: usize, preset: &String) {
-        if let Some(buffer) = self.radio_buffer.get(&id) {
+    pub(super) fn preset_to_buffer_radio(&mut self, id: &BigUint, preset: &String) {
+        if let Some(buffer) = self.radio_buffer.get(id) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
                 buffer.clone_from(preset);
             }
         }
     }
 
-    pub(super) fn preset_to_buffer_select_single(&mut self, id: usize, preset: &str) {
-        if let Some(buffer) = self.select_searchable_buffer.get(&id) {
+    pub(super) fn preset_to_buffer_select_single(&mut self, id: &BigUint, preset: &str) {
+        if let Some(buffer) = self.select_searchable_buffer.get(id) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
                 if !preset.is_empty() {
                     let mut value: HashSet<String> = HashSet::new();
@@ -321,8 +325,8 @@ where
         }
     }
 
-    pub(super) fn preset_to_buffer_select_multiple(&mut self, id: usize, preset: &[String]) {
-        if let Some(buffer) = self.select_searchable_buffer.get(&id) {
+    pub(super) fn preset_to_buffer_select_multiple(&mut self, id: &BigUint, preset: &[String]) {
+        if let Some(buffer) = self.select_searchable_buffer.get(id) {
             if let Ok(mut buffer) = buffer.try_borrow_mut() {
                 if !preset.is_empty() {
                     *buffer = Some(preset.iter().cloned().collect::<HashSet<String>>());
@@ -331,8 +335,8 @@ where
         }
     }
 
-    pub(super) fn preset_to_buffer_vec_select(&mut self, id: usize, preset: &[HashSet<String>]) {
-        if let Some(buffer) = self.vec_select_buffer.get(&id) {
+    pub(super) fn preset_to_buffer_vec_select(&mut self, id: &BigUint, preset: &[HashSet<String>]) {
+        if let Some(buffer) = self.vec_select_buffer.get(id) {
             for (b, p) in buffer.iter().zip(preset.iter()) {
                 if let Ok(mut b) = b.try_borrow_mut() {
                     *b = Some(p.clone());
@@ -357,7 +361,7 @@ where
         ctx: &Context<Self>,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         parent_checked: bool,
     ) -> bool {
         let mut required = Vec::<bool>::new();
@@ -417,7 +421,7 @@ where
                         }
                         (InputItem::Group(item), InputConfig::Group(conf)) => {
                             if !item.is_empty() {
-                                self.group_required_all_recursive(item, conf, this_index);
+                                self.group_required_all_recursive(item, conf, &this_index);
                             }
                             input_conf.required() && item.is_empty()
                         }
@@ -429,7 +433,7 @@ where
                                             ctx,
                                             data.children(),
                                             &config_children.children,
-                                            Some(this_index),
+                                            Some(&this_index),
                                             true,
                                         )
                                     {
@@ -455,7 +459,7 @@ where
                                                 ctx,
                                                 data_children,
                                                 config_children,
-                                                Some(cal_index(Some(this_index), checked_index)),
+                                                Some(&cal_index(Some(&this_index), checked_index)),
                                                 true,
                                             )
                                         {
@@ -488,7 +492,7 @@ where
         &mut self,
         group: &GroupItem,
         config: &GroupConfig,
-        base_index: usize,
+        base_index: &BigUint,
     ) {
         let required = config
         .items
@@ -539,7 +543,7 @@ where
                                     Some(Some(false))
                                 } else if self
                                     .comparison_kind(
-                                        cal_index(Some(cal_index(Some(base_index), row_index)), col_index)
+                                        &cal_index(Some(&cal_index(Some(base_index), row_index)), col_index)
                                     )
                                     .is_some()
                                 {
@@ -582,7 +586,7 @@ where
                 {
                     if data_empty.map_or(true, |x| x) && *data_required {
                         self.required_msg.insert(cal_index(
-                            Some(cal_index(Some(base_index), row_index)),
+                            Some(&cal_index(Some(base_index), row_index)),
                             col_index,
                         ));
                     }
@@ -600,7 +604,7 @@ where
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         parent_checked: bool,
     ) -> bool {
         let mut rtn = true;
@@ -672,11 +676,11 @@ where
                         (InputItem::Nic(nics), InputConfig::Nic(_)) => {
                             if parent_checked {
                                 for (i, nic) in nics.iter().enumerate() {
-                                    let nic_index = cal_index(Some(item_index), i);
+                                    let nic_index = cal_index(Some(&item_index), i);
                                     if !nic.interface.is_empty() || !nic.gateway.is_empty() {
                                         if nic.name.is_empty() {
                                             self.verification_nic.insert(
-                                                (nic_index, 0),
+                                                (nic_index.clone(), 0),
                                                 Verification::Invalid(
                                                     InvalidMessage::InterfaceNameRequired,
                                                 ),
@@ -685,7 +689,7 @@ where
                                         }
                                         if nic.interface.is_empty() {
                                             self.verification_nic.insert(
-                                                (nic_index, 1),
+                                                (nic_index.clone(), 1),
                                                 Verification::Invalid(
                                                     InvalidMessage::InterfaceRequired,
                                                 ),
@@ -693,7 +697,7 @@ where
                                             rtn = false;
                                         } else if Ipv4Net::from_str(&nic.interface).is_err() {
                                             self.verification_nic.insert(
-                                                (nic_index, 1),
+                                                (nic_index.clone(), 1),
                                                 Verification::Invalid(
                                                     InvalidMessage::WrongInterface,
                                                 ),
@@ -702,7 +706,7 @@ where
                                         }
                                         if nic.gateway.is_empty() {
                                             self.verification_nic.insert(
-                                                (nic_index, 2),
+                                                (nic_index.clone(), 2),
                                                 Verification::Invalid(
                                                     InvalidMessage::GatewayRequired,
                                                 ),
@@ -717,7 +721,7 @@ where
                                         }
                                     } else if !nic.name.is_empty() {
                                         self.verification_nic.insert(
-                                            (nic_index, 1),
+                                            (nic_index.clone(), 1),
                                             Verification::Invalid(
                                                 InvalidMessage::InterfaceRequired,
                                             ),
@@ -738,7 +742,7 @@ where
                                     && !self.verify_recursive(
                                         data.children(),
                                         &config_children.children,
-                                        Some(item_index),
+                                        Some(&item_index),
                                         data.status() == CheckStatus::Checked,
                                     )
                                 {
@@ -760,7 +764,7 @@ where
                                         && !self.verify_recursive(
                                             data_children,
                                             config_children,
-                                            Some(cal_index(Some(item_index), checked_index)),
+                                            Some(&cal_index(Some(&item_index), checked_index)),
                                             true,
                                         )
                                     {
@@ -852,7 +856,7 @@ where
         pos: &Rc<RefCell<InputItem>>,
         input_conf: &Rc<InputConfig>,
         checked: Option<CheckStatus>, // parent of `this_checked`, that is, `pos`
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
     ) -> Option<CheckStatus> {
         let this_index = cal_index(base_index, layer_index);
@@ -975,11 +979,11 @@ where
                         (child.try_borrow_mut(), config_children.get(index))
                     {
                         let propa_index = if let Some(radio) = radio {
-                            cal_index(Some(this_index), radio)
+                            cal_index(Some(&this_index), radio)
                         } else {
-                            this_index
+                            this_index.clone()
                         };
-                        let item_index = cal_index(Some(propa_index), index);
+                        let item_index = cal_index(Some(&propa_index), index);
                         match (&mut (*c), &**t) {
                             // HIGHLIGHT: `preset` should be set even when `this_checked` is
                             // `Unchecked`, because `this_checked`` may be changed later depending
@@ -997,14 +1001,14 @@ where
                             ) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     *user = HostNetworkGroupItem::default();
-                                    self.host_network_to_buffer(item_index, user);
+                                    self.host_network_to_buffer(&item_index, user);
                                 }
                             }
                             (InputItem::SelectSingle(user), InputConfig::SelectSingle(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
-                                        self.select_searchable_to_buffer(item_index, user);
+                                        self.select_searchable_to_buffer(&item_index, user);
                                     }
                                 }
                             }
@@ -1015,7 +1019,7 @@ where
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
-                                        self.select_multiple_to_buffer(item_index, user, config);
+                                        self.select_multiple_to_buffer(&item_index, user, config);
                                     }
                                 }
                             }
@@ -1045,7 +1049,7 @@ where
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);
                                     }
-                                    self.vec_select_to_buffer(item_index, user);
+                                    self.vec_select_to_buffer(&item_index, user);
                                 }
                             }
                             (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
@@ -1068,7 +1072,7 @@ where
                                     if let Some(preset) = &config.preset {
                                         if user.selected() != preset {
                                             user.set_selected(preset.clone());
-                                            self.radio_to_buffer(item_index, user, config);
+                                            self.radio_to_buffer(&item_index, user, config);
                                         }
                                     }
                                 }
@@ -1083,13 +1087,26 @@ where
                                     ));
                                 }
                             }
+                            (InputItem::Group(user), InputConfig::Group(conf)) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    let new_row = conf
+                                        .items
+                                        .iter()
+                                        .map(|conf| {
+                                            Rc::new(RefCell::new(super::component::group_item(
+                                                conf,
+                                            )))
+                                        })
+                                        .collect::<Vec<_>>();
+                                    *user = GroupItem::new(vec![new_row]);
+                                }
+                            }
                             (InputItem::Password(_), InputConfig::Password(_))
                             | (InputItem::Tag(_), InputConfig::Tag(_))
                             | (InputItem::Nic(_), InputConfig::Nic(_))
                             | (InputItem::File(_), InputConfig::File(_))
-                            | (InputItem::Comparison(_), InputConfig::Comparison(_))
-                            | (InputItem::Group(_), InputConfig::Group(_)) => {
-                                panic!("Children items do not include Password, Tag, Nic, File, Comparison, and Group.")
+                            | (InputItem::Comparison(_), InputConfig::Comparison(_)) => {
+                                panic!("Children items do not include Password, Tag, Nic, File, and Comparison.")
                             }
                             (_, _) => {
                                 panic!("InputItem and InputConfig is not matched");
@@ -1107,7 +1124,7 @@ where
                 child,
                 config_child,
                 this_checked,
-                Some(*propa_index),
+                Some(propa_index),
                 *sub_index,
             ));
         }
@@ -1170,16 +1187,19 @@ where
         };
 
         if let Some(CheckStatus::Unchecked) = final_checked {
-            let this_index_float = this_index.to_f64().expect("usize to f64 is safe.");
-            let this_level = this_index_float
-                .log(super::MAX_PER_LAYER.to_f64().expect("u32 to f64 is safe."))
-                .floor();
-            let Some(this_level) = this_level.to_u32() else {
-                panic!("Too many levels in hierarchy of input items");
+            let bits = this_index.bits();
+            let bits = if bits == 0 { 1 } else { bits };
+            let base = (bits - 1)
+                / super::POWER_OF_MAX_NUM_OF_LAYER
+                    .to_u64()
+                    .expect("u32 to u64 is safe.");
+            let Some(base) = base.to_u32() else {
+                panic!("Too many levels in hierarchy of input items.");
             };
-            let this_level = super::MAX_PER_LAYER.pow(this_level + 1);
-            let prefix = this_index / this_level * this_level;
-            self.required_msg.retain(|x| *x - prefix != this_index);
+            let base = super::MAX_NUM_OF_LAYER.pow(base + 1);
+            let base = &this_index / &base * &base;
+
+            self.required_msg.retain(move |x| (x - &base) != this_index);
         }
 
         final_checked
@@ -1200,7 +1220,7 @@ where
         &mut self,
         input_data: &[Rc<RefCell<InputItem>>],
         input_conf: &[Rc<InputConfig>],
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         parent_checked: bool,
     ) {
         input_data
@@ -1214,7 +1234,8 @@ where
                         if let (InputItem::HostNetworkGroup(_), InputConfig::HostNetworkGroup(_)) =
                             (&*input_data, &**input_conf)
                         {
-                            self.verification_host_network.insert(item_index, None);
+                            self.verification_host_network
+                                .insert(item_index.clone(), None);
                         }
                     }
 
@@ -1228,7 +1249,7 @@ where
                                 self.reset_veri_host_network_recursive(
                                     data.children(),
                                     &config_children.children,
-                                    Some(item_index),
+                                    Some(&item_index),
                                     data.status() == CheckStatus::Checked,
                                 );
                             }
@@ -1250,7 +1271,7 @@ where
                                         self.reset_veri_host_network_recursive(
                                             data_children,
                                             radio_children,
-                                            Some(cal_index(Some(item_index), checked_index)),
+                                            Some(&cal_index(Some(&item_index), checked_index)),
                                             true,
                                         );
                                     }
@@ -1262,41 +1283,43 @@ where
             });
     }
 
-    fn host_network_to_buffer(&mut self, index: usize, data: &HostNetworkGroupItem) {
+    fn host_network_to_buffer(&mut self, index: &BigUint, data: &HostNetworkGroupItem) {
         self.host_network_buffer
-            .insert(index, Rc::new(RefCell::new(data.into_inner())));
+            .insert(index.clone(), Rc::new(RefCell::new(data.into_inner())));
     }
 
-    fn select_searchable_to_buffer(&mut self, index: usize, data: &SelectSingleItem) {
+    fn select_searchable_to_buffer(&mut self, index: &BigUint, data: &SelectSingleItem) {
         let mut buf = HashSet::new();
         if let Some(data) = data.as_ref() {
             buf.insert(data.clone());
         }
         self.select_searchable_buffer
-            .insert(index, Rc::new(RefCell::new(Some(buf))));
+            .insert(index.clone(), Rc::new(RefCell::new(Some(buf))));
     }
 
     fn select_multiple_to_buffer(
         &mut self,
-        index: usize,
+        index: &BigUint,
         data: &SelectMultipleItem,
         config: &SelectMultipleConfig,
     ) {
         if config.all {
             self.select_searchable_buffer
-                .insert(index, Rc::new(RefCell::new(None)));
+                .insert(index.clone(), Rc::new(RefCell::new(None)));
         } else {
-            self.select_searchable_buffer
-                .insert(index, Rc::new(RefCell::new(Some(data.into_inner()))));
+            self.select_searchable_buffer.insert(
+                index.clone(),
+                Rc::new(RefCell::new(Some(data.into_inner()))),
+            );
         }
     }
 
-    fn tag_to_buffer(&mut self, index: usize, data: &TagItem) {
+    fn tag_to_buffer(&mut self, index: &BigUint, data: &TagItem) {
         self.tag_buffer
-            .insert(index, Rc::new(RefCell::new(data.into_inner())));
+            .insert(index.clone(), Rc::new(RefCell::new(data.into_inner())));
     }
 
-    fn comparison_to_buffer(&mut self, index: usize, data: &ComparisonItem) {
+    fn comparison_to_buffer(&mut self, index: &BigUint, data: &ComparisonItem) {
         let (mut buf, mut kind) = (HashSet::new(), HashSet::new());
         let (first, second) = if let Some(data) = data.as_ref() {
             buf.insert(data.value_kind().to_string());
@@ -1306,27 +1329,29 @@ where
             (None, None)
         };
         self.comparison_value_kind_buffer
-            .insert(index, Rc::new(RefCell::new(Some(buf))));
+            .insert(index.clone(), Rc::new(RefCell::new(Some(buf))));
         self.comparison_value_cmp_buffer
-            .insert(index, Rc::new(RefCell::new(Some(kind))));
+            .insert(index.clone(), Rc::new(RefCell::new(Some(kind))));
         self.comparison_value_buffer.insert(
-            index,
+            index.clone(),
             (Rc::new(RefCell::new(first)), Rc::new(RefCell::new(second))),
         );
     }
 
-    fn vec_select_to_buffer(&mut self, index: usize, data: &VecSelectItem) {
+    fn vec_select_to_buffer(&mut self, index: &BigUint, data: &VecSelectItem) {
         self.vec_select_buffer.insert(
-            index,
+            index.clone(),
             data.iter()
                 .map(|d| Rc::new(RefCell::new(Some(d.clone()))))
                 .collect::<Vec<_>>(),
         );
     }
 
-    fn radio_to_buffer(&mut self, index: usize, data: &RadioItem, _: &RadioConfig) {
-        self.radio_buffer
-            .insert(index, Rc::new(RefCell::new(data.selected().to_string())));
+    fn radio_to_buffer(&mut self, index: &BigUint, data: &RadioItem, _: &RadioConfig) {
+        self.radio_buffer.insert(
+            index.clone(),
+            Rc::new(RefCell::new(data.selected().to_string())),
+        );
     }
 }
 

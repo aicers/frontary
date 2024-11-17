@@ -1,6 +1,7 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc, str::FromStr};
 
 use json_gettext::get_text;
+use num_bigint::BigUint;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::{events::InputEvent, html, Component, Context, Html};
@@ -24,7 +25,7 @@ where
         ctx: &Context<Self>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,
-        base_index: Option<usize>,
+        base_index: Option<&BigUint>,
         layer_index: usize,
         group: bool,
     ) -> Html {
@@ -100,8 +101,8 @@ where
         );
         let list = Rc::new(vec![first, second]);
         let parent_message = vec![
-            Message::InputComparisonValueKind(my_index, input_data.clone()),
-            Message::InputComparisonComparisionKind(my_index, input_data.clone()),
+            Message::InputComparisonValueKind(my_index.clone(), input_data.clone()),
+            Message::InputComparisonComparisionKind(my_index.clone(), input_data.clone()),
         ];
         let txt = ctx.props().txt.txt.clone();
 
@@ -122,7 +123,7 @@ where
                     <VecSelect<Self>
                         txt={ctx.props().txt.clone()}
                         language={ctx.props().language}
-                        id={format!("VecSelect-{}-{layer_index}", base_index.unwrap_or_default())}
+                        id={format!("VecSelect-{}-{layer_index}", base_index.map_or_else(String::new, ToString::to_string))}
                         title={title}
                         kind_last={SelectSearchableKind::Single}
                         empty_msg={empty_msg}
@@ -135,9 +136,9 @@ where
                         selected={selected}
                         parent_message={parent_message}
                     />
-                    { self.view_comparison_value(ctx, input_data, my_index) }
+                    { self.view_comparison_value(ctx, input_data, &my_index) }
                 </div>
-                { self.view_required_msg(ctx, my_index) }
+                { self.view_required_msg(ctx, &my_index) }
             </div>
         }
     }
@@ -146,7 +147,7 @@ where
         &self,
         ctx: &Context<Self>,
         input_data: &Rc<RefCell<InputItem>>,
-        data_id: usize,
+        data_id: &BigUint,
     ) -> Html {
         let (Some(value_kind), Some(cmp_kind)) =
             (self.comparison_kind(data_id), self.comparison_cmp(data_id))
@@ -187,10 +188,11 @@ where
         &self,
         ctx: &Context<Self>,
         input_data: &Rc<RefCell<InputItem>>,
-        data_id: usize,
+        data_id: &BigUint,
         value_index: usize,
         value_kind: ValueKind,
     ) -> Html {
+        let data_id_clone = data_id.clone();
         let input_data_clone = input_data.clone();
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
@@ -215,7 +217,7 @@ where
                     };
                     if let Some(value) = value {
                         Message::InputComparisonValue(
-                            data_id,
+                            data_id_clone.clone(),
                             value_index,
                             value,
                             input_data_clone.clone(),
@@ -225,7 +227,7 @@ where
                     }
                 })
         });
-        let value = if let Some((first, second)) = self.comparison_value_buffer.get(&data_id) {
+        let value = if let Some((first, second)) = self.comparison_value_buffer.get(data_id) {
             let value = if value_index == 0 { first } else { second };
             value.try_borrow().map_or_else(
                 |_| String::new(),
@@ -261,7 +263,7 @@ where
 
     pub(super) fn input_comparison_comparison_kind(
         &self,
-        data_id: usize,
+        data_id: &BigUint,
         input_data: &Rc<RefCell<InputItem>>,
     ) {
         let Some(kind) = self.comparison_kind(data_id) else {
@@ -313,9 +315,9 @@ where
         }
     }
 
-    pub(super) fn comparison_kind(&self, data_id: usize) -> Option<ValueKind> {
+    pub(super) fn comparison_kind(&self, data_id: &BigUint) -> Option<ValueKind> {
         self.comparison_value_kind_buffer
-            .get(&data_id)?
+            .get(data_id)?
             .try_borrow()
             .ok()?
             .as_ref()
@@ -326,9 +328,9 @@ where
             })
     }
 
-    pub(super) fn comparison_cmp(&self, data_id: usize) -> Option<ComparisonKind> {
+    pub(super) fn comparison_cmp(&self, data_id: &BigUint) -> Option<ComparisonKind> {
         self.comparison_value_cmp_buffer
-            .get(&data_id)?
+            .get(data_id)?
             .try_borrow()
             .ok()?
             .as_ref()
@@ -341,7 +343,7 @@ where
 
     pub(super) fn input_comparison_value(
         &mut self,
-        data_id: usize,
+        data_id: &BigUint,
         value_index: usize,
         value: &ComparisonValue,
         input_data: &Rc<RefCell<InputItem>>,
@@ -349,7 +351,7 @@ where
         let Some(cmp) = self.comparison_cmp(data_id) else {
             return;
         };
-        let Some((first, second)) = self.comparison_value_buffer.get(&data_id) else {
+        let Some((first, second)) = self.comparison_value_buffer.get(data_id) else {
             return;
         };
         let (Ok(mut first), Ok(mut second)) = (first.try_borrow_mut(), second.try_borrow_mut())
@@ -371,26 +373,26 @@ where
             if let (Some(first), Some(second)) = (&*first, &*second) {
                 if let Ok(data) = Comparison::try_new(cmp, first.clone(), Some(second.clone())) {
                     *input_data = ComparisonItem::new(Some(data));
-                    self.required_msg.remove(&data_id);
+                    self.required_msg.remove(data_id);
                 }
             }
         } else if let Some(first) = &*first {
             if let Ok(data) = Comparison::try_new(cmp, first.clone(), None) {
                 *input_data = ComparisonItem::new(Some(data));
-                self.required_msg.remove(&data_id);
+                self.required_msg.remove(data_id);
             }
         }
     }
 
     pub(super) fn clear_comparison_value(
         &self,
-        data_id: usize,
+        data_id: &BigUint,
         input_data: &Rc<RefCell<InputItem>>,
     ) {
         if let Ok(mut data) = input_data.try_borrow_mut() {
             *data = InputItem::Comparison(ComparisonItem::new(None));
         }
-        let Some((first, second)) = self.comparison_value_buffer.get(&data_id) else {
+        let Some((first, second)) = self.comparison_value_buffer.get(data_id) else {
             return;
         };
         if let Ok(mut first) = first.try_borrow_mut() {
