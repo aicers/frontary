@@ -807,12 +807,10 @@ where
 
                         data.push(new_row);
                         if let Some(d) = data.last() {
+                            let row_rep_index = cal_index(Some(&base_index), data.len() - 1);
                             for (col, d) in d.iter().enumerate() {
                                 if let Ok(d) = d.try_borrow() {
-                                    let item_index = cal_index(
-                                        Some(&base_index),
-                                        (data.len() - 1) * items_conf.len() + col,
-                                    );
+                                    let item_index = cal_index(Some(&row_rep_index), col);
                                     if let InputItem::SelectSingle(copied_default) = &*d {
                                         let mut buf = HashSet::new();
                                         if let Some(copied_default) = copied_default.as_ref() {
@@ -864,7 +862,6 @@ where
                                             row_index,
                                             col,
                                             data.len(),
-                                            items_conf.len(),
                                         );
                                     } else if let InputItem::Comparison(_) = &*d {
                                         rearrange_buffer(
@@ -873,7 +870,6 @@ where
                                             row_index,
                                             col,
                                             data.len(),
-                                            items_conf.len(),
                                         );
                                         rearrange_buffer(
                                             &mut self.comparison_value_cmp_buffer,
@@ -881,7 +877,6 @@ where
                                             row_index,
                                             col,
                                             data.len(),
-                                            items_conf.len(),
                                         );
                                         rearrange_buffer(
                                             &mut self.comparison_value_buffer,
@@ -889,7 +884,6 @@ where
                                             row_index,
                                             col,
                                             data.len(),
-                                            items_conf.len(),
                                         );
                                     } else if let InputItem::VecSelect(_) = &*d {
                                         rearrange_buffer(
@@ -898,23 +892,23 @@ where
                                             row_index,
                                             col,
                                             data.len(),
-                                            items_conf.len(),
                                         );
                                     }
                                 }
                                 self.required_msg.remove(
                                     &(cal_index(
-                                        Some(&base_index),
-                                        row_index * items_conf.len() + col,
+                                        Some(&cal_index(Some(&base_index), row_index)),
+                                        col,
                                     )),
                                 );
+
                                 for r in row_index + 1..data.len() {
                                     if self.required_msg.remove(
-                                        &(cal_index(Some(&base_index), r * items_conf.len() + col)),
+                                        &(cal_index(Some(&cal_index(Some(&base_index), r)), col)),
                                     ) {
                                         self.required_msg.insert(cal_index(
-                                            Some(&base_index),
-                                            (r - 1) * items_conf.len() + col,
+                                            Some(&cal_index(Some(&base_index), r - 1)),
+                                            col,
                                         ));
                                     }
                                 }
@@ -1267,17 +1261,15 @@ fn rearrange_buffer<T>(
     row: usize,
     col: usize,
     len: usize,
-    len_cols: usize,
 ) where
     T: Clone,
 {
     for row_index in row + 1..len {
-        let Some(item) = buffer.remove(&(cal_index(Some(base), row_index * len_cols + col))) else {
+        let index = cal_index(Some(&cal_index(Some(base), row_index)), col);
+        let Some(item) = buffer.remove(&index) else {
             continue;
         };
-        buffer.insert(
-            cal_index(Some(base), (row_index - 1) * len_cols + col),
-            item.clone(),
-        );
+        let index = cal_index(Some(&cal_index(Some(base), row_index - 1)), col);
+        buffer.insert(index, item.clone());
     }
 }
