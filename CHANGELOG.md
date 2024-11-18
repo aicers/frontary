@@ -20,10 +20,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `InputConfig` to be composed of the corresponding structs.
 - Changed the variants of `InputItem` to be composed of the corresponding
   structs.
-- Remove `Essential::default`
+- Removed `Essential::default` and introduced `preset`:
   - Some `InputConfig` variants, that need preset values for users, now have the
     `preset` field.
-- Remove `Essential::unique` because it is required in `TextConfig` only.
+- Moved `Essential::unique` to `TextConfig`, because only `TextConfig` needs it.
 
 ### Removed
 

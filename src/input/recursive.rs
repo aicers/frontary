@@ -476,9 +476,6 @@ where
                         self.required_msg.insert(this_index);
                         required.push(true);
                     }
-                    // else {
-                    //     self.required_msg.remove(&this_index);
-                    // }
                 }
             }
         }

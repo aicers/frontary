@@ -800,6 +800,10 @@ where
             Message::InputGroupAdd(base_index, input_data, items_conf) => {
                 if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Group(data) = &mut *input_data {
+                        if data.len() == 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER) {
+                            // TODO: issue #188
+                            return false;
+                        }
                         let new_row = items_conf
                             .iter()
                             .map(|conf| Rc::new(RefCell::new(group_item(conf))))
