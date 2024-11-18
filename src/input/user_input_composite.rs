@@ -73,7 +73,9 @@ where
             html! {
                 <div class="input-radio-outer">
                     <div class="input-radio">
-                        { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index) }
+                        if cfg!(feature = "debug") {
+                            { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index) }
+                        }
                         <div class="input-radio-title">
                             { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                         </div>
@@ -189,7 +191,7 @@ where
             },
         );
 
-        // Since dynamic titles for checkbox are not included in language files, the below is reuqired.
+        // Since dynamic titles for checkbox are not included in language files, the below is required.
         let title = get_text!(txt, ctx.props().language.tag(), ess.title())
             .map_or(ess.title.clone(), |text| text.to_string());
 
@@ -197,7 +199,9 @@ where
             html! {
                 <div class={class}>
                     <div class={class_align}>
-                        { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index.clone()) }
+                        if cfg!(feature = "debug") {
+                            { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index.clone()) }
+                        }
                         {
                             if always == Some(CheckStatus::Checked) || always == Some(CheckStatus::Unchecked) {
                                 html! {
@@ -427,7 +431,9 @@ where
                 <div class="input-group">
                     <div>
                         <table class="input-group">
-                            { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, this_index.to_string()) }
+                            if cfg!(feature = "debug") {
+                                { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, this_index.to_string()) }
+                            }
                             if display_titles {
                                 <tr>
                                     {

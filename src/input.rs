@@ -38,7 +38,7 @@ pub use tag::Model as Tag;
 pub use self::user_input::view_asterisk;
 use crate::{parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange};
 
-const POWER_OF_MAX_NUM_OF_LAYER: u32 = 5; // 2^5 = 32 is the maximum number of items in a layer.
+const POWER_OF_MAX_NUM_OF_LAYER: u32 = 6; // 2^6 = 64 is the maximum number of items in a layer.
 static MAX_NUM_OF_LAYER: LazyLock<BigUint> =
     LazyLock::new(|| BigUint::from(2_u32.pow(POWER_OF_MAX_NUM_OF_LAYER)));
 
@@ -46,19 +46,19 @@ static MAX_NUM_OF_LAYER: LazyLock<BigUint> =
 mod tests {
     #[test]
     fn cal_index_test() {
-        assert_eq!(super::_cal_index_first_ver(Some(4), 0), 36);
+        assert_eq!(super::_cal_index_first_ver(Some(4), 0), 68);
         assert_eq!(
-            super::_cal_index_first_ver(Some(3_277_860_usize), 1),
-            70_386_724_usize
+            super::_cal_index_first_ver(Some(790_596_usize), 1),
+            34_345_028_usize
         );
     }
 
     #[test]
     fn cal_index_bit_test() {
-        assert_eq!(super::_cal_index_with_bit_op(Some(4), 0), 36);
+        assert_eq!(super::_cal_index_with_bit_op(Some(4), 0), 68);
         assert_eq!(
-            super::_cal_index_with_bit_op(Some(3_277_860_usize), 1),
-            70_386_724_usize
+            super::_cal_index_with_bit_op(Some(790_596_usize), 1),
+            34_345_028_usize
         );
     }
 
@@ -66,15 +66,11 @@ mod tests {
     fn cal_index_big_test() {
         assert_eq!(
             super::cal_index(Some(&num_bigint::BigUint::from(4_u32)), 0),
-            num_bigint::BigUint::from(36_u32)
+            num_bigint::BigUint::from(68_u32)
         );
         assert_eq!(
-            super::cal_index(Some(&num_bigint::BigUint::from(1060_u32)), 3),
-            num_bigint::BigUint::from(132_132_u32)
-        );
-        assert_eq!(
-            super::cal_index(Some(&num_bigint::BigUint::from(3_277_860_u32)), 1),
-            num_bigint::BigUint::from(70_386_724_u32)
+            super::cal_index(Some(&num_bigint::BigUint::from(790_596_u32)), 1),
+            num_bigint::BigUint::from(34_345_028_u32)
         );
     }
 }
@@ -111,11 +107,8 @@ fn _cal_index_with_bit_op(base_index: Option<usize>, layer_index: usize) -> usiz
 fn cal_index(base_index: Option<&BigUint>, layer_index: usize) -> BigUint {
     if let Some(base_index) = base_index {
         let bits = base_index.bits();
-        #[allow(clippy::manual_assert)] // intentional panic
-        if bits == 0 {
-            panic!("The index of parent base must not be zero.");
-        }
-        let base = (bits - 1)
+        let bits = if bits == 0 { 1 } else { bits - 1 };
+        let base = bits
             / POWER_OF_MAX_NUM_OF_LAYER
                 .to_u64()
                 .expect("u32 to u64 is safe.");
