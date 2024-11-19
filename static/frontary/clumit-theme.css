@@ -1275,10 +1275,6 @@ div.list-whole-list-pages-inner {
     position: relative;
 }
 
-span.list-whole-list-multiple-sep {
-    color: var(--whole-list-sep-color);
-}
-
 div.list-whole-delete-checked {
     position: absolute;
     bottom: 60px;
@@ -1497,7 +1493,7 @@ div.page-selected {
 }
 
 div.page-unselected:hover {
-    color: var(--page-unselected-hover-color);
+    color: var(--Dark-20);
     cursor: pointer;
 }
 
@@ -1513,7 +1509,6 @@ td.page-bar {
     font-size: 13px;
     line-height: 13px;
     color: #666666;
-    border-left: 1px solid var(--page-bar-border-color);
 }
 
 table.page-go {
