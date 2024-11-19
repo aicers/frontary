@@ -24,6 +24,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   - Some `InputConfig` variants, that need preset values for users, now have the
     `preset` field.
 - Moved `Essential::unique` to `TextConfig`, because only `TextConfig` needs it.
+- Replaced deprecated Clumit color variable names with new color naming
+  conventions.
 
 ### Removed
 
