@@ -161,7 +161,9 @@ where
         if cmp_kind.chain_cmp() {
             html! {
                 <div class="input-comparison-value">
-                    { cmp_statement_head(cmp_kind) }
+                    <div class="input-comparison-value-indicator">
+                        { cmp_statement_head(cmp_kind) }
+                    </div>
                     <div class="input-comparison-value-value">
                         { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind) }
                     </div>
@@ -175,7 +177,9 @@ where
         } else {
             html! {
                 <div class="input-comparison-value">
-                    { cmp_statement_symbol(cmp_kind) }
+                    <div class="input-comparison-value-indicator">
+                        { cmp_statement_symbol(cmp_kind) }
+                    </div>
                     <div class="input-comparison-value-value">
                         { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind) }
                     </div>

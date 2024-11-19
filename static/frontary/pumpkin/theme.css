@@ -126,14 +126,18 @@ div.radio-space {
 div.searchable-select-vector {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
 }
 
 div.searchable-select-vector-margin {
-    margin-right: 4px;
+    margin-right: 8px;
+    width: 100%;
+    max-width: 255px;
 }
 
 div.searchable-select {
     height: 40px;
+    position: relative;
 }
 
 div.searchable-select-top {
@@ -1615,7 +1619,7 @@ div.input-item {
     width: 100%;
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 div.input-item-group {
@@ -1676,10 +1680,16 @@ div.input-text-message {
 }
 
 div.input-required-message {
-    margin-top: 5px;
-    font-size: 12px;
-    line-height: 15px;
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
     color: var(--Red-50);
+}
+
+img.input-error-icon {
+    width: 16px;
+    height: 16px;
 }
 
 div.input-contents-item-alert-message {
@@ -1887,9 +1897,10 @@ div.input-select-vector {
 }
 
 div.input-select-vector-vec {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
+}
+div.searchable-select-vector > div {
+    width: 100% !important;
 }
 
 div.input-select-vector-vec-required {
@@ -2439,6 +2450,11 @@ div.input-nic-delete-outer {
     align-items: center;
 }
 
+div.input-nic-delete-outer:hover {
+    border-radius: 8px;
+    background: var(--Transparent-Mid-Grey);
+}
+
 div.input-nic-delete {
     width: 32px;
     height: 32px;
@@ -2600,27 +2616,45 @@ table.input-group {
 
 th.input-group-heading {
     height: 30px;
-    background-color: rgba(95, 104, 118, 0.24);
-    font-weight: normal;
-    font-size: 11px;
-    color: var(--Dark-10);
-    font-weight: 400;
+    font-size: 16px;
+    color: var(--Text-Primary);
+    font-weight: 500;
+    text-align: left;
+    padding-bottom: 4px;
+}
+
+th.input-group-heading div.input-group-asterisk {
+    display: inline;
+    margin-left: 4px;
 }
 
 th.input-group-heading-delete {
     width: 24px;
-    background-color: rgba(95, 104, 118, 0.24);
+}
+
+td.input-group-delete {
+    padding-right: 12px;
+    padding-bottom: 12px;
 }
 
 td.input-group {
-    padding: 4px;
+    padding-right: 12px;
+    padding-bottom: 12px;
+}
+
+td.input-group:last-child {
+    padding-right: 0px;
 }
 
 div.input-group-item-outer {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+}
+
+div.input-group-item-outer > div {
+    width: 100% !important;
 }
 
 div.input-group-add {
@@ -2628,7 +2662,7 @@ div.input-group-add {
     flex-direction: row;
     justify-content: flex-end;
     align-items: flex-end;
-    padding-bottom: 4px;
+    padding-bottom: 12px;
 }
 
 div.input-comparison-outer {
@@ -2637,23 +2671,30 @@ div.input-comparison-outer {
 }
 
 div.input-comparison {
+    width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }
 
 div.input-comparison-value {
-    width: 260px;
     margin-left: 4px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--Text-Primary);
+}
+
+div.input-comparison-value-indicator {
+    min-width: fit-content;
+    margin: 0px 8px;
 }
 
 div.input-comparison-value-value {
-    width: 90px;
     margin-left: 4px;
     margin-right: 4px;
 }
@@ -2936,7 +2977,7 @@ td.tab-menu-selected {
     height: 40px;
     padding: 0 16px;
     text-align: center;
-    vertical-align: botton;
+    vertical-align: bottom;
     font-weight: 500;
     line-height: 24px;
     font-size: 16px;
