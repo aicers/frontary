@@ -390,6 +390,9 @@ where
                     } else {
                         html! {
                             <input type="number" class={class} style={style}
+                                // HIGHLIGHT: This must be set to empty string. If not, the previous
+                                // input shows here when another item in the group is added.
+                                value={String::new()}
                                 placeholder={placeholder}
                                 autofocus={autofocus}
                                 oninput={oninput}
@@ -518,6 +521,9 @@ where
                     } else {
                         html! {
                             <input type="number" class={class} style={style}
+                                // HIGHLIGHT: This must be set to empty string. If not, the previous
+                                // input shows here when another item in the group is added.
+                                value={String::new()}
                                 step={step.to_string()}
                                 placeholder={placeholder}
                                 autofocus={autofocus}
@@ -646,6 +652,9 @@ where
                     } else {
                         html! {
                             <input type="number" class={class} style={style}
+                                // HIGHLIGHT: This must be set to empty string. If not, the previous
+                                // input shows here when another item in the group is added.
+                                value={String::new()}
                                 placeholder={placeholder}
                                 autofocus={autofocus}
                                 oninput={oninput}

@@ -1100,7 +1100,7 @@ where
                                             )))
                                         })
                                         .collect::<Vec<_>>();
-                                    *user = GroupItem::new(vec![new_row]);
+                                    user.set_groups(vec![new_row]);
                                 }
                             }
                             (InputItem::Password(_), InputConfig::Password(_))

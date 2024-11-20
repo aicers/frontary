@@ -473,47 +473,44 @@ where
                                         html! {
                                             <tr>
                                                 {
-                                                    for items_conf.iter().enumerate().map(|(col_index, each)| {
-                                                        let Some(input_data) = row.get(col_index) else {
-                                                            return html! {};
-                                                        };
+                                                    for row.iter().zip(items_conf.iter()).enumerate().map(|(col_index, (each_item, each_conf))| {
                                                         html! {
                                                             <td class="input-group">
                                                                 <div class="input-group-item-outer">
                                                                 {
-                                                                    match &**each {
+                                                                    match &**each_conf {
                                                                         InputConfig::Text(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_text(ctx, &ess, config.length, config.width, input_data,
+                                                                            self.view_text(ctx, &ess, config.length, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, input_data,
+                                                                            self.view_select_searchable(ctx, false, &ess, config.width, &config.options, each_item,
                                                                                 Some(&row_rep_index), col_index, 1, true)
                                                                         }
                                                                         InputConfig::VecSelect(config) => {
                                                                             self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths,
-                                                                                &config.max_heights, &config.map_list, input_data, Some(&row_rep_index), col_index, true)
+                                                                                &config.max_heights, &config.map_list, each_item, Some(&row_rep_index), col_index, true)
                                                                         }
                                                                         InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, input_data,
+                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Float64(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_float_64(ctx, &ess, config.step, config.width, input_data,
+                                                                            self.view_float_64(ctx, &ess, config.step, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Comparison(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_comparison(ctx, &ess, input_data, Some(&row_rep_index), col_index, true)
+                                                                            self.view_comparison(ctx, &ess, each_item, Some(&row_rep_index), col_index, true)
                                                                         }
                                                                         _ => html! {}
                                                                     }
