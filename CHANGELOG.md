@@ -26,6 +26,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Moved `Essential::unique` to `TextConfig`, because only `TextConfig` needs it.
 - Replaced deprecated Clumit color variable names with new color naming
   conventions.
+- Added a lint option to the Clippy part of ci.yml: -W clippy::unwrap_used
 
 ### Removed
 
