@@ -785,6 +785,7 @@ where
         &self,
         ctx: &Context<Self>,
         ess: &InputEssential,
+        extensions: &[String],
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
@@ -807,6 +808,7 @@ where
             }
             Message::ChooseFile(my_index_clone.clone(), result, input_data_clone.clone())
         });
+        let extensions = extensions.join(",");
         let txt = ctx.props().txt.txt.clone();
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::File(file) = &(*input_data) {
@@ -830,8 +832,7 @@ where
                     <label for="input-file" class="input-file-choose-file">
                         { text!(txt, ctx.props().language, "Choose a file") }
                     </label>
-
-                    <input type="file" id="input-file" accept=".aice" name="upload-file" style="display: none;"
+                    <input type="file" id="input-file" accept={extensions} name="upload-file" style="display: none;"
                         onchange={onchange}
                     />
                 </div>

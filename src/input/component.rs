@@ -1077,7 +1077,7 @@ where
                         self.view_nic(ctx, &config.ess, input_data, None, index)
                     }
                     InputConfig::File(config) => {
-                        self.view_file(ctx, &config.ess, input_data, None, index)
+                        self.view_file(ctx, &config.ess, &config.allowed_extensions, input_data, None, index)
                     }
                     InputConfig::Comparison(config) => {
                         self.view_comparison(ctx, &config.ess, input_data, None, index, false)
