@@ -20,22 +20,14 @@ use super::{
 use crate::{
     language::Language,
     list::{Column, ListItem},
-    sort_hosts, sort_networks, text, InputNic, MessageType, Rerender, Texts, ViewString,
+    sort_hosts, sort_networks, text, InputNic, InvalidPasswordKind, MessageType, Rerender, Texts,
+    ViewString,
 };
 
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum InvalidMessage {
     InvalidInput,
-    PasswordHasSpace,
-    PasswordHasControlCharacter,
-    PasswordNotMatch,
-    PasswordTooShort,
-    PasswordNoLowercaseLetter,
-    PasswordNoUppercaseLetter,
-    PasswordNoNumber,
-    PasswordNoSymbol,
-    PasswordHasConsecutiveLetters,
-    PasswordHasAdjacentLetters,
+    InvalidPassword(InvalidPasswordKind),
     InterfaceNameRequired,
     InterfaceRequired,
     GatewayRequired,

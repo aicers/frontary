@@ -15,6 +15,7 @@ use super::{
     RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem,
     VecSelectItem,
 };
+use crate::InvalidPasswordKind as Kind;
 
 const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
 const PASSWORD_MIN_FORBID_ADJACENT_LEN: usize = 4; // adjacent keyboard characters
@@ -651,8 +652,12 @@ where
                                 if let Some(cnf_pwd) = self.confirm_password.get(&(item_index)) {
                                     if pwd == cnf_pwd {
                                         if let Some(v) = invalid_password(pwd) {
-                                            self.verification
-                                                .insert(item_index, Verification::Invalid(v));
+                                            self.verification.insert(
+                                                item_index,
+                                                Verification::Invalid(
+                                                    InvalidMessage::InvalidPassword(v),
+                                                ),
+                                            );
                                             rtn = false;
                                         } else {
                                             self.verification
@@ -661,7 +666,9 @@ where
                                     } else {
                                         self.verification.insert(
                                             item_index,
-                                            Verification::Invalid(InvalidMessage::PasswordNotMatch),
+                                            Verification::Invalid(InvalidMessage::InvalidPassword(
+                                                Kind::NotMatch,
+                                            )),
                                         );
                                         rtn = false;
                                     }
@@ -1360,48 +1367,49 @@ const PASSWD_CMP: [&str; 7] = [
     "ZXCVBNM",
 ];
 
-fn invalid_password(password: &str) -> Option<InvalidMessage> {
+#[must_use]
+pub fn invalid_password(password: &str) -> Option<Kind> {
     let analyzed = analyzer::analyze(password);
     let filtered = analyzed.password();
 
     #[allow(clippy::collapsible_else_if)]
     if cfg!(feature = "cc-password") {
         if password != filtered {
-            Some(InvalidMessage::PasswordHasControlCharacter)
+            Some(Kind::HasControlCharacter)
         } else if analyzed.spaces_count() > 0 {
-            Some(InvalidMessage::PasswordHasSpace)
+            Some(Kind::HasSpace)
         } else if analyzed.length() < PASSWORD_MIN_LEN {
-            Some(InvalidMessage::PasswordTooShort)
+            Some(Kind::TooShort)
         } else if analyzed.lowercase_letters_count() == 0 {
-            Some(InvalidMessage::PasswordNoLowercaseLetter)
+            Some(Kind::NoLowercaseLetter)
         } else if analyzed.uppercase_letters_count() == 0 {
-            Some(InvalidMessage::PasswordNoUppercaseLetter)
+            Some(Kind::NoUppercaseLetter)
         } else if analyzed.numbers_count() == 0 {
-            Some(InvalidMessage::PasswordNoNumber)
+            Some(Kind::NoNumber)
         } else if analyzed.symbols_count() == 0 {
-            Some(InvalidMessage::PasswordNoSymbol)
+            Some(Kind::NoSymbol)
         } else if analyzed.consecutive_count() > 0 {
-            Some(InvalidMessage::PasswordHasConsecutiveLetters)
+            Some(Kind::HasConsecutiveLetters)
         } else if cmp_consecutive(password) {
-            Some(InvalidMessage::PasswordHasAdjacentLetters)
+            Some(Kind::HasAdjacentLetters)
         } else {
             None
         }
     } else {
         if password != filtered {
-            Some(InvalidMessage::PasswordHasControlCharacter)
+            Some(Kind::HasControlCharacter)
         } else if analyzed.spaces_count() > 0 {
-            Some(InvalidMessage::PasswordHasSpace)
+            Some(Kind::HasSpace)
         } else if analyzed.length() < PASSWORD_MIN_LEN {
-            Some(InvalidMessage::PasswordTooShort)
+            Some(Kind::TooShort)
         } else if analyzed.lowercase_letters_count() == 0 {
-            Some(InvalidMessage::PasswordNoLowercaseLetter)
+            Some(Kind::NoLowercaseLetter)
         } else if analyzed.uppercase_letters_count() == 0 {
-            Some(InvalidMessage::PasswordNoUppercaseLetter)
+            Some(Kind::NoUppercaseLetter)
         } else if analyzed.numbers_count() == 0 {
-            Some(InvalidMessage::PasswordNoNumber)
+            Some(Kind::NoNumber)
         } else if analyzed.symbols_count() == 0 {
-            Some(InvalidMessage::PasswordNoSymbol)
+            Some(Kind::NoSymbol)
         } else {
             None
         }
