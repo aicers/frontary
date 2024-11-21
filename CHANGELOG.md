@@ -10,6 +10,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Enabled the radio component have child items recursively.
+- Added the `invalid_password` method to validate user passwords based on
+  different criteria depending on whether the `cc-password` feature is enabled.
 
 ### Changed
 

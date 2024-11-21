@@ -15,7 +15,8 @@ use super::{
     InputItem,
 };
 use crate::{
-    input::component::Verification, text, HostNetworkHtml, HostNetworkKind, InputEssential, Tag,
+    input::component::Verification, text, HostNetworkHtml, HostNetworkKind, InputEssential,
+    InvalidPasswordKind as Kind, Tag,
 };
 
 const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input a new one.";
@@ -264,19 +265,18 @@ where
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
                 {
-                    if let Some(Verification::Invalid(m)) = self.verification.get(&my_index) {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidPassword(m))) = self.verification.get(&my_index) {
                         let msg = match m {
-                            InvalidMessage::PasswordHasSpace => Some(PASSWD_HAS_SPACE_MSG),
-                            InvalidMessage::PasswordHasControlCharacter => Some(PASSWD_HAS_CONTROL_CHARACTER_MSG),
-                            InvalidMessage::PasswordNotMatch => Some(PASSWD_NOT_MATCH_MSG),
-                            InvalidMessage::PasswordTooShort => Some(PASSWD_TOO_SHORT_MSG),
-                            InvalidMessage::PasswordNoLowercaseLetter => Some(PASSWD_NO_LOWER_MSG),
-                            InvalidMessage::PasswordNoUppercaseLetter => Some(PASSWD_NO_UPPER_MSG),
-                            InvalidMessage::PasswordNoNumber => Some(PASSWD_NO_NUMBER_MSG),
-                            InvalidMessage::PasswordNoSymbol => Some(PASSWD_NO_SYMBOL_MSG),
-                            InvalidMessage::PasswordHasConsecutiveLetters => Some(PASSWD_CONSECUTIVE_MSG),
-                            InvalidMessage::PasswordHasAdjacentLetters => Some(PASSWD_ADJACENT_MSG),
-                            _ => None,
+                            Kind::HasSpace => Some(PASSWD_HAS_SPACE_MSG),
+                            Kind::HasControlCharacter => Some(PASSWD_HAS_CONTROL_CHARACTER_MSG),
+                            Kind::NotMatch => Some(PASSWD_NOT_MATCH_MSG),
+                            Kind::TooShort => Some(PASSWD_TOO_SHORT_MSG),
+                            Kind::NoLowercaseLetter => Some(PASSWD_NO_LOWER_MSG),
+                            Kind::NoUppercaseLetter => Some(PASSWD_NO_UPPER_MSG),
+                            Kind::NoNumber => Some(PASSWD_NO_NUMBER_MSG),
+                            Kind::NoSymbol => Some(PASSWD_NO_SYMBOL_MSG),
+                            Kind::HasConsecutiveLetters => Some(PASSWD_CONSECUTIVE_MSG),
+                            Kind::HasAdjacentLetters => Some(PASSWD_ADJACENT_MSG),
                         };
                         if let Some(msg) = msg {
                             html! {
