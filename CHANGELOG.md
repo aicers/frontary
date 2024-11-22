@@ -41,6 +41,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed `SelectMini` component to ensure long data entries are display on a
   single line.
 - Adjusted alignment for example text in input fields.
+- Fixed the layout of tags to wrap properly and fit within their container
+  without overflowing.
 
 ## [0.9.4] - 2024-10-16
 

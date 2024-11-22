@@ -297,11 +297,17 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = format!("max-height: {}px;", ctx.props().max_height);
+        let style = if cfg!(feature = "pumpkin-dark") {
+            String::new()
+        } else {
+            format!("max-height: {}px;", ctx.props().max_height)
+        };
         html! {
             <div class="tag-group-input-outer">
                 <div class="tag-group-input" style={style}>
-                    { self.view_tag_group(ctx) }
+                    <div class="tag-list">
+                        { self.view_tag_group(ctx) }
+                    </div>
                     { self.view_input(ctx) }
                 </div>
                 { self.view_message(ctx) }
