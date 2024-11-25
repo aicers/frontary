@@ -607,6 +607,10 @@ impl GroupItem {
         self.groups.clone()
     }
 
+    pub fn set_groups(&mut self, groups: Vec<Vec<Rc<RefCell<InputItem>>>>) {
+        self.groups = groups;
+    }
+
     pub fn clear(&mut self) {
         for group in &mut self.groups {
             for item in group {

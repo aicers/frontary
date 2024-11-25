@@ -72,6 +72,8 @@ pub struct SelectMultipleConfig {
     pub preset: Option<Vec<String>>,
 }
 
+/// `Tag` items must belong to the top level of the hierarchy. It cannot be a child of `Checkbox` or
+/// `Radio`, and cannot be an item of `VecSelect` or `Group`.
 #[derive(Clone, PartialEq)]
 pub struct TagConfig {
     pub ess: Essential,
