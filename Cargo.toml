@@ -7,7 +7,7 @@ publish = false
 [features]
 cc-password = []
 debug = []
-default = []
+default = ["test"]
 pumpkin-dark = []
 pumpkin-light = []
 test = []

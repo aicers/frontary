@@ -13,6 +13,7 @@ mod user_input_select;
 
 use core::panic;
 use std::sync::LazyLock;
+use std::{cell::RefCell, rc::Rc};
 use std::{collections::HashSet, fmt};
 
 use bincode::Options;
@@ -500,6 +501,125 @@ impl Comparison {
             | Self::NotCloseRange(_, v)
             | Self::NotLeftOpenRange(_, v)
             | Self::NotRightOpenRange(_, v) => Some(v.clone()),
+        }
+    }
+}
+
+#[must_use]
+pub fn gen_default_items_from_confs(confs: &[Rc<InputConfig>]) -> Vec<Rc<RefCell<InputItem>>> {
+    default_items(confs, 0)
+}
+
+fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<InputItem>>> {
+    confs
+        .iter()
+        .map(|conf| {
+            Rc::new(RefCell::new(match &**conf {
+                InputConfig::Text(_) => InputItem::Text(TextItem::default()),
+                InputConfig::Password(_) => InputItem::Password(PasswordItem::default()),
+                InputConfig::HostNetworkGroup(_) => {
+                    InputItem::HostNetworkGroup(HostNetworkGroupItem::default())
+                }
+                InputConfig::SelectSingle(_) => {
+                    InputItem::SelectSingle(SelectSingleItem::default())
+                }
+                InputConfig::SelectMultiple(_) => {
+                    InputItem::SelectMultiple(SelectMultipleItem::default())
+                }
+                InputConfig::Tag(_) => InputItem::Tag(TagItem::default()),
+                InputConfig::Unsigned32(_) => InputItem::Unsigned32(Unsigned32Item::default()),
+                InputConfig::Float64(_) => InputItem::Float64(Float64Item::default()),
+                InputConfig::Percentage(_) => InputItem::Percentage(PercentageItem::default()),
+                InputConfig::Nic(_) => InputItem::Nic(NicItem::default()),
+                InputConfig::File(_) => InputItem::File(FileItem::default()),
+                InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::default()),
+                InputConfig::VecSelect(conf) => InputItem::VecSelect(VecSelectItem::new(vec![
+                        HashSet::new();
+                        conf.items_ess_list.len()
+                    ])),
+                InputConfig::Group(conf) => {
+                    if level == 0 {
+                        let items = vec![default_items(&conf.items, level + 1)];
+                        InputItem::Group(GroupItem::new(items))
+                    } else {
+                        InputItem::Group(GroupItem::default())
+                    }
+                }
+                InputConfig::Checkbox(conf) => {
+                    if let Some(children) = conf.children.as_ref() {
+                        if children.children.is_empty() {
+                            InputItem::Checkbox(CheckboxItem::default())
+                        } else {
+                            InputItem::Checkbox(CheckboxItem::default_with_children(default_items(
+                                &children.children,
+                                level + 1,
+                            )))
+                        }
+                    } else {
+                        InputItem::Checkbox(CheckboxItem::default())
+                    }
+                }
+                InputConfig::Radio(conf) => {
+                    if conf.children_group.is_empty() {
+                        InputItem::Radio(RadioItem::default())
+                    } else {
+                        let children = conf
+                            .children_group
+                            .iter()
+                            .map(|c| {
+                                c.as_ref()
+                                    .map_or_else(Vec::new, |c| default_items(c, level + 1))
+                            })
+                            .collect::<Vec<_>>();
+                        InputItem::Radio(RadioItem::default_with_children(children))
+                    }
+                }
+            }))
+        })
+        .collect::<Vec<_>>()
+}
+
+fn group_item_list_preset(confs: &[Rc<InputConfig>]) -> Vec<Rc<RefCell<InputItem>>> {
+    confs
+        .iter()
+        .map(|conf| Rc::new(RefCell::new(item_preset(conf))))
+        .collect::<Vec<_>>()
+}
+
+fn item_preset(conf: &Rc<InputConfig>) -> InputItem {
+    match &**conf {
+        InputConfig::Text(conf) => InputItem::Text(TextItem::new(
+            conf.preset.as_deref().unwrap_or_default().to_string(),
+        )),
+        InputConfig::HostNetworkGroup(_) => {
+            InputItem::HostNetworkGroup(HostNetworkGroupItem::new(InputHostNetworkGroup::default()))
+        }
+        InputConfig::SelectSingle(conf) => {
+            InputItem::SelectSingle(SelectSingleItem::new(conf.preset.clone()))
+        }
+        InputConfig::SelectMultiple(conf) => InputItem::SelectMultiple(SelectMultipleItem::new(
+            conf.preset.as_ref().map_or_else(HashSet::new, |p| {
+                p.iter().cloned().collect::<HashSet<String>>()
+            }),
+        )),
+        InputConfig::Unsigned32(conf) => InputItem::Unsigned32(Unsigned32Item::new(conf.preset)),
+        InputConfig::Float64(conf) => InputItem::Float64(Float64Item::new(conf.preset)),
+        InputConfig::Percentage(conf) => InputItem::Percentage(PercentageItem::new(conf.preset)),
+        InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::new(None)),
+        InputConfig::VecSelect(config) => {
+            InputItem::VecSelect(VecSelectItem::new(config.preset.as_ref().map_or_else(
+                || vec![HashSet::new(); config.items_ess_list.len()],
+                Clone::clone,
+            )))
+        }
+        InputConfig::Password(_)
+        | InputConfig::Tag(_)
+        | InputConfig::Nic(_)
+        | InputConfig::File(_)
+        | InputConfig::Group(_)
+        | InputConfig::Checkbox(_)
+        | InputConfig::Radio(_) => {
+            panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
         }
     }
 }

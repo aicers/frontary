@@ -12,10 +12,10 @@ use num_bigint::BigUint;
 use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
 
 use super::{
-    cal_index, ComparisonItem, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
+    cal_index, group_item_list_preset, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
     InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
     SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item,
-    Value as ComparisonValue, VecSelectItem,
+    Value as ComparisonValue,
 };
 use crate::{
     language::Language,
@@ -796,12 +796,9 @@ where
                             // TODO: issue #188
                             return false;
                         }
-                        let new_row = items_conf
-                            .iter()
-                            .map(|conf| Rc::new(RefCell::new(group_item(conf))))
-                            .collect::<Vec<_>>();
-
+                        let new_row = group_item_list_preset(&items_conf);
                         data.push(new_row);
+
                         if let Some(d) = data.last() {
                             let row_rep_index = cal_index(Some(&base_index), data.len() - 1);
                             for (col, d) in d.iter().enumerate() {
@@ -1209,44 +1206,6 @@ where
                     }
                 }
             }
-        }
-    }
-}
-
-pub(super) fn group_item(conf: &Rc<InputConfig>) -> InputItem {
-    match &**conf {
-        InputConfig::Text(conf) => InputItem::Text(TextItem::new(
-            conf.preset.as_deref().unwrap_or_default().to_string(),
-        )),
-        InputConfig::HostNetworkGroup(_) => {
-            InputItem::HostNetworkGroup(HostNetworkGroupItem::new(InputHostNetworkGroup::default()))
-        }
-        InputConfig::SelectSingle(conf) => {
-            InputItem::SelectSingle(SelectSingleItem::new(conf.preset.clone()))
-        }
-        InputConfig::SelectMultiple(conf) => InputItem::SelectMultiple(SelectMultipleItem::new(
-            conf.preset.as_ref().map_or_else(HashSet::new, |p| {
-                p.iter().cloned().collect::<HashSet<String>>()
-            }),
-        )),
-        InputConfig::Unsigned32(conf) => InputItem::Unsigned32(Unsigned32Item::new(conf.preset)),
-        InputConfig::Float64(conf) => InputItem::Float64(Float64Item::new(conf.preset)),
-        InputConfig::Percentage(conf) => InputItem::Percentage(PercentageItem::new(conf.preset)),
-        InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::new(None)),
-        InputConfig::VecSelect(config) => {
-            InputItem::VecSelect(VecSelectItem::new(config.preset.as_ref().map_or_else(
-                || vec![HashSet::new(); config.items_ess_list.len()],
-                Clone::clone,
-            )))
-        }
-        InputConfig::Password(_)
-        | InputConfig::Tag(_)
-        | InputConfig::Nic(_)
-        | InputConfig::File(_)
-        | InputConfig::Group(_)
-        | InputConfig::Checkbox(_)
-        | InputConfig::Radio(_) => {
-            panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
         }
     }
 }
