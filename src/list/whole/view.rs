@@ -81,7 +81,7 @@ where
                                 let first = sum_cols;
                                 sum_cols += cols.len();
                                 let style = if let ColWidths::Pixel(cols) = cols {
-                                    format!("width: {}px;", cols.iter().filter_map(Clone::clone).sum::<u32>())
+                                    format!("width: {}px;", cols.iter().filter_map(|x| *x).sum::<u32>())
                                 } else {
                                     "width: 100%;".to_string()
                                 };
@@ -352,7 +352,7 @@ where
                                                                 let first = sum_cols;
                                                                 sum_cols += cols.len();
                                                                 let style = if let ColWidths::Pixel(cols) = cols {
-                                                                    format!("width: {}px;", cols.iter().filter_map(Clone::clone).sum::<u32>())
+                                                                    format!("width: {}px;", cols.iter().filter_map(|x| *x).sum::<u32>())
                                                                 } else {
                                                                     "width: 100%;".to_string()
                                                                 };
@@ -478,8 +478,7 @@ where
     fn varied_width(ctx: &Context<Self>, widths: &ColWidths) -> Option<u32> {
         match widths {
             ColWidths::Pixel(widths) => Some(
-                ctx.props().display_info.width_full
-                    - widths.iter().filter_map(Clone::clone).sum::<u32>(),
+                ctx.props().display_info.width_full - widths.iter().filter_map(|x| *x).sum::<u32>(),
             ),
             ColWidths::Ratio(_) => None,
         }

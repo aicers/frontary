@@ -307,7 +307,7 @@ where
                             }
                         }
                         Kind::Single => {
-                            let key = selected.iter().map(Clone::clone).next();
+                            let key = selected.iter().next().cloned();
 
                             let value = if let (Some(key), Ok(list)) =
                                 (key, ctx.props().list.try_borrow())

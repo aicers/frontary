@@ -157,7 +157,7 @@ where
         let previous = self
             .sorted_keys
             .iter()
-            .map(Clone::clone)
+            .cloned()
             .collect::<HashSet<String>>();
 
         let (index, asc) = self.sort.map_or((None, true), |s| {
@@ -202,7 +202,7 @@ where
         let current = self
             .sorted_keys
             .iter()
-            .map(Clone::clone)
+            .cloned()
             .collect::<HashSet<String>>();
 
         let added = current

@@ -92,15 +92,9 @@ where
             .selected
             .iter()
             .filter_map(|s| {
-                s.try_borrow().ok().and_then(|s| {
-                    s.as_ref().and_then(|s| {
-                        s.iter()
-                            .map(Clone::clone)
-                            .collect::<Vec<String>>()
-                            .first()
-                            .cloned()
-                    })
-                })
+                s.try_borrow()
+                    .ok()
+                    .and_then(|s| s.as_ref().and_then(|s| s.iter().next().cloned()))
             })
             .collect::<Vec<String>>();
         let mut key = Vec::<String>::new();

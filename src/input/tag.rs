@@ -549,7 +549,7 @@ where
 
     fn init_view_order(&mut self, ctx: &Context<Self>) {
         if let Ok(data) = ctx.props().input_data.try_borrow() {
-            let mut old = data.old.iter().map(Clone::clone).collect::<Vec<String>>();
+            let mut old = data.old.iter().cloned().collect::<Vec<String>>();
             old.sort_unstable();
             self.view_order = old;
         }

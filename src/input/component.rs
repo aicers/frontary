@@ -619,7 +619,7 @@ where
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
                     let empty = if let Ok(buffer) = buffer.try_borrow() {
                         if let Some(buffer) = buffer.as_ref() {
-                            let selected = buffer.iter().map(Clone::clone).next();
+                            let selected = buffer.iter().next().cloned();
                             if let Ok(mut item) = input_data.try_borrow_mut() {
                                 *item = InputItem::SelectSingle(SelectSingleItem::new(selected));
                             }
@@ -1216,7 +1216,7 @@ where
 pub(super) fn group_item(conf: &Rc<InputConfig>) -> InputItem {
     match &**conf {
         InputConfig::Text(conf) => InputItem::Text(TextItem::new(
-            conf.preset.as_ref().map_or_else(String::new, Clone::clone),
+            conf.preset.as_deref().unwrap_or_default().to_string(),
         )),
         InputConfig::HostNetworkGroup(_) => {
             InputItem::HostNetworkGroup(HostNetworkGroupItem::new(InputHostNetworkGroup::default()))
@@ -1226,7 +1226,7 @@ pub(super) fn group_item(conf: &Rc<InputConfig>) -> InputItem {
         }
         InputConfig::SelectMultiple(conf) => InputItem::SelectMultiple(SelectMultipleItem::new(
             conf.preset.as_ref().map_or_else(HashSet::new, |p| {
-                p.iter().map(Clone::clone).collect::<HashSet<String>>()
+                p.iter().cloned().collect::<HashSet<String>>()
             }),
         )),
         InputConfig::Unsigned32(conf) => InputItem::Unsigned32(Unsigned32Item::new(conf.preset)),

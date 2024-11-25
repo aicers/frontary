@@ -721,11 +721,7 @@ where
             Message::DeleteChecked => match ctx.props().kind {
                 Kind::LayeredSecond => {
                     if let Ok(mut second) = ctx.props().input_second_keys.try_borrow_mut() {
-                        let keys = self
-                            .checked
-                            .iter()
-                            .map(Clone::clone)
-                            .collect::<Vec<String>>();
+                        let keys = self.checked.iter().cloned().collect::<Vec<String>>();
                         *second = Some(keys);
                     }
                     ctx.link().send_message(Message::DeleteSecond);
@@ -733,11 +729,7 @@ where
                 }
                 Kind::LayeredFirst | Kind::Flat => {
                     let send_msg = if let Ok(mut ids) = ctx.props().input_ids.try_borrow_mut() {
-                        *ids = self
-                            .checked
-                            .iter()
-                            .map(Clone::clone)
-                            .collect::<Vec<String>>();
+                        *ids = self.checked.iter().cloned().collect::<Vec<String>>();
                         true
                     } else {
                         false

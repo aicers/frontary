@@ -854,12 +854,12 @@ impl From<&Column> for InputItem {
                 Self::SelectSingle(SelectSingleItem::new(value.as_ref().map(|d| d.0.clone())))
             }
             Column::SelectMultiple(list) => Self::SelectMultiple(SelectMultipleItem::new(
-                list.keys().map(Clone::clone).collect::<HashSet<String>>(),
+                list.keys().cloned().collect::<HashSet<String>>(),
             )),
             Column::VecSelect(list) => {
                 let list = list
                     .iter()
-                    .map(|l| l.keys().map(Clone::clone).collect::<HashSet<String>>())
+                    .map(|l| l.keys().cloned().collect::<HashSet<String>>())
                     .collect::<Vec<_>>();
                 Self::VecSelect(VecSelectItem::new(list))
             }
