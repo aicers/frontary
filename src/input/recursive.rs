@@ -11,9 +11,9 @@ use super::{
     super::CheckStatus,
     cal_index,
     component::{InvalidMessage, Model, Verification},
-    ComparisonItem, GroupConfig, GroupItem, HostNetworkGroupItem, InputConfig, InputItem,
-    RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem,
-    VecSelectItem,
+    group_item_list_preset, ComparisonItem, GroupConfig, GroupItem, HostNetworkGroupItem,
+    InputConfig, InputItem, RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem,
+    SelectSingleItem, TagItem, VecSelectItem,
 };
 use crate::InvalidPasswordKind as Kind;
 
@@ -775,6 +775,7 @@ where
                                 }
                             }
                         }
+                        //+ TODO: Check this
                         (_, _) => (),
                     }
                 }
@@ -1054,6 +1055,12 @@ where
                                     self.vec_select_to_buffer(&item_index, user);
                                 }
                             }
+                            (InputItem::Group(user), InputConfig::Group(conf)) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    let new_row = group_item_list_preset(&conf.items);
+                                    user.set_groups(vec![new_row]);
+                                }
+                            }
                             (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
                                 // HIGHLIGHT: This should be called regardless of the user.status(),
                                 // because it might be changed according to the status of children.
@@ -1087,20 +1094,6 @@ where
                                         Rc::clone(child),
                                         Rc::clone(t),
                                     ));
-                                }
-                            }
-                            (InputItem::Group(user), InputConfig::Group(conf)) => {
-                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
-                                    let new_row = conf
-                                        .items
-                                        .iter()
-                                        .map(|conf| {
-                                            Rc::new(RefCell::new(super::component::group_item(
-                                                conf,
-                                            )))
-                                        })
-                                        .collect::<Vec<_>>();
-                                    user.set_groups(vec![new_row]);
                                 }
                             }
                             (InputItem::Password(_), InputConfig::Password(_))

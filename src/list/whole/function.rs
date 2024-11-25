@@ -8,8 +8,9 @@ use yew::{Component, Context};
 
 use super::{component::SortListKind, Message, Model, SortColumn, ViewInputStatus};
 use crate::{
+    gen_default_items_from_confs,
     list::{DataType, Kind},
-    {CheckStatus, PagesInfo, SortStatus},
+    InputItem, {CheckStatus, PagesInfo, SortStatus},
 };
 
 impl<T> Model<T>
@@ -266,25 +267,20 @@ where
         }
     }
 
-    pub(super) fn clear_input_data(ctx: &Context<Self>) {
+    pub(super) fn default_input_data(ctx: &Context<Self>) {
         match ctx.props().kind {
             Kind::LayeredFirst | Kind::Flat => {
-                for input in &ctx.props().input_data {
-                    if let Ok(mut input) = input.try_borrow_mut() {
-                        input.clear();
-                    }
-                }
+                let default_items = gen_default_items_from_confs(&ctx.props().input_conf);
+                copy_items(&default_items, &ctx.props().input_data);
+
                 if let Ok(mut input_ids) = ctx.props().input_ids.try_borrow_mut() {
                     input_ids.clear();
                 }
             }
             Kind::LayeredSecond => {
-                if let Some(input) = ctx.props().input_second_data.as_ref() {
-                    for input in input {
-                        if let Ok(mut input) = input.try_borrow_mut() {
-                            input.clear();
-                        }
-                    }
+                if let Some(data) = ctx.props().input_second_data.as_ref() {
+                    let default_items = gen_default_items_from_confs(&ctx.props().input_conf);
+                    copy_items(&default_items, data);
                 }
             }
         }
@@ -325,6 +321,14 @@ where
                     }
                 }
             }
+        }
+    }
+}
+
+fn copy_items(from: &[Rc<RefCell<InputItem>>], to: &[Rc<RefCell<InputItem>>]) {
+    for (from, to) in from.iter().zip(to.iter()) {
+        if let (Ok(from), Ok(mut to)) = (from.try_borrow(), to.try_borrow_mut()) {
+            *to = from.clone();
         }
     }
 }

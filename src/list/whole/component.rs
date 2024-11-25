@@ -561,7 +561,7 @@ where
             }
             Message::InputAdd => {
                 self.toggle_view_input_status(ViewInputStatus::Add);
-                Self::clear_input_data(ctx);
+                Self::default_input_data(ctx);
             }
             Message::ExtraMessage(message) => {
                 if let (Some(parent), Some(msg)) =
