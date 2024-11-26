@@ -20,11 +20,14 @@ impl Model {
             CheckStatus::Checked => "checked",
             _ => "unchecked",
         };
-        let style_all = if cfg!(feature = "pumpkin-dark") {
-            format!("background-image: url('/frontary/clumit-radio-opener-{postfix}.svg');")
+        let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
+            ("pumpkin/", "svg")
         } else {
-            format!("background-image: url('/frontary/radio-opener-{postfix}.png');")
+            ("", "png")
         };
+        let style_all = format!(
+            "background-image: url('/frontary/{prefix}radio-opener-{postfix}.{extension}');"
+        );
         let style = format!("width: {}px;", ctx.props().pop_width);
         let style_pop = format!(
             "widht: {}px; height: {}px;",
@@ -35,8 +38,8 @@ impl Model {
         let (style_list, style_input) = if self.view_list {
             if cfg!(feature = "pumpkin-dark") {
                 (
-                    "background-image: url('/frontary/clumit-collapse-contents.svg');",
-                    "background-image: url('/frontary/clumit-collapse-contents.svg');",
+                    "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
+                    "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
                 )
             } else {
                 (
@@ -46,8 +49,8 @@ impl Model {
             }
         } else if cfg!(feature = "pumpkin-dark") {
             (
-                "background-image: url('/frontary/clumit-expand-contents.svg');",
-                "background-image: url('/frontary/clumit-expand-contents.svg');",
+                "background-image: url('/frontary/pumpkin/expand-contents.svg');",
+                "background-image: url('/frontary/pumpkin/expand-contents.svg');",
             )
         } else {
             (

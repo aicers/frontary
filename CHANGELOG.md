@@ -28,6 +28,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Moved `Essential::unique` to `TextConfig`, because only `TextConfig` needs it.
 - Replaced deprecated Clumit color variable names with new color naming
   conventions.
+- Moved Clumit images to the pumpkin directory, removed the `clumit-` prefix
+  for consistency, and updated references accordingly.
 
 ### Removed
 
@@ -35,7 +37,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed `clumit-delete-trash` and `clumit-close-white` icon.
+- Fixed `delete-trash` and `close-white` icon.
 - Fixed overlapping placeholder text.
 - Fixed search box width and border radius.
 - Fixed `SelectMini` component to ensure long data entries are display on a
