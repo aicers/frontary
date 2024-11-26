@@ -196,7 +196,13 @@ pub enum Message {
     InputNicAdd(BigUint, usize, Rc<RefCell<InputItem>>),
     InputNicDelete(BigUint, usize, Rc<RefCell<InputItem>>),
     InputGroupAdd(BigUint, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
-    InputGroupDelete(BigUint, usize, Rc<RefCell<InputItem>>, Vec<Rc<InputConfig>>),
+    InputGroupDelete(
+        BigUint,
+        usize,
+        Rc<RefCell<InputItem>>,
+        Vec<Rc<InputConfig>>,
+        bool,
+    ), // bool for required
     InputComparisonValueKind(BigUint, Rc<RefCell<InputItem>>),
     InputComparisonComparisionKind(BigUint, Rc<RefCell<InputItem>>),
     InputComparisonValue(BigUint, usize, ComparisonValue, Rc<RefCell<InputItem>>),
@@ -248,8 +254,8 @@ impl Clone for Message {
             Self::InputNicAdd(a, b, c) => Self::InputNicAdd(a.clone(), *b, c.clone()),
             Self::InputNicDelete(a, b, c) => Self::InputNicDelete(a.clone(), *b, c.clone()),
             Self::InputGroupAdd(a, b, c) => Self::InputGroupAdd(a.clone(), b.clone(), c.clone()),
-            Self::InputGroupDelete(a, b, c, d) => {
-                Self::InputGroupDelete(a.clone(), *b, c.clone(), d.clone())
+            Self::InputGroupDelete(a, b, c, d, e) => {
+                Self::InputGroupDelete(a.clone(), *b, c.clone(), d.clone(), *e)
             }
             Self::InputComparisonValueKind(a, b) => {
                 Self::InputComparisonValueKind(a.clone(), b.clone())
@@ -332,9 +338,10 @@ impl PartialEq for Message {
             (Self::InputGroupAdd(s1, s2, s3), Self::InputGroupAdd(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::InputGroupDelete(s1, s2, s3, s4), Self::InputGroupDelete(o1, o2, o3, o4)) => {
-                s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4
-            }
+            (
+                Self::InputGroupDelete(s1, s2, s3, s4, s5),
+                Self::InputGroupDelete(o1, o2, o3, o4, o5),
+            ) => s1 == o1 && s2 == o2 && s3 == o3 && s4 == o4 && s5 == o5,
             (Self::ChooseFile(_, _, _), Self::ChooseFile(_, _, _)) | (_, _) => false,
         }
     }
@@ -547,6 +554,7 @@ where
                     *item = InputItem::Unsigned32(Unsigned32Item::new(Some(value)));
                 }
                 self.remove_required_msg(&id, false);
+                self.remove_group_required(ctx);
                 self.unique_msg.remove(&id);
             }
             Message::InputFloat64(id, value, input_data) => {
@@ -842,7 +850,7 @@ where
                     }
                 }
             }
-            Message::InputGroupDelete(base_index, row_index, input_data, items_conf) => {
+            Message::InputGroupDelete(base_index, row_index, input_data, items_conf, required) => {
                 let empty = if let Ok(mut input_data) = input_data.try_borrow_mut() {
                     if let InputItem::Group(data) = &mut *input_data {
                         if let Some(d) = data.get(row_index) {
@@ -908,6 +916,9 @@ where
                             }
                         }
                         data.remove(row_index);
+                        if required && data.is_inside_empty() {
+                            self.required_msg.insert(base_index.clone());
+                        }
                         data.is_empty()
                     } else {
                         false

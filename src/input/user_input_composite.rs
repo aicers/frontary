@@ -422,11 +422,15 @@ where
         });
         let display_titles =
             !(items_conf.len() == 1 && items_conf.first().map_or(false, |x| x.title().is_empty()));
+        let required = ess.required;
 
         html! {
             <div class="input-item">
                 <div class="input-contents-item-title">
                     { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                </div>
+                <div class="input-text-message">
+                    { self.view_required_msg(ctx, &this_index) }
                 </div>
                 <div class="input-group">
                     <div>
@@ -465,6 +469,7 @@ where
                                             row_index,
                                             input_data_callback.clone(),
                                             items_conf_callback.clone(),
+                                            required,
                                         )
                                     });
                                     let row_rep_index = cal_index(Some(&this_index), row_index);

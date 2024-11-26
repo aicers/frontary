@@ -602,6 +602,18 @@ impl GroupItem {
         Self { groups }
     }
 
+    pub fn is_inside_empty(&self) -> bool {
+        self.groups.iter().all(|group| {
+            group.iter().all(|item| {
+                if let Ok(item) = item.try_borrow() {
+                    item.is_empty()
+                } else {
+                    false
+                }
+            })
+        })
+    }
+
     #[must_use]
     pub fn into_inner(&self) -> Vec<Vec<Rc<RefCell<InputItem>>>> {
         self.groups.clone()

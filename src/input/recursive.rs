@@ -344,6 +344,36 @@ where
         }
     }
 
+    pub(super) fn remove_group_required(&mut self, ctx: &Context<Self>) {
+        self.remove_group_required_recursive(&ctx.props().input_data, None);
+    }
+
+    pub(super) fn remove_group_required_recursive(
+        &mut self,
+        input_data: &[Rc<RefCell<InputItem>>],
+        base_index: Option<&BigUint>,
+    ) {
+        for (index, d) in input_data.iter().enumerate() {
+            let this_index = cal_index(base_index, index);
+            if let Ok(d) = d.try_borrow() {
+                if let InputItem::Checkbox(d) = &*d {
+                    self.remove_group_required_recursive(d.children(), Some(&this_index));
+                } else if let InputItem::Radio(d) = &*d {
+                    for (sub_index, d) in d.children_group().iter().enumerate() {
+                        self.remove_group_required_recursive(
+                            d,
+                            Some(&cal_index(Some(&this_index), sub_index)),
+                        );
+                    }
+                } else if let InputItem::Group(d) = &*d {
+                    if !d.is_inside_empty() {
+                        self.required_msg.remove(&this_index);
+                    }
+                }
+            }
+        }
+    }
+
     pub(super) fn decide_required_all(&mut self, ctx: &Context<Self>) -> bool {
         self.decide_required_all_recursive(
             ctx,
@@ -419,10 +449,10 @@ where
                                     .any(|(selected, ess)| selected.is_empty() && ess.required)
                         }
                         (InputItem::Group(item), InputConfig::Group(conf)) => {
-                            if !item.is_empty() {
+                            if !item.is_inside_empty() {
                                 self.group_required_all_recursive(item, conf, &this_index);
                             }
-                            input_conf.required() && item.is_empty()
+                            input_conf.required() && item.is_inside_empty()
                         }
                         (InputItem::Checkbox(data), InputConfig::Checkbox(conf)) => {
                             if !data.is_empty() {
