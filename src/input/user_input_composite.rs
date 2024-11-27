@@ -381,7 +381,7 @@ where
             | InputConfig::Nic(_)
             | InputConfig::File(_)
             | InputConfig::Comparison(_) => {
-                panic!("Checkbox does not support Password, Tag, VecSelect, Nic, File, and Comparison for children.")
+                panic!("Checkbox does not support Password, Tag, Nic, File, VecSelect, and Comparison for children.")
             }
         }
     }
@@ -490,16 +490,24 @@ where
                                                                             self.view_text(ctx, &ess, config.length, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
+                                                                        InputConfig::HostNetworkGroup(config) => {
+                                                                            let mut ess = config.ess.clone();
+                                                                            ess.required = false;
+                                                                            self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, each_item,
+                                                                                Some(&row_rep_index), col_index)
+                                                                        }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_select_searchable(ctx, false, &ess, config.width, &config.options, each_item,
                                                                                 Some(&row_rep_index), col_index, 1, true)
                                                                         }
-                                                                        InputConfig::VecSelect(config) => {
-                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths,
-                                                                                &config.max_heights, &config.map_list, each_item, Some(&row_rep_index), col_index, true)
-                                                                        }
+                                                                        InputConfig::SelectMultiple(config) => {
+                                                                            let mut ess = config.ess.clone();
+                                                                            ess.required = false;
+                                                                            self.view_select_nic_or(ctx, &config.options, config.nic_index, &ess, each_item,
+                                                                                Some(&row_rep_index), col_index, 1)
+                                                                            }
                                                                         InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
@@ -512,12 +520,24 @@ where
                                                                             self.view_float_64(ctx, &ess, config.step, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
+                                                                        InputConfig::Percentage(config) => {
+                                                                            let mut ess = config.ess.clone();
+                                                                            ess.required = false;
+                                                                            self.view_percentage(ctx, &ess, config.min, config.max, config.num_decimals, config.width, each_item,
+                                                                                Some(&row_rep_index), col_index, false)
+                                                                        }
                                                                         InputConfig::Comparison(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_comparison(ctx, &ess, each_item, Some(&row_rep_index), col_index, true)
                                                                         }
-                                                                        _ => html! {}
+                                                                        InputConfig::VecSelect(config) => {
+                                                                            self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last, config.full_width, &config.widths, &config.max_widths,
+                                                                            &config.max_heights, &config.map_list, each_item, Some(&row_rep_index), col_index, true)
+                                                                        }
+                                                                        _ => {
+                                                                            panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+                                                                        }
                                                                     }
                                                                 }
                                                                 </div>

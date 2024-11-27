@@ -450,6 +450,9 @@ where
                         }
                         (InputItem::Group(item), InputConfig::Group(conf)) => {
                             if !item.is_inside_empty() {
+                                // HIGHLIGHT: Even if any element in the group is required, no need
+                                // to check the inside of the group, because the group being wholly
+                                // empty only relates to whether the group itself is required.
                                 self.group_required_all_recursive(item, conf, &this_index);
                             }
                             input_conf.required() && item.is_inside_empty()
@@ -607,6 +610,8 @@ where
         for (row_index, row) in empty.iter().enumerate() {
             let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
             if !all_empty || config.ess.required && row_index == 0 {
+                // HIGHLIGHT: If the entire row is empty, this row will be ignored. Only when more
+                // than one column is not empty, the other elements being empty need to be checked.
                 for ((col_index, data_empty), data_required) in
                     row.iter().enumerate().zip(required.iter())
                 {
@@ -1089,6 +1094,9 @@ where
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     let new_row = group_item_list_preset(&conf.items);
                                     user.set_groups(vec![new_row]);
+                                    if let Some(data) = user.last() {
+                                        self.group_row_to_buffer(&item_index, data, &conf.items);
+                                    }
                                 }
                             }
                             (InputItem::Checkbox(_), InputConfig::Checkbox(_)) => {
@@ -1308,12 +1316,12 @@ where
             });
     }
 
-    fn host_network_to_buffer(&mut self, index: &BigUint, data: &HostNetworkGroupItem) {
+    pub(super) fn host_network_to_buffer(&mut self, index: &BigUint, data: &HostNetworkGroupItem) {
         self.host_network_buffer
             .insert(index.clone(), Rc::new(RefCell::new(data.into_inner())));
     }
 
-    fn select_searchable_to_buffer(&mut self, index: &BigUint, data: &SelectSingleItem) {
+    pub(super) fn select_searchable_to_buffer(&mut self, index: &BigUint, data: &SelectSingleItem) {
         let mut buf = HashSet::new();
         if let Some(data) = data.as_ref() {
             buf.insert(data.clone());
@@ -1322,7 +1330,7 @@ where
             .insert(index.clone(), Rc::new(RefCell::new(Some(buf))));
     }
 
-    fn select_multiple_to_buffer(
+    pub(super) fn select_multiple_to_buffer(
         &mut self,
         index: &BigUint,
         data: &SelectMultipleItem,
@@ -1377,6 +1385,56 @@ where
             index.clone(),
             Rc::new(RefCell::new(data.selected().to_string())),
         );
+    }
+
+    pub(super) fn group_row_to_buffer(
+        &mut self,
+        index: &BigUint,
+        row: &[Rc<RefCell<InputItem>>],
+        items_conf: &[Rc<InputConfig>],
+    ) {
+        for (col, (d, conf)) in row.iter().zip(items_conf.iter()).enumerate() {
+            if let Ok(d) = d.try_borrow() {
+                let item_index = cal_index(Some(index), col);
+                match &*d {
+                    InputItem::HostNetworkGroup(data) => {
+                        self.host_network_to_buffer(&item_index, data);
+                    }
+                    InputItem::SelectSingle(copied_default) => {
+                        self.select_searchable_to_buffer(&item_index, copied_default);
+                    }
+                    InputItem::SelectMultiple(copied_default) => {
+                        if let InputConfig::SelectMultiple(conf) = &**conf {
+                            self.select_multiple_to_buffer(&item_index, copied_default, conf);
+                        }
+                    }
+                    InputItem::Comparison(_) => {
+                        self.comparison_value_kind_buffer.insert(
+                            item_index.clone(),
+                            Rc::new(RefCell::new(Some(HashSet::new()))),
+                        );
+                        self.comparison_value_cmp_buffer.insert(
+                            item_index.clone(),
+                            Rc::new(RefCell::new(Some(HashSet::new()))),
+                        );
+                        self.comparison_value_buffer.insert(
+                            item_index,
+                            (Rc::new(RefCell::new(None)), Rc::new(RefCell::new(None))),
+                        );
+                    }
+                    InputItem::VecSelect(copied_default) => {
+                        self.vec_select_buffer.insert(
+                            item_index,
+                            copied_default
+                                .iter()
+                                .map(|d| Rc::new(RefCell::new(Some(d.clone()))))
+                                .collect::<Vec<_>>(),
+                        );
+                    }
+                    _ => {} // the rest do not need to be buffered.
+                }
+            }
+        }
     }
 }
 

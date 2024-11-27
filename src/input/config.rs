@@ -72,8 +72,9 @@ pub struct SelectMultipleConfig {
     pub preset: Option<Vec<String>>,
 }
 
-/// `Tag` items must belong to the top level of the hierarchy. It cannot be a child of `Checkbox` or
-/// `Radio`, and cannot be an item of `VecSelect` or `Group`.
+/// `TagConfig` defines how `InputItem::Tag` works. `InputItem::Tag` items must belong to the top
+/// level of the hierarchy. It cannot be a child of `Checkbox` or `Radio`, and cannot be an item of
+/// `VecSelect` or `Group`.
 #[derive(Clone, PartialEq)]
 pub struct TagConfig {
     pub ess: Essential,
@@ -122,11 +123,13 @@ pub struct FileConfig {
 
 #[derive(Clone, PartialEq)]
 pub struct ComparisonConfig {
+    // TODO: #183
     pub ess: Essential,
 }
 
 #[derive(Clone, PartialEq)]
 pub struct VecSelectConfig {
+    // TODO: #183
     pub ess: Essential,
     pub items_ess_list: Vec<Essential>,
     /// Whether the last item is for selecting multiple items.
@@ -142,12 +145,17 @@ pub struct VecSelectConfig {
     pub preset: Option<Vec<HashSet<String>>>,
 }
 
+/// `GroupConfig` defines how `InputItem::Group` works. `InputItem::Group` handles multiple items in
+/// one group. It can include `Text`, `HostNetworkGroup`, `SelectSingle`, `SelectMultiple`,
+/// `Unsigned32`, `Float64`, `Percentage`, `Comparison`, and `VecSelect`. The other types such as
+/// `Password`, `Tag`, `Nic`, `File`, `Group`, `Checkbox`, and `Radio` are not allowed. If
+/// `Essential::required` of `GroupConfig` is set to `true`, at least one valid row must be
+/// included. Rows where all columns are empty do not affect the validation of either the row or the
+/// entire group; users should handle rows where all columns are empty. However, if one or more
+/// columns in a given row are not empty, any column with `Essential::required == true` must be
+/// filled.
 #[derive(Clone, PartialEq)]
 pub struct GroupConfig {
-    // TODO: issue #183 (This comment should be clarified.)
-    /// If `Essesntial::required` is set true, one valid row should be included at least. If one or
-    /// more of columns in a given row are not empty, all the columns with `Essential::required ==
-    /// true` cannot be empty.
     pub ess: Essential,
     /// If true, all items are displayed in one row. If false, each item is displayed in one row.
     pub all_in_one_row: bool,
@@ -162,6 +170,11 @@ pub struct CheckboxChildrenConfig {
     pub children: Vec<Rc<InputConfig>>,
 }
 
+/// `CheckboxConfig` defines how `InputItem::Checkbox` works. `InputItem::Checkbox` is a special
+/// item that can have child items recursively. As its children, it supports `Text`,
+/// `HostNetworkGroup`, `SelectSingle`, `SelectMultiple`, `Unsigned32`, `Float64`, `Percentage`,
+/// `Group`, `Checkbox`, and `Radio`. The other types, such as `Password`, `Tag`, `Nic`, `File`,
+/// `VecSelect`, and `Comparison`, are not allowed.
 #[derive(Clone, PartialEq)]
 pub struct CheckboxConfig {
     pub ess: Essential,
@@ -172,6 +185,9 @@ pub struct CheckboxConfig {
     pub preset: Option<CheckStatus>,
 }
 
+/// `RadioConfig` defines how `InputItem::Radio` works. `InputItem::Radio` has child items like
+/// `InputItem::Checkbox` in addition to its own option. As its children, `InputItem::Radio`
+/// supports the same items as `InputItem::Checkbox` does.
 #[derive(Clone, PartialEq)]
 pub struct RadioConfig {
     pub ess: Essential,
