@@ -602,6 +602,7 @@ impl GroupItem {
         Self { groups }
     }
 
+    #[must_use]
     pub fn is_inside_empty(&self) -> bool {
         self.groups.iter().all(|group| {
             group.iter().all(|item| {

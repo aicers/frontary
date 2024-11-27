@@ -254,8 +254,8 @@ impl Clone for Message {
             Self::InputNicAdd(a, b, c) => Self::InputNicAdd(a.clone(), *b, c.clone()),
             Self::InputNicDelete(a, b, c) => Self::InputNicDelete(a.clone(), *b, c.clone()),
             Self::InputGroupAdd(a, b, c) => Self::InputGroupAdd(a.clone(), b.clone(), c.clone()),
-            Self::InputGroupDelete(a, b, c, d, e) => {
-                Self::InputGroupDelete(a.clone(), *b, c.clone(), d.clone(), *e)
+            Self::InputGroupDelete(a, b, c, d, required) => {
+                Self::InputGroupDelete(a.clone(), *b, c.clone(), d.clone(), *required)
             }
             Self::InputComparisonValueKind(a, b) => {
                 Self::InputComparisonValueKind(a.clone(), b.clone())
@@ -809,43 +809,7 @@ where
 
                         if let Some(d) = data.last() {
                             let row_rep_index = cal_index(Some(&base_index), data.len() - 1);
-                            for (col, d) in d.iter().enumerate() {
-                                if let Ok(d) = d.try_borrow() {
-                                    let item_index = cal_index(Some(&row_rep_index), col);
-                                    if let InputItem::SelectSingle(copied_default) = &*d {
-                                        let mut buf = HashSet::new();
-                                        if let Some(copied_default) = copied_default.as_ref() {
-                                            buf.insert(copied_default.clone());
-                                        }
-                                        self.select_searchable_buffer
-                                            .insert(item_index, Rc::new(RefCell::new(Some(buf))));
-                                    } else if let InputItem::Comparison(_) = &*d {
-                                        self.comparison_value_kind_buffer.insert(
-                                            item_index.clone(),
-                                            Rc::new(RefCell::new(Some(HashSet::new()))),
-                                        );
-                                        self.comparison_value_cmp_buffer.insert(
-                                            item_index.clone(),
-                                            Rc::new(RefCell::new(Some(HashSet::new()))),
-                                        );
-                                        self.comparison_value_buffer.insert(
-                                            item_index,
-                                            (
-                                                Rc::new(RefCell::new(None)),
-                                                Rc::new(RefCell::new(None)),
-                                            ),
-                                        );
-                                    } else if let InputItem::VecSelect(copied_default) = &*d {
-                                        self.vec_select_buffer.insert(
-                                            item_index,
-                                            copied_default
-                                                .iter()
-                                                .map(|d| Rc::new(RefCell::new(Some(d.clone()))))
-                                                .collect::<Vec<_>>(),
-                                        );
-                                    }
-                                }
-                            }
+                            self.group_row_to_buffer(&row_rep_index, d, &items_conf);
                         }
                     }
                 }
@@ -856,44 +820,50 @@ where
                         if let Some(d) = data.get(row_index) {
                             for (col, d) in d.iter().enumerate() {
                                 if let Ok(d) = d.try_borrow() {
-                                    if let InputItem::SelectSingle(_) = &*d {
-                                        rearrange_buffer(
-                                            &mut self.select_searchable_buffer,
-                                            &base_index,
-                                            row_index,
-                                            col,
-                                            data.len(),
-                                        );
-                                    } else if let InputItem::Comparison(_) = &*d {
-                                        rearrange_buffer(
-                                            &mut self.comparison_value_kind_buffer,
-                                            &base_index,
-                                            row_index,
-                                            col,
-                                            data.len(),
-                                        );
-                                        rearrange_buffer(
-                                            &mut self.comparison_value_cmp_buffer,
-                                            &base_index,
-                                            row_index,
-                                            col,
-                                            data.len(),
-                                        );
-                                        rearrange_buffer(
-                                            &mut self.comparison_value_buffer,
-                                            &base_index,
-                                            row_index,
-                                            col,
-                                            data.len(),
-                                        );
-                                    } else if let InputItem::VecSelect(_) = &*d {
-                                        rearrange_buffer(
-                                            &mut self.vec_select_buffer,
-                                            &base_index,
-                                            row_index,
-                                            col,
-                                            data.len(),
-                                        );
+                                    match &*d {
+                                        InputItem::SelectSingle(_)
+                                        | InputItem::SelectMultiple(_) => {
+                                            rearrange_buffer(
+                                                &mut self.select_searchable_buffer,
+                                                &base_index,
+                                                row_index,
+                                                col,
+                                                data.len(),
+                                            );
+                                        }
+                                        InputItem::Comparison(_) => {
+                                            rearrange_buffer(
+                                                &mut self.comparison_value_kind_buffer,
+                                                &base_index,
+                                                row_index,
+                                                col,
+                                                data.len(),
+                                            );
+                                            rearrange_buffer(
+                                                &mut self.comparison_value_cmp_buffer,
+                                                &base_index,
+                                                row_index,
+                                                col,
+                                                data.len(),
+                                            );
+                                            rearrange_buffer(
+                                                &mut self.comparison_value_buffer,
+                                                &base_index,
+                                                row_index,
+                                                col,
+                                                data.len(),
+                                            );
+                                        }
+                                        InputItem::VecSelect(_) => {
+                                            rearrange_buffer(
+                                                &mut self.vec_select_buffer,
+                                                &base_index,
+                                                row_index,
+                                                col,
+                                                data.len(),
+                                            );
+                                        }
+                                        _ => (), // The rest don't have buffer.
                                     }
                                 }
                                 self.required_msg.remove(
