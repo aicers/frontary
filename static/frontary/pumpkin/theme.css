@@ -2322,6 +2322,7 @@ div.input-checkbox-me-title {
     font-weight: 400;
     line-height: 24px;
     color: var(--Text-Primary);
+    white-space: nowrap;
 }
 
 div.input-checkbox-child {
