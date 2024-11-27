@@ -50,6 +50,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed the layout of tags to wrap properly and fit within their container
   without overflowing.
 - Fixed to show on the same line instead of two lines in `Checkbox`.
+- Fixed to handle `File` properly in `Column`.
 
 ## [0.9.4] - 2024-10-16
 

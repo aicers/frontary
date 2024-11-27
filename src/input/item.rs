@@ -923,7 +923,8 @@ impl From<&Column> for InputItem {
                             | Column::Float64(..)
                             | Column::Percentage(..)
                             | Column::Comparison(..)
-                            | Column::VecSelect(..) => {
+                            | Column::VecSelect(..)
+                            | Column::File(..) => {
                                 input_row.push(Rc::new(RefCell::new(c.into())));
                             }
                             Column::Tag(..)
@@ -940,6 +941,7 @@ impl From<&Column> for InputItem {
                 Self::Group(GroupItem::new(input))
             }
             Column::Comparison(value) => Self::Comparison(ComparisonItem::new(value.clone())),
+            Column::File(value) => Self::File(FileItem::new(value.to_string(), String::new())),
         }
     }
 }

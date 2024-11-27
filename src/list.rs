@@ -40,12 +40,13 @@ pub enum Column {
     Radio(ViewString, Vec<(bool, Vec<Column>)>, Option<String>), // bool = checked, String = display
     Group(Vec<Vec<Column>>),
     Comparison(Option<Comparison>),
+    File(ViewString),
 }
 
 impl std::fmt::Display for Column {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Text(d) => write!(formatter, "{d}"),
+            Self::Text(d) | Self::File(d) => write!(formatter, "{d}"),
             Self::HostNetworkGroup(d) => write!(formatter, "{}", d.join(",")),
             Self::SelectSingle(d) => {
                 if let Some((_, value)) = d {
