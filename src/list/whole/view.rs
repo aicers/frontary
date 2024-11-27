@@ -642,7 +642,7 @@ where
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
         let txt = ctx.props().txt.txt.clone();
         match col {
-            Column::Text(elem) => html! {
+            Column::Text(elem) | Column::File(elem) => html! {
                 elem.to_string_txt(&txt, ctx.props().language)
             },
             Column::Unsigned32(_)
@@ -778,7 +778,8 @@ where
                                                 | Column::Float64(..)
                                                 | Column::Percentage(..)
                                                 | Column::Comparison(..)
-                                                | Column::VecSelect(..) => html! {
+                                                | Column::VecSelect(..)
+                                                | Column::File(..)  => html! {
                                                     <td class="list-whole-group">
                                                         { Self::view_column(ctx, index, c) }
                                                     </td>
