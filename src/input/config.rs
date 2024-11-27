@@ -117,6 +117,7 @@ pub struct NicConfig {
 #[derive(Clone, PartialEq)]
 pub struct FileConfig {
     pub ess: Essential,
+    pub allowed_extensions: Vec<String>,
 }
 
 #[derive(Clone, PartialEq)]

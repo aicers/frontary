@@ -30,6 +30,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   conventions.
 - Moved Clumit images to the pumpkin directory, removed the `clumit-` prefix
   for consistency, and updated references accordingly.
+- Changed file input extension handling to avoid hardcoding extension values.
 
 ### Removed
 
