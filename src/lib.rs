@@ -6,6 +6,7 @@ mod list;
 mod modal;
 mod notification;
 mod pages;
+mod password;
 mod port_range_input;
 mod radio;
 mod radio_separate;
@@ -58,6 +59,8 @@ pub use crate::notification::{
     NotificationItem, NotificationType, TIMEOUT_SECS,
 };
 pub use crate::pages::{Info as PagesInfo, Model as Pages};
+pub use crate::password::{check_password_requirements, Requirement as PasswordRequirement};
+pub(crate) use crate::password::{is_adjacent, PASSWORD_MIN_LEN};
 pub use crate::port_range_input::{Model as PortRangeInput, PortRange};
 pub use crate::radio::Model as Radio;
 pub use crate::radio_separate::Model as RadioSeparate;
