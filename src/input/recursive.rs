@@ -15,10 +15,8 @@ use super::{
     InputConfig, InputItem, RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem,
     SelectSingleItem, TagItem, VecSelectItem,
 };
-use crate::InvalidPasswordKind as Kind;
+use crate::{is_adjacent, InvalidPasswordKind as Kind, PASSWORD_MIN_LEN};
 
-const PASSWORD_MIN_LEN: usize = if cfg!(feature = "cc-password") { 9 } else { 8 };
-const PASSWORD_MIN_FORBID_ADJACENT_LEN: usize = 4; // adjacent keyboard characters
 type PropaChildren = Vec<(BigUint, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
 
 impl<T> Model<T>
@@ -1438,16 +1436,6 @@ where
     }
 }
 
-const PASSWD_CMP: [&str; 7] = [
-    "1234567890",
-    "qwertyuiop",
-    "QWERTYUIOP",
-    "asdfghjkl",
-    "ASDFGHJKL",
-    "zxcvbnm",
-    "ZXCVBNM",
-];
-
 #[must_use]
 pub fn invalid_password(password: &str) -> Option<Kind> {
     let analyzed = analyzer::analyze(password);
@@ -1471,7 +1459,7 @@ pub fn invalid_password(password: &str) -> Option<Kind> {
             Some(Kind::NoSymbol)
         } else if analyzed.consecutive_count() > 0 {
             Some(Kind::HasConsecutiveLetters)
-        } else if cmp_consecutive(password) {
+        } else if is_adjacent(password) {
             Some(Kind::HasAdjacentLetters)
         } else {
             None
@@ -1495,25 +1483,4 @@ pub fn invalid_password(password: &str) -> Option<Kind> {
             None
         }
     }
-}
-
-fn cmp_consecutive(password: &str) -> bool {
-    for c in PASSWD_CMP {
-        for i in 0..=c.len() - PASSWORD_MIN_FORBID_ADJACENT_LEN {
-            if let Some(slice) = c.get(i..i + PASSWORD_MIN_FORBID_ADJACENT_LEN) {
-                if password.contains(slice) {
-                    return true;
-                }
-            }
-        }
-        let c_rev: String = c.chars().rev().collect();
-        for i in 0..=c_rev.len() - PASSWORD_MIN_FORBID_ADJACENT_LEN {
-            if let Some(slice) = c_rev.get(i..i + PASSWORD_MIN_FORBID_ADJACENT_LEN) {
-                if password.contains(slice) {
-                    return true;
-                }
-            }
-        }
-    }
-    false
 }
