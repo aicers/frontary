@@ -808,7 +808,7 @@ where
             }
             Message::ChooseFile(my_index_clone.clone(), result, input_data_clone.clone())
         });
-        let extensions = extensions.join(",");
+        let extensions = validate_extensions(extensions).join(",");
         let txt = ctx.props().txt.txt.clone();
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::File(file) = &(*input_data) {
@@ -880,4 +880,21 @@ pub fn view_asterisk(required: bool) -> Html {
     } else {
         html! {}
     }
+}
+
+fn validate_extensions(extensions: &[String]) -> Vec<String> {
+    extensions
+        .iter()
+        .filter_map(|ext| {
+            if !ext.contains(' ') && ext.chars().all(|c| c.is_alphanumeric() || c == '.') {
+                Some(if ext.starts_with('.') {
+                    ext.to_string()
+                } else {
+                    format!(".{ext}")
+                })
+            } else {
+                None
+            }
+        })
+        .collect()
 }

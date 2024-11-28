@@ -1028,7 +1028,7 @@ where
                             &config.options, input_data, None, index, 0, false)
                     }
                     InputConfig::SelectMultiple(config) => {
-                        self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess,
+                        self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &config.ess,
                             input_data, None, index, 0)
                     }
                     InputConfig::Tag(config) => {

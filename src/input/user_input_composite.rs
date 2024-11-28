@@ -317,7 +317,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_nic_or(ctx, &config.options, config.nic_index, &config.ess, child_data, Some(base_index), layer_index, depth) }
+                        { self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &config.ess, child_data, Some(base_index), layer_index, depth) }
                     </div>
                 }
             }
@@ -505,7 +505,7 @@ where
                                                                         InputConfig::SelectMultiple(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_select_nic_or(ctx, &config.options, config.nic_index, &ess, each_item,
+                                                                            self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &ess, each_item,
                                                                                 Some(&row_rep_index), col_index, 1)
                                                                             }
                                                                         InputConfig::Unsigned32(config) => {
