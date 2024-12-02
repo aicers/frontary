@@ -80,7 +80,7 @@ where
     pub(super) fn view_select_nic_or(
         &self,
         ctx: &Context<Self>,
-        list: &Option<Vec<(String, ViewString)>>,
+        list: Option<&Vec<(String, ViewString)>>,
         nics: Option<usize>,
         ess: &InputEssential,
         input_data: &Rc<RefCell<InputItem>>,

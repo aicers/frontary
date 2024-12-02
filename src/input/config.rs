@@ -118,6 +118,10 @@ pub struct NicConfig {
 #[derive(Clone, PartialEq)]
 pub struct FileConfig {
     pub ess: Essential,
+    /// A list of allowed file extensions.
+    /// Each extension should start with a `.` (e.g. `.txt`, `.csv`).
+    /// Extensions must not contain spaces or invalid characters (e.g. `!`, `@`, `#`).
+    /// If an extension does not start with a `.`, one will be automatically added.
     pub allowed_extensions: Vec<String>,
 }
 

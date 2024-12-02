@@ -13,6 +13,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added the `invalid_password` method to validate user passwords based on
   different criteria depending on whether the `cc-password` feature is enabled.
 - Added a method to validate all password requirements.
+- Added extensions validation to allow any extensions and automatically add a
+  `.` if necessary
 
 ### Changed
 
