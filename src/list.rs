@@ -36,11 +36,11 @@ pub enum Column {
     Float64(Option<f64>),
     Percentage(Option<f32>, Option<usize>), // usize = # of decimals
     Nic(Vec<InputNic>),
+    File(ViewString),
+    Comparison(Option<Comparison>),
+    Group(Vec<Vec<Column>>),
     Checkbox(CheckStatus, Vec<Column>, Option<String>), // String = display
     Radio(ViewString, Vec<(bool, Vec<Column>)>, Option<String>), // bool = checked, String = display
-    Group(Vec<Vec<Column>>),
-    Comparison(Option<Comparison>),
-    File(ViewString),
 }
 
 impl std::fmt::Display for Column {

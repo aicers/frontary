@@ -923,16 +923,16 @@ impl From<&Column> for InputItem {
                             | Column::Float64(..)
                             | Column::Percentage(..)
                             | Column::Comparison(..)
-                            | Column::VecSelect(..)
-                            | Column::File(..) => {
+                            | Column::VecSelect(..) => {
                                 input_row.push(Rc::new(RefCell::new(c.into())));
                             }
                             Column::Tag(..)
                             | Column::Nic(..)
+                            | Column::File(..)
                             | Column::Group(..)
                             | Column::Checkbox(..)
                             | Column::Radio(..) => {
-                                panic!("Column Group does not support some items such as Tag, Nic, Group, Checkbox, and Radio.")
+                                panic!("Column Group does not support some items such as Tag, Nic, File, Group, Checkbox, and Radio.")
                             }
                         }
                     }
