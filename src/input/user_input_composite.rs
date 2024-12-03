@@ -13,7 +13,6 @@ use super::{
     InputConfig, InputItem,
 };
 use crate::{text, Checkbox, Radio, ViewString};
-
 impl<T> Model<T>
 where
     T: Clone + Component + PartialEq,
@@ -412,6 +411,7 @@ where
         let InputItem::Group(input_data) = &*input_data else {
             return html! {};
         };
+
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(move |_| {
             Message::InputGroupAdd(
@@ -440,7 +440,10 @@ where
                             }
                             if display_titles {
                                 <tr>
+                                    <th class={classes!("input-group-heading" ,"input-group-empty-header")}>
+                                    </th>
                                     {
+
                                         for items_conf.iter().enumerate().map(|(col_index, each)| {
                                             let style = if let Some(Some(width)) = widths.get(col_index) {
                                                 format!("width: {}px;", *width)
@@ -454,8 +457,6 @@ where
                                             }
                                         })
                                     }
-                                    <th class="input-group-heading-delete">
-                                    </th>
                                 </tr>
                             }
                             {
@@ -477,10 +478,16 @@ where
                                     if one_row {
                                         html! {
                                             <tr>
+                                            <div class="group-list-link-line-top"></div>
                                                 {
                                                     for row.iter().zip(items_conf.iter()).enumerate().map(|(col_index, (each_item, each_conf))| {
+                                                        let style = if let Some(Some(width)) = widths.get(col_index) {
+                                                            format!("width: {}px;", *width)
+                                                        } else {
+                                                            String::new()
+                                                        };
                                                         html! {
-                                                            <td class="input-group">
+                                                            <td class="input-group" style={style}>
                                                                 <div class="input-group-item-outer">
                                                                 {
                                                                     match &**each_conf {
@@ -545,9 +552,9 @@ where
                                                         }
                                                     })
                                                 }
-                                                <td class="input-group-delete">
-                                                    <div class="input-nic-delete-outer">
-                                                        <div class="input-nic-delete" onclick={onclick_delete}>
+                                                <td class="input-trash-can-delete">
+                                                    <div class="input-trash-can-delete-outer">
+                                                        <div class="input-trash-can-delete" onclick={onclick_delete}>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -555,16 +562,17 @@ where
                                         }
                                     } else {
                                         // TODO: implement in the case of !one_row
-                                        html! {}
+                                        html! {<div>{input_data.len()}</div>}
                                     }
                                 })
                             }
                         </table>
                     </div>
-                    <div class="input-group-add">
-                        <div class="input-add-item" onclick={onclick_add}>
-                            { text!(txt, ctx.props().language, "+ Add") }
-                        </div>
+                </div>
+                <div class="input-group-add">
+                    <div class="group-list-link-line-bottom"></div>
+                    <div class="input-add-item" onclick={onclick_add}>
+                        { text!(txt, ctx.props().language, "+ Add another condition") }
                     </div>
                 </div>
             </div>

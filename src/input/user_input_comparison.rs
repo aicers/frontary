@@ -152,10 +152,7 @@ where
         let (Some(value_kind), Some(cmp_kind)) =
             (self.comparison_kind(data_id), self.comparison_cmp(data_id))
         else {
-            return html! {
-                <div class="input-comparison-value">
-                </div>
-            };
+            return html! {};
         };
 
         if cmp_kind.chain_cmp() {

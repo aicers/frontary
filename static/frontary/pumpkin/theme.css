@@ -1622,7 +1622,7 @@ div.input-item-group {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
 }
 
 div.input-contents-item-title {
@@ -1902,7 +1902,7 @@ div.input-select-vector-vec-required {
 div.input-contents-item-general-title {
     color: var(--Text-Primary);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 24px;
 }
 
@@ -2351,6 +2351,27 @@ div.input-checkbox-link-line {
     background-repeat: no-repeat;
 }
 
+div.group-list-link-line-bottom {
+    position: relative;
+    width: 30px;
+    height: 25px;
+    top: 22px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-bottom.svg');
+    background-size: 20px 25px;
+    background-repeat: no-repeat;
+}
+
+div.group-list-link-line-top {
+    position: relative;
+    height: 70px;
+    width: 30px;
+    top: 34px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-top.svg');
+    background-size: 20px 70px;
+    background-repeat: no-repeat;
+    transform: scale(1, -1.05);
+}
+
 div.input-checkbox-link-line-right {
     position: relative;
     top: 12px;
@@ -2445,6 +2466,30 @@ div.input-nic-delete:hover {
     cursor: pointer;
 }
 
+div.input-trash-can-delete-outer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.input-trash-can-delete {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    background-image: url('/frontary/pumpkin/trash-can.svg');
+    background-size: 32px 32px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--Transparent-Mid-Grey);
+    border-radius: 8px;
+}
+
+div.input-trash-can-delete:hover {
+    cursor: pointer;
+}
+
 td.input-nic-input-add {
     padding-left: 20px;
 }
@@ -2462,6 +2507,7 @@ div.input-add-item {
     font-weight: 500;
     line-height: 24px;
     padding: 8px 24px;
+    margin-top: 12px;
 }
 
 div.input-add-item:hover {
@@ -2580,23 +2626,32 @@ label.input-file-choose-file:hover {
     background-color: var(--Dark-80);
 }
 
+div.fill-width {
+    width: 100%;
+}
+
 div.input-group {
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 1fr 95px;
 }
 
 table.input-group {
     width: 100%;
 }
 
+th.input-group-empty-header {
+    width: 30px;
+}
+
 th.input-group-heading {
     height: 30px;
-    background-color: rgba(95, 104, 118, 0.24);
     font-weight: normal;
-    font-size: 11px;
+    font-size: 16px;
     color: var(--Dark-10);
-    font-weight: 400;
+    font-weight: 500;
+    line-height: 24px;
+    text-align: left;
+    padding-top: 16px;
 }
 
 th.input-group-heading-delete {
@@ -2605,21 +2660,21 @@ th.input-group-heading-delete {
 }
 
 td.input-group {
-    padding: 4px;
+    padding: 4px 12px 6px 0px;
 }
 
 div.input-group-item-outer {
     width: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
 }
 
 div.input-group-add {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
-    align-items: flex-end;
+    justify-content: flex-start;
+    align-items: flex-start;
     padding-bottom: 4px;
 }
 
@@ -2642,6 +2697,7 @@ div.input-comparison-value {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    color: var(--Text-Primary);
 }
 
 div.input-comparison-value-value {

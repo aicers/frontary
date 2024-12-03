@@ -369,6 +369,8 @@ where
     pub input_data: Vec<Rc<RefCell<InputItem>>>,
     #[prop_or(None)]
     pub input_data_tag: Option<Rc<RefCell<InputTag>>>,
+    #[prop_or(false)]
+    pub init_one_row: bool,
 
     pub action_message: T::Message,
     pub escape_message: T::Message,
@@ -414,7 +416,6 @@ where
             file_reader: None,
 
             rerender_serial_host_network: 0,
-
             phantom: PhantomData,
         };
         Self::prepare_nic(ctx);
