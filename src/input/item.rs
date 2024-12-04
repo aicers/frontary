@@ -854,10 +854,10 @@ impl InputItem {
 impl From<&Column> for InputItem {
     fn from(col: &Column) -> Self {
         match col {
-            Column::Text(txt) => Self::Text(TextItem::new(txt.to_string())),
+            Column::Text(txt) => Self::Text(TextItem::new(txt.text.to_string())),
             Column::HostNetworkGroup(items) => {
                 let mut input = InputHostNetworkGroup::default();
-                for item in items {
+                for item in &items.host_network_group {
                     match parse_host_network(item) {
                         Some(HostNetwork::Host(host)) => input.hosts.push(host),
                         Some(HostNetwork::Network(network)) => input.networks.push(network),
@@ -867,39 +867,40 @@ impl From<&Column> for InputItem {
                 }
                 Self::HostNetworkGroup(HostNetworkGroupItem::new(input))
             }
-            Column::SelectSingle(value) => {
-                Self::SelectSingle(SelectSingleItem::new(value.as_ref().map(|d| d.0.clone())))
-            }
+            Column::SelectSingle(value) => Self::SelectSingle(SelectSingleItem::new(
+                value.selected.as_ref().map(|d| d.0.clone()),
+            )),
             Column::SelectMultiple(list) => Self::SelectMultiple(SelectMultipleItem::new(
-                list.keys().cloned().collect::<HashSet<String>>(),
+                list.selected.keys().cloned().collect::<HashSet<String>>(),
             )),
             Column::VecSelect(list) => {
                 let list = list
+                    .selected
                     .iter()
                     .map(|l| l.keys().cloned().collect::<HashSet<String>>())
                     .collect::<Vec<_>>();
                 Self::VecSelect(VecSelectItem::new(list))
             }
             Column::Tag(tags) => Self::Tag(TagItem::new(InputTagGroup {
-                old: tags.clone(),
+                old: tags.tags.clone(),
                 new: None,
                 edit: None,
                 delete: None,
             })),
-            Column::Unsigned32(value) => Self::Unsigned32(Unsigned32Item::new(*value)),
-            Column::Float64(value) => Self::Float64(Float64Item::new(*value)),
-            Column::Percentage(f, _) => Self::Percentage(PercentageItem::new(*f)),
-            Column::Nic(nics) => Self::Nic(NicItem::new(nics.clone())),
-            Column::Checkbox(status, children, _) => Self::Checkbox(CheckboxItem::new(
-                *status,
-                children
+            Column::Unsigned32(value) => Self::Unsigned32(Unsigned32Item::new(value.value)),
+            Column::Float64(value) => Self::Float64(Float64Item::new(value.value)),
+            Column::Percentage(value) => Self::Percentage(PercentageItem::new(value.value)),
+            Column::Nic(nics) => Self::Nic(NicItem::new(nics.nics.clone())),
+            Column::Checkbox(cb) => Self::Checkbox(CheckboxItem::new(
+                cb.status,
+                cb.children
                     .iter()
                     .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                     .collect::<Vec<Rc<RefCell<InputItem>>>>(),
             )),
-            Column::Radio(option, children_group, _) => Self::Radio(RadioItem::new(
-                option.to_string(),
-                children_group
+            Column::Radio(rd) => Self::Radio(RadioItem::new(
+                rd.selected.to_string(),
+                rd.children
                     .iter()
                     .map(|(_, children)| {
                         children
@@ -911,7 +912,7 @@ impl From<&Column> for InputItem {
             )),
             Column::Group(group) => {
                 let mut input: Vec<Vec<Rc<RefCell<InputItem>>>> = Vec::new();
-                for g in group {
+                for g in &group.groups {
                     let mut input_row: Vec<Rc<RefCell<InputItem>>> = Vec::new();
                     for c in g {
                         match c {
@@ -940,8 +941,10 @@ impl From<&Column> for InputItem {
                 }
                 Self::Group(GroupItem::new(input))
             }
-            Column::Comparison(value) => Self::Comparison(ComparisonItem::new(value.clone())),
-            Column::File(value) => Self::File(FileItem::new(value.to_string(), String::new())),
+            Column::Comparison(value) => {
+                Self::Comparison(ComparisonItem::new(value.comparison.clone()))
+            }
+            Column::File(value) => Self::File(FileItem::new(value.filename.clone(), String::new())),
         }
     }
 }

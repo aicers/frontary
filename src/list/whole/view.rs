@@ -393,7 +393,7 @@ where
                                         let data = Rc::new(item.sub_items.iter().enumerate().map(|(index, item)| {
                                             // HIGHLIGHT: use the first item as the key
                                             let key = if let Some(Column::Text(txt)) = item.first() {
-                                                txt.to_string()
+                                                txt.text.to_string()
                                             } else {
                                                 index.to_string()
                                             };
@@ -593,7 +593,7 @@ where
                         text!(txt, ctx.props().language, "Add an item").to_string()
                     }
                 }
-                _ => String::new(), // unreachable
+                _ => unreachable!(),
             };
 
             let onclick_add_second = ctx.link().callback(|_| Message::InputAdd);
@@ -642,84 +642,38 @@ where
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
         let txt = ctx.props().txt.txt.clone();
         match col {
-            Column::Text(elem) | Column::File(elem) => html! {
-                elem.to_string_txt(&txt, ctx.props().language)
+            Column::Text(elem) => html! {
+                elem.text.to_string_txt(&txt, ctx.props().language)
             },
-            Column::Unsigned32(_)
-            | Column::Float64(_)
-            | Column::Percentage(_, _)
-            | Column::Comparison(_) => html! { col.to_string() },
-            Column::SelectSingle(elem) => {
-                let Some((_, elem)) = elem.as_ref() else {
-                    return html! {};
-                };
-                html! {
-                    elem.to_string_txt(&txt, ctx.props().language)
-                }
-            }
-            Column::Checkbox(_, _, _) => {
-                if let Some(sep) = ctx.props().br_separator {
-                    let display = col.to_string();
-                    let display = display
-                        .split(sep)
-                        .map(ToString::to_string)
-                        .collect::<Vec<String>>();
-                    {
-                        view_list_sep_dot(&display, true)
-                    }
-                } else {
-                    html! { col.to_string() }
-                }
-            }
-            Column::Radio(option, _, display) => {
-                if display.is_some() {
-                    html! { col.to_string() }
-                } else {
-                    html! {
-                        option.to_string_txt(&txt, ctx.props().language)
-                    }
-                }
-            }
-            Column::Nic(nics) => {
-                html! {
-                    for nics.iter().map(|n| html! {
-                        <>
-                            { n.name.clone() } {": (ip/mask) "} { n.interface.clone() } { " (gateway) " } { n.gateway.clone() } <br/>
-                        </>
-                    })
-                }
-            }
             Column::HostNetworkGroup(elem) => {
                 html! {
-                    for elem.iter().map(|elem| html! {
+                    for elem.host_network_group.iter().map(|elem| html! {
                         <>
                             { elem.clone() } <br/>
                         </>
                     })
                 }
             }
+            Column::SelectSingle(elem) => {
+                let Some((_, elem)) = elem.selected.as_ref() else {
+                    return html! {};
+                };
+                html! {
+                    elem.to_string_txt(&txt, ctx.props().language)
+                }
+            }
             Column::SelectMultiple(list) => {
                 let mut list = list
+                    .selected
                     .values()
                     .map(|v| v.to_string_txt(&txt, ctx.props().language))
                     .collect::<Vec<String>>();
                 list.sort_unstable();
                 view_list_sep_dot(&list, false)
             }
-            Column::VecSelect(list) => {
-                let list = list
-                    .iter()
-                    .map(|s| {
-                        s.values()
-                            .map(|v| v.to_string_txt(&txt, ctx.props().language))
-                            .collect::<Vec<_>>()
-                            .join(",")
-                    })
-                    .collect::<Vec<_>>();
-                view_list_sep_dot(&list, false)
-            }
             Column::Tag(tags) => {
                 let mut list = tags
+                    .tags
                     .iter()
                     .filter_map(|t| {
                         ctx.props().input_conf.get(index).and_then(|x| {
@@ -744,6 +698,35 @@ where
                     </div>
                 }
             }
+            Column::Unsigned32(_)
+            | Column::Float64(_)
+            | Column::Percentage(_)
+            | Column::Comparison(_) => html! { col.to_string() },
+            Column::Nic(nics) => {
+                html! {
+                    for nics.nics.iter().map(|n| html! {
+                        <>
+                            { n.name.clone() } {": (ip/mask) "} { n.interface.clone() } { " (gateway) " } { n.gateway.clone() } <br/>
+                        </>
+                    })
+                }
+            }
+            Column::File(elem) => html! {
+                elem.filename.clone()
+            },
+            Column::VecSelect(list) => {
+                let list = list
+                    .selected
+                    .iter()
+                    .map(|s| {
+                        s.values()
+                            .map(|v| v.to_string_txt(&txt, ctx.props().language))
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    })
+                    .collect::<Vec<_>>();
+                view_list_sep_dot(&list, false)
+            }
             Column::Group(group) => {
                 let Some(input_conf) = ctx.props().input_conf.get(index) else {
                     return html! {};
@@ -764,7 +747,7 @@ where
                         }
                         </tr>
                         {
-                            for group.iter().map(|g|
+                            for group.groups.iter().map(|g|
                                 html! {
                                     <tr>
                                     {
@@ -800,6 +783,29 @@ where
                             )
                         }
                     </table>
+                }
+            }
+            Column::Checkbox(_) => {
+                if let Some(sep) = ctx.props().br_separator {
+                    let display = col.to_string();
+                    let display = display
+                        .split(sep)
+                        .map(ToString::to_string)
+                        .collect::<Vec<String>>();
+                    {
+                        view_list_sep_dot(&display, true)
+                    }
+                } else {
+                    html! { col.to_string() }
+                }
+            }
+            Column::Radio(elem) => {
+                if elem.display.is_some() {
+                    html! { col.to_string() }
+                } else {
+                    html! {
+                        elem.selected.to_string_txt(&txt, ctx.props().language)
+                    }
                 }
             }
         }

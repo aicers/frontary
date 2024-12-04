@@ -1146,14 +1146,15 @@ where
                             for (key, item) in &*ctx.props().data {
                                 if id.as_ref().map_or(true, |id| id != key) {
                                     if let Some(other) = item.columns.get(index) {
-                                        if let (
-                                            Column::Text(ViewString::Raw(other_value)),
-                                            InputItem::Text(value),
-                                        ) = (other, &(*input))
+                                        if let (Column::Text(other_value), InputItem::Text(value)) =
+                                            (other, &(*input))
                                         {
-                                            if value == other_value {
-                                                different = false;
-                                                break;
+                                            if let ViewString::Raw(other_value) = &other_value.text
+                                            {
+                                                if value == other_value {
+                                                    different = false;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
