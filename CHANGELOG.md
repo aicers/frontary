@@ -34,6 +34,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Moved Clumit images to the pumpkin directory, removed the `clumit-` prefix
   for consistency, and updated references accordingly.
 - Changed file input extension handling to avoid hardcoding extension values.
+- Adjusted `user_input_composite::view_group()`, `user_input_select`,
+  and `user_input_comparison` styling for refined and enhanced
+  design for seamless integration of the modal for `InputType::Group`,
+  `InputItem::Group`, and `ListItem::Group` of `WholeList`.
 
 ### Removed
 

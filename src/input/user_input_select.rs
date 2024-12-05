@@ -66,10 +66,18 @@ where
         } else {
             ctx.props().width - PADDING_SUM
         };
-        let class_item = if group {
-            "fill-width"
+        let class_item = if cfg!(feature = "pumpkin-dark") {
+            if group {
+                "fill-width"
+            } else {
+                "input-select-searchable"
+            }
         } else {
-            "input-select-searchable"
+            if group {
+                ""
+            } else {
+                "input-select-searchable"
+            }
         };
         let class = if self.required_msg.contains(&my_index) {
             "input-select-searchable-required"

@@ -129,7 +129,7 @@ div.searchable-select-vector {
 }
 
 div.searchable-select-vector-margin {
-    margin-right: 4px;
+    margin-right: 12px;
 }
 
 div.searchable-select {
@@ -2354,20 +2354,20 @@ div.input-checkbox-link-line {
 div.group-list-link-line-bottom {
     position: relative;
     width: 30px;
-    height: 25px;
-    top: 22px;
+    height: 30px;
+    top: 26px;
     background-image: url('/frontary/pumpkin/group-list-link-line-bottom.svg');
-    background-size: 20px 25px;
+    background-size: 20px 5px;
     background-repeat: no-repeat;
 }
 
 div.group-list-link-line-top {
     position: relative;
-    height: 70px;
+    height: 59px;
     width: 30px;
-    top: 34px;
+    top: 27px;
     background-image: url('/frontary/pumpkin/group-list-link-line-top.svg');
-    background-size: 20px 70px;
+    background-size: 20px 59px;
     background-repeat: no-repeat;
     transform: scale(1, -1.05);
 }
@@ -2479,7 +2479,7 @@ div.input-trash-can-delete {
     height: 40px;
     display: inline-block;
     background-image: url('/frontary/pumpkin/trash-can.svg');
-    background-size: 32px 32px;
+    background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
     background-color: var(--Transparent-Mid-Grey);

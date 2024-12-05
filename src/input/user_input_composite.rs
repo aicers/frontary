@@ -423,6 +423,11 @@ where
         let display_titles =
             !(items_conf.len() == 1 && items_conf.first().map_or(false, |x| x.title().is_empty()));
         let required = ess.required;
+        let add_message = if cfg!(feature = "pumpkin-dark") {
+            "+ Add another condition"
+        } else {
+            "+ Add"
+        };
 
         html! {
             <div class="input-item">
@@ -440,8 +445,17 @@ where
                             }
                             if display_titles {
                                 <tr>
-                                    <th class={classes!("input-group-heading" ,"input-group-empty-header")}>
-                                    </th>
+                                {
+                                    if cfg!(feature = "pumpkin-dark") {
+                                        html!{
+                                            <th class={classes!("input-group-heading" ,"input-group-empty-header")}>
+                                            </th>
+                                        }
+                                    }
+                                    else {
+                                        html!{}
+                                    }
+                                }
                                     {
 
                                         for items_conf.iter().enumerate().map(|(col_index, each)| {
@@ -456,6 +470,17 @@ where
                                                 </th>
                                             }
                                         })
+                                    }
+                                    {
+                                        if cfg!(feature = "pumpkin-dark"){
+                                            html!{}
+                                        }
+                                        else {
+                                            html!{
+                                            <th class="input-group-heading-delete">
+                                                </th>
+                                            }
+                                        }
                                     }
                                 </tr>
                             }
@@ -478,14 +503,29 @@ where
                                     if one_row {
                                         html! {
                                             <tr>
-                                            <div class="group-list-link-line-top"></div>
+                                            {
+                                                if cfg!(feature = "pumpkin-dark") {
+                                                    html!{
+                                                        <div class="group-list-link-line-top"></div>
+                                                    }
+                                                }
+                                                else {
+                                                    html!{}
+                                                }
+                                            }
                                                 {
                                                     for row.iter().zip(items_conf.iter()).enumerate().map(|(col_index, (each_item, each_conf))| {
-                                                        let style = if let Some(Some(width)) = widths.get(col_index) {
-                                                            format!("width: {}px;", *width)
-                                                        } else {
+                                                        let style = if cfg!(feature = "pumpkin-dark") {
+                                                            if let Some(Some(width)) = widths.get(col_index) {
+                                                                format!("width: {}px;", *width)
+                                                            } else {
+                                                                String::new()
+                                                            }
+                                                        }
+                                                        else {
                                                             String::new()
                                                         };
+
                                                         html! {
                                                             <td class="input-group" style={style}>
                                                                 <div class="input-group-item-outer">
@@ -552,12 +592,29 @@ where
                                                         }
                                                     })
                                                 }
-                                                <td class="input-trash-can-delete">
-                                                    <div class="input-trash-can-delete-outer">
-                                                        <div class="input-trash-can-delete" onclick={onclick_delete}>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                                {
+                                                    if cfg!(feature = "pumpkin-dark") {
+                                                        html! {
+                                                            <td class="input-trash-can-delete">
+                                                                <div class="input-trash-can-delete-outer">
+                                                                    <div class="input-trash-can-delete" onclick={onclick_delete}>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    }
+                                                    else {
+                                                        html!{
+                                                            <td class="input-group-delete">
+                                                                <div class="input-nic-delete-outer">
+                                                                    <div class="input-nic-delete" onclick={onclick_delete}>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    }
+                                                }
+
                                             </tr>
                                         }
                                     } else {
@@ -570,9 +627,18 @@ where
                     </div>
                 </div>
                 <div class="input-group-add">
-                    <div class="group-list-link-line-bottom"></div>
+                {
+                    if cfg!(feature = "pumpkin-dark") {
+                        html! {
+                            <div class="group-list-link-line-bottom"></div>
+                        }
+                    }
+                    else {
+                        html! {}
+                    }
+                }
                     <div class="input-add-item" onclick={onclick_add}>
-                        { text!(txt, ctx.props().language, "+ Add another condition") }
+                        { text!(txt, ctx.props().language, add_message) }
                     </div>
                 </div>
             </div>

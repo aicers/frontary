@@ -152,7 +152,14 @@ where
         let (Some(value_kind), Some(cmp_kind)) =
             (self.comparison_kind(data_id), self.comparison_cmp(data_id))
         else {
-            return html! {};
+            return if cfg!(feature = "pumpkin-dark") {
+                html! {}
+            } else {
+                html! {
+                    <div class="input-comparison-value">
+                    </div>
+                }
+            };
         };
 
         if cmp_kind.chain_cmp() {
