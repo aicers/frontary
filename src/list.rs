@@ -1,13 +1,13 @@
 #![allow(clippy::module_name_repetitions)]
 mod whole;
 
-use std::collections::{HashMap, HashSet};
-use std::fmt;
+use std::{
+    collections::{HashMap, HashSet},
+    fmt,
+};
 
 use chrono::{DateTime, Utc};
-pub use whole::MessageType;
-pub use whole::Model as WholeList;
-pub use whole::SortColumn;
+pub use whole::{MessageType, Model as WholeList, SortColumn};
 
 use crate::{
     checkbox::CheckStatus,
@@ -25,31 +25,111 @@ pub struct ListItem {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct TextColumn {
+    pub text: ViewString,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct HostNetworkGroupColumn {
+    pub host_network_group: Vec<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct SelectSingleColumn {
+    pub selected: Option<(String, ViewString)>, // id, value
+}
+
+#[derive(Clone, PartialEq)]
+pub struct SelectMultipleColumn {
+    pub selected: HashMap<String, ViewString>, // id, value
+}
+
+#[derive(Clone, PartialEq)]
+pub struct TagColumn {
+    pub tags: HashSet<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Unsigned32Column {
+    pub value: Option<u32>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Float64Column {
+    pub value: Option<f64>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct PercentageColumn {
+    pub value: Option<f32>,
+    pub decimals: Option<usize>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct NicColumn {
+    pub nics: Vec<InputNic>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct FileColumn {
+    pub filename: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct ComparisonColumn {
+    pub comparison: Option<Comparison>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct VecSelectColumn {
+    pub selected: Vec<HashMap<String, ViewString>>, // id, value
+}
+
+#[derive(Clone, PartialEq)]
+pub struct GroupColumn {
+    pub groups: Vec<Vec<Column>>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct CheckboxColumn {
+    pub status: CheckStatus,
+    pub children: Vec<Column>,
+    pub display: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct RadioColumn {
+    pub selected: ViewString,
+    pub children: Vec<(bool, Vec<Column>)>, // bool = checked
+    pub display: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
 pub enum Column {
-    Text(ViewString),
-    HostNetworkGroup(Vec<String>),
-    SelectSingle(Option<(String, ViewString)>), // id, value
-    SelectMultiple(HashMap<String, ViewString>), // id, value
-    VecSelect(Vec<HashMap<String, ViewString>>), // id, value
-    Tag(HashSet<String>),
-    Unsigned32(Option<u32>),
-    Float64(Option<f64>),
-    Percentage(Option<f32>, Option<usize>), // usize = # of decimals
-    Nic(Vec<InputNic>),
-    File(ViewString),
-    Comparison(Option<Comparison>),
-    Group(Vec<Vec<Column>>),
-    Checkbox(CheckStatus, Vec<Column>, Option<String>), // String = display
-    Radio(ViewString, Vec<(bool, Vec<Column>)>, Option<String>), // bool = checked, String = display
+    Text(TextColumn),
+    HostNetworkGroup(HostNetworkGroupColumn),
+    SelectSingle(SelectSingleColumn),
+    SelectMultiple(SelectMultipleColumn),
+    Tag(TagColumn),
+    Unsigned32(Unsigned32Column),
+    Float64(Float64Column),
+    Percentage(PercentageColumn),
+    Nic(NicColumn),
+    File(FileColumn),
+    Comparison(ComparisonColumn),
+    VecSelect(VecSelectColumn),
+    Group(GroupColumn),
+    Checkbox(CheckboxColumn),
+    Radio(RadioColumn),
 }
 
 impl std::fmt::Display for Column {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Text(d) | Self::File(d) => write!(formatter, "{d}"),
-            Self::HostNetworkGroup(d) => write!(formatter, "{}", d.join(",")),
+            Self::Text(d) => write!(formatter, "{}", &d.text),
+            Self::HostNetworkGroup(d) => write!(formatter, "{}", d.host_network_group.join(",")),
             Self::SelectSingle(d) => {
-                if let Some((_, value)) = d {
+                if let Some((_, value)) = d.selected.as_ref() {
                     write!(formatter, "{value}")
                 } else {
                     Ok(())
@@ -58,15 +138,62 @@ impl std::fmt::Display for Column {
             Self::SelectMultiple(d) => {
                 // Since the language is not known here, keys are used.
                 let values = d
+                    .selected
                     .values()
                     .map(ToString::to_string)
                     .collect::<Vec<_>>()
                     .join(",");
                 write!(formatter, "{values}")
             }
+            Self::Tag(d) => {
+                let values = d
+                    .tags
+                    .iter()
+                    .map(String::as_str)
+                    .collect::<Vec<_>>()
+                    .join(",");
+                write!(formatter, "{values}")
+            }
+            Self::Unsigned32(d) => {
+                let value = d.value.map_or_else(String::new, |d| d.to_string());
+                write!(formatter, "{value}")
+            }
+            Self::Float64(d) => {
+                let value = d.value.map_or_else(String::new, |d| d.to_string());
+                write!(formatter, "{value}")
+            }
+            Self::Percentage(v) => {
+                let value = v.value.map_or_else(String::new, |f| {
+                    format!(
+                        "{0:.1$}%",
+                        f * 100.0,
+                        v.decimals.unwrap_or(NUM_OF_DECIMALS_DEFAULT)
+                    )
+                });
+                write!(formatter, "{value}")
+            }
+            Self::Nic(nics) => {
+                let mut display = String::new();
+                for nic in &nics.nics {
+                    display.push_str(&format!(
+                        "{{{}: {}(interface) {}(gateway)}} ",
+                        nic.name, nic.interface, nic.gateway
+                    ));
+                }
+                write!(formatter, "{display}")
+            }
+            Self::File(d) => write!(formatter, "{}", &d.filename),
+            Self::Comparison(d) => {
+                if let Some(d) = d.comparison.as_ref() {
+                    write!(formatter, "{d}")
+                } else {
+                    Ok(())
+                }
+            }
             Self::VecSelect(d) => {
                 // Since the language is not known here, keys are used.
                 let values = d
+                    .selected
                     .iter()
                     .map(|s| {
                         s.values()
@@ -78,45 +205,17 @@ impl std::fmt::Display for Column {
                     .join(" | ");
                 write!(formatter, "{values}")
             }
-            Self::Tag(d) => {
-                let values = d.iter().map(String::as_str).collect::<Vec<_>>().join(",");
-                write!(formatter, "{values}")
-            }
-            Self::Unsigned32(d) => {
-                let value = d.map_or_else(String::new, |d| d.to_string());
-                write!(formatter, "{value}")
-            }
-            Self::Float64(d) => {
-                let value = d.map_or_else(String::new, |d| d.to_string());
-                write!(formatter, "{value}")
-            }
-            Self::Percentage(f, d) => {
-                let value = f.map_or_else(String::new, |f| {
-                    format!("{0:.1$}%", f * 100.0, d.unwrap_or(NUM_OF_DECIMALS_DEFAULT))
-                });
-                write!(formatter, "{value}")
-            }
-            Self::Nic(nics) => {
-                let mut display = String::new();
-                for nic in nics {
-                    display.push_str(&format!(
-                        "{{{}: {}(interface) {}(gateway)}} ",
-                        nic.name, nic.interface, nic.gateway
-                    ));
-                }
-                write!(formatter, "{display}")
-            }
-            Self::Checkbox(_, _, display) | Self::Radio(_, _, display) => {
-                if let Some(display) = display {
+            Self::Group(_) => Ok(()),
+            Self::Checkbox(d) => {
+                if let Some(display) = d.display.as_ref() {
                     write!(formatter, "{display}")
                 } else {
                     Ok(())
                 }
             }
-            Self::Group(_) => Ok(()),
-            Self::Comparison(d) => {
-                if let Some(d) = d {
-                    write!(formatter, "{d}")
+            Self::Radio(d) => {
+                if let Some(display) = d.display.as_ref() {
+                    write!(formatter, "{display}")
                 } else {
                     Ok(())
                 }
