@@ -34,6 +34,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Moved Clumit images to the pumpkin directory, removed the `clumit-` prefix
   for consistency, and updated references accordingly.
 - Changed file input extension handling to avoid hardcoding extension values.
+- Changed the variants of `Column` to use structs instead of tuples.
 
 ### Removed
 
