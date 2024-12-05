@@ -208,6 +208,8 @@ div.searchable-select-list-down {
 
 div.searchable-select-list-search {
     margin-top: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #C7C7C7;
     height: 30px;
     background-image: url('/frontary/magnifier.png');
     background-size: 20px 20px;

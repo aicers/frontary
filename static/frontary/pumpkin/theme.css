@@ -118,6 +118,10 @@ img.radio-img {
     display: inline-block;
 }
 
+div.searchable-select-list-search-space {
+    display: none;
+}
+
 div.radio-space {
     width: 24px;
     display: inline-block;
@@ -203,13 +207,14 @@ div.searchable-select-list-down {
     color: #4D4D4D;
     position: relative;
     z-index: 199;
-    background-color: #30353A;
+    background-color: var(--Dropdown-Background);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
 }
 
 div.searchable-select-list-search {
     margin-top: 6px;
+    margin-bottom: 3px;
     padding: 8px;
     height: 48px;
     background-image: url('/frontary/pumpkin/magnifier.svg');
@@ -233,10 +238,6 @@ input[type=text].searchable-select-search::placeholder {
     color: var(--Dark-20);
 }
 
-div.searchable-select-list-search-space {
-    height: 6px;
-}
-
 div.searchable-select-list-search-all {
     height: 48px;
 }
@@ -249,6 +250,7 @@ td.searchable-select-list-checkbox {
 td.searchable-select-list-item {
     float: left;
     padding-top: 12px;
+    padding-bottom: 12px;
     height: auto;
     font-size: 16px;
     line-height: 24px;
@@ -286,6 +288,7 @@ td.searchable-select-list-item-single {
 }
 
 div.scrollable-table-wrapper {
+    padding: 0px 5px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
@@ -688,7 +691,7 @@ div.mini-select-list-down {
     background-color: var(--Dark-70);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
-    padding: 5px 0px;
+    padding: 7px 0px;
 }
 
 div.mini-select-list-down-hidden {
@@ -1576,6 +1579,7 @@ div.input-inner {
     background-color: var(--Dark-80);
     border-radius: 8px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+    max-height: 600px;
 }
 
 table.input-head {
@@ -1608,7 +1612,7 @@ div.input-contents {
     display: flex;
     flex-direction: column;
     overflow: auto;
-    max-height: 600px;
+    max-height: 432px;
 }
 
 div.input-item {
@@ -1694,12 +1698,13 @@ div.input-contents-item-alert-message {
 
 div.input-password-notice {
     width: 100%;
-    height: 38px;
     font-weight: normal;
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: #818181;
+    color: var(--Dark-10);
+    margin-bottom: 20px;
+    padding-top: 4px;
 }
 
 div.input-reenter-password-title {
@@ -1864,7 +1869,7 @@ div.input-radio-notice {
     line-height: 16px;
     display: flex;
     align-items: center;
-    color: #818181;
+    color: var(--Dark-10);
 }
 
 div.input-radio-message {
@@ -1994,7 +1999,8 @@ div.host-network-group-input-input-notice {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: #818181;
+    color: var(--Dark-10);
+    padding-top: 4px;
 }
 
 div.simple-input-input-notice {
@@ -2310,6 +2316,10 @@ div.input-checkbox-me {
     margin-top: -13px;
 }
 
+.input-checkbox-link-line~.input-checkbox {
+    margin-left: -8px;
+}
+
 div.input-checkbox-me-nextline {
     width: 100%;
 }
@@ -2332,6 +2342,7 @@ div.input-checkbox-child {
     align-items: flex-start;
     margin-top: 3px;
     margin-bottom: -6px;
+    gap: 8px;
 }
 
 div.input-checkbox-child-right {
@@ -2339,6 +2350,7 @@ div.input-checkbox-child-right {
     flex-direction: row;
     align-items: flex-start;
     margin-bottom: 3px;
+    gap: 8px;
 }
 
 div.input-checkbox-link-line {
