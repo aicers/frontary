@@ -391,13 +391,31 @@ where
             } else {
                 42
             }
+        } else if cfg!(feature = "pumpkin-dark") {
+            60
         } else {
             80
         };
-        let height = std::cmp::min(
-            list_len * ELEM_HEIGHT + extra_height,
-            ctx.props().max_height,
-        );
+        let height = if cfg!(feature = "pumpkin-dark") {
+            if ctx.props().kind == Kind::Single {
+                std::cmp::min(
+                    list_len * ELEM_HEIGHT + extra_height,
+                    ctx.props().max_height,
+                )
+            } else {
+                std::cmp::min(
+                    (list_len + 1) * ELEM_HEIGHT + extra_height,
+                    ctx.props().max_height,
+                )
+            }
+        } else {
+            std::cmp::min(
+                list_len * ELEM_HEIGHT + extra_height,
+                ctx.props().max_height,
+            )
+        };
+
+        let max_height = 6 * ELEM_HEIGHT + extra_height;
         let left = if width > ctx.props().top_width - 8 && !ctx.props().align_left {
             format!("-{}", width - (ctx.props().top_width - 8) + 4)
         } else {
@@ -411,13 +429,30 @@ where
             style_inner_width_search,
             style_scrollable_table,
         ) = if cfg!(feature = "pumpkin-dark") {
-            (
-                format!("height: {height}px;"),
-                format!("width: 100%; height: {height}px;"),
-                "width: 100%;".to_string(),
-                "width: 100%;".to_string(),
-                format!("height: {}px;", height - 48),
-            )
+            if list_len > 5 {
+                (
+                    format!("height: {height}px; max-height: {max_height}px;"),
+                    format!(
+                        "width: 100%; max-height: {}px; height: {}px;",
+                        max_height - 6,
+                        height - 6
+                    ),
+                    "width: 100%;".to_string(),
+                    "width: 100%;".to_string(),
+                    format!("height: {}px; overflow-y: scroll;", 6 * ELEM_HEIGHT + 6),
+                )
+            } else {
+                (
+                    format!("height: {height}px; min-height: fit-content;"),
+                    format!(
+                        "width: 100%; min-height: fit-content; height: {}px;",
+                        height - 6
+                    ),
+                    "width: 100%;".to_string(),
+                    "width: 100%;".to_string(),
+                    "min-height: fit-content;".to_string(),
+                )
+            }
         } else {
             (
                 format!("width: {width}px; height: {height}px; left: {left}px;"),
@@ -511,8 +546,6 @@ where
                         />
                     </div>
                     <div class="scrollable-table-wrapper" style={style_scrollable_table}>
-                    <div class="searchable-select-list-search-space" style={style_inner_width.clone()}>
-                    </div>
                     {
                         if ctx.props().kind == Kind::Multi {
                             html! {
