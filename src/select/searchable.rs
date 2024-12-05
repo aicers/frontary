@@ -396,17 +396,25 @@ where
         } else {
             80
         };
-        let height = if ctx.props().kind == Kind::Single {
+        let height = if cfg!(feature = "pumpkin-dark") {
+            if ctx.props().kind == Kind::Single {
+                std::cmp::min(
+                    list_len * ELEM_HEIGHT + extra_height,
+                    ctx.props().max_height,
+                )
+            } else {
+                std::cmp::min(
+                    (list_len + 1) * ELEM_HEIGHT + extra_height,
+                    ctx.props().max_height,
+                )
+            }
+        } else {
             std::cmp::min(
                 list_len * ELEM_HEIGHT + extra_height,
                 ctx.props().max_height,
             )
-        } else {
-            std::cmp::min(
-                (list_len + 1) * ELEM_HEIGHT + extra_height,
-                ctx.props().max_height,
-            )
         };
+
         let max_height = 6 * ELEM_HEIGHT + extra_height;
         let left = if width > ctx.props().top_width - 8 && !ctx.props().align_left {
             format!("-{}", width - (ctx.props().top_width - 8) + 4)
@@ -538,8 +546,6 @@ where
                         />
                     </div>
                     <div class="scrollable-table-wrapper" style={style_scrollable_table}>
-                    <div class="searchable-select-list-search-space" style={style_inner_width.clone()}>
-                    </div>
                     {
                         if ctx.props().kind == Kind::Multi {
                             html! {

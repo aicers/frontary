@@ -209,6 +209,7 @@ div.searchable-select-list-down {
 div.searchable-select-list-search {
     margin-top: 6px;
     margin-bottom: 6px;
+    box-sizing: content-box;
     border-bottom: 1px solid #C7C7C7;
     height: 30px;
     background-image: url('/frontary/magnifier.png');
@@ -227,11 +228,6 @@ input[type=text].searchable-select-search {
 input[type=text].searchable-select-search::placeholder {
     font-size: 13px;
     color: #A9A9A9;
-}
-
-div.searchable-select-list-search-space {
-    height: 6px;
-    border-top: 1px solid #C7C7C7;
 }
 
 div.searchable-select-list-search-all {
