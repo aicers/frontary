@@ -128,10 +128,10 @@ div.searchable-select-vector {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    gap: 8px;
 }
 
 div.searchable-select-vector-margin {
-    margin-right: 8px;
     width: 100%;
     max-width: 255px;
 }
@@ -1636,7 +1636,7 @@ div.input-contents-item-title {
     font-size: 16px;
     color: var(--Text-Primary);
     line-height: 24px;
-    padding-bottom: 4px;
+    margin-bottom: 16px;
 }
 
 div.input-required-asterisk {
@@ -2616,6 +2616,18 @@ table.input-group {
     width: 100%;
 }
 
+table.input-group tr {
+    margin-bottom: 12px;
+}
+
+table.input-group tr td {
+    padding-bottom: 12px;
+}
+
+table.input-group tr:last-child td {
+    padding-bottom: 0px;
+}
+
 th.input-group-heading {
     height: 30px;
     font-size: 16px;
@@ -2636,12 +2648,10 @@ th.input-group-heading-delete {
 
 td.input-group-delete {
     padding-right: 12px;
-    padding-bottom: 12px;
 }
 
 td.input-group {
     padding-right: 12px;
-    padding-bottom: 12px;
 }
 
 td.input-group:last-child {
@@ -2664,7 +2674,6 @@ div.input-group-add {
     flex-direction: row;
     justify-content: flex-end;
     align-items: flex-end;
-    padding-bottom: 12px;
 }
 
 div.input-comparison-outer {
@@ -2681,11 +2690,10 @@ div.input-comparison {
 }
 
 div.input-comparison-value {
-    margin-left: 4px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     font-size: 16px;
     font-weight: 400;
     color: var(--Text-Primary);
@@ -2693,12 +2701,15 @@ div.input-comparison-value {
 
 div.input-comparison-value-indicator {
     min-width: fit-content;
-    margin: 0px 8px;
+    margin: 0px 4px;
+}
+
+div.input-comparison-value-indicator:last-of-type {
+    margin: 0px;
 }
 
 div.input-comparison-value-value {
-    margin-left: 4px;
-    margin-right: 4px;
+    margin: 0px;
 }
 
 div.notification {
