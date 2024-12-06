@@ -127,6 +127,7 @@ div.searchable-select-vector {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    width: 100%;
 }
 
 div.searchable-select-vector-margin {
@@ -1899,8 +1900,9 @@ div.input-select-vector {
 div.input-select-vector-vec {
     display: block;
 }
-div.searchable-select-vector > div {
-    width: 100% !important;
+
+div.searchable-select-vector>div {
+    width: 100%;
 }
 
 div.input-select-vector-vec-required {
@@ -2653,8 +2655,8 @@ div.input-group-item-outer {
     align-items: center;
 }
 
-div.input-group-item-outer > div {
-    width: 100% !important;
+div.input-group-item-outer>div {
+    width: 100%;
 }
 
 div.input-group-add {
