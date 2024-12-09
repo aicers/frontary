@@ -33,7 +33,7 @@ const PASSWD_NO_UPPER_MSG: &str = "Your password must contain at least one upper
 const PASSWD_NO_NUMBER_MSG: &str = "Your password must contain at least one number.";
 const PASSWD_NO_SYMBOL_MSG: &str = "Your password must contain at least one special character.";
 const PASSWD_CONSECUTIVE_MSG: &str =
-    "Your password must not contain consecutive repetitive characters.";
+    "Your password must not contain consecutive repeating characters.";
 const PASSWD_ADJACENT_MSG: &str =
     "Your password must not contain more than 3 adjacent keyboard characters.";
 const PASSWD_REQUIREMENT: &str = if cfg!(feature = "cc-password") {
