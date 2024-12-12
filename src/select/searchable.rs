@@ -10,8 +10,8 @@ use yew::virtual_dom::AttrValue;
 use yew::{classes, events::InputEvent, html, Component, Context, Html, Properties};
 
 use crate::{
-    language::Language, shorten_text, text, text_width, toggle_display, toggle_visibility,
-    CheckStatus, Checkbox, Item, Texts,
+    language::Language, shorten_text, text, text_width, toggle_visibility, CheckStatus, Checkbox,
+    Item, Texts,
 };
 
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
@@ -119,11 +119,7 @@ where
         let txt = ctx.props().txt.txt.clone();
         let send_msg = match msg {
             Message::Click => {
-                if cfg!(feature = "pumpkin-dark") {
-                    toggle_display(&ctx.props().id);
-                } else {
-                    toggle_visibility(&ctx.props().id);
-                }
+                toggle_visibility(&ctx.props().id);
                 false
             }
             Message::InputSearch(input) => {
