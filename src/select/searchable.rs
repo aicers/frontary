@@ -439,7 +439,10 @@ where
                     ),
                     "width: 100%;".to_string(),
                     "width: 100%;".to_string(),
-                    format!("height: {}px; overflow-y: scroll;", 6 * ELEM_HEIGHT + 6),
+                    format!(
+                        "height: {}px; overflow-y: scroll;",
+                        std::cmp::min(6 * ELEM_HEIGHT + 6, height - (ELEM_HEIGHT + 10))
+                    ),
                 )
             } else {
                 (

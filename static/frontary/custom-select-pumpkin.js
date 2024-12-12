@@ -3,34 +3,34 @@ export function toggle_visibility(id) {
     if (elem != null) {
         var elemDisplay = window
             .getComputedStyle(elem)
-            .getPropertyValue("visibility");
-        if (elemDisplay == "hidden") {
+            .getPropertyValue("display");
+        if (elemDisplay == "none") {
             // close other selects
             var elems = document.getElementsByClassName(
                 "searchable-select-list-down"
             );
             for (var i = 0; i < elems.length; i++) {
-                elems[i].style.visibility = "hidden";
+                elems[i].style.display = "none";
                 remove_listen_click();
             }
             var elems = document.getElementsByClassName(
                 "mini-select-list-down"
             );
             for (var i = 0; i < elems.length; i++) {
-                elems[i].style.visibility = "hidden";
+                elems[i].style.display = "none";
                 remove_listen_click();
             }
             var elems = document.getElementsByClassName(
                 "tag-group-input-select"
             );
             for (var i = 0; i < elems.length; i++) {
-                elems[i].style.visibility = "hidden";
+                elems[i].style.display = "none";
                 remove_listen_click();
             }
-            elem.style.visibility = "visible";
+            elem.style.display = "block";
             add_listen_click();
         } else {
-            elem.style.visibility = "hidden";
+            elem.style.display = "none";
             remove_listen_click();
         }
     }
@@ -41,12 +41,12 @@ export function toggle_visibility_complex(id) {
     if (elem != null) {
         var elemDisplay = window
             .getComputedStyle(elem)
-            .getPropertyValue("visibility");
-        if (elemDisplay == "hidden") {
-            elem.style.visibility = "visible";
+            .getPropertyValue("display");
+        if (elemDisplay == "none") {
+            elem.style.display = "block";
             add_listen_click_complex();
         } else {
-            elem.style.visibility = "hidden";
+            elem.style.display = "none";
             remove_listen_click_complex();
         }
     }
@@ -55,7 +55,7 @@ export function toggle_visibility_complex(id) {
 export function visible_tag_select(id) {
     var elem = document.getElementById(id);
     if (elem != null) {
-        elem.style.visibility = "visible";
+        elem.style.display = "block";
         add_listen_click();
     }
 }
@@ -110,19 +110,19 @@ function close_custom_select(elmnt) {
 
     var elems = document.getElementsByClassName("searchable-select-list-down");
     for (i = 0; i < elems.length; i++) {
-        elems[i].style.visibility = "hidden";
+        elems[i].style.display = "none";
         remove_listen_click();
     }
 
     var elems = document.getElementsByClassName("mini-select-list-down");
     for (i = 0; i < elems.length; i++) {
-        elems[i].style.visibility = "hidden";
+        elems[i].style.display = "none";
         remove_listen_click();
     }
 
     var elems = document.getElementsByClassName("tag-group-input-select");
     for (i = 0; i < elems.length; i++) {
-        elems[i].style.visibility = "hidden";
+        elems[i].style.display = "none";
         remove_listen_click();
     }
 }
@@ -145,7 +145,7 @@ function close_custom_select_complex(elmnt) {
 
     var elems = document.getElementsByClassName("complex-select-pop");
     for (i = 0; i < elems.length; i++) {
-        elems[i].style.visibility = "hidden";
+        elems[i].style.display = "none";
         remove_listen_click_complex();
     }
 }

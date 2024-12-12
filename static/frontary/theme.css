@@ -2604,6 +2604,10 @@ div.input-comparison-value {
     justify-content: center;
 }
 
+div.input-comparison-value-indicator {
+    display: inline-block;
+}
+
 div.input-comparison-value-value {
     width: 90px;
     margin-left: 4px;
