@@ -534,6 +534,7 @@ const NBSP: &str = "&nbsp;";
 #[wasm_bindgen(module = "/static/frontary/custom-select.js")]
 extern "C" {
     fn toggle_visibility(id: &str);
+    fn toggle_display(id: &str);
     fn toggle_visibility_complex(id: &str);
     fn visible_tag_select(id: &str);
 }

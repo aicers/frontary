@@ -128,10 +128,10 @@ div.searchable-select-vector {
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
+    gap: 8px;
 }
 
 div.searchable-select-vector-margin {
-    margin-right: 8px;
     width: 100%;
     max-width: 255px;
 }
@@ -202,11 +202,12 @@ input[type=text].searchable-select-input-empty-alert {
 }
 
 div.searchable-select-list-down {
-    visibility: hidden;
+    display: none;
     margin-top: 3px;
     font-size: 16px;
     color: #4D4D4D;
-    position: relative;
+    position: absolute;
+    width: 100%;
     z-index: 199;
     background-color: var(--Dropdown-Background);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
@@ -696,11 +697,11 @@ div.mini-select-list-down {
 }
 
 div.mini-select-list-down-hidden {
-    visibility: hidden;
+    display: none;
 }
 
 div.mini-select-list-down-visible {
-    visibility: visible;
+    display: none;
 }
 
 table.mini-select-list-down-table {
@@ -1636,7 +1637,16 @@ div.input-contents-item-title {
     font-size: 16px;
     color: var(--Text-Primary);
     line-height: 24px;
+    margin-bottom: 16px;
+}
+
+div.input-contents-text-item-title {
     padding-bottom: 4px;
+    width: 100%;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--Text-Primary);
+    line-height: 24px;
 }
 
 div.input-required-asterisk {
@@ -2116,7 +2126,7 @@ input[type=text].tag-group-input-input-input::placeholder {
 
 div.tag-group-input-select {
     position: absolute;
-    visibility: hidden;
+    display: none;
     top: 30px;
     max-width: 226px;
     max-height: 300px;
@@ -2616,8 +2626,19 @@ table.input-group {
     width: 100%;
 }
 
+table.input-group tr {
+    margin-bottom: 12px;
+}
+
+table.input-group tr td {
+    padding-bottom: 12px;
+}
+
+table.input-group tr:last-child td {
+    padding-bottom: 0px;
+}
+
 th.input-group-heading {
-    height: 30px;
     font-size: 16px;
     color: var(--Text-Primary);
     font-weight: 500;
@@ -2636,12 +2657,10 @@ th.input-group-heading-delete {
 
 td.input-group-delete {
     padding-right: 12px;
-    padding-bottom: 12px;
 }
 
 td.input-group {
     padding-right: 12px;
-    padding-bottom: 12px;
 }
 
 td.input-group:last-child {
@@ -2664,7 +2683,6 @@ div.input-group-add {
     flex-direction: row;
     justify-content: flex-end;
     align-items: flex-end;
-    padding-bottom: 12px;
 }
 
 div.input-comparison-outer {
@@ -2681,11 +2699,10 @@ div.input-comparison {
 }
 
 div.input-comparison-value {
-    margin-left: 4px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     font-size: 16px;
     font-weight: 400;
     color: var(--Text-Primary);
@@ -2693,12 +2710,20 @@ div.input-comparison-value {
 
 div.input-comparison-value-indicator {
     min-width: fit-content;
-    margin: 0px 8px;
+    margin: 0px 4px;
+}
+
+div.input-comparison-value-indicator:last-of-type {
+    margin: 0px;
 }
 
 div.input-comparison-value-value {
-    margin-left: 4px;
-    margin-right: 4px;
+    margin: 0px;
+}
+
+div.input-comparison div.searchable-select-vector-margin {
+    width: 100%;
+    max-width: 110px;
 }
 
 div.notification {

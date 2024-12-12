@@ -1,20 +1,28 @@
 export function toggle_visibility(id) {
     var elem = document.getElementById(id);
     if (elem != null) {
-        var elemDisplay = window.getComputedStyle(elem).getPropertyValue("visibility");
+        var elemDisplay = window
+            .getComputedStyle(elem)
+            .getPropertyValue("visibility");
         if (elemDisplay == "hidden") {
             // close other selects
-            var elems = document.getElementsByClassName("searchable-select-list-down");
+            var elems = document.getElementsByClassName(
+                "searchable-select-list-down"
+            );
             for (var i = 0; i < elems.length; i++) {
                 elems[i].style.visibility = "hidden";
                 remove_listen_click();
             }
-            var elems = document.getElementsByClassName("mini-select-list-down");
+            var elems = document.getElementsByClassName(
+                "mini-select-list-down"
+            );
             for (var i = 0; i < elems.length; i++) {
                 elems[i].style.visibility = "hidden";
                 remove_listen_click();
             }
-            var elems = document.getElementsByClassName("tag-group-input-select");
+            var elems = document.getElementsByClassName(
+                "tag-group-input-select"
+            );
             for (var i = 0; i < elems.length; i++) {
                 elems[i].style.visibility = "hidden";
                 remove_listen_click();
@@ -28,10 +36,50 @@ export function toggle_visibility(id) {
     }
 }
 
+export function toggle_display(id) {
+    var elem = document.getElementById(id);
+    if (elem != null) {
+        var elemDisplay = window
+            .getComputedStyle(elem)
+            .getPropertyValue("display");
+        if (elemDisplay == "none") {
+            // close other selects
+            var elems = document.getElementsByClassName(
+                "searchable-select-list-down"
+            );
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.display = "none";
+                remove_listen_click();
+            }
+            var elems = document.getElementsByClassName(
+                "mini-select-list-down"
+            );
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.display = "none";
+                remove_listen_click();
+            }
+            var elems = document.getElementsByClassName(
+                "tag-group-input-select"
+            );
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.display = "none";
+                remove_listen_click();
+            }
+            elem.style.display = "block";
+            add_listen_click();
+        } else {
+            elem.style.display = "none";
+            remove_listen_click();
+        }
+    }
+}
+
 export function toggle_visibility_complex(id) {
     var elem = document.getElementById(id);
     if (elem != null) {
-        var elemDisplay = window.getComputedStyle(elem).getPropertyValue("visibility");
+        var elemDisplay = window
+            .getComputedStyle(elem)
+            .getPropertyValue("visibility");
         if (elemDisplay == "hidden") {
             elem.style.visibility = "visible";
             add_listen_click_complex();
@@ -54,9 +102,11 @@ function close_custom_select(elmnt) {
     // HIGHLIGHT: in case when elmnt has been removed after it was clicked.
     if (elmnt.target.parentNode == null) return;
 
-    if (elmnt.target.className == "tag-select-edit"
-        || elmnt.target.className == "tag-select-edit-done"
-        || elmnt.target.className == "tag-input-close") {
+    if (
+        elmnt.target.className == "tag-select-edit" ||
+        elmnt.target.className == "tag-select-edit-done" ||
+        elmnt.target.className == "tag-input-close"
+    ) {
         return;
     }
 
