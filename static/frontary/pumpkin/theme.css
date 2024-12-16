@@ -381,7 +381,7 @@ input[type=text].complex-select-input-empty-alert {
 }
 
 div.complex-select-pop {
-    visibility: hidden;
+    display: none;
     position: fixed;
     z-index: 20;
     height: 100%;

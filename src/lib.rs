@@ -531,15 +531,6 @@ impl Eq for Texts {}
 
 const NBSP: &str = "&nbsp;";
 
-#[cfg(feature = "pumpkin-dark")]
-#[wasm_bindgen(module = "/static/frontary/custom-select-pumpkin.js")]
-extern "C" {
-    fn toggle_visibility(id: &str);
-    fn toggle_visibility_complex(id: &str);
-    fn visible_tag_select(id: &str);
-}
-
-#[cfg(not(feature = "pumpkin-dark"))]
 #[wasm_bindgen(module = "/static/frontary/custom-select.js")]
 extern "C" {
     fn toggle_visibility(id: &str);
