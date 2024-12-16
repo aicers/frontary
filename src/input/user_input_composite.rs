@@ -140,6 +140,7 @@ where
         &self,
         ctx: &Context<Self>,
         ess: &InputEssential,
+        language: bool,
         always: Option<CheckStatus>,
         children_config: Option<&CheckboxChildrenConfig>,
         input_data: &Rc<RefCell<InputItem>>,
@@ -191,9 +192,12 @@ where
             },
         );
 
-        // Since dynamic titles for checkbox are not included in language files, the below is required.
-        let title = get_text!(txt, ctx.props().language.tag(), ess.title())
-            .map_or(ess.title.clone(), |text| text.to_string());
+        let title = if language {
+            get_text!(txt, ctx.props().language.tag(), ess.title())
+                .map_or(ess.title.clone(), |text| text.to_string())
+        } else {
+            ess.title.clone()
+        };
 
         if let Some(checked) = checked {
             html! {
@@ -362,7 +366,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(), child_data, Some(base_index), layer_index, None, depth + 1) }
+                        { self.view_checkbox(ctx, &config.ess, config.language, config.always, config.children.as_ref(), child_data, Some(base_index), layer_index, None, depth + 1) }
                     </div>
                 }
             }

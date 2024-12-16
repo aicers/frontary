@@ -1072,7 +1072,7 @@ where
                                 Some(true)
                             }
                         });
-                        self.view_checkbox(ctx, &config.ess, config.always, config.children.as_ref(),
+                        self.view_checkbox(ctx, &config.ess, config.language, config.always, config.children.as_ref(),
                             input_data, None, index, both, 1)
                     }
                     InputConfig::Radio(config) => {
