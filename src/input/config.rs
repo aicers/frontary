@@ -182,6 +182,9 @@ pub struct CheckboxChildrenConfig {
 #[derive(Clone, PartialEq)]
 pub struct CheckboxConfig {
     pub ess: Essential,
+    /// If true, `ess::title` is displayed accrording to the language set by the user.
+    /// If false, it is displayed in English.
+    pub language: bool,
     /// `Some(CheckStatus::{Checked|Unchecked|Indeterminate})` means this is always that status.
     /// This `always` always shows but might contradict with the result of children.
     pub always: Option<CheckStatus>,
