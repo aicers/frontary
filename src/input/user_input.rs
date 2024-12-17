@@ -111,9 +111,15 @@ where
                     } else {
                         html! {
                             if !ess.title.is_empty() {
-                                <div class="input-contents-item-title">
-                                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
-                                </div>
+                                if cfg!(feature = "pumpkin-dark") {
+                                    <div class="input-contents-text-item-title">
+                                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                                    </div>
+                                } else {
+                                    <div class="input-contents-item-title">
+                                        { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                                    </div>
+                                }
                             }
                         }
                     }

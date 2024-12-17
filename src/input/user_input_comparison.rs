@@ -158,24 +158,38 @@ where
             };
         };
 
+        let last_elem_style = if cmp_statement_tail(cmp_kind).is_empty() {
+            "margin: 0px;".to_string()
+        } else {
+            "margin-left: 4px;".to_string()
+        };
+
         if cmp_kind.chain_cmp() {
             html! {
                 <div class="input-comparison-value">
-                    { cmp_statement_head(cmp_kind) }
+                    <div class="input-comparison-value-indicator">
+                        { cmp_statement_head(cmp_kind) }
+                    </div>
                     <div class="input-comparison-value-value">
                         { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind) }
                     </div>
-                    { cmp_statement_symbol(cmp_kind) }
+                    <div class="input-comparison-value-indicator">
+                        { cmp_statement_symbol(cmp_kind) }
+                    </div>
                     <div class="input-comparison-value-value">
                         { self.view_comparison_value_each(ctx, input_data, data_id, 1, value_kind) }
                     </div>
-                    { cmp_statement_tail(cmp_kind) }
+                    <div class="input-comparison-value-indicator" style={last_elem_style}>
+                        { cmp_statement_tail(cmp_kind) }
+                    </div>
                 </div>
             }
         } else {
             html! {
                 <div class="input-comparison-value">
-                    { cmp_statement_symbol(cmp_kind) }
+                    <div class="input-comparison-value-indicator">
+                        { cmp_statement_symbol(cmp_kind) }
+                    </div>
                     <div class="input-comparison-value-value">
                         { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind) }
                     </div>

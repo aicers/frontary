@@ -192,7 +192,7 @@ input[type=text].searchable-select-input-empty-alert {
 }
 
 div.searchable-select-list-down {
-    visibility: hidden;
+    display: none;
     margin-top: 4px;
     padding-left: 5px;
     padding-right: 5px;
@@ -345,7 +345,7 @@ input[type=text].complex-select-input-empty-alert {
 }
 
 div.complex-select-pop {
-    visibility: hidden;
+    display: none;
     position: fixed;
     z-index: 20;
     height: 100%;
@@ -655,11 +655,11 @@ div.mini-select-list-down {
 }
 
 div.mini-select-list-down-hidden {
-    visibility: hidden;
+    display: none;
 }
 
 div.mini-select-list-down-visible {
-    visibility: visible;
+    display: block;
 }
 
 table.mini-select-list-down-table {
@@ -2076,7 +2076,7 @@ input[type=text].tag-group-input-input-input::placeholder {
 
 div.tag-group-input-select {
     position: absolute;
-    visibility: hidden;
+    display: none;
     top: 30px;
     max-width: 226px;
     max-height: 300px;
@@ -2602,6 +2602,10 @@ div.input-comparison-value {
     flex-direction: row;
     align-items: center;
     justify-content: center;
+}
+
+div.input-comparison-value-indicator {
+    display: inline-block;
 }
 
 div.input-comparison-value-value {
