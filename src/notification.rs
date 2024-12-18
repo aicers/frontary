@@ -65,35 +65,16 @@ impl Component for Model {
     type Message = Message;
     type Properties = Props;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {
+    fn create(ctx: &Context<Self>) -> Self {
+        let mut s = Self {
             timeouts: HashMap::new(),
-        }
+        };
+        s.add_timer(ctx);
+        s
     }
 
     fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
-        let Ok(list) = ctx.props().list.try_borrow() else {
-            return false;
-        };
-        let (serial, time) = if let Some((serial, item)) = list.last() {
-            (*serial, item.time)
-        } else {
-            return false;
-        };
-
-        if let Some(time) = time {
-            let handle = {
-                let link = ctx.link().clone();
-                Timeout::new(
-                    time.as_millis()
-                        .to_u32()
-                        .expect("timeout should be u32 size"),
-                    move || link.send_message(Message::Timeout(serial)),
-                )
-            };
-            self.timeouts.insert(serial, handle);
-        }
-        true
+        self.add_timer(ctx)
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -136,6 +117,39 @@ impl Component for Model {
 }
 
 impl Model {
+    fn add_timer(&mut self, ctx: &Context<Self>) -> bool {
+        let Ok(list) = ctx.props().list.try_borrow() else {
+            return false;
+        };
+        let (serial, time) = if let Some((serial, item)) = list.last() {
+            (*serial, item.time)
+        } else {
+            return false;
+        };
+        if self.timeouts.contains_key(&serial) {
+            return false;
+        }
+
+        if let Some(time) = time {
+            let handle = {
+                let link = ctx.link().clone();
+                Timeout::new(
+                    time.as_millis().to_u32().unwrap_or_else(|| {
+                        TIMEOUT_SECS
+                            .as_millis()
+                            .to_u32()
+                            .expect("Default timeout is within u32 range")
+                    }),
+                    move || link.send_message(Message::Timeout(serial)),
+                )
+            };
+            self.timeouts.insert(serial, handle);
+            true
+        } else {
+            false
+        }
+    }
+
     fn view_item(ctx: &Context<Self>, serial: usize, noti: &NotificationItem) -> Html {
         let color = match noti.category {
             Category::Fail => FAIL_COLOR,
