@@ -46,20 +46,50 @@ static MAX_NUM_OF_LAYER: LazyLock<BigUint> =
 
 #[cfg(test)]
 mod tests {
+    use num_traits::ToPrimitive;
+    fn cal_index_first_ver(base_index: Option<usize>, layer_index: usize) -> usize {
+        // `base_index` means parent's index
+        if let Some(base_index) = base_index {
+            let max = 2_u32
+                .pow(super::POWER_OF_MAX_NUM_OF_LAYER)
+                .to_f64()
+                .expect("usize to f64 is safe.");
+            let base = base_index.to_f64().expect("usize to f64 is safe.");
+            let base = base.log(max).floor();
+            let Some(base) = base.to_u32() else {
+                panic!("Too many levels in hierarchy of input items");
+            };
+            let base = 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER).pow(base + 1);
+            base_index + base * (1 + layer_index)
+        } else {
+            layer_index
+        }
+    }
+
+    fn cal_index_with_bit_op(base_index: Option<usize>, layer_index: usize) -> usize {
+        if let Some(base_index) = base_index {
+            let base = (63 - base_index.leading_zeros()) / super::POWER_OF_MAX_NUM_OF_LAYER;
+            let base = 1 << (super::POWER_OF_MAX_NUM_OF_LAYER * (base + 1));
+            base_index + base * (1 + layer_index)
+        } else {
+            layer_index
+        }
+    }
+
     #[test]
     fn cal_index_test() {
-        assert_eq!(super::_cal_index_first_ver(Some(4), 0), 68);
+        assert_eq!(cal_index_first_ver(Some(4), 0), 68);
         assert_eq!(
-            super::_cal_index_first_ver(Some(790_596_usize), 1),
+            cal_index_first_ver(Some(790_596_usize), 1),
             34_345_028_usize
         );
     }
 
     #[test]
     fn cal_index_bit_test() {
-        assert_eq!(super::_cal_index_with_bit_op(Some(4), 0), 68);
+        assert_eq!(cal_index_with_bit_op(Some(4), 0), 68);
         assert_eq!(
-            super::_cal_index_with_bit_op(Some(790_596_usize), 1),
+            cal_index_with_bit_op(Some(790_596_usize), 1),
             34_345_028_usize
         );
     }
@@ -74,35 +104,6 @@ mod tests {
             super::cal_index(Some(&num_bigint::BigUint::from(790_596_u32)), 1),
             num_bigint::BigUint::from(34_345_028_u32)
         );
-    }
-}
-
-fn _cal_index_first_ver(base_index: Option<usize>, layer_index: usize) -> usize {
-    // `base_index` means parent's index
-    if let Some(base_index) = base_index {
-        let max = 2_u32
-            .pow(POWER_OF_MAX_NUM_OF_LAYER)
-            .to_f64()
-            .expect("usize to f64 is safe.");
-        let base = base_index.to_f64().expect("usize to f64 is safe.");
-        let base = base.log(max).floor();
-        let Some(base) = base.to_u32() else {
-            panic!("Too many levels in hierarchy of input items");
-        };
-        let base = 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER).pow(base + 1);
-        base_index + base * (1 + layer_index)
-    } else {
-        layer_index
-    }
-}
-
-fn _cal_index_with_bit_op(base_index: Option<usize>, layer_index: usize) -> usize {
-    if let Some(base_index) = base_index {
-        let base = (63 - base_index.leading_zeros()) / POWER_OF_MAX_NUM_OF_LAYER;
-        let base = 1 << (POWER_OF_MAX_NUM_OF_LAYER * (base + 1));
-        base_index + base * (1 + layer_index)
-    } else {
-        layer_index
     }
 }
 
