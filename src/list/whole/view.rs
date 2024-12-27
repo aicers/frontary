@@ -1,9 +1,14 @@
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::str::FromStr;
 
 use htmlescape::decode_html;
 use json_gettext::get_text;
-use yew::{classes, html, Component, Context, Html};
+use yew::{
+    classes, html,
+    virtual_dom::{AttrValue, VNode},
+    Component, Context, Html,
+};
 
 use super::{
     component::{Message, Model},
@@ -785,23 +790,20 @@ where
                     </table>
                 }
             }
-            Column::Checkbox(_) => {
-                if let Some(sep) = ctx.props().br_separator {
-                    let display = col.to_string();
-                    let display = display
-                        .split(sep)
-                        .map(ToString::to_string)
-                        .collect::<Vec<String>>();
-                    {
-                        view_list_sep_dot(&display, true)
-                    }
+            Column::Checkbox(elem) => {
+                if let Some(display) = elem.display.as_deref() {
+                    let display = to_unchecked_html(display);
+                    html! { display }
                 } else {
-                    html! { col.to_string() }
+                    html! {
+                        col.to_string()
+                    }
                 }
             }
             Column::Radio(elem) => {
-                if elem.display.is_some() {
-                    html! { col.to_string() }
+                if let Some(display) = elem.display.as_deref() {
+                    let display = to_unchecked_html(display);
+                    html! { display }
                 } else {
                     html! {
                         elem.selected.to_string_txt(&txt, ctx.props().language)
@@ -841,6 +843,10 @@ where
             }
         }
     }
+}
+
+fn to_unchecked_html(display: &str) -> VNode {
+    Html::from_html_unchecked(AttrValue::from_str(display).expect("AttrValue never returns Err."))
 }
 
 fn view_list_sep_dot(list: &[String], br: bool) -> Html {

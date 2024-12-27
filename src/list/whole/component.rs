@@ -155,9 +155,6 @@ where
     #[prop_or(None)]
     pub input_second_type: Option<Vec<Rc<InputConfig>>>,
 
-    #[prop_or(None)]
-    pub br_separator: Option<&'static str>,
-
     pub messages: HashMap<MessageType, T::Message>,
 }
 
