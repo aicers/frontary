@@ -35,6 +35,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   for consistency, and updated references accordingly.
 - Changed file input extension handling to avoid hardcoding extension values.
 - Changed the variants of `Column` to use structs instead of tuples.
+- Removed `br_separator` for `Column::{Checkbox | Radio}`.
+  - `Column::{Checkbox | Radio}::display` is now injected directly into the HTML
+    stream using `Html::from_html_unchecked` of Yew.
 
 ### Removed
 
