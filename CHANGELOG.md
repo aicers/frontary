@@ -38,6 +38,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Removed `br_separator` for `Column::{Checkbox | Radio}`.
   - `Column::{Checkbox | Radio}::display` is now injected directly into the HTML
     stream using `Html::from_html_unchecked` of Yew.
+- Changed styling for `user_input_composite.rs` and `user_input.rs` to enahnce
+  design and funcionality for `view_group`.
 
 ### Removed
 

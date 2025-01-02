@@ -427,16 +427,36 @@ where
         let display_titles =
             !(items_conf.len() == 1 && items_conf.first().map_or(false, |x| x.title().is_empty()));
         let required = ess.required;
+        let add_message = if cfg!(feature = "pumpkin-dark") {
+            "+ Add another condition"
+        } else {
+            "+ Add"
+        };
+        let input_add_class = if cfg!(feature = "pumpkin-dark") {
+            "input-group-add-start"
+        } else {
+            "input-group-add"
+        };
+        let input_group = if cfg!(feature = "pumpkin-dark") {
+            "input-group-one-col"
+        } else {
+            "input-group"
+        };
+        let input_contents_item_title = if display_titles {
+            "input-contents-item-title"
+        } else {
+            "input-contents-item-title-no-margin"
+        };
 
         html! {
             <div class="input-item">
-                <div class="input-contents-item-title">
+                <div class={input_contents_item_title}>
                     { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                 </div>
                 <div class="input-text-message">
                     { self.view_required_msg(ctx, &this_index) }
                 </div>
-                <div class="input-group">
+                <div class={input_group}>
                     <div>
                         <table class="input-group">
                             if cfg!(feature = "debug") {
@@ -444,6 +464,8 @@ where
                             }
                             if display_titles {
                                 <tr>
+                                    <th class={classes!("input-group-heading" ,"input-group-empty-header")}>
+                                    </th>
                                     {
                                         for items_conf.iter().enumerate().map(|(col_index, each)| {
                                             let style = if let Some(Some(width)) = widths.get(col_index) {
@@ -481,6 +503,7 @@ where
                                     if one_row {
                                         html! {
                                             <tr>
+                                                <div class="group-list-link-line-top"></div>
                                                 {
                                                     for row.iter().zip(items_conf.iter()).enumerate().map(|(col_index, (each_item, each_conf))| {
                                                         html! {
@@ -549,12 +572,28 @@ where
                                                         }
                                                     })
                                                 }
-                                                <td class="input-group-delete">
-                                                    <div class="input-nic-delete-outer">
-                                                        <div class="input-nic-delete" onclick={onclick_delete}>
-                                                        </div>
-                                                    </div>
-                                                </td>
+                                                {
+                                                    if cfg!(feature = "pumpkin-dark") {
+                                                        html! {
+                                                            <td class="input-trash-can-delete">
+                                                                <div class="input-trash-can-delete-outer">
+                                                                    <div class="input-trash-can-delete" onclick={onclick_delete}>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    }
+                                                    else {
+                                                        html!{
+                                                            <td class="input-group-delete">
+                                                                <div class="input-nic-delete-outer">
+                                                                    <div class="input-nic-delete" onclick={onclick_delete}>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    }
+                                                }
                                             </tr>
                                         }
                                     } else {
@@ -565,12 +604,36 @@ where
                             }
                         </table>
                     </div>
-                    <div class="input-group-add">
-                        <div class="input-add-item" onclick={onclick_add}>
-                            { text!(txt, ctx.props().language, "+ Add") }
-                        </div>
-                    </div>
+                    {
+                        if cfg!(feature = "pumpkin-dark") {
+                            html!{}
+                        }
+                        else {
+                            html!{
+                                <div class={input_add_class}>
+                                    <div class="input-add-item" onclick={onclick_add.clone()}>
+                                        { text!(txt, ctx.props().language, add_message) }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
                 </div>
+                {
+                    if cfg!(feature = "pumpkin-dark") {
+                        html!{
+                            <div class={input_add_class}>
+                            <div class="group-list-link-line-bottom"></div>
+                                <div class="input-add-item" onclick={onclick_add}>
+                                    { text!(txt, ctx.props().language, add_message) }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else {
+                        html!{}
+                    }
+                }
             </div>
         }
     }
