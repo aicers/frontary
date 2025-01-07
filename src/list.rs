@@ -27,6 +27,7 @@ pub struct ListItem {
 #[derive(Clone, PartialEq)]
 pub struct TextColumn {
     pub text: ViewString,
+    pub display: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -94,14 +95,22 @@ pub struct GroupColumn {
 pub struct CheckboxColumn {
     pub status: CheckStatus,
     pub children: Vec<Column>,
-    pub display: Option<String>,
+    pub display: Vec<String>,
+    pub modal: Vec<ModalDisplay>,
 }
 
 #[derive(Clone, PartialEq)]
 pub struct RadioColumn {
     pub selected: ViewString,
     pub children: Vec<(bool, Vec<Column>)>, // bool = checked
-    pub display: Option<String>,
+    pub display: Vec<String>,
+    pub modal: Vec<ModalDisplay>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct ModalDisplay {
+    pub title: String,
+    pub content: String,
 }
 
 #[derive(Clone, PartialEq)]
@@ -205,21 +214,7 @@ impl std::fmt::Display for Column {
                     .join(" | ");
                 write!(formatter, "{values}")
             }
-            Self::Group(_) => Ok(()),
-            Self::Checkbox(d) => {
-                if let Some(display) = d.display.as_ref() {
-                    write!(formatter, "{display}")
-                } else {
-                    Ok(())
-                }
-            }
-            Self::Radio(d) => {
-                if let Some(display) = d.display.as_ref() {
-                    write!(formatter, "{display}")
-                } else {
-                    Ok(())
-                }
-            }
+            Self::Group(_) | Self::Checkbox(_) | Self::Radio(_) => Ok(()),
         }
     }
 }

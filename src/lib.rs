@@ -50,9 +50,9 @@ pub use crate::ip_range_input::Model as IpRangeInput;
 pub use crate::language::Language;
 pub use crate::list::{
     CheckboxColumn, ColWidths, Column, ComparisonColumn, DataType, DisplayInfo, FileColumn,
-    Float64Column, GroupColumn, HostNetworkGroupColumn, Kind, ListItem, MessageType, NicColumn,
-    PercentageColumn, RadioColumn, SelectMultipleColumn, SelectSingleColumn, SortColumn, TagColumn,
-    TextColumn, Unsigned32Column, VecSelectColumn, WholeList,
+    Float64Column, GroupColumn, HostNetworkGroupColumn, Kind, ListItem, MessageType, ModalDisplay,
+    NicColumn, PercentageColumn, RadioColumn, SelectMultipleColumn, SelectSingleColumn, SortColumn,
+    TagColumn, TextColumn, Unsigned32Column, VecSelectColumn, WholeList,
 };
 pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
