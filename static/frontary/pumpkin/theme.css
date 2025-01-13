@@ -1649,6 +1649,14 @@ div.input-contents-text-item-title {
     line-height: 24px;
 }
 
+div.input-contents-item-title-no-margin {
+    width: 100%;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--Text-Primary);
+    line-height: 24px;
+}
+
 div.input-required-asterisk {
     display: inline-block;
     color: var(--Red-70);
@@ -2631,7 +2639,7 @@ table.input-group tr {
 }
 
 table.input-group tr td {
-    padding-bottom: 12px;
+    padding-bottom: 0px;
 }
 
 table.input-group tr:last-child td {
@@ -2659,6 +2667,55 @@ td.input-group-delete {
     padding-right: 12px;
 }
 
+div.input-trash-can-delete-outer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.input-trash-can-delete {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    background-image: url('/frontary/pumpkin/trash-can.svg');
+    background-size: 24px 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--Transparent-Mid-Grey);
+    border-radius: 8px;
+}
+
+div.input-trash-can-delete:hover {
+    cursor: pointer;
+}
+
+div.group-list-link-line-bottom {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    top: 16px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-bottom.svg');
+    background-size: 20px 5px;
+    background-repeat: no-repeat;
+}
+
+div.group-list-link-line-top {
+    position: relative;
+    height: 56px;
+    width: 30px;
+    top: 29px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-top.svg');
+    background-size: 20px 56px;
+    background-repeat: no-repeat;
+    transform: scale(1, -1.05);
+}
+
+th.input-group-empty-header {
+    width: 30px;
+}
+
 td.input-group {
     padding-right: 12px;
 }
@@ -2678,11 +2735,25 @@ div.input-group-item-outer>div {
     width: 100%;
 }
 
-div.input-group-add {
+div.input-group-add-end {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     align-items: flex-end;
+}
+
+div.input-group-add-start {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-top: 12px;
+}
+
+div.input-group-one-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
 }
 
 div.input-comparison-outer {

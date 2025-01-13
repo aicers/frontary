@@ -512,11 +512,11 @@ where
                     }
                 }
             }
-                <div class="input-contents-item-input">
+                <div class="input-contents-item-input" style={style}>
                 {
                     if let Some(value) = value {
                         html! {
-                            <input type="number" class={class} style={style}
+                            <input type="number" class={class}
                                 value={value.to_string()}
                                 step={step.to_string()}
                                 placeholder={placeholder}
@@ -526,7 +526,7 @@ where
                         }
                     } else {
                         html! {
-                            <input type="number" class={class} style={style}
+                            <input type="number" class={class}
                                 // HIGHLIGHT: This must be set to empty string. If not, the previous
                                 // input shows here when another item in the group is added.
                                 value={String::new()}

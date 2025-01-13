@@ -163,6 +163,20 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
 
         let close_white = include_bytes!("../static/frontary/pumpkin/close-white.svg");
         rtn.push(("close-white.svg", close_white));
+
+        let group_list_link_line_bottom =
+            include_bytes!("../static/frontary/pumpkin/group-list-link-line-bottom.svg");
+        rtn.push((
+            "group-list-link-line-bottom.svg",
+            group_list_link_line_bottom,
+        ));
+
+        let group_list_link_line_top =
+            include_bytes!("../static/frontary/pumpkin/group-list-link-line-top.svg");
+        rtn.push(("group-list-link-line-top.svg", group_list_link_line_top));
+
+        let trash_can = include_bytes!("../static/frontary/pumpkin/trash-can.svg");
+        rtn.push(("trash-can.svg", trash_can));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));
