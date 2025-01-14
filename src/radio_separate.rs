@@ -76,7 +76,7 @@ where
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let checked = if let Ok(selected_index) = ctx.props().selected_index.try_borrow() {
-            (*selected_index).map_or(false, |s| s == ctx.props().index)
+            (*selected_index).is_some_and(|s| s == ctx.props().index)
         } else {
             false
         };
