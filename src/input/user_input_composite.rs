@@ -425,7 +425,7 @@ where
             )
         });
         let display_titles =
-            !(items_conf.len() == 1 && items_conf.first().map_or(false, |x| x.title().is_empty()));
+            !(items_conf.len() == 1 && items_conf.first().is_some_and(|x| x.title().is_empty()));
         let required = ess.required;
         let add_message = if cfg!(feature = "pumpkin-dark") {
             "+ Add another condition"

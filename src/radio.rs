@@ -79,7 +79,7 @@ where
             {
                 for ctx.props().list.iter().enumerate().map(|(index, item)| {
                     let checked = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
-                        ctx.props().candidate_values.get(index).map_or(false, |candidate| *selected == *candidate)
+                        ctx.props().candidate_values.get(index).is_some_and(|candidate| *selected == *candidate)
                     } else {
                         false
                     };

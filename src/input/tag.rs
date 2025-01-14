@@ -414,7 +414,7 @@ where
             <div id={self.id.clone()} class="tag-group-input-select">
             {
                 for self.search_list.iter().enumerate().map(|(index, (k, v))| {
-                    if self.edit.as_ref().map_or(false, |t| t == k) {
+                    if self.edit.as_ref() == Some(k) {
                         let oninput = ctx.link().callback(|e: InputEvent| {
                             e.target()
                                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
@@ -474,7 +474,7 @@ where
                             </div>
                         }
                     } else {
-                        let class = if self.search_cursor.map_or(false, |c| c == index) {
+                        let class = if self.search_cursor == Some(index) {
                             "tag-group-input-select-item-outer-cursor"
                         } else {
                             "tag-group-input-select-item-outer"

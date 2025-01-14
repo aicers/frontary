@@ -411,21 +411,21 @@ where
         let notice = match ctx.props().kind {
             Kind::All => Some(INPUT_ALL_NOTICE),
             Kind::HostOnly => {
-                if ctx.props().num.map_or(false, |x| x == 1) {
+                if ctx.props().num == Some(1) {
                     None
                 } else {
                     Some(INPUT_HOST_NOTICE)
                 }
             }
             Kind::NetworkOnly => {
-                if ctx.props().num.map_or(false, |x| x == 1) {
+                if ctx.props().num == Some(1) {
                     None
                 } else {
                     Some(INPUT_NETWORK_NOTICE)
                 }
             }
             Kind::RangeOnly => {
-                if ctx.props().num.map_or(false, |x| x == 1) {
+                if ctx.props().num == Some(1) {
                     None
                 } else {
                     Some(INPUT_RANGE_NOTICE)

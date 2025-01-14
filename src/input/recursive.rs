@@ -423,7 +423,7 @@ where
                                 && self
                                     .verification_host_network
                                     .get(&this_index)
-                                    .map_or(false, |v| v.map_or(true, |v| v))
+                                    .is_some_and(|v| v.map_or(true, |v| v))
                         }
                         (InputItem::Nic(n), InputConfig::Nic(_)) => {
                             input_conf.required()
