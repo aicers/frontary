@@ -35,11 +35,14 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   for consistency, and updated references accordingly.
 - Changed file input extension handling to avoid hardcoding extension values.
 - Changed the variants of `Column` to use structs instead of tuples.
-- Removed `br_separator` for `Column::{Checkbox | Radio}`.
-  - `Column::{Checkbox | Radio}::display` is now injected directly into the HTML
-    stream using `Html::from_html_unchecked` of Yew.
 - Changed styling for `user_input_composite.rs` and `user_input.rs` to enahnce
   design and funcionality for `view_group`.
+- Removed `br_separator` for `Column::{Checkbox | Radio}`.
+- Introduced `{CheckboxColumn | RadioColumn}::modal`, which displays a modal window
+  corresponding to each of the `{CheckboxColumn | RadioColumn}::display` elements.
+- The content of both `modal` and `display` is directly injected into the HTML
+  stream using `Html::from_html_unchecked` from Yew.
+- Added `TextColumn::display` element.
 
 ### Removed
 

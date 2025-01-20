@@ -4,18 +4,14 @@ use std::str::FromStr;
 
 use htmlescape::decode_html;
 use json_gettext::get_text;
-use yew::{
-    classes, html,
-    virtual_dom::{AttrValue, VNode},
-    Component, Context, Html,
-};
+use yew::{classes, html, virtual_dom::AttrValue, Component, Context, Html};
 
 use super::{
     component::{Message, Model},
     DEFAULT_NUM_PAGES,
 };
 use crate::{
-    list::{ColWidths, Column, DataType, Kind, ListItem},
+    list::{ColWidths, Column, DataType, Kind, ListItem, ModalDisplay},
     text, CheckStatus, Checkbox, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
     SortStatus, ViewString, WholeList, NBSP,
 };
@@ -323,7 +319,7 @@ where
                                                             }
 
                                                             html! {
-                                                                Self::view_column_row(ctx, item.columns.as_ref(), 0, widths, ctx.props().display_info.widths.len() > 1)
+                                                                self.view_column_row(ctx, item.columns.as_ref(), 0, widths, ctx.props().display_info.widths.len() > 1)
                                                             }
                                                         } else {
                                                             html! {}
@@ -373,7 +369,7 @@ where
                                                                                 <div class="list-whole-column-next-lines">
                                                                                     <table style={style}>
                                                                                         <tr style={height}>
-                                                                                            { Self::view_column_row(ctx, item.columns.as_ref(), first, cols, true) }
+                                                                                            { self.view_column_row(ctx, item.columns.as_ref(), first, cols, true) }
                                                                                         </tr>
                                                                                     </table>
                                                                                 </div>
@@ -518,6 +514,7 @@ where
     }
 
     pub(super) fn view_column_row(
+        &self,
         ctx: &Context<Self>,
         columns: &[Column],
         start: usize,
@@ -538,10 +535,33 @@ where
                         ""
                     };
                     let style = Self::style_width_height(ctx, widths, i, varied_width);
+                    let onclick_close = {
+                        ctx.link().callback(move |_| Message::CloseModal)
+                    };
 
                     html! {
                         <td class={classes!("list-whole-list-flat", if border { class_border } else { "" })} style={style}>
                             { Self::view_column(ctx, index, col) }
+                            {
+                                if let Some(modal) = &self.modal {
+                                    let modal_content = Some(Html::from_html_unchecked(AttrValue::from_str(&modal.1).expect("AttrValue never returns Err.")));
+                                    html! {
+                                        <div class="modal-outer">
+                                            <div class="popup-outer">
+                                                <div class="popup-title">
+                                                    <span>{&modal.0}</span>
+                                                    <div onclick={onclick_close}>
+                                                        <div class="complex-select-pop-head-close-icon"></div>
+                                                    </div>
+                                                </div>
+                                                { modal_content }
+                                            </div>
+                                        </div>
+                                    }
+                                } else {
+                                    html! {}
+                                }
+                            }
                         </td>
                     }
                 } else {
@@ -647,9 +667,22 @@ where
     fn view_column(ctx: &Context<Self>, index: usize, col: &Column) -> Html {
         let txt = ctx.props().txt.txt.clone();
         match col {
-            Column::Text(elem) => html! {
-                elem.text.to_string_txt(&txt, ctx.props().language)
-            },
+            Column::Text(elem) => {
+                if let Some(display) = &elem.display {
+                    let v_node = Html::from_html_unchecked(
+                        AttrValue::from_str(display).expect("AttrValue never returns Err."),
+                    );
+                    html! {
+                        <div>
+                            { v_node }
+                        </div>
+                    }
+                } else {
+                    html! {
+                        elem.text.to_string_txt(&txt, ctx.props().language)
+                    }
+                }
+            }
             Column::HostNetworkGroup(elem) => {
                 html! {
                     for elem.host_network_group.iter().map(|elem| html! {
@@ -791,23 +824,21 @@ where
                 }
             }
             Column::Checkbox(elem) => {
-                if let Some(display) = elem.display.as_deref() {
-                    let display = to_unchecked_html(display);
-                    html! { display }
-                } else {
+                if elem.display.is_empty() {
                     html! {
-                        col.to_string()
+                        {"-"}
                     }
+                } else {
+                    Self::to_unchecked_html(ctx, &elem.display, &elem.modal)
                 }
             }
             Column::Radio(elem) => {
-                if let Some(display) = elem.display.as_deref() {
-                    let display = to_unchecked_html(display);
-                    html! { display }
-                } else {
+                if elem.display.is_empty() {
                     html! {
                         elem.selected.to_string_txt(&txt, ctx.props().language)
                     }
+                } else {
+                    Self::to_unchecked_html(ctx, &elem.display, &elem.modal)
                 }
             }
         }
@@ -843,10 +874,24 @@ where
             }
         }
     }
-}
 
-fn to_unchecked_html(display: &str) -> VNode {
-    Html::from_html_unchecked(AttrValue::from_str(display).expect("AttrValue never returns Err."))
+    fn to_unchecked_html(ctx: &Context<Self>, display: &[String], modal: &[ModalDisplay]) -> Html {
+        html! {
+            for display.iter().enumerate().map(|(index, d)| {
+                let modal_data = modal.get(index).map(|modal| (modal.title.clone(), modal.content.clone()));
+                let onclick_button = {
+                    ctx.link()
+                        .callback(move |_| Message::ClickButton(modal_data.clone()))
+                };
+                let v_node = Html::from_html_unchecked(AttrValue::from_str(d).expect("AttrValue never returns Err."));
+                html! {
+                    <div onclick={onclick_button.clone()}>
+                        { v_node }
+                    </div>
+                }
+            })
+        }
+    }
 }
 
 fn view_list_sep_dot(list: &[String], br: bool) -> Html {

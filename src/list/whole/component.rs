@@ -51,6 +51,8 @@ pub struct Model<T> {
     pub(super) sort_list_kind: Rc<RefCell<Option<SortListKind>>>,
 
     phantom: PhantomData<T>,
+
+    pub(super) modal: Option<(String, String)>, // (String, String) = (title,  content)
 }
 
 #[allow(clippy::enum_variant_names)]
@@ -84,6 +86,8 @@ pub enum Message {
     DoMoreAction(String),
     SortList,
     SetSecondSortDefault,
+    ClickButton(Option<(String, String)>),
+    CloseModal,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -186,6 +190,8 @@ where
             sort_list_kind: Rc::new(RefCell::new(None)),
 
             phantom: PhantomData,
+
+            modal: None,
         };
         s.initiate_pages_info(ctx);
         s.reset_sort_second_layer(ctx);
@@ -433,6 +439,9 @@ where
                     }
                     Kind::LayeredSecond => return false, // unreachable
                 };
+            }
+            Message::ClickButton(modal) => {
+                self.modal = modal;
             }
             Message::CheckItem(key) => {
                 if self.check_status(ctx) == CheckStatus::Unchecked {
@@ -744,6 +753,9 @@ where
             },
             Message::SetSecondSortDefault => {
                 self.reset_sort_second_layer(ctx);
+            }
+            Message::CloseModal => {
+                self.modal = None;
             }
         }
         true
