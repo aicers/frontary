@@ -153,8 +153,14 @@ where
             (self.comparison_kind(data_id), self.comparison_cmp(data_id))
         else {
             return html! {
-                <div class="input-comparison-value">
-                </div>
+                if cfg!(feature = "pumpkin-dark") {
+                    <div class="input-comparison-empty">
+                    </div>
+                }
+                else {
+                    <div class="input-comparison-value">
+                    </div>
+                }
             };
         };
 
@@ -164,6 +170,18 @@ where
             "margin-left: 4px;".to_string()
         };
 
+        let indicator_class = if cfg!(feature = "pumpkin-dark") {
+            "input-comparison-value-indicator-padded"
+        } else {
+            "input-comparison-value-indicator"
+        };
+
+        let indicator_single_class = if cfg!(feature = "pumpkin-dark") {
+            "input-comparison-value-indicator-single"
+        } else {
+            "input-comparison-value-indicator"
+        };
+
         if cmp_kind.chain_cmp() {
             html! {
                 <div class="input-comparison-value">
@@ -171,13 +189,13 @@ where
                         { cmp_statement_head(cmp_kind) }
                     </div>
                     <div class="input-comparison-value-value">
-                        { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind) }
+                        { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind, cmp_kind) }
                     </div>
-                    <div class="input-comparison-value-indicator">
+                    <div class={indicator_class}>
                         { cmp_statement_symbol(cmp_kind) }
                     </div>
                     <div class="input-comparison-value-value">
-                        { self.view_comparison_value_each(ctx, input_data, data_id, 1, value_kind) }
+                        { self.view_comparison_value_each(ctx, input_data, data_id, 1, value_kind, cmp_kind) }
                     </div>
                     <div class="input-comparison-value-indicator" style={last_elem_style}>
                         { cmp_statement_tail(cmp_kind) }
@@ -187,11 +205,11 @@ where
         } else {
             html! {
                 <div class="input-comparison-value">
-                    <div class="input-comparison-value-indicator">
+                    <div class={indicator_single_class}>
                         { cmp_statement_symbol(cmp_kind) }
                     </div>
                     <div class="input-comparison-value-value">
-                        { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind) }
+                        { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind, cmp_kind) }
                     </div>
                 </div>
             }
@@ -205,9 +223,15 @@ where
         data_id: &BigUint,
         value_index: usize,
         value_kind: ValueKind,
+        cmp_kind: ComparisonKind,
     ) -> Html {
         let data_id_clone = data_id.clone();
         let input_data_clone = input_data.clone();
+        let input_class = if cmp_kind.chain_cmp() && cfg!(feature = "pumpkin-dark") {
+            "input-number-comparison"
+        } else {
+            "input-number"
+        };
         let oninput = ctx.link().callback(move |e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
@@ -267,7 +291,7 @@ where
             },
             ValueKind::Integer | ValueKind::Float => html! {
                 <input type="number"
-                    class="input-number"
+                    class={input_class}
                     oninput={oninput}
                     value={value}
                 />

@@ -181,6 +181,9 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
 
         let trash_can = include_bytes!("../static/frontary/pumpkin/trash-can.svg");
         rtn.push(("trash-can.svg", trash_can));
+
+        let addition_symbol = include_bytes!("../static/frontary/pumpkin/addition-symbol.svg");
+        rtn.push(("addition-symbol.svg", addition_symbol));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));
