@@ -283,7 +283,11 @@ where
             ctx.props().list.try_borrow(),
         ) {
             if list.is_empty() {
-                class_input = "searchable-select-input-empty";
+                class_input = if cfg!(feature = "pumpkin-dark") {
+                    "searchable-select-input-empty-disabled"
+                } else {
+                    "searchable-select-input-empty"
+                };
                 text!(txt, ctx.props().language, "None").to_string()
             } else if let Some(selected) = selected.as_ref() {
                 if selected.is_empty() {

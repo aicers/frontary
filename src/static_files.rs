@@ -68,6 +68,10 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let select_down = include_bytes!("../static/frontary/pumpkin/select-down.svg");
         rtn.push(("select-down.svg", select_down));
 
+        let select_down_disabled =
+            include_bytes!("../static/frontary/pumpkin/select-down-disabled.svg");
+        rtn.push(("select-down-disabled.svg", select_down_disabled));
+
         let magnifier = include_bytes!("../static/frontary/pumpkin/magnifier.svg");
         rtn.push(("magnifier.svg", magnifier));
 
