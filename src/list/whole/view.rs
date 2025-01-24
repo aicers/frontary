@@ -693,11 +693,22 @@ where
                 }
             }
             Column::SelectSingle(elem) => {
-                let Some((_, elem)) = elem.selected.as_ref() else {
+                let Some((_, value)) = elem.selected.as_ref() else {
                     return html! {};
                 };
-                html! {
-                    elem.to_string_txt(&txt, ctx.props().language)
+                if let Some(display) = &elem.display {
+                    let v_node = Html::from_html_unchecked(
+                        AttrValue::from_str(display).expect("AttrValue never returns Err."),
+                    );
+                    html! {
+                        <div>
+                            { v_node }
+                        </div>
+                    }
+                } else {
+                    html! {
+                        value.to_string_txt(&txt, ctx.props().language)
+                    }
                 }
             }
             Column::SelectMultiple(list) => {
