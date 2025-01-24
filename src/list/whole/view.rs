@@ -748,6 +748,7 @@ where
                 }
             }
             Column::Unsigned32(_)
+            | Column::Unsigned8(_)
             | Column::Float64(_)
             | Column::Percentage(_)
             | Column::Comparison(_) => html! { col.to_string() },
@@ -807,6 +808,7 @@ where
                                                 | Column::SelectSingle(..)
                                                 | Column::SelectMultiple(..)
                                                 | Column::Unsigned32(..)
+                                                | Column::Unsigned8(..)
                                                 | Column::Float64(..)
                                                 | Column::Percentage(..)
                                                 | Column::Comparison(..)
