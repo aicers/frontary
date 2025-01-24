@@ -177,6 +177,22 @@ input[type=text].searchable-select-input-empty {
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
     padding: 8px 12px;
+    color: var(--Dark-30);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+}
+
+input[type=text].searchable-select-input-empty-disabled {
+    height: 40px;
+    border: none;
+    background-image: url('/frontary/pumpkin/select-down-disabled.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 4px;
+    background-repeat: no-repeat;
+    padding: 8px 12px;
     color: var(--Dark-50);
     font-size: 16px;
     font-weight: 400;
@@ -197,7 +213,7 @@ input[type=text].searchable-select-input-empty-alert {
     background-repeat: no-repeat;
     border: none;
     line-height: 24px;
-    color: var(--Dark-20);
+    color: var(--Dark-30);
     font-weight: 400;
 }
 
@@ -237,7 +253,7 @@ input[type=text].searchable-select-search {
 
 input[type=text].searchable-select-search::placeholder {
     font-size: 16px;
-    color: var(--Dark-20);
+    color: var(--Dark-30);
 }
 
 div.searchable-select-list-search-all {
@@ -370,11 +386,11 @@ input[type=text].complex-select-input-empty-alert {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: var(--Dark-20);
+    color: var(--Dark-30);
     background-color: var(--Transparent-Mid-Grey);
     border: 2px solid var(--Red-60);
     border-radius: 8px;
-    background-image: url('/frontary/pumpkin/complex-select-pop.-alert.svg');
+    background-image: url('/frontary/pumpkin/complex-select-pop-alert.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -578,7 +594,7 @@ input[type=text].complex-select-search {
 
 input[type=text].complex-select-search::placeholder {
     font-size: 16px;
-    color: var(--Dark-20);
+    color: var(--Dark-30);
 }
 
 input[type=text].complex-select-search:focus {
@@ -637,7 +653,7 @@ input[type=text].complex-select-pop-input::placeholder {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: var(--Dark-20);
+    color: var(--Dark-30);
 }
 
 input[type=text].complex-select-pop-input:focus {
@@ -1560,7 +1576,7 @@ input[type=text].page-input {
 }
 
 input[type=text].page-input::placeholder {
-    color: #A9A9A9;
+    color: var(--Dark-30);
 }
 
 div.input-outer {
@@ -1677,7 +1693,7 @@ input[type=text].frontary-input-text {
 }
 
 input[type=text].frontary-input-text::placeholder {
-    color: var(--Dark-50);
+    color: var(--Dark-30);
 }
 
 input[type=text].frontary-input-text-alert {
@@ -1754,7 +1770,7 @@ input[type=password].input-password {
 }
 
 input[type=password].input-password::placeholder {
-    color: var(--Dark-50);
+    color: var(--Dark-30);
 }
 
 input[type=password].input-password-alert {
@@ -1786,7 +1802,7 @@ input[type=number].input-number {
 }
 
 input[type=number].input-number::placeholder {
-    color: var(--Dark-50);
+    color: var(--Dark-30);
 }
 
 input[type=number].input-number-alert {
@@ -2006,7 +2022,7 @@ input[type=text].host-network-group-input-input-input {
 }
 
 input[type=text].host-network-group-input-input-input::placeholder {
-    color: var(--Dark-50);
+    color: var(--Dark-30);
 }
 
 div.host-network-group-input-input-message {
@@ -2127,7 +2143,7 @@ input[type=text].tag-group-input-input-input {
 }
 
 input[type=text].tag-group-input-input-input::placeholder {
-    color: var(--Dark-50);
+    color: var(--Dark-30);
     background-color: transparent;
     font-size: 16px;
 }
@@ -2284,7 +2300,7 @@ input[type=text].tag-select-edit-tag {
 }
 
 input[type=text].tag-select-edit-tag::placeholder {
-    color: var(--Dark-20);
+    color: var(--Dark-30);
 }
 
 img.tag-select-edit-done {
@@ -2572,15 +2588,15 @@ input[type=text].input-nic-gateway {
 }
 
 input[type=text].input-nic-name::placeholder {
-    color: #A9A9A9;
+    color: var(--Dark-30);
 }
 
 input[type=text].input-nic-interface::placeholder {
-    color: #A9A9A9;
+    color: var(--Dark-30);
 }
 
 input[type=text].input-nic-gateway::placeholder {
-    color: #A9A9A9;
+    color: var(--Dark-30);
 }
 
 div.input-file {
@@ -3157,10 +3173,10 @@ div.popup-title {
     justify-content: space-between;
 }
 
-div:nth-of-type(1) > .admin-node-config-button {
+div:nth-of-type(1)>.admin-node-config-button {
     margin-bottom: 8px;
 }
 
-div:nth-of-type(2) > .admin-node-config-button {
+div:nth-of-type(2)>.admin-node-config-button {
     margin-bottom: 0;
 }
