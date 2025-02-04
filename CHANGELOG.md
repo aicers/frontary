@@ -43,6 +43,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - The content of both `modal` and `display` is directly injected into the HTML
   stream using `Html::from_html_unchecked` from Yew.
 - Added `TextColumn::display` element.
+- Added `SelectSingleColumn::display` element.
 
 ### Removed
 

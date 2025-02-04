@@ -38,6 +38,7 @@ pub struct HostNetworkGroupColumn {
 #[derive(Clone, PartialEq)]
 pub struct SelectSingleColumn {
     pub selected: Option<(String, ViewString)>, // id, value
+    pub display: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]
