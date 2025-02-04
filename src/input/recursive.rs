@@ -109,6 +109,10 @@ where
                                                 InputItem::Unsigned32(_),
                                                 InputConfig::Unsigned32(_),
                                             )
+                                            | (
+                                                InputItem::Unsigned8(_),
+                                                InputConfig::Unsigned8(_),
+                                            )
                                             | (InputItem::Float64(_), InputConfig::Float64(_))
                                             | (
                                                 InputItem::Percentage(_),
@@ -160,6 +164,7 @@ where
                         (InputItem::Text(_), InputConfig::Text(_))
                         | (InputItem::Password(_), InputConfig::Password(_))
                         | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
+                        | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
                         | (InputItem::Float64(_), InputConfig::Float64(_))
                         | (InputItem::Percentage(_), InputConfig::Percentage(_))
                         | (InputItem::Nic(_), InputConfig::Nic(_))
@@ -216,6 +221,13 @@ where
                             }
                         }
                         (InputItem::Unsigned32(item), InputConfig::Unsigned32(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(*preset);
+                                }
+                            }
+                        }
+                        (InputItem::Unsigned8(item), InputConfig::Unsigned8(config)) => {
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(*preset);
@@ -405,6 +417,7 @@ where
                         | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_))
                         | (InputItem::Tag(_), InputConfig::Tag(_))
                         | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
+                        | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
                         | (InputItem::Float64(_), InputConfig::Float64(_))
                         | (InputItem::Percentage(_), InputConfig::Percentage(_))
                         | (InputItem::File(_), InputConfig::File(_))
@@ -530,6 +543,7 @@ where
             | InputConfig::SelectSingle(_)
             | InputConfig::SelectMultiple(_)
             | InputConfig::Unsigned32(_)
+            | InputConfig::Unsigned8(_)
             | InputConfig::Float64(_)
             | InputConfig::Percentage(_)
             | InputConfig::Comparison(_)
@@ -563,6 +577,7 @@ where
                             | InputItem::SelectSingle(_)
                             | InputItem::SelectMultiple(_)
                             | InputItem::Unsigned32(_)
+                            | InputItem::Unsigned8(_)
                             | InputItem::Float64(_)
                             | InputItem::Percentage(_) => Some(Some(col.is_empty())),
                             InputItem::Comparison(v) => {
@@ -649,6 +664,21 @@ where
                     // HIGHTLIGHT: Since HostNetworkGroup items were verified, they don't need to be verified here.
                     match (&*input_data, &**input_conf) {
                         (InputItem::Unsigned32(value), InputConfig::Unsigned32(config)) => {
+                            if let Some(value) = value.as_ref() {
+                                if parent_checked {
+                                    if *value >= config.min && *value <= config.max {
+                                        self.verification.insert(item_index, Verification::Valid);
+                                    } else {
+                                        self.verification.insert(
+                                            item_index,
+                                            Verification::Invalid(InvalidMessage::InvalidInput),
+                                        );
+                                        rtn = false;
+                                    }
+                                }
+                            }
+                        }
+                        (InputItem::Unsigned8(value), InputConfig::Unsigned8(config)) => {
                             if let Some(value) = value.as_ref() {
                                 if parent_checked {
                                     if *value >= config.min && *value <= config.max {
@@ -1060,6 +1090,13 @@ where
                                 }
                             }
                             (InputItem::Unsigned32(user), InputConfig::Unsigned32(config)) => {
+                                if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(preset) = &config.preset {
+                                        user.set(*preset);
+                                    }
+                                }
+                            }
+                            (InputItem::Unsigned8(user), InputConfig::Unsigned8(config)) => {
                                 if user.is_none() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(*preset);

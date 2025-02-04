@@ -44,6 +44,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   stream using `Html::from_html_unchecked` from Yew.
 - Added `TextColumn::display` element.
 - Added `SelectSingleColumn::display` element.
+- Added `Unsigned8` to `Column`, `InputConfig`, `InputItem`.
 
 ### Removed
 

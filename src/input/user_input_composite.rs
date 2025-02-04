@@ -276,6 +276,7 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_lines)]
     pub(super) fn view_child(
         &self,
         ctx: &Context<Self>,
@@ -331,6 +332,15 @@ where
                         <div class={class_line}>
                         </div>
                         { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, Some(base_index), layer_index, false, false) }
+                    </div>
+                }
+            }
+            InputConfig::Unsigned8(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_unsigned_8(ctx, &config.ess, config.min, config.max, config.width, child_data, Some(base_index), layer_index, false, false) }
                     </div>
                 }
             }

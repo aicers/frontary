@@ -57,6 +57,11 @@ pub struct Unsigned32Column {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct Unsigned8Column {
+    pub value: Option<u8>,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct Float64Column {
     pub value: Option<f64>,
 }
@@ -122,6 +127,7 @@ pub enum Column {
     SelectMultiple(SelectMultipleColumn),
     Tag(TagColumn),
     Unsigned32(Unsigned32Column),
+    Unsigned8(Unsigned8Column),
     Float64(Float64Column),
     Percentage(PercentageColumn),
     Nic(NicColumn),
@@ -165,6 +171,10 @@ impl std::fmt::Display for Column {
                 write!(formatter, "{values}")
             }
             Self::Unsigned32(d) => {
+                let value = d.value.map_or_else(String::new, |d| d.to_string());
+                write!(formatter, "{value}")
+            }
+            Self::Unsigned8(d) => {
                 let value = d.value.map_or_else(String::new, |d| d.to_string());
                 write!(formatter, "{value}")
             }

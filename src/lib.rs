@@ -43,8 +43,8 @@ pub use crate::input::{
     InputTagGroup, Model as Input, NicConfig, NicItem, PasswordConfig, PasswordItem,
     PercentageConfig, PercentageItem, RadioConfig, RadioItem, SelectMultipleConfig,
     SelectMultipleItem, SelectSingleConfig, SelectSingleItem, Tag, TagConfig, TagItem, TextConfig,
-    TextItem, Unsigned32Config, Unsigned32Item, Value as ComparisonValue, ValueKind,
-    VecSelectConfig, VecSelectItem,
+    TextItem, Unsigned32Config, Unsigned32Item, Unsigned8Config, Unsigned8Item,
+    Value as ComparisonValue, ValueKind, VecSelectConfig, VecSelectItem,
 };
 pub use crate::ip_range_input::Model as IpRangeInput;
 pub use crate::language::Language;
@@ -52,7 +52,7 @@ pub use crate::list::{
     CheckboxColumn, ColWidths, Column, ComparisonColumn, DataType, DisplayInfo, FileColumn,
     Float64Column, GroupColumn, HostNetworkGroupColumn, Kind, ListItem, MessageType, ModalDisplay,
     NicColumn, PercentageColumn, RadioColumn, SelectMultipleColumn, SelectSingleColumn, SortColumn,
-    TagColumn, TextColumn, Unsigned32Column, VecSelectColumn, WholeList,
+    TagColumn, TextColumn, Unsigned32Column, Unsigned8Column, VecSelectColumn, WholeList,
 };
 pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,
