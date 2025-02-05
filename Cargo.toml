@@ -1,6 +1,6 @@
 [package]
 name = "frontary"
-version = "0.9.4"
+version = "0.10.0"
 edition = "2021"
 publish = false
 
@@ -15,7 +15,7 @@ test = []
 [dependencies]
 anyhow = "1"
 bincode = "1"
-chrono = { version = ">=0.4.35", default-features = false, features = [
+chrono = { version = "0.4.35", default-features = false, features = [
     "serde",
     "wasmbind",
 ] }
@@ -33,11 +33,10 @@ num-bigint = "0.4"
 num-traits = "0.2"
 passwords = { version = "3", features = ["common-password"] }
 reqwasm = "0.5"
-scraper = "0.20"
 serde = { version = "1", features = ["derive"] }
 strum = "0.26"
 strum_macros = "0.26"
-wasm-bindgen = { version = ">=0.2.82", features = [
+wasm-bindgen = { version = "0.2.82", features = [
     "serde-serialize",
 ] } # rustwasm/wasm-bindgen#2963
 web-sys = { version = "0.3", features = [
