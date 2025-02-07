@@ -355,14 +355,10 @@ where
         } else {
             "input-item"
         };
-        let style = if cfg!(feature = "pumpkin-dark") {
-            "width: 320px;".to_string()
-        } else {
-            format!(
-                "width: {};",
-                width.map_or("100%".to_string(), |w| format!("{w}px"))
-            )
-        };
+        let style = format!(
+            "width: {};",
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
+        );
 
         html! {
             <div class={class_item}>
@@ -494,14 +490,10 @@ where
         } else {
             "input-item"
         };
-        let style = if cfg!(feature = "pumpkin-dark") {
-            "width: 320px;".to_string()
-        } else {
-            format!(
-                "width: {};",
-                width.map_or("100%".to_string(), |w| format!("{w}px"))
-            )
-        };
+        let style = format!(
+            "width: {};",
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
+        );
 
         html! {
             <div class={class_item}>
