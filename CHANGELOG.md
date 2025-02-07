@@ -5,7 +5,7 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.10.0]
 
 ### Added
 
@@ -38,8 +38,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Changed styling for `user_input_composite.rs` and `user_input.rs` to enahnce
   design and funcionality for `view_group`.
 - Removed `br_separator` for `Column::{Checkbox | Radio}`.
-- Introduced `{CheckboxColumn | RadioColumn}::modal`, which displays a modal window
-  corresponding to each of the `{CheckboxColumn | RadioColumn}::display` elements.
+- Introduced `{CheckboxColumn | RadioColumn}::modal`, which displays a modal
+  window corresponding to each of the `{CheckboxColumn | RadioColumn}::display`
+  elements.
 - The content of both `modal` and `display` is directly injected into the HTML
   stream using `Html::from_html_unchecked` from Yew.
 - Added `TextColumn::display` element.
@@ -272,7 +273,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
-[Unreleased]: https://github.com/aicers/frontary/compare/0.9.4...main
+[0.10.0]: https://github.com/aicers/frontary/compare/0.9.4...0.10.0
 [0.9.4]: https://github.com/aicers/frontary/compare/0.9.3...0.9.4
 [0.9.3]: https://github.com/aicers/frontary/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/aicers/frontary/compare/0.9.1...0.9.2
