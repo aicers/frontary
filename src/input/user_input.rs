@@ -23,6 +23,7 @@ const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input
 const EXISTING_MSG: &str = "The input already exists.";
 const REQUIRED_MSG: &str = "This field is required.";
 const INVALID_MSG: &str = "Invalid input";
+const INVALID_DNS_MSG: &str = "Valid domain is required.";
 const PASSWD_NOT_MATCH_MSG: &str = "Passwords must match.";
 const PASSWD_HAS_SPACE_MSG: &str = "Your password must not constain any spaces.";
 const PASSWD_HAS_CONTROL_CHARACTER_MSG: &str =
@@ -163,6 +164,20 @@ where
                             <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, EXISTING_MSG)}
                             </div>
+                        }
+                    } else if let Some(Verification::Invalid(m)) = self.verification.get(&my_index) {
+                        let msg = match m {
+                            InvalidMessage::InvalidDnsInput => Some(INVALID_DNS_MSG),
+                            _ => None,
+                        };
+                        if let Some(msg) = msg {
+                            html! {
+                                <div class="input-contents-item-alert-message">
+                                    { text!(txt, ctx.props().language, msg)}
+                                </div>
+                            }
+                        } else {
+                            html! {}
                         }
                     } else {
                         html! {}

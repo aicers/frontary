@@ -26,6 +26,7 @@ use crate::{
 
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum InvalidMessage {
+    InvalidDnsInput,
     InvalidInput,
     InvalidPassword(InvalidPasswordKind),
     InterfaceNameRequired,
@@ -1182,7 +1183,7 @@ where
                                 }
                             }
                             if !different {
-                                self.unique_msg.insert(BigUint::from(index + 1));
+                                self.unique_msg.insert(BigUint::from(index));
                                 unique.push(true);
                             }
                         }

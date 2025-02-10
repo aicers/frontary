@@ -26,6 +26,7 @@ gloo-storage = "0.3"
 gloo-timers = "0.3"
 gloo-utils = "0.2"
 htmlescape = "0.3"
+idna = "1"
 ipnet = { version = "2", features = ["serde"] }
 js-sys = "0.3"
 json-gettext = "4"
@@ -36,6 +37,7 @@ reqwasm = "0.5"
 serde = { version = "1", features = ["derive"] }
 strum = "0.26"
 strum_macros = "0.26"
+url = "2"
 wasm-bindgen = { version = "0.2.82", features = [
     "serde-serialize",
 ] } # rustwasm/wasm-bindgen#2963

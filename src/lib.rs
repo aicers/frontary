@@ -43,7 +43,7 @@ pub use crate::input::{
     InputTagGroup, Model as Input, NicConfig, NicItem, PasswordConfig, PasswordItem,
     PercentageConfig, PercentageItem, RadioConfig, RadioItem, SelectMultipleConfig,
     SelectMultipleItem, SelectSingleConfig, SelectSingleItem, Tag, TagConfig, TagItem, TextConfig,
-    TextItem, Unsigned32Config, Unsigned32Item, Unsigned8Config, Unsigned8Item,
+    TextItem, TextValidation, Unsigned32Config, Unsigned32Item, Unsigned8Config, Unsigned8Item,
     Value as ComparisonValue, ValueKind, VecSelectConfig, VecSelectItem,
 };
 pub use crate::ip_range_input::Model as IpRangeInput;

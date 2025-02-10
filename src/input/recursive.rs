@@ -1,10 +1,12 @@
 use core::panic;
+use std::net::IpAddr;
 use std::{cell::RefCell, collections::HashSet, net::Ipv4Addr, rc::Rc, str::FromStr};
 
 use ipnet::Ipv4Net;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use passwords::analyzer;
+use url::Url;
 use yew::{Component, Context};
 
 use super::{
@@ -15,6 +17,7 @@ use super::{
     InputConfig, InputItem, RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem,
     SelectSingleItem, TagItem, VecSelectItem,
 };
+use crate::input::config::TextValidation;
 use crate::{is_adjacent, InvalidPasswordKind as Kind, PASSWORD_MIN_LEN};
 
 type PropaChildren = Vec<(BigUint, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
@@ -663,6 +666,21 @@ where
                     // HIGHTLIGHT: All kinds are not necessarily to be verified.
                     // HIGHTLIGHT: Since HostNetworkGroup items were verified, they don't need to be verified here.
                     match (&*input_data, &**input_conf) {
+                        (InputItem::Text(value), InputConfig::Text(config)) => {
+                            if let Some(conf) = config.validation {
+                                if conf == TextValidation::DnsValidation && parent_checked {
+                                    if validate_dns(value) {
+                                        self.verification.insert(item_index, Verification::Valid);
+                                    } else {
+                                        self.verification.insert(
+                                            item_index,
+                                            Verification::Invalid(InvalidMessage::InvalidDnsInput),
+                                        );
+                                        rtn = false;
+                                    }
+                                }
+                            }
+                        }
                         (InputItem::Unsigned32(value), InputConfig::Unsigned32(config)) => {
                             if let Some(value) = value.as_ref() {
                                 if parent_checked {
@@ -1518,6 +1536,74 @@ pub fn invalid_password(password: &str) -> Option<Kind> {
             Some(Kind::NoSymbol)
         } else {
             None
+        }
+    }
+}
+
+fn validate_dns(input: &str) -> bool {
+    let domain_check = |s: &&str| {
+        idna::domain_to_ascii_strict(s).is_ok() && s.contains('.') && s.parse::<IpAddr>().is_err()
+    };
+
+    if let Ok(parsed_url) = Url::parse(input) {
+        parsed_url
+            .host_str()
+            .filter(domain_check)
+            .map_or_else(|| false, |_| true)
+    } else {
+        domain_check(&input)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::input::recursive::validate_dns;
+
+    #[test]
+    fn test_validate_dns() {
+        let test_cases = vec![
+            ("example.123.co.kr", true),
+            ("example.xyz", true),
+            ("example.com", true),
+            ("http://example.com", true),
+            ("https://example.com", true),
+            ("sub.example.com", true),
+            ("http://xn--d1acj3b.xn--p1ai", true),
+            ("https://例子.测试", true),
+            ("http://테스트.한국", true),
+            ("https://xn--9t4b11yi5a.xn--3e0b707e", true),
+            ("http://例子.テスト", true),
+            ("https://テスト.日本", true),
+            ("example.net", true),
+            ("example.org", true),
+            ("example.한국", true),
+            ("example.中国", true),
+            ("example.日本", true),
+            ("example.de", true),
+            ("example.fr", true),
+            ("example.au", true),
+            ("example.co.uk", true),
+            ("example.io", true),
+            ("example.xyz", true),
+            ("https://xn--fiq228c.xn--fiqs8s", true),
+            ("https://xn--wgv71a119e.xn--kpry57d", true),
+            // Invalid domains
+            ("http://-example.com", false),
+            ("https://example-.com", false),
+            ("http://exa_mple.com", false),
+            ("http://", false),
+            ("", false),
+            ("example.test.com.", false),
+            ("http://example..com", false),
+            ("http://.example.com", false),
+            ("http://exa%mple.com", false),
+            ("11111", false),
+            ("test", false),
+            ("1.1.1.1", false),
+        ];
+
+        for (domain, expected) in test_cases {
+            assert_eq!(validate_dns(domain), expected);
         }
     }
 }

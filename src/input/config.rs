@@ -26,6 +26,11 @@ pub enum ChildrenPosition {
     Right,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum TextValidation {
+    DnsValidation,
+}
+
 #[derive(Clone, PartialEq)]
 pub struct TextConfig {
     pub ess: Essential,
@@ -33,6 +38,7 @@ pub struct TextConfig {
     pub width: Option<u32>,
     pub preset: Option<String>,
     pub unique: bool,
+    pub validation: Option<TextValidation>,
 }
 
 #[derive(Clone, PartialEq)]

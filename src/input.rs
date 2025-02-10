@@ -22,7 +22,7 @@ pub use config::{
     CheckboxChildrenConfig, CheckboxConfig, ChildrenPosition, ComparisonConfig, Essential,
     FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig, InputConfig, NicConfig,
     PasswordConfig, PercentageConfig, RadioConfig, SelectMultipleConfig, SelectSingleConfig,
-    TagConfig, TextConfig, Unsigned32Config, Unsigned8Config, VecSelectConfig,
+    TagConfig, TextConfig, TextValidation, Unsigned32Config, Unsigned8Config, VecSelectConfig,
 };
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
