@@ -56,19 +56,16 @@ img {
 
 input[type=text] {
     font-size: 13px;
-    color: #000000;
     outline: none;
 }
 
 input[type=number] {
     font-size: 13px;
-    color: #000000;
     outline: none;
 }
 
 input[type=password] {
     font-size: 13px;
-    color: #000000;
     outline: none;
 }
 
@@ -221,7 +218,6 @@ div.searchable-select-list-down {
     display: none;
     margin-top: 3px;
     font-size: 16px;
-    color: #4D4D4D;
     position: absolute;
     width: 100%;
     z-index: 199;
@@ -410,7 +406,6 @@ div.complex-select-pop {
 div.complex-select-pop-head {
     height: 70px;
     width: 100%;
-    background-color: #E2E2E2;
 }
 
 td.complex-select-pop-head-text {
@@ -435,7 +430,6 @@ td.complex-select-pop-head-close {
     background-color: var(--Dark-80);
     vertical-align: top;
     font-size: 16px;
-    color: #000000;
 }
 
 div.complex-select-pop-head-close-icon {
@@ -666,7 +660,6 @@ div.complex-select-pop-input-list {
     padding-right: 24px;
     padding-bottom: 20px;
     font-size: 13px;
-    color: #4D4D4D;
 }
 
 td.complex-select-pop-input-list-networks {
@@ -864,7 +857,6 @@ div.mini-select-basic {
     padding-right: 2px;
     padding-left: 4px;
     font-size: 13px;
-    color: #4D4D4D;
     display: grid;
     grid-template-columns: 1fr 24px;
     grid-template-rows: 28px
@@ -1187,10 +1179,6 @@ td.list-whole-list-first-layer {
     padding: 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
     -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-}
-
-span.list-whole-list-first-layer-light {
-    color: #707070;
 }
 
 td.list-whole-list-first-layer-more-action {
@@ -1523,60 +1511,14 @@ table.page-bar {
     margin-bottom: 8.5px;
 }
 
-td.page-bar {
-    height: 13px;
-    padding-left: 8px;
-    font-size: 13px;
-    line-height: 13px;
-    color: #666666;
-}
-
 table.page-go {
     display: inline-block;
     margin-left: 8px;
     border-collapse: separate;
 }
 
-td.page-go-input {
-    width: 72px;
-    height: 28px;
-    padding-left: 3px;
-    padding-right: 3px;
-    border: 1px solid #C7C7C7;
-    border-radius: 3px 0px 0px 3px;
-}
-
-td.page-go-icon {
-    width: 30px;
-    height: 28px;
-    border-right: 1px solid #C7C7C7;
-    border-top: 1px solid #C7C7C7;
-    border-bottom: 1px solid #C7C7C7;
-    border-radius: 0px 3px 3px 0px;
-    background-color: #D8D8D8;
-    background-image: url('/frontary/page-go.png');
-    background-position: 7px 6px;
-    background-size: 16px 16px;
-    background-repeat: no-repeat;
-}
-
 td.page-go-icon:hover {
     cursor: pointer;
-}
-
-input[type=text].page-input {
-    width: 66px;
-    height: 28px;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-size: 13px;
-    border: 0;
-    color: #000000;
-    background-color: var(--White);
-}
-
-input[type=text].page-input::placeholder {
-    color: var(--Dark-30);
 }
 
 div.input-outer {
@@ -1588,7 +1530,7 @@ div.input-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.55);
+    background-color: var(--Modal-Background);
     z-index: 99;
 }
 
@@ -1709,6 +1651,10 @@ input[type=text].frontary-input-text-alert {
     background-color: var(--Transparent-Mid-Grey);
 }
 
+input[type=text].frontary-input-text-alert::placeholder {
+    color: var(--Dark-30);
+}
+
 div.input-text-message {
     width: 100%;
 }
@@ -1784,6 +1730,10 @@ input[type=password].input-password-alert {
     border-radius: 8px;
     border: 2px solid var(--Red-60);
     background-color: var(--Transparent-Mid-Grey);
+}
+
+input[type=password].input-password-alert::placeholder {
+    color: var(--Dark-30);
 }
 
 input[type=number].input-number {
@@ -1881,7 +1831,6 @@ div.input-radio-outer {
 div.input-radio {
     font-weight: normal;
     font-size: 13px;
-    color: #4D4D4D;
     display: flex;
     align-items: flex-start;
 }
@@ -1942,7 +1891,6 @@ div.input-select-vector-vec-required {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #FFE9E9;
     border: 2px solid var(--Red-50);
 }
 
@@ -2330,8 +2278,6 @@ div.input-checkbox {
 
 div.input-checkbox-both {
     width: 100%;
-    border-top: 1px solid #EBEBEB;
-    border-bottom: 1px solid #EBEBEB;
     padding-top: 12px;
     padding-bottom: 12px;
 }
@@ -2415,99 +2361,6 @@ div.input-checkbox-link-line-right {
     background: var(--Dark-30);
 }
 
-th.input-nic-heading {
-    height: 30px;
-    background-color: #F4F1F1;
-    font-weight: normal;
-    font-size: 11px;
-    color: #000000;
-    border-top: 1px solid #D7D7D7;
-    border-bottom: 1px solid #D7D7D7;
-}
-
-th.input-nic-border {
-    border-left: 1px solid #D7D7D7;
-    border-right: 1px solid #D7D7D7;
-}
-
-th.input-nic-heading-name {
-    width: 130px;
-}
-
-th.input-nic-heading-ip {
-    width: 180px;
-}
-
-th.input-nic-heading-delete {
-    width: 24px;
-    background-color: #F4F1F1;
-    border-top: 1px solid #D7D7D7;
-    border-bottom: 1px solid #D7D7D7;
-}
-
-th.input-nic-heading-add {
-    width: 100px;
-}
-
-td.input-nic-input {
-    height: 40px;
-    background-color: var(--White);
-    color: #000000;
-    padding-top: 4px;
-    padding-bottom: 4px;
-}
-
-td.input-nic-input-last {
-    height: 40px;
-    background-color: var(--White);
-    color: #000000;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #CECECE;
-}
-
-td.input-nic-delete-last {
-    border-bottom: 1px solid #CECECE;
-}
-
-div.input-nic-input-outer {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-div.input-nic-delete-outer {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-div.input-nic-delete-outer:hover {
-    border-radius: 8px;
-    background: var(--Transparent-Mid-Grey);
-}
-
-div.input-nic-delete {
-    width: 32px;
-    height: 32px;
-    display: inline-block;
-    background-image: url('/frontary/pumpkin/nic-delete.svg');
-    background-size: 32px 32px;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-div.input-nic-delete:hover {
-    cursor: pointer;
-}
-
-td.input-nic-input-add {
-    padding-left: 20px;
-}
-
 div.input-add-item {
     height: 40px;
     display: flex;
@@ -2527,75 +2380,6 @@ div.input-add-item:hover {
     cursor: pointer;
     border: 2px solid var(--Blue-40);
     background-color: var(--Dark-80);
-}
-
-input[type=text].input-nic {
-    height: 30px;
-    font-size: 13px;
-    padding-left: 8px;
-    padding-right: 8px;
-    color: #000000;
-    background-color: var(--White);
-    border: 1px solid #CECECE;
-    border-radius: 2px;
-}
-
-div.input-nic-msg {
-    height: 15px;
-    font-size: 12px;
-    font-weight: normal;
-    line-height: 15px;
-    color: var(--Text-Primary);
-    text-align: left;
-    margin-top: 4px;
-}
-
-div.input-nic-input-name {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    width: 90px;
-}
-
-div.input-nic-input-interface {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    width: 140;
-}
-
-div.input-nic-input-gateway {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    width: 140;
-}
-
-input[type=text].input-nic-name {
-    width: 90px;
-}
-
-input[type=text].input-nic-interface {
-    width: 140px;
-}
-
-input[type=text].input-nic-gateway {
-    width: 140px;
-}
-
-input[type=text].input-nic-name::placeholder {
-    color: var(--Dark-30);
-}
-
-input[type=text].input-nic-interface::placeholder {
-    color: var(--Dark-30);
-}
-
-input[type=text].input-nic-gateway::placeholder {
-    color: var(--Dark-30);
 }
 
 div.input-file {
@@ -2630,6 +2414,7 @@ label.input-file-choose-file {
     align-items: center;
     justify-content: center;
     color: var(--Blue-40);
+    font-weight: 500;
 }
 
 label.input-file-choose-file:hover {
@@ -2928,7 +2713,7 @@ div.modal-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.55);
+    background-color: var(--Modal-Background);
     z-index: 99;
 }
 
