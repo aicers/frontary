@@ -710,7 +710,7 @@ div.mini-select-list-down-hidden {
 }
 
 div.mini-select-list-down-visible {
-    display: none;
+    display: block;
 }
 
 table.mini-select-list-down-table {
