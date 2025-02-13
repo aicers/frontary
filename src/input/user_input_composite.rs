@@ -438,9 +438,9 @@ where
             !(items_conf.len() == 1 && items_conf.first().is_some_and(|x| x.title().is_empty()));
         let required = ess.required;
         let add_message = if cfg!(feature = "pumpkin-dark") {
-            "+ Add another condition"
+            "Add another condition"
         } else {
-            "+ Add"
+            "Add"
         };
         let input_add_class = if cfg!(feature = "pumpkin-dark") {
             "input-group-add-start"
@@ -635,6 +635,7 @@ where
                             <div class={input_add_class}>
                             <div class="group-list-link-line-bottom"></div>
                                 <div class="input-add-item" onclick={onclick_add}>
+                                    <img src="/frontary/pumpkin/addition-symbol.svg" />
                                     { text!(txt, ctx.props().language, add_message) }
                                 </div>
                             </div>
