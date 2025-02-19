@@ -84,12 +84,12 @@ where
                         false
                     };
                     let img = if checked {
-                        if cfg!(feature="pumpkin-dark") {
+                        if cfg!(feature="appearance") {
                             "/frontary/pumpkin/radio-checked.svg"
                         } else {
                             "/frontary/radio-checked.png"
                         }
-                    } else if cfg!(feature="pumpkin-dark") {
+                    } else if cfg!(feature="appearance") {
                             "/frontary/pumpkin/radio-unchecked.svg"
                     } else {
                             "/frontary/radio-unchecked.png"
