@@ -37,9 +37,9 @@ pub enum Message {
     ClickItem(String),
     InputError,
 }
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 const ELEM_HEIGHT: u32 = 48;
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 const ELEM_HEIGHT: u32 = 32;
 const DEFAULT_MAX_WIDTH: u32 = 500;
 pub(super) const DEFAULT_SIZED_VALUE: bool = true;
@@ -266,7 +266,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = if cfg!(feature = "pumpkin-dark") {
+        let style = if cfg!(feature = "pumpkin") {
             if ctx.props().id == "select-searchable-report" {
                 format!("width: {}px;", ctx.props().top_width)
             } else {
@@ -283,7 +283,7 @@ where
             ctx.props().list.try_borrow(),
         ) {
             if list.is_empty() {
-                class_input = if cfg!(feature = "pumpkin-dark") {
+                class_input = if cfg!(feature = "pumpkin") {
                     "searchable-select-input-empty-disabled"
                 } else {
                     "searchable-select-input-empty"
@@ -390,17 +390,17 @@ where
             .to_u32()
             .expect("> u32::MAX never happens");
         let extra_height = if ctx.props().kind == Kind::Single {
-            if cfg!(feature = "pumpkin-dark") {
+            if cfg!(feature = "pumpkin") {
                 67
             } else {
                 42
             }
-        } else if cfg!(feature = "pumpkin-dark") {
+        } else if cfg!(feature = "pumpkin") {
             60
         } else {
             80
         };
-        let height = if cfg!(feature = "pumpkin-dark") {
+        let height = if cfg!(feature = "pumpkin") {
             if ctx.props().kind == Kind::Single {
                 std::cmp::min(
                     list_len * ELEM_HEIGHT + extra_height,
@@ -432,7 +432,7 @@ where
             style_inner_width,
             style_inner_width_search,
             style_scrollable_table,
-        ) = if cfg!(feature = "pumpkin-dark") {
+        ) = if cfg!(feature = "pumpkin") {
             if list_len > 5 {
                 (
                     format!("height: {height}px; max-height: {max_height}px;"),

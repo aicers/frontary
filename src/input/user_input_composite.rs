@@ -437,17 +437,17 @@ where
         let display_titles =
             !(items_conf.len() == 1 && items_conf.first().is_some_and(|x| x.title().is_empty()));
         let required = ess.required;
-        let add_message = if cfg!(feature = "pumpkin-dark") {
+        let add_message = if cfg!(feature = "pumpkin") {
             "Add another condition"
         } else {
             "Add"
         };
-        let input_add_class = if cfg!(feature = "pumpkin-dark") {
+        let input_add_class = if cfg!(feature = "pumpkin") {
             "input-group-add-start"
         } else {
             "input-group-add"
         };
-        let input_group = if cfg!(feature = "pumpkin-dark") {
+        let input_group = if cfg!(feature = "pumpkin") {
             "input-group-one-col"
         } else {
             "input-group"
@@ -583,7 +583,7 @@ where
                                                     })
                                                 }
                                                 {
-                                                    if cfg!(feature = "pumpkin-dark") {
+                                                    if cfg!(feature = "pumpkin") {
                                                         html! {
                                                             <td class="input-trash-can-delete">
                                                                 <div class="input-trash-can-delete-outer">
@@ -615,7 +615,7 @@ where
                         </table>
                     </div>
                     {
-                        if cfg!(feature = "pumpkin-dark") {
+                        if cfg!(feature = "pumpkin") {
                             html!{}
                         }
                         else {
@@ -630,7 +630,7 @@ where
                     }
                 </div>
                 {
-                    if cfg!(feature = "pumpkin-dark") {
+                    if cfg!(feature = "pumpkin") {
                         html!{
                             <div class={input_add_class}>
                             <div class="group-list-link-line-bottom"></div>

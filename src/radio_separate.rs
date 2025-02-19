@@ -80,7 +80,7 @@ where
         } else {
             false
         };
-        let pumpkin = cfg!(feature = "pumpkin-dark");
+        let pumpkin = cfg!(feature = "pumpkin");
         let img = match (checked, pumpkin) {
             (true, true) => "/frontary/pumpkin/radio-checked.svg",
             (true, false) => "/frontary/radio-checked.png",

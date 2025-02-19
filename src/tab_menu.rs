@@ -5,13 +5,13 @@ use yew::{classes, html, Component, Context, Html, Properties};
 
 use crate::{define_u32_consts, language::Language, text, Texts};
 
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 define_u32_consts! {
     DEFAULT_FULL_WIDTH => 1080,
     DEFAULT_ITEM_WIDTH => 80,
     MAX_ITEM_WIDTH => 100
 }
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 define_u32_consts! {
     DEFAULT_FULL_WIDTH => 1080,
     DEFAULT_ITEM_WIDTH => 120,
@@ -73,18 +73,18 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let div_style = if cfg!(feature = "pumpkin-dark") {
+        let div_style = if cfg!(feature = "pumpkin") {
             format!("width: {MAX_ITEM_WIDTH}%;")
         } else {
             format!("width: {}px;", ctx.props().full_width)
         };
-        let table_style = if cfg!(feature = "pumpkin-dark") {
+        let table_style = if cfg!(feature = "pumpkin") {
             String::new()
         } else {
             format!("width: {}px;", ctx.props().full_width)
         };
 
-        let style_menu = if cfg!(feature = "pumpkin-dark") {
+        let style_menu = if cfg!(feature = "pumpkin") {
             String::new()
         } else {
             format!(
@@ -113,7 +113,7 @@ where
                                 html! {
                                     <td class={classes!("tab-menu-selected", class_last)} style={style_menu.clone()}>
                                         { text!(txt, ctx.props().language, title) }
-                                        if cfg!(feature ="pumpkin-dark") {
+                                        if cfg!(feature ="pumpkin") {
                                             <div class="selected-background">
                                             </div>
                                             <div class="selected-bar">

@@ -136,7 +136,7 @@ where
                     } else {
                         ""
                     };
-                    let style = if cfg!(feature = "pumpkin-dark") {
+                    let style = if cfg!(feature = "pumpkin") {
                         format!("width: {}px;", ctx.props().display_info.width_full)
                     } else {
                         Self::style_width_height(ctx, widths, i, varied_width)
@@ -217,7 +217,7 @@ where
                                     Kind::LayeredFirst => {
                                         if ctx.props().data_type == Some(DataType::Customer) {
                                             let cols = ctx.props().display_info.titles.len().to_string();
-                                            let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
+                                            let (prefix, extension) = if cfg!(feature = "pumpkin") {
                                                 ("pumpkin/", "svg")
                                             } else {
                                                 ("", "png")
@@ -229,7 +229,7 @@ where
                                             };
                                             let style = format!("background-image: url('/frontary/{prefix}{expand_collapse_img}');");
                                             let onclick_expandible = |key: String| ctx.link().callback(move |_| Message::ClickExpandible(key.clone()));
-                                            let list_top = if cfg!(feature = "pumpkin-dark") {
+                                            let list_top = if cfg!(feature = "pumpkin") {
                                                 34
                                             } else {
                                                 28
@@ -287,7 +287,7 @@ where
                                             "list-whole-list-flat"
                                         };
                                         let rowspan = ctx.props().display_info.widths.len().to_string();
-                                        let list_top = if cfg!(feature = "pumpkin-dark") {
+                                        let list_top = if cfg!(feature = "pumpkin") {
                                             34
                                         } else {
                                             28
@@ -873,12 +873,12 @@ where
                         <tr>
                             <td class="list-whole-delete-checked-trash">
                                 <div class="list-whole-delete-checked-trash" onclick={onclick_delete}>
-                                    <img src={if cfg!(feature = "pumpkin-dark") { "/frontary/pumpkin/delete-trash.svg" } else { "/frontary/delete-trash-white.png" }} class="list-whole-delete-trash-white" />
+                                    <img src={if cfg!(feature = "pumpkin") { "/frontary/pumpkin/delete-trash.svg" } else { "/frontary/delete-trash-white.png" }} class="list-whole-delete-trash-white" />
                                 </div>
                             </td>
                             <td class="list-whole-delete-checked-close">
                                 <div class="list-whole-delete-checked-close" onclick={onclick_cancel}>
-                                    <img src={if cfg! (feature = "pumpkin-dark") {"/frontary/pumpkin/close-white.svg"} else {"/frontary/close-white.png"} } class="list-whole-close-white" />
+                                    <img src={if cfg! (feature = "pumpkin") {"/frontary/pumpkin/close-white.svg"} else {"/frontary/close-white.png"} } class="list-whole-close-white" />
                                 </div>
                             </td>
                         </tr>

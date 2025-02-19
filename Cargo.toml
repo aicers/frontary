@@ -8,8 +8,7 @@ publish = false
 cc-password = []
 debug = []
 default = []
-pumpkin-dark = []
-pumpkin-light = []
+pumpkin = []
 test = []
 
 [dependencies]

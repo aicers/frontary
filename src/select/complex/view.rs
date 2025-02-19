@@ -20,7 +20,7 @@ impl Model {
             CheckStatus::Checked => "checked",
             _ => "unchecked",
         };
-        let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
+        let (prefix, extension) = if cfg!(feature = "pumpkin") {
             ("pumpkin/", "svg")
         } else {
             ("", "png")
@@ -36,7 +36,7 @@ impl Model {
         );
         let style_head_title = format!("width: {}px;", ctx.props().pop_width - 34);
         let (style_list, style_input) = if self.view_list {
-            if cfg!(feature = "pumpkin-dark") {
+            if cfg!(feature = "pumpkin") {
                 (
                     "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
                     "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
@@ -47,7 +47,7 @@ impl Model {
                     "background-image: url('/frontary/collapse-contents.png');",
                 )
             }
-        } else if cfg!(feature = "pumpkin-dark") {
+        } else if cfg!(feature = "pumpkin") {
             (
                 "background-image: url('/frontary/pumpkin/expand-contents.svg');",
                 "background-image: url('/frontary/pumpkin/expand-contents.svg');",
@@ -384,11 +384,7 @@ impl Model {
                 SelectionExtraInfo::Network(EndpointKind::Source),
                 SelectionExtraInfo::Network(EndpointKind::Destination),
             ]);
-            let top_width = if cfg!(feature = "pumpkin-dark") {
-                90
-            } else {
-                70
-            };
+            let top_width = if cfg!(feature = "pumpkin") { 90 } else { 70 };
             if let Some(selected) = self.direction_items.get(id) {
                 html! {
                     <SelectMini::<SelectionExtraInfo, Self>
@@ -428,7 +424,7 @@ impl Model {
                 std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 226 - 15
             }
         });
-        let style_width_input = if cfg!(feature = "pumpkin-dark") {
+        let style_width_input = if cfg!(feature = "pumpkin") {
             format!("width: {}px", ctx.props().pop_width - 100)
         } else {
             format!("width: {}px", ctx.props().pop_width - 86)
@@ -500,7 +496,7 @@ impl Model {
                                 html! {
                                     match ctx.props().kind {
                                         SelectComplexKind::NetworkIp => {
-                                            let style_ip = if cfg!(feature = "pumpkin-dark") {
+                                            let style_ip = if cfg!(feature = "pumpkin") {
                                                 format!("float: left; width: {}px;", ctx.props().pop_width - 180)
                                             } else {
                                                 format!("float: left; width: {}px;", ctx.props().pop_width - 150)
@@ -516,7 +512,7 @@ impl Model {
                                                 SelectionExtraInfo::Network(EndpointKind::Destination),
                                             ]);
                                             let onclick_del = |key: String| ctx.link().callback(move |_| Message::DeleteInputItem(key.clone()));
-                                            let (top_bg_color, top_width, list_top) = if cfg!(feature = "pumpkin-dark") {
+                                            let (top_bg_color, top_width, list_top) = if cfg!(feature = "pumpkin") {
                                                 ("rgba(97, 105, 116, 0.24)", 90, 42)
                                             } else {
                                                 ("#F6F6F6", 70, 28)

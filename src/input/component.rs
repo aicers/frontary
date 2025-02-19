@@ -969,7 +969,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = if cfg!(feature = "pumpkin-dark") {
+        let style = if cfg!(feature = "pumpkin") {
             format!("width: {}px;", ctx.props().width)
         } else {
             format!(
@@ -978,7 +978,7 @@ where
                 ctx.props().height
             )
         };
-        let style_input = if cfg!(feature = "pumpkin-dark") {
+        let style_input = if cfg!(feature = "pumpkin") {
             String::new()
         } else {
             format!("height: {}px;", ctx.props().height - 166)

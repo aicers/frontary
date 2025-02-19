@@ -356,7 +356,7 @@ where
         html! {
             <div class="host-network-group-input-item">
                 { item }
-                if cfg!(feature = "pumpkin-dark") {
+                if cfg!(feature = "pumpkin") {
                     <img src="/frontary/pumpkin/delete-x.svg" class="host-network-group-close" onclick={onclick_delete(index)} />
                 } else {
                     <img src="/frontary/host-network-close.png" class="host-network-group-close" onclick={onclick_delete(index)} />
