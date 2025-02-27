@@ -841,6 +841,10 @@ where
                     html! {
                         {"-"}
                     }
+                } else if elem.modal.is_empty() {
+                    html! {
+                        { elem.display.first().unwrap_or(&"-".to_string()) }
+                    }
                 } else {
                     Self::to_unchecked_html(ctx, &elem.display, &elem.modal)
                 }
