@@ -5,6 +5,12 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed overflow error when `NotificationType::ErrorList` has an empty errors.
+
 ## [0.10.1]
 
 ### Changed
@@ -279,6 +285,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
+[Unreleased]: https://github.com/aicers/frontary/compare/0.10.1...main
 [0.10.1]: https://github.com/aicers/frontary/compare/0.10.0...0.10.1
 [0.10.0]: https://github.com/aicers/frontary/compare/0.9.4...0.10.0
 [0.9.4]: https://github.com/aicers/frontary/compare/0.9.3...0.9.4

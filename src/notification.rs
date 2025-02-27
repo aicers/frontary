@@ -314,16 +314,18 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
         },
         NotificationType::ErrorList(message, errors) => {
             let mut sub_message = String::new();
-            let last = errors.len() - 1;
-            for (index, error) in errors.into_iter().enumerate() {
-                if index == last {
-                    if error.ends_with("Forbidden") {
-                        sub_message += "Unauthorized";
+            if !errors.is_empty() {
+                let last = errors.len() - 1;
+                for (index, error) in errors.into_iter().enumerate() {
+                    if index == last {
+                        if error.ends_with("Forbidden") {
+                            sub_message += "Unauthorized";
+                        } else {
+                            sub_message += &error;
+                        }
                     } else {
-                        sub_message += &error;
+                        write!(sub_message, "{error} & ").expect("in-memory operation");
                     }
-                } else {
-                    write!(sub_message, "{error} & ").expect("in-memory operation");
                 }
             }
             NotificationItem {
