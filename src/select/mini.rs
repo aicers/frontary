@@ -337,7 +337,7 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 html! {
-                                                    <td class={classes!("mini-select-list-down-item-more-action-basic", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
+                                                    <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
                                                         <div class="mini-select-list-down-item-more-action">
                                                             <div class={classes!("mini-select-list-down-item-more-action-text", class_list_align_more_action)}>
                                                             { text!(txt, ctx.props().language, key) }
