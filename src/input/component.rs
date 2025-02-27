@@ -518,7 +518,7 @@ where
                 if !self
                     .verification_host_network
                     .values()
-                    .any(|v| (*v).map_or(true, |v| !v))
+                    .any(|v| (*v).is_none_or(|v| !v))
                 {
                     // HIGHLIGHT: Only if all of the HostNetworkGroup items are valid, proceed to save the user input
                     self.verify_host_network_group = false;
@@ -1165,7 +1165,7 @@ where
                         if conf.unique {
                             let mut different = true;
                             for (key, item) in &*ctx.props().data {
-                                if id.as_ref().map_or(true, |id| id != key) {
+                                if id.as_ref().is_none_or(|id| id != key) {
                                     if let Some(other) = item.columns.get(index) {
                                         if let (Column::Text(other_value), InputItem::Text(value)) =
                                             (other, &(*input))
