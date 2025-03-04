@@ -1596,7 +1596,7 @@ div.input-contents-item-title {
     font-size: 16px;
     color: var(--Text-Primary);
     line-height: 24px;
-    margin-bottom: 16px;
+    margin-bottom: 4px;
 }
 
 div.input-contents-text-item-title {
