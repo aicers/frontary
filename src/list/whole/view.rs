@@ -837,9 +837,15 @@ where
                 }
             }
             Column::Checkbox(elem) => {
-                if elem.display.is_empty() {
-                    html! {
-                        {"-"}
+                if elem.modal.is_empty() {
+                    if let Some(display) = elem.display.first() {
+                        html! {
+                            display
+                        }
+                    } else {
+                        html! {
+                            "-"
+                        }
                     }
                 } else {
                     Self::to_unchecked_html(ctx, &elem.display, &elem.modal)
