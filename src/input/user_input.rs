@@ -849,33 +849,27 @@ where
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
         if let Some(buffer) = self.host_network_buffer.get(&my_index) {
-            let class = if self.required_msg.contains(&my_index) {
-                "input-host-network-group-required"
-            } else {
-                ""
-            };
             html! {
                 <div class="input-host-network-group">
                     <div class="input-contents-item-general-title">
                         { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                     </div>
-                    <div {class}>
-                        <HostNetworkHtml<Self>
-                            txt={ctx.props().txt.clone()}
-                            language={ctx.props().language}
-                            rerender_serial={self.rerender_serial_host_network}
-                            kind={kind}
-                            num={num}
-                            width={width}
-                            input_data={Rc::clone(buffer)}
-                            input_notice={Some(ess.notice)}
-                            parent_message={Some(Message::InputHostNetworkGroup(my_index.clone(), input_data.clone()))}
-                            parent_message_save={Some(Message::RightHostNetworkGroup(my_index.clone(), input_data.clone()))}
-                            parent_message_no_save={Some(Message::WrongHostNetworkGroup(my_index.clone()))}
-                            parent_message_user_input={Some(Message::UserInputHostNetworkGroup(my_index.clone()))}
-                            verify_to_save={self.verify_host_network_group}
-                        />
-                    </div>
+                    <HostNetworkHtml<Self>
+                        txt={ctx.props().txt.clone()}
+                        language={ctx.props().language}
+                        rerender_serial={self.rerender_serial_host_network}
+                        {kind}
+                        {num}
+                        {width}
+                        input_data={Rc::clone(buffer)}
+                        input_notice={Some(ess.notice)}
+                        parent_message={Some(Message::InputHostNetworkGroup(my_index.clone(), input_data.clone()))}
+                        parent_message_save={Some(Message::RightHostNetworkGroup(my_index.clone(), input_data.clone()))}
+                        parent_message_no_save={Some(Message::WrongHostNetworkGroup(my_index.clone()))}
+                        parent_message_user_input={Some(Message::UserInputHostNetworkGroup(my_index.clone()))}
+                        verify_to_save={self.verify_host_network_group}
+                        is_required={self.required_msg.contains(&my_index)}
+                    />
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
             }

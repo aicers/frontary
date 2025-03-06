@@ -93,6 +93,8 @@ where
     pub max_height: u32,
     #[prop_or(false)]
     pub verify_to_save: bool,
+    #[prop_or(false)]
+    pub is_required: bool,
 }
 
 impl<T> Component for Model<T>
@@ -292,9 +294,14 @@ where
                 .width
                 .map_or("100%".to_string(), |w| format!("{w}px"))
         );
+        let class = if ctx.props().is_required {
+            "input-host-network-group-required"
+        } else {
+            "host-network-group-input"
+        };
         html! {
             <>
-                <div class="host-network-group-input" style={style}>
+                <div {class} {style}>
                     { self.view_host_network_group(ctx) }
                     { self.view_input(ctx) }
                 </div>
