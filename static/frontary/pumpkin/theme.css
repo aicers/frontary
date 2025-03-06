@@ -1950,7 +1950,7 @@ div.input-select-vector-vec-required {
 div.input-contents-item-general-title {
     color: var(--Text-Primary);
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 24px;
 }
 
@@ -1960,9 +1960,17 @@ div.input-host-network-group {
 }
 
 div.input-host-network-group-required {
-    width: fit-content;
-    border: 2px solid var(--Red-70);
+    height: 40px;
+    width: 100%;
+    padding: 8px 12px;
+    color: var(--Text-Primary);
+    outline: none;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
     border-radius: 8px;
+    border: 2px solid var(--Red-60);
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.host-network-group-input {
