@@ -87,7 +87,8 @@ where
             String::new()
         };
 
-        let class = if self.required_msg.contains(&my_index) {
+        let class = if self.required_msg.contains(&my_index) || self.unique_msg.contains(&my_index)
+        {
             "frontary-input-text-alert"
         } else {
             "frontary-input-text"
