@@ -144,10 +144,8 @@ impl Model {
                 )
             };
             self.timeouts.insert(serial, handle);
-            true
-        } else {
-            false
         }
+        true
     }
 
     fn view_item(ctx: &Context<Self>, serial: usize, noti: &NotificationItem) -> Html {

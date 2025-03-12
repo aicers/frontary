@@ -10,6 +10,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Fixed overflow error when `NotificationType::ErrorList` has an empty errors.
+- Show notification when no timeout is provided. Previously, notifications were
+  not re-rendered if no timeout was provided.
 
 ## [0.10.1]
 
