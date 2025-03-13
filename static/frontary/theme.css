@@ -1895,9 +1895,18 @@ div.input-host-network-group {
 }
 
 div.input-host-network-group-required {
-    width: fit-content;
+    height: 30px;
+    width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
+    color: var(--alert-text-color);
+    background-color: #FFE9E9;
     border: 2px solid var(--alert-text-color);
-    border-radius: 8px;
+    border-radius: 2px;
+    outline: none;
+    display: flex;
+    justify-content: left;
+    align-items: center;
 }
 
 div.host-network-group-input {
@@ -1947,8 +1956,7 @@ img.host-network-group-close:hover {
 input[type=text].host-network-group-input-input-input {
     width: 230px;
     height: 22px;
-    padding-left: 4px;
-    background-color: #FFFFFF;
+    background-color: transparent;
     border: 0px;
     font-weight: normal;
     font-size: 13px;
@@ -1956,10 +1964,6 @@ input[type=text].host-network-group-input-input-input {
     flex-direction: row;
     align-items: center;
     color: #4D4D4D;
-}
-
-input[type=text].host-network-group-input-input-input::placeholder {
-    color: #A9A9A9;
 }
 
 div.host-network-group-input-input-message {
