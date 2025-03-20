@@ -538,7 +538,6 @@ where
                     let onclick_close = {
                         ctx.link().callback(move |_| Message::CloseModal)
                     };
-
                     html! {
                         <td class={classes!("list-whole-list-flat", if border { class_border } else { "" })} style={style}>
                             { Self::view_column(ctx, index, col) }
@@ -546,15 +545,17 @@ where
                                 if let Some(modal) = &self.modal {
                                     let modal_content = Some(Html::from_html_unchecked(AttrValue::from_str(&modal.1).expect("AttrValue never returns Err.")));
                                     html! {
-                                        <div class="modal-outer">
-                                            <div class="popup-outer">
-                                                <div class="popup-title">
+                                        <div class="cell-modal-container">
+                                            <div class="cell-modal-wrapper">
+                                                <div class="cell-modal-header">
                                                     <span>{&modal.0}</span>
                                                     <div onclick={onclick_close}>
                                                         <div class="complex-select-pop-head-close-icon"></div>
                                                     </div>
                                                 </div>
-                                                { modal_content }
+                                                <div class="cell-modal-body">
+                                                    { modal_content }
+                                                </div>
                                             </div>
                                         </div>
                                     }
