@@ -29,6 +29,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added a method to validate all password requirements.
 - Added extensions validation to allow any extensions and automatically add a
   `.` if necessary
+- Added `Theme` enum with light/dark mode support and local storage integration.
 
 ### Changed
 

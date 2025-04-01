@@ -15,6 +15,7 @@ mod sort;
 pub mod static_files;
 mod tab_menu;
 mod text_input;
+pub mod theme;
 
 use std::cell::RefCell;
 use std::cmp::{Ord, Ordering};
@@ -74,6 +75,7 @@ pub use crate::select::vec_searchable::Model as VecSelect;
 pub use crate::sort::{Model as Sort, Status as SortStatus};
 pub use crate::tab_menu::Model as TabMenu;
 pub use crate::text_input::Model as TextInput;
+pub use crate::theme::Theme;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum InvalidPasswordKind {
