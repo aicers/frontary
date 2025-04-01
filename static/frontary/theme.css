@@ -2903,7 +2903,31 @@ td.tab-menu-right {
     pointer-events: none;
 }
 
-div.popup-outer {
+div.cell-modal-container {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+}
+
+div.cell-modal-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.09;
+    background-color: rgba(0, 0, 0, 0.55);
+    z-index: -1;
+}
+
+div.cell-modal-wrapper {
     display: flex;
     width: 600px;
     padding: 24px;
@@ -2912,12 +2936,10 @@ div.popup-outer {
     gap: 24px;
     background-color: #FFFFFF;
     border-radius: 2px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     max-height: 600px;
-    overflow: auto;
 }
 
-div.popup-title {
+div.cell-modal-header {
     flex: 1 0 0;
     color: var(--title-text-color);
     font-size: 16px;
@@ -2926,4 +2948,13 @@ div.popup-title {
     align-items: center;
     align-self: stretch;
     justify-content: space-between;
+}
+
+div.cell-modal-body {
+    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
 }
