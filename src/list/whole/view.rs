@@ -837,9 +837,23 @@ where
                 }
             }
             Column::Checkbox(elem) => {
-                if elem.display.is_empty() {
-                    html! {
-                        {"-"}
+                if elem.modal.is_empty() {
+                    if elem.display.is_empty() {
+                        html! {
+                            "-"
+                        }
+                    } else {
+                        html! {
+                            {
+                                for elem.display.iter().map(|display| {
+                                    html! {
+                                        <div>
+                                            { display }
+                                        </div>
+                                    }
+                                })
+                            }
+                        }
                     }
                 } else {
                     Self::to_unchecked_html(ctx, &elem.display, &elem.modal)
