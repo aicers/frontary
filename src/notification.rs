@@ -11,11 +11,11 @@ use yew::{html, Component, Context, Html, Properties};
 
 use crate::{define_u32_consts, language::Language, text, window_inner_height, Texts};
 
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 define_u32_consts! {
     DEFAULT_NOTIFICATION_WIDTH => 400
 }
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 define_u32_consts! {
     DEFAULT_NOTIFICATION_WIDTH => 252
 }
@@ -97,7 +97,7 @@ impl Component for Model {
         let Ok(list) = ctx.props().list.try_borrow() else {
             return html! {};
         };
-        let style = if cfg!(feature = "pumpkin-dark") {
+        let style = if cfg!(feature = "pumpkin") {
             format!("max-height: {}px;", window_inner_height() - 60)
         } else {
             format!(
@@ -171,7 +171,7 @@ impl Model {
 
         let onclick_close = ctx.link().callback(move |_| Message::Close(serial));
         let onclick_done = ctx.link().callback(move |_| Message::Close(serial));
-        let (prefix, extension) = if cfg!(feature = "pumpkin-dark") {
+        let (prefix, extension) = if cfg!(feature = "pumpkin") {
             ("pumpkin/", "svg")
         } else {
             ("", "png")
@@ -182,14 +182,14 @@ impl Model {
             <table class="notification">
                 <tr>
                     <td class="notification-contents" style={style_contents}>
-                        if cfg!(feature = "pumpkin-dark") {
+                        if cfg!(feature = "pumpkin") {
                             {
                                 if noti.time.is_none() {
                                     html! {
                                         <div class="clumit-notification-error">
                                             <img src="/frontary/pumpkin/notification-error.svg" class="clumit-notification-error"/>
                                             { text!(txt, ctx.props().language, "Error") }
-                                            if cfg!(feature = "pumpkin-dark") {
+                                            if cfg!(feature = "pumpkin") {
                                                 <td class="notification-contents-text-close">
                                                     <img src={ close_img.clone() }
                                                     class="notification-close"
@@ -210,7 +210,7 @@ impl Model {
                                     <td class="notification-contents-text-text">
                                         { msg }
                                     </td>
-                                    if cfg!(feature = "pumpkin-dark") {
+                                    if cfg!(feature = "pumpkin") {
                                         if noti.time.is_some() {
                                             <td class="notification-contents-text-close">
                                                 <img src={ close_img.clone() }
@@ -244,7 +244,7 @@ impl Model {
                             }
                         }
                     </td>
-                    if !cfg!(feature = "pumpkin-dark")  {
+                    if !cfg!(feature = "pumpkin")  {
                         <td class="notification-label" style={style_label}>
                         </td>
                     }

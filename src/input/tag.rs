@@ -297,7 +297,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = if cfg!(feature = "pumpkin-dark") {
+        let style = if cfg!(feature = "pumpkin") {
             String::new()
         } else {
             format!("max-height: {}px;", ctx.props().max_height)
@@ -345,7 +345,7 @@ where
         html! {
             <div class="tag-group-input-item">
                 { tag }
-                if cfg!(feature = "pumpkin-dark") {
+                if cfg!(feature = "pumpkin") {
                     <img src="/frontary/pumpkin/delete-x.svg" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
                 } else {
                     <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
@@ -426,12 +426,12 @@ where
                         let onclick_cancel_edit = ctx.link().callback(|_| Message::CancelEdit);
                         let onclick_edit_done = ctx.link().callback(move |_| Message::EditDone);
                         let done_img = if self.input_edit.is_empty() {
-                            if cfg!(feature = "pumpkin-dark") {
+                            if cfg!(feature = "pumpkin") {
                                 "/frontary/pumpkin/tag-select-edit-done-dim.svg"
                             } else {
                                 "/frontary/tag-select-edit-done-dim.png"
                             }
-                        } else if cfg!(feature = "pumpkin-dark") {
+                        } else if cfg!(feature = "pumpkin") {
                             "/frontary/pumpkin/tag-select-edit-done.svg"
                         } else {
                             "/frontary/tag-select-edit-done.png"
@@ -448,11 +448,11 @@ where
                                         />
                                     </div>
                                     <div class="tag-group-input-select-item-edit-img">
-                                    if !cfg!(feature = "pumpkin-dark") {
+                                    if !cfg!(feature = "pumpkin") {
                                         <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
                                     }
                                         <img src={done_img} class="tag-select-edit-done" onclick={onclick_edit_done} />
-                                        if cfg!(feature = "pumpkin-dark") {
+                                        if cfg!(feature = "pumpkin") {
                                             <img src="/frontary/pumpkin/tag-input-close.svg" class="tag-input-close" onclick={onclick_cancel_edit} />
                                         } else {
                                             <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
@@ -497,7 +497,7 @@ where
                                     <div class="tag-group-input-select-item-text" onclick={ onclick_item(k.clone()) }>
                                         { v.clone() }
                                     </div>
-                                    if cfg!(feature = "pumpkin-dark") {
+                                    if cfg!(feature = "pumpkin") {
                                         <img src="/frontary/pumpkin/edit.svg" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
                                         <img src="/frontary/pumpkin/delete-trash.svg" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
                                     } else {

@@ -3,7 +3,7 @@ use yew::{function_component, html, Html, Properties};
 
 use crate::define_str_consts;
 
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 define_str_consts! {
     CHECKED_URL => "/frontary/pumpkin/enabled-checked.svg",
     INDETERMINATE_URL => "/frontary/pumpkin/enabled-indeterminate.svg",
@@ -12,7 +12,7 @@ define_str_consts! {
     ALWAYS_INDETERMINATE_URL => "/frontary/pumpkin/disabled-indeterminate.svg",
     ALWAYS_UNCHECKED_URL => "/frontary/pumpkin/disabled-unchecked.svg"
 }
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 define_str_consts! {
     CHECKED_URL => "/frontary/checkbox-checked.png",
     INDETERMINATE_URL => "/frontary/checkbox-indeterminate.png",

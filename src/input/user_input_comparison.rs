@@ -153,7 +153,7 @@ where
             (self.comparison_kind(data_id), self.comparison_cmp(data_id))
         else {
             return html! {
-                if cfg!(feature = "pumpkin-dark") {
+                if cfg!(feature = "pumpkin") {
                     <div class="input-comparison-empty">
                     </div>
                 }
@@ -170,13 +170,13 @@ where
             "margin-left: 4px;".to_string()
         };
 
-        let indicator_class = if cfg!(feature = "pumpkin-dark") {
+        let indicator_class = if cfg!(feature = "pumpkin") {
             "input-comparison-value-indicator-padded"
         } else {
             "input-comparison-value-indicator"
         };
 
-        let indicator_single_class = if cfg!(feature = "pumpkin-dark") {
+        let indicator_single_class = if cfg!(feature = "pumpkin") {
             "input-comparison-value-indicator-single"
         } else {
             "input-comparison-value-indicator"
@@ -227,7 +227,7 @@ where
     ) -> Html {
         let data_id_clone = data_id.clone();
         let input_data_clone = input_data.clone();
-        let input_class = if cmp_kind.chain_cmp() && cfg!(feature = "pumpkin-dark") {
+        let input_class = if cmp_kind.chain_cmp() && cfg!(feature = "pumpkin") {
             "input-number-comparison"
         } else {
             "input-number"

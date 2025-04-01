@@ -10,11 +10,11 @@ const DEFAULT_MIN_HEIGHT: u32 = 306;
 const DEFAULT_MIN_OPTION_WIDTH: u32 = 220;
 const DEFAULT_MAX_OPTION_WIDTH: u32 = 440;
 
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 define_u32_consts! {
     DEFAULT_WIDTH => 600
 }
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 define_u32_consts! {
     DEFAULT_WIDTH => 714
 }
@@ -121,7 +121,7 @@ where
             AlignButton::Row => ("modal-buttons-row", "modal-button-item-row"),
             AlignButton::Column => ("modal-buttons-column", "modal-button-item-column"),
         };
-        let style = if cfg!(feature = "pumpkin-dark") {
+        let style = if cfg!(feature = "pumpkin") {
             format!("width: {}px", ctx.props().width)
         } else {
             format!(
@@ -131,7 +131,7 @@ where
                 MAX_HEIGHT,
             )
         };
-        let button_style = if cfg!(feature = "pumpkin-dark") {
+        let button_style = if cfg!(feature = "pumpkin") {
             String::new()
         } else {
             format!(
@@ -146,7 +146,7 @@ where
         html! {
             <div class="modal-outer">
                 <div class="modal-contents" style={style}>
-                if cfg!(feature="pumpkin-dark") {
+                if cfg!(feature="pumpkin") {
                     <div class="modal-icon-close">
                         <div class="modal-icon">
                         {
@@ -197,7 +197,7 @@ where
                         })
                     }
                     </div>
-                    if cfg!(feature="pumpkin-dark") {
+                    if cfg!(feature="pumpkin") {
                         <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
                     }
                     <div class={align_class}>

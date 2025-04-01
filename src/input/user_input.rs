@@ -111,7 +111,7 @@ where
                     } else {
                         html! {
                             if !ess.title.is_empty() {
-                                if cfg!(feature = "pumpkin-dark") {
+                                if cfg!(feature = "pumpkin") {
                                     <div class="input-contents-text-item-title">
                                         { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
                                     </div>

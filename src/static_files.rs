@@ -5,7 +5,7 @@ use std::include_bytes;
 pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
     let mut rtn: Vec<(&'static str, &'static [u8])> = Vec::new();
 
-    if cfg!(feature = "pumpkin-dark") {
+    if cfg!(feature = "pumpkin") {
         let theme = include_bytes!("../static/frontary/pumpkin/theme.css");
         rtn.push(("theme.css", theme));
 

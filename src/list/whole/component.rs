@@ -763,12 +763,12 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style_full = if cfg!(feature = "pumpkin-dark") {
+        let style_full = if cfg!(feature = "pumpkin") {
             String::new()
         } else {
             format!("width: {}px;", ctx.props().display_info.width_full)
         };
-        let style_view = if cfg!(feature = "pumpkin-dark") {
+        let style_view = if cfg!(feature = "pumpkin") {
             format!("width: {DEFAULT_TABLE_WIDTH}%;")
         } else {
             format!("width: {}px;", ctx.props().display_info.width_view)
@@ -810,11 +810,7 @@ where
             SortListKind::Ascending,
             SortListKind::Descending,
         ]);
-        let list_top = if cfg!(feature = "pumpkin-dark") {
-            42
-        } else {
-            38
-        };
+        let list_top = if cfg!(feature = "pumpkin") { 42 } else { 38 };
 
         match ctx.props().kind {
             Kind::LayeredFirst | Kind::Flat => {
@@ -824,7 +820,7 @@ where
                             { text!(txt, ctx.props().language, &ctx.props().title) }
                         </div>
                         <div class="list-add" onclick={onclick_add}>
-                            if cfg!(feature = "pumpkin-dark") {
+                            if cfg!(feature = "pumpkin") {
                                 <img src="/frontary/pumpkin/list-add.svg" class="list-add" />
                             } else {
                                 <img src="/frontary/list-add.png" class="list-add" />

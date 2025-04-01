@@ -34,13 +34,13 @@ pub enum Message {
     ListenClick,
 }
 
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 const DEFAULT_BG_COLOR: &str = "rgba(97, 105, 116, 0.24);";
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 const DEFAULT_BG_COLOR: &str = "#EAEAEA";
-#[cfg(feature = "pumpkin-dark")]
+#[cfg(feature = "pumpkin")]
 const DEFAULT_VALUE_TEXT_COLOR: &str = "#FFFFFF";
-#[cfg(not(feature = "pumpkin-dark"))]
+#[cfg(not(feature = "pumpkin"))]
 const DEFAULT_VALUE_TEXT_COLOR: &str = "#363636";
 const DEFAULT_LIST_TEXT_COLOR: &str = "#363636";
 
@@ -231,7 +231,7 @@ where
         } else {
             "right"
         };
-        let list_top = if cfg!(feature = "pumpkin-dark") {
+        let list_top = if cfg!(feature = "pumpkin") {
             43
         } else {
             ctx.props().list_top
@@ -283,13 +283,13 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 let icon = if key == "Edit" {
-                                                    if cfg!(feature = "pumpkin-dark") {
+                                                    if cfg!(feature = "pumpkin") {
                                                         "/frontary/pumpkin/edit.svg"
                                                     } else {
                                                         "/frontary/edit.png"
                                                     }
                                                 } else if key == "Delete" {
-                                                    if cfg!(feature = "pumpkin-dark") {
+                                                    if cfg!(feature = "pumpkin") {
                                                         "/frontary/pumpkin/delete-trash.svg"
                                                     } else {
                                                         "/frontary/delete-trash.png"
@@ -375,7 +375,7 @@ where
 
     fn view_basic(ctx: &Context<Self>, value: &str) -> Html {
         let style_width = ctx.props().top_width.map_or_else(String::new, |w| {
-            if cfg!(feature = "pumpkin-dark") {
+            if cfg!(feature = "pumpkin") {
                 String::new()
             } else {
                 format!("width: {w}px;")
@@ -395,7 +395,7 @@ where
             )
         } else {
             // `Kind::Soft` only
-            if cfg!(feature = "pumpkin-dark") {
+            if cfg!(feature = "pumpkin") {
                 format!("{style_width} {style_height} background-color: rgba(97, 105, 116, 0.24);",)
             } else {
                 format!("{style_width} {style_height} background-color: #FFFFFF;",)
@@ -411,7 +411,7 @@ where
         html! {
             <div onclick={onclick} class={classes!("mini-select-basic", outer_sub_class)} style={style}>
             <div class="mini-select-basic-value" style={
-                if cfg!(feature = "pumpkin-dark") {
+                if cfg!(feature = "pumpkin") {
                     String::new()
                 } else {
                     style_height.clone()
@@ -420,7 +420,7 @@ where
                     { value }
                 </div>
                 <div class={classes!("mini-select-basic-icon", icon_sub_class)} style={
-                    if cfg!(feature = "pumpkin-dark") {
+                    if cfg!(feature = "pumpkin") {
                         String::new()
                     } else {
                         style_height
