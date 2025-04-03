@@ -3,7 +3,7 @@ use std::{
     rc::Rc,
 };
 
-use super::{user_input_select::VecSelectListMap, HostNetworkKind};
+use super::{HostNetworkKind, user_input_select::VecSelectListMap};
 use crate::{CheckStatus, ViewString};
 
 #[derive(Clone, PartialEq)]

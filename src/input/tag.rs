@@ -7,12 +7,12 @@ use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{
-    events::InputEvent, html, virtual_dom::AttrValue, Component, Context, Html, Properties,
-    TargetCast,
+    Component, Context, Html, Properties, TargetCast, events::InputEvent, html,
+    virtual_dom::AttrValue,
 };
 
 use crate::{
-    language::Language, text, toggle_visibility, visible_tag_select, InputTagGroup, Texts,
+    InputTagGroup, Texts, language::Language, text, toggle_visibility, visible_tag_select,
 };
 
 pub struct Model<T> {

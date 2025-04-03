@@ -3,15 +3,16 @@ use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
 
 use json_gettext::get_text;
-use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, html, virtual_dom::AttrValue};
 
-use super::{MessageType, DEFAULT_NUM_PAGES, DEFAULT_NUM_PER_PAGE};
+use super::{DEFAULT_NUM_PAGES, DEFAULT_NUM_PER_PAGE, MessageType};
 use crate::{
+    CheckStatus, Input, InputConfig, InputItem, InputTag, MoreAction, PagesInfo, SelectMini,
+    SelectMiniKind, SortStatus, Texts, ViewString,
     input::InputSecondId,
     language::Language,
     list::{DataType, DisplayInfo, Kind, ListItem},
-    text, CheckStatus, Input, InputConfig, InputItem, InputTag, MoreAction, PagesInfo, SelectMini,
-    SelectMiniKind, SortStatus, Texts, ViewString,
+    text,
 };
 
 const DEFAULT_TABLE_WIDTH: u32 = 100;
