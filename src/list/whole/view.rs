@@ -4,16 +4,17 @@ use std::str::FromStr;
 
 use htmlescape::decode_html;
 use json_gettext::get_text;
-use yew::{classes, html, virtual_dom::AttrValue, Component, Context, Html};
+use yew::{Component, Context, Html, classes, html, virtual_dom::AttrValue};
 
 use super::{
-    component::{Message, Model},
     DEFAULT_NUM_PAGES,
+    component::{Message, Model},
 };
 use crate::{
+    CheckStatus, Checkbox, InputConfig, MoreAction, NBSP, Pages, SelectMini, SelectMiniKind, Sort,
+    SortStatus, ViewString, WholeList,
     list::{ColWidths, Column, DataType, Kind, ListItem, ModalDisplay},
-    text, CheckStatus, Checkbox, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
-    SortStatus, ViewString, WholeList, NBSP,
+    text,
 };
 
 impl<T> Model<T>

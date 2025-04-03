@@ -7,9 +7,9 @@ use std::time::Duration;
 use gloo_timers::callback::Timeout;
 use json_gettext::get_text;
 use num_traits::ToPrimitive;
-use yew::{html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, html};
 
-use crate::{define_u32_consts, language::Language, text, window_inner_height, Texts};
+use crate::{Texts, define_u32_consts, language::Language, text, window_inner_height};
 
 #[cfg(feature = "pumpkin")]
 define_u32_consts! {

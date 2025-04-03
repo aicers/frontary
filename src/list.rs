@@ -10,9 +10,9 @@ use chrono::{DateTime, Utc};
 pub use whole::{MessageType, Model as WholeList, SortColumn};
 
 use crate::{
+    ViewString,
     checkbox::CheckStatus,
     input::{Comparison, InputNic},
-    ViewString,
 };
 
 const NUM_OF_DECIMALS_DEFAULT: usize = 2;

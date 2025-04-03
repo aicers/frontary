@@ -7,8 +7,8 @@ use std::{
 };
 
 use super::{
-    parse_host_network, CheckStatus, Comparison, HostNetwork, InputConfig, InputHostNetworkGroup,
-    InputNic, InputTagGroup,
+    CheckStatus, Comparison, HostNetwork, InputConfig, InputHostNetworkGroup, InputNic,
+    InputTagGroup, parse_host_network,
 };
 use crate::list::Column;
 
@@ -983,7 +983,9 @@ impl From<&Column> for InputItem {
                             | Column::Group(..)
                             | Column::Checkbox(..)
                             | Column::Radio(..) => {
-                                panic!("Column Group does not support some items such as Tag, Nic, File, Group, Checkbox, and Radio.")
+                                panic!(
+                                    "Column Group does not support some items such as Tag, Nic, File, Group, Checkbox, and Radio."
+                                )
                             }
                         }
                     }

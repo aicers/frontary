@@ -3,16 +3,15 @@ use std::rc::Rc;
 
 use json_gettext::get_text;
 use num_bigint::BigUint;
-use yew::{classes, html, Component, Context, Html};
+use yew::{Component, Context, Html, classes, html};
 
 use super::{
-    cal_index,
+    CheckStatus, CheckboxChildrenConfig, ChildrenPosition, Essential as InputEssential,
+    InputConfig, InputItem, cal_index,
     component::{Message, Model},
     user_input::view_asterisk,
-    CheckStatus, CheckboxChildrenConfig, ChildrenPosition, Essential as InputEssential,
-    InputConfig, InputItem,
 };
-use crate::{text, Checkbox, Radio, ViewString};
+use crate::{Checkbox, Radio, ViewString, text};
 
 impl<T> Model<T>
 where
@@ -395,7 +394,9 @@ where
             | InputConfig::Nic(_)
             | InputConfig::File(_)
             | InputConfig::Comparison(_) => {
-                panic!("Checkbox does not support Password, Tag, Nic, File, VecSelect, and Comparison for children.")
+                panic!(
+                    "Checkbox does not support Password, Tag, Nic, File, VecSelect, and Comparison for children."
+                )
             }
         }
     }

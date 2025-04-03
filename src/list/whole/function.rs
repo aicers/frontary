@@ -1,16 +1,16 @@
 use std::cell::RefCell;
-use std::collections::hash_map::Entry::Vacant;
 use std::collections::HashSet;
+use std::collections::hash_map::Entry::Vacant;
 use std::rc::Rc;
 
 use chrono::{DateTime, Utc};
 use yew::{Component, Context};
 
-use super::{component::SortListKind, Message, Model, SortColumn, ViewInputStatus};
+use super::{Message, Model, SortColumn, ViewInputStatus, component::SortListKind};
 use crate::{
-    gen_default_items_from_confs,
+    InputItem, gen_default_items_from_confs,
     list::{DataType, Kind},
-    InputItem, {CheckStatus, PagesInfo, SortStatus},
+    {CheckStatus, PagesInfo, SortStatus},
 };
 
 impl<T> Model<T>

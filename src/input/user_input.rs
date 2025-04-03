@@ -7,16 +7,15 @@ use json_gettext::get_text;
 use num_bigint::BigUint;
 use wasm_bindgen::JsCast;
 use web_sys::{Event, HtmlInputElement};
-use yew::{events::InputEvent, html, html::TargetCast, Component, Context, Html};
+use yew::{Component, Context, Html, events::InputEvent, html, html::TargetCast};
 
 use super::{
-    cal_index,
+    InputItem, cal_index,
     component::{InvalidMessage, Message, Model},
-    InputItem,
 };
 use crate::{
-    input::component::Verification, text, HostNetworkHtml, HostNetworkKind, InputEssential,
-    InvalidPasswordKind as Kind, Tag,
+    HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag,
+    input::component::Verification, text,
 };
 
 const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input a new one.";

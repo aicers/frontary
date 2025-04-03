@@ -9,13 +9,13 @@ use yew::{Component, Context};
 
 use super::{
     super::CheckStatus,
-    cal_index,
+    ComparisonItem, GroupConfig, GroupItem, HostNetworkGroupItem, InputConfig, InputItem,
+    RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem, SelectSingleItem, TagItem,
+    VecSelectItem, cal_index,
     component::{InvalidMessage, Model, Verification},
-    group_item_list_preset, ComparisonItem, GroupConfig, GroupItem, HostNetworkGroupItem,
-    InputConfig, InputItem, RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem,
-    SelectSingleItem, TagItem, VecSelectItem,
+    group_item_list_preset,
 };
-use crate::{is_adjacent, InvalidPasswordKind as Kind, PASSWORD_MIN_LEN};
+use crate::{InvalidPasswordKind as Kind, PASSWORD_MIN_LEN, is_adjacent};
 
 type PropaChildren = Vec<(BigUint, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
 
@@ -1174,7 +1174,9 @@ where
                             | (InputItem::Nic(_), InputConfig::Nic(_))
                             | (InputItem::File(_), InputConfig::File(_))
                             | (InputItem::Comparison(_), InputConfig::Comparison(_)) => {
-                                panic!("Children items do not include Password, Tag, Nic, File, and Comparison.")
+                                panic!(
+                                    "Children items do not include Password, Tag, Nic, File, and Comparison."
+                                )
                             }
                             (_, _) => {
                                 panic!("InputItem and InputConfig is not matched");

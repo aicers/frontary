@@ -7,11 +7,11 @@ use num_traits::ToPrimitive;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
 use yew::virtual_dom::AttrValue;
-use yew::{classes, events::InputEvent, html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, classes, events::InputEvent, html};
 
 use crate::{
-    language::Language, shorten_text, text, text_width, toggle_visibility, CheckStatus, Checkbox,
-    Item, Texts,
+    CheckStatus, Checkbox, Item, Texts, language::Language, shorten_text, text, text_width,
+    toggle_visibility,
 };
 
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
@@ -390,11 +390,7 @@ where
             .to_u32()
             .expect("> u32::MAX never happens");
         let extra_height = if ctx.props().kind == Kind::Single {
-            if cfg!(feature = "pumpkin") {
-                67
-            } else {
-                42
-            }
+            if cfg!(feature = "pumpkin") { 67 } else { 42 }
         } else if cfg!(feature = "pumpkin") {
             60
         } else {
