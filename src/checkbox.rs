@@ -1,5 +1,5 @@
 use strum_macros::Display;
-use yew::{function_component, html, Html, Properties};
+use yew::{Html, Properties, function_component, html};
 
 use crate::define_str_consts;
 

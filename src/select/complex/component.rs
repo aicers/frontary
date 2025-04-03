@@ -1,18 +1,18 @@
 use std::cell::RefCell;
 use std::collections::{
-    hash_map::Entry::{Occupied, Vacant},
     HashMap, HashSet,
+    hash_map::Entry::{Occupied, Vacant},
 };
 use std::rc::Rc;
 
 use json_gettext::get_text;
 use yew::virtual_dom::AttrValue;
-use yew::{classes, html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, classes, html};
 
 use super::DEFAULT_POP_WIDTH;
 use crate::{
-    language::Language, text, toggle_visibility_complex, validate_host_network, CheckStatus,
-    ComplexSelection, EndpointKind, NetworkGroup, NetworkItem, SelectionExtraInfo, Texts,
+    CheckStatus, ComplexSelection, EndpointKind, NetworkGroup, NetworkItem, SelectionExtraInfo,
+    Texts, language::Language, text, toggle_visibility_complex, validate_host_network,
 };
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -334,15 +334,17 @@ impl Component for Model {
                         }
                     }
                 } else {
-                    self.input_wrong_msg = Some("Invalid input (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)");
-                };
+                    self.input_wrong_msg = Some(
+                        "Invalid input (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)",
+                    );
+                }
             }
             Message::DeleteInputItem(key) => {
                 if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                     if let Occupied(entry) = custom.entry(key) {
                         entry.remove_entry();
                     }
-                };
+                }
             }
             Message::SetDirection => {
                 self.set_direction(ctx);

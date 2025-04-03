@@ -1,9 +1,9 @@
 use std::{marker::PhantomData, rc::Rc};
 
 use json_gettext::get_text;
-use yew::{classes, html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, classes, html};
 
-use crate::{define_u32_consts, language::Language, text, Texts};
+use crate::{Texts, define_u32_consts, language::Language, text};
 
 const MAX_HEIGHT: u32 = 700;
 const DEFAULT_MIN_HEIGHT: u32 = 306;

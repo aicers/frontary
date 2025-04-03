@@ -4,24 +4,24 @@ use std::{cell::RefCell, marker::PhantomData};
 
 use data_encoding::BASE64;
 use gloo_file::{
-    callbacks::{read_as_bytes, FileReader},
     File,
+    callbacks::{FileReader, read_as_bytes},
 };
 use json_gettext::get_text;
 use num_bigint::BigUint;
-use yew::{html, virtual_dom::AttrValue, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, html, virtual_dom::AttrValue};
 
 use super::{
-    cal_index, group_item_list_preset, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
-    InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
-    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned32Item, Unsigned8Item,
-    Value as ComparisonValue,
+    FileItem, Float64Item, HostNetworkGroupItem, InputConfig, InputHostNetworkGroup, InputItem,
+    InputTag, InputTagGroup, PasswordItem, PercentageItem, SelectMultipleItem, SelectSingleItem,
+    TagItem, TextItem, Unsigned8Item, Unsigned32Item, Value as ComparisonValue, cal_index,
+    group_item_list_preset,
 };
 use crate::{
+    InputNic, InvalidPasswordKind, MessageType, Rerender, Texts, ViewString,
     language::Language,
     list::{Column, ListItem},
-    sort_hosts, sort_networks, text, InputNic, InvalidPasswordKind, MessageType, Rerender, Texts,
-    ViewString,
+    sort_hosts, sort_networks, text,
 };
 
 #[derive(Clone, Copy, PartialEq)]

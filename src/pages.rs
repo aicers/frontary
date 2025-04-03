@@ -5,9 +5,9 @@ use std::{cell::RefCell, marker::PhantomData};
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
-use yew::{events::InputEvent, html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, events::InputEvent, html};
 
-use crate::{language::Language, text, Texts};
+use crate::{Texts, language::Language, text};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Info {

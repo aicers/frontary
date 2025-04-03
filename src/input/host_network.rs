@@ -4,10 +4,10 @@ use std::{cell::RefCell, marker::PhantomData};
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
-use yew::{events::InputEvent, html, Component, Context, Html, Properties, TargetCast};
+use yew::{Component, Context, Html, Properties, TargetCast, events::InputEvent, html};
 
 use crate::{
-    language::Language, parse_host_network, text, HostNetwork, InputHostNetworkGroup, Texts,
+    HostNetwork, InputHostNetworkGroup, Texts, language::Language, parse_host_network, text,
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]

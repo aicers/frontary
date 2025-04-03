@@ -3,9 +3,9 @@ use std::{cell::RefCell, net::Ipv4Addr, rc::Rc, str::FromStr};
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{html, Component, Context, Html, InputEvent, Properties};
+use yew::{Component, Context, Html, InputEvent, Properties, html};
 
-use crate::{input::view_asterisk, language::Language, text, IpRange, Texts};
+use crate::{IpRange, Texts, input::view_asterisk, language::Language, text};
 
 const DEFAULT_MAX_HEIGHT: u32 = 280;
 

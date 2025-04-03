@@ -2,16 +2,15 @@ use std::{cell::RefCell, cmp::Ordering, collections::HashMap, rc::Rc};
 
 use json_gettext::get_text;
 use num_bigint::BigUint;
-use yew::{html, Component, Context, Html};
+use yew::{Component, Context, Html, html};
 
 use super::{
-    cal_index,
+    InputItem, cal_index,
     component::{Message, Model},
     user_input::view_asterisk,
-    InputItem,
 };
 use crate::{
-    text, InputEssential, Item, SelectSearchable, SelectSearchableKind, VecSelect, ViewString,
+    InputEssential, Item, SelectSearchable, SelectSearchableKind, VecSelect, ViewString, text,
 };
 
 const PADDING_SUM: u32 = 66; // left + right paddings
