@@ -4,12 +4,12 @@ use htmlescape::decode_html;
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
-use yew::{events::InputEvent, html, Context, Html};
+use yew::{Context, Html, events::InputEvent, html};
 
-use super::{Message, Model, MIN_POP_HEIGHT};
+use super::{MIN_POP_HEIGHT, Message, Model};
 use crate::{
-    text, window_inner_height, CheckStatus, Checkbox, EndpointKind, NetworkItem, SelectComplexKind,
-    SelectMini, SelectMiniKind, SelectionExtraInfo, ViewString, NBSP,
+    CheckStatus, Checkbox, EndpointKind, NBSP, NetworkItem, SelectComplexKind, SelectMini,
+    SelectMiniKind, SelectionExtraInfo, ViewString, text, window_inner_height,
 };
 
 impl Model {

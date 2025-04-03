@@ -7,16 +7,17 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Replaced `pumpkin-dark` and `pumpkin-light` features with a single
+  `pumpkin` feature for unified theme handling.
+- Updated to Rust 2024 edition.
+
 ### Fixed
 
 - Fixed overflow error when `NotificationType::ErrorList` has an empty errors.
 - Fixed notifications not re-rendering when a new notification is given without
   a timeout.
-
-### Changed
-
-- Replaced `pumpkin-dark` and `pumpkin-light` features with a single
-  `pumpkin` feature for unified theme handling.
 
 ## [0.10.1]
 

@@ -22,14 +22,14 @@ pub use config::{
     CheckboxChildrenConfig, CheckboxConfig, ChildrenPosition, ComparisonConfig, Essential,
     FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig, InputConfig, NicConfig,
     PasswordConfig, PercentageConfig, RadioConfig, SelectMultipleConfig, SelectSingleConfig,
-    TagConfig, TextConfig, Unsigned32Config, Unsigned8Config, VecSelectConfig,
+    TagConfig, TextConfig, Unsigned8Config, Unsigned32Config, VecSelectConfig,
 };
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
 pub use item::{
     CheckboxItem, ComparisonItem, FileItem, Float64Item, GroupItem, HostNetworkGroupItem,
     InputItem, NicItem, PasswordItem, PercentageItem, RadioItem, SelectMultipleItem,
-    SelectSingleItem, TagItem, TextItem, Unsigned32Item, Unsigned8Item, VecSelectItem,
+    SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned32Item, VecSelectItem,
 };
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -38,7 +38,7 @@ use strum_macros::{Display, EnumIter, EnumString};
 pub use tag::Model as Tag;
 
 pub use self::user_input::view_asterisk;
-use crate::{parse_host_network, CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange};
+use crate::{CheckStatus, HostNetwork, HostNetworkGroupTrait, IpRange, parse_host_network};
 
 const POWER_OF_MAX_NUM_OF_LAYER: u32 = 6; // 2^6 = 64 is the maximum number of items in a layer.
 static MAX_NUM_OF_LAYER: LazyLock<BigUint> =
@@ -622,7 +622,9 @@ fn item_preset(conf: &Rc<InputConfig>) -> InputItem {
         | InputConfig::Group(_)
         | InputConfig::Checkbox(_)
         | InputConfig::Radio(_) => {
-            panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+            panic!(
+                "Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio."
+            )
         }
     }
 }

@@ -5,15 +5,14 @@ use json_gettext::get_text;
 use num_bigint::BigUint;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{classes, events::InputEvent, html, Component, Context, Html};
+use yew::{Component, Context, Html, classes, events::InputEvent, html};
 
 use super::{
-    cal_index,
+    InputItem, cal_index,
     component::{InvalidMessage, Message, Model},
     user_input::view_asterisk,
-    InputItem,
 };
-use crate::{input::component::Verification, text, InputEssential, InputNic, ViewString};
+use crate::{InputEssential, InputNic, ViewString, input::component::Verification, text};
 
 const INTERFACE_NOTICE: &str = "x.x.x.x/x";
 const GATEWAY_NOTICE: &str = "x.x.x.x";

@@ -3,10 +3,10 @@ use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
 
 use yew::virtual_dom::AttrValue;
-use yew::{html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, html};
 
 use super::searchable::DEFAULT_SIZED_VALUE;
-use crate::{language::Language, Item, SelectSearchable, SelectSearchableKind, Texts};
+use crate::{Item, SelectSearchable, SelectSearchableKind, Texts, language::Language};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum Message {

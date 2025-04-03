@@ -2,9 +2,9 @@ use std::rc::Rc;
 use std::{cell::RefCell, marker::PhantomData};
 
 use json_gettext::get_text;
-use yew::{html, Component, Context, Html, Properties};
+use yew::{Component, Context, Html, Properties, html};
 
-use crate::{language::Language, text, Texts, ViewString};
+use crate::{Texts, ViewString, language::Language, text};
 
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Message {

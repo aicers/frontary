@@ -4,15 +4,15 @@ use json_gettext::get_text;
 use num_bigint::BigUint;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
-use yew::{events::InputEvent, html, Component, Context, Html};
+use yew::{Component, Context, Html, events::InputEvent, html};
 
 use super::{
+    Comparison, ComparisonItem, ComparisonKind, InputItem, Value as ComparisonValue, ValueKind,
     cal_index,
     component::{Message, Model},
     user_input::view_asterisk,
-    Comparison, ComparisonItem, ComparisonKind, InputItem, Value as ComparisonValue, ValueKind,
 };
-use crate::{text, InputEssential, Item, SelectSearchableKind, VecSelect, ViewString};
+use crate::{InputEssential, Item, SelectSearchableKind, VecSelect, ViewString, text};
 
 impl<T> Model<T>
 where
