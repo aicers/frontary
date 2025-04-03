@@ -5,9 +5,9 @@ use gloo_events::EventListener;
 use json_gettext::get_text;
 use web_sys::{Event, HtmlElement};
 use yew::virtual_dom::AttrValue;
-use yew::{classes, html, Component, Context, Html, NodeRef, Properties};
+use yew::{Component, Context, Html, NodeRef, Properties, classes, html};
 
-use crate::{language::Language, text, toggle_visibility, Texts, ViewString};
+use crate::{Texts, ViewString, language::Language, text, toggle_visibility};
 
 pub struct Model<T, U> {
     click_listener: Option<EventListener>,
@@ -176,7 +176,7 @@ where
                     .candidate_values
                     .iter()
                     .enumerate()
-                    .find(|(_, &v)| v == value)
+                    .find(|(_, v)| *v == &value)
                     .map_or(msg.clone(), |(index, _)| {
                         ctx.props()
                             .list
@@ -466,7 +466,7 @@ where
                     .candidate_values
                     .iter()
                     .enumerate()
-                    .find(|(_, &v)| v == value)
+                    .find(|(_, v)| *v == &value)
                     .map_or_else(String::new, |(index, _)| {
                         ctx.props()
                             .list
@@ -516,7 +516,7 @@ where
                     .candidate_values
                     .iter()
                     .enumerate()
-                    .find(|(_, &v)| v == value)
+                    .find(|(_, v)| *v == &value)
                     .map_or_else(String::new, |(index, _)| {
                         ctx.props()
                             .list
