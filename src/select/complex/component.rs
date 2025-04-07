@@ -308,12 +308,12 @@ impl Component for Model {
                         if let Ok(mut sel) = ctx.props().selected.predefined.try_borrow_mut() {
                             *sel = None;
                         }
-                    };
+                    }
                     self.buffer_direction_items(ctx);
                 } else {
                     ctx.link().send_message(Message::ClickAll);
                     return false;
-                };
+                }
             }
             Message::ClickAddInput => {
                 if self.validate_user_input(ctx) {

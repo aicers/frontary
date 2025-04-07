@@ -3,7 +3,7 @@ mod whole;
 
 use std::{
     collections::{HashMap, HashSet},
-    fmt,
+    fmt::{self, Write},
 };
 
 use chrono::{DateTime, Utc};
@@ -195,10 +195,11 @@ impl std::fmt::Display for Column {
             Self::Nic(nics) => {
                 let mut display = String::new();
                 for nic in &nics.nics {
-                    display.push_str(&format!(
+                    write!(
+                        display,
                         "{{{}: {}(interface) {}(gateway)}} ",
                         nic.name, nic.interface, nic.gateway
-                    ));
+                    )?;
                 }
                 write!(formatter, "{display}")
             }
