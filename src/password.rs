@@ -18,8 +18,8 @@ pub enum Requirement {
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct CheckResult {
-    pub requirement: Requirement,
-    pub passed: bool,
+    pub(crate) requirement: Requirement,
+    pub(crate) passed: bool,
 }
 
 #[must_use]
