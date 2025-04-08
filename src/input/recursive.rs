@@ -436,7 +436,7 @@ where
                                 && self
                                     .verification_host_network
                                     .get(&this_index)
-                                    .is_some_and(|v| v.map_or(true, |v| v))
+                                    .is_some_and(|&v| v != Some(true))
                         }
                         (InputItem::Nic(n), InputConfig::Nic(_)) => {
                             input_conf.required()
@@ -621,14 +621,14 @@ where
         })
         .collect::<Vec<Vec<Option<bool>>>>();
         for (row_index, row) in empty.iter().enumerate() {
-            let all_empty = row.iter().all(|x| x.map_or(false, |x| x));
+            let all_empty = row.iter().all(|&x| x == Some(true));
             if !all_empty || config.ess.required && row_index == 0 {
                 // HIGHLIGHT: If the entire row is empty, this row will be ignored. Only when more
                 // than one column is not empty, the other elements being empty need to be checked.
                 for ((col_index, data_empty), data_required) in
                     row.iter().enumerate().zip(required.iter())
                 {
-                    if data_empty.map_or(true, |x| x) && *data_required {
+                    if *data_empty != Some(false) && *data_required {
                         self.required_msg.insert(cal_index(
                             Some(&cal_index(Some(base_index), row_index)),
                             col_index,

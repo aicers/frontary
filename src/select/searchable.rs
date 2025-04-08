@@ -600,7 +600,7 @@ where
                                         CheckStatus::Unchecked
                                     };
                                     let mut item_value = item.value_txt(&txt, ctx.props().language);
-                                    if  ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); };
+                                    if  ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); }
                                     html! {
                                         <tr>
                                             <td class="searchable-select-list-checkbox">
@@ -629,7 +629,7 @@ where
                                         CheckStatus::Unchecked
                                     };
                                     let mut item_value = item.value_txt(&txt, ctx.props().language);
-                                    if ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); };
+                                    if ctx.props().sized_value { item_value = shorten_text(item.value_txt(&txt, ctx.props().language).as_str(), width, &ctx.props().font, 5); }
                                     if ctx.props().kind == Kind::Multi {
                                         html! {
                                             <tr>

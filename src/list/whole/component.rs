@@ -359,7 +359,7 @@ where
                     if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
                         *id = vec![key];
                     }
-                };
+                }
                 self.checked.clear();
                 if let Ok(mut second) = self.check_status_second.try_borrow_mut() {
                     *second = CheckStatus::Unchecked;
@@ -438,7 +438,7 @@ where
                         return false;
                     }
                     Kind::LayeredSecond => return false, // unreachable
-                };
+                }
             }
             Message::ClickButton(modal) => {
                 self.modal = modal;
