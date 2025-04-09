@@ -1,6 +1,6 @@
 # Frontary
 
-Reusable HTML components using Yew for AICE
+Yew-based reusable HTML components for AICE
 
 ## License
 
