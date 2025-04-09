@@ -1032,7 +1032,8 @@ where
         let is_immutable = |title: &str| {
             ctx.props()
                 .immutable_fields
-                .as_ref().is_some_and(|fields| fields.contains(&title))
+                .as_ref()
+                .is_some_and(|fields| fields.contains(&title))
         };
 
         html! {
