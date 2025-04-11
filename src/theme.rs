@@ -14,10 +14,25 @@ pub enum Theme {
 impl Theme {
     #[must_use]
     pub fn load_from_browser() -> Option<Theme> {
-        LocalStorage::get(STORAGE_KEY).ok()
+        if cfg!(feature = "pumpkin") {
+            LocalStorage::get(STORAGE_KEY).ok()
+        } else {
+            None
+        }
     }
 
     pub fn save_to_browser(theme: Theme) {
-        let _ = LocalStorage::set(STORAGE_KEY, theme);
+        if cfg!(feature = "pumpkin") {
+            let _ = LocalStorage::set(STORAGE_KEY, theme);
+        }
+    }
+
+    #[must_use]
+    pub fn path(theme: &Option<Theme>, file: &str) -> String {
+        match theme {
+            Some(Theme::Light) => format!("/frontary/pumpkin/light/{file}"),
+            Some(Theme::Dark) => format!("/frontary/pumpkin/{file}"),
+            None => format!("/frontary/{file}"),
+        }
     }
 }
