@@ -161,6 +161,9 @@ where
     pub input_second_type: Option<Vec<Rc<InputConfig>>>,
 
     pub messages: HashMap<MessageType, T::Message>,
+
+    #[prop_or(None)]
+    pub immutable_fields: Option<Vec<&'static str>>,
 }
 
 impl<T> Component for Model<T>
@@ -886,6 +889,7 @@ where
                                         action_message={msg}
                                         escape_message={Message::InputEscape}
                                         extra_messages={messages}
+                                        immutable_fields={ctx.props().immutable_fields.clone()}
                                     />
                                 }
                             }
@@ -933,6 +937,7 @@ where
                                         input_data_tag={tag}
                                         action_message={msg}
                                         escape_message={Message::InputEscape}
+                                        immutable_fields={ctx.props().immutable_fields.clone()}
                                     />
                                 }
                             } else {

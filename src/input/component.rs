@@ -385,6 +385,9 @@ where
 
     #[prop_or(None)]
     pub example_message: Option<String>,
+
+    #[prop_or(None)]
+    pub immutable_fields: Option<Vec<&'static str>>,
 }
 
 impl<T> Component for Model<T>
@@ -1025,12 +1028,26 @@ where
     <T as Component>::Message: Clone + PartialEq,
 {
     fn view_input(&self, ctx: &Context<Self>) -> Html {
+        let is_edit_mode = ctx.props().input_id.is_some();
+        let is_immutable = |title: &str| {
+            ctx.props()
+                .immutable_fields
+                .as_ref()
+                .is_some_and(|fields| fields.contains(&title))
+        };
+
         html! {
             for ctx.props().input_data.iter().enumerate().zip(ctx.props().input_conf.iter()).map(|((index , input_data), input_conf)| {
                 match &**input_conf {
                     InputConfig::Text(config) => {
+                        let immutable_flag = if is_edit_mode {
+                            is_immutable(config.ess.title())
+                        } else {
+                            false
+                        };
                         self.view_text(ctx, &config.ess, config.length, config.width, input_data,
-                            None, index, index == 0, false)
+                            None, index, index == 0, false, immutable_flag
+                        )
                     }
                     InputConfig::Password(config) => {
                         self.view_password(ctx, &config.ess, config.width, input_data, None, index,

@@ -60,6 +60,7 @@ where
         layer_index: usize,
         autofocus: bool,
         group: bool,
+        is_immutable: bool,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let my_index_clone = my_index.clone();
@@ -135,6 +136,7 @@ where
                                     autocomplete="off"
                                     oninput={oninput}
                                     maxlength={length.to_string()}
+                                    disabled={is_immutable}
                                 />
                                 { Self::view_explanation_msg(ctx)}
                             </>
@@ -148,6 +150,7 @@ where
                                     autofocus={autofocus}
                                     autocomplete="off"
                                     oninput={oninput}
+                                    disabled={is_immutable}
                                 />
                                 { Self::view_explanation_msg(ctx)}
                             </>
