@@ -9,7 +9,7 @@ use json_gettext::get_text;
 use num_traits::ToPrimitive;
 use yew::{Component, Context, Html, Properties, html};
 
-use crate::{Texts, define_u32_consts, language::Language, text, window_inner_height};
+use crate::{Texts, Theme, define_u32_consts, language::Language, text, window_inner_height};
 
 #[cfg(feature = "pumpkin")]
 define_u32_consts! {
@@ -59,6 +59,8 @@ pub struct Props {
     pub serial: usize,
     #[prop_or(DEFAULT_NOTIFICATION_WIDTH)]
     pub width: u32,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl Component for Model {
@@ -106,10 +108,11 @@ impl Component for Model {
                 window_inner_height() - 60
             )
         };
+        let theme = ctx.props().theme;
         html! {
             <>
                 <div id="notification" class="notification" style={style}>
-                { for list.iter().rev().map(|l| Self::view_item(ctx, l.0, &l.1)) }
+                { for list.iter().rev().map(|l| Self::view_item(ctx, l.0, &l.1, theme)) }
                 </div>
             </>
         }
@@ -148,7 +151,13 @@ impl Model {
         true
     }
 
-    fn view_item(ctx: &Context<Self>, serial: usize, noti: &NotificationItem) -> Html {
+    #[allow(clippy::too_many_lines)]
+    fn view_item(
+        ctx: &Context<Self>,
+        serial: usize,
+        noti: &NotificationItem,
+        theme: Option<Theme>,
+    ) -> Html {
         let color = match noti.category {
             Category::Fail => FAIL_COLOR,
             Category::Success => SUCCESS_COLOR,
@@ -171,12 +180,13 @@ impl Model {
 
         let onclick_close = ctx.link().callback(move |_| Message::Close(serial));
         let onclick_done = ctx.link().callback(move |_| Message::Close(serial));
-        let (prefix, extension) = if cfg!(feature = "pumpkin") {
-            ("pumpkin/", "svg")
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
         } else {
-            ("", "png")
+            "png"
         };
-        let close_img = format!("/frontary/{prefix}notification-close.{extension}");
+        let close_img = Theme::path(&theme, &format!("notification-close.{ext}"));
+        let error_img = Theme::path(&theme, "notification-error.svg");
 
         html! {
             <table class="notification">
@@ -187,11 +197,11 @@ impl Model {
                                 if noti.time.is_none() {
                                     html! {
                                         <div class="clumit-notification-error">
-                                            <img src="/frontary/pumpkin/notification-error.svg" class="clumit-notification-error"/>
+                                            <img src={error_img} class="clumit-notification-error"/>
                                             { text!(txt, ctx.props().language, "Error") }
                                             if cfg!(feature = "pumpkin") {
                                                 <td class="notification-contents-text-close">
-                                                    <img src={ close_img.clone() }
+                                                    <img src={close_img.clone()}
                                                     class="notification-close"
                                                     onclick={onclick_close.clone()}
                                                     />
@@ -221,7 +231,7 @@ impl Model {
                                         }
                                     } else {
                                         <td class="notification-contents-text-close">
-                                            <img src={ close_img }
+                                            <img src={close_img}
                                             class="notification-close"
                                             onclick={onclick_close}
                                             />

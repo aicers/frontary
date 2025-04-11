@@ -12,149 +12,343 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let enabled_unchecked = include_bytes!("../static/frontary/pumpkin/enabled-unchecked.svg");
         rtn.push(("enabled-unchecked.svg", enabled_unchecked));
 
+        let enabled_unchecked_light =
+            include_bytes!("../static/frontary/pumpkin/light/enabled-unchecked.svg");
+        rtn.push(("light/enabled-unchecked.svg", enabled_unchecked_light));
+
         let disabled_unchecked =
             include_bytes!("../static/frontary/pumpkin/disabled-unchecked.svg");
         rtn.push(("disabled-unchecked.svg", disabled_unchecked));
+
+        let disabled_unchecked_light =
+            include_bytes!("../static/frontary/pumpkin/light/disabled-unchecked.svg");
+        rtn.push(("light/disabled-unchecked.svg", disabled_unchecked_light));
 
         let enabled_indeterminate =
             include_bytes!("../static/frontary/pumpkin/enabled-indeterminate.svg");
         rtn.push(("enabled-indeterminate.svg", enabled_indeterminate));
 
+        let enabled_indeterminate_light =
+            include_bytes!("../static/frontary/pumpkin/light/enabled-indeterminate.svg");
+        rtn.push((
+            "light/enabled-indeterminate.svg",
+            enabled_indeterminate_light,
+        ));
+
         let disabled_indeterminate =
             include_bytes!("../static/frontary/pumpkin/disabled-indeterminate.svg");
         rtn.push(("disabled-indeterminate.svg", disabled_indeterminate));
 
+        let disabled_indeterminate_light =
+            include_bytes!("../static/frontary/pumpkin/light/disabled-indeterminate.svg");
+        rtn.push((
+            "light/disabled-indeterminate.svg",
+            disabled_indeterminate_light,
+        ));
+
         let enabled_checked = include_bytes!("../static/frontary/pumpkin/enabled-checked.svg");
         rtn.push(("enabled-checked.svg", enabled_checked));
+
+        let enabled_checked_light =
+            include_bytes!("../static/frontary/pumpkin/light/enabled-checked.svg");
+        rtn.push(("light/enabled-checked.svg", enabled_checked_light));
 
         let disabled_checked = include_bytes!("../static/frontary/pumpkin/disabled-checked.svg");
         rtn.push(("disabled-checked.svg", disabled_checked));
 
+        let disabled_checked_light =
+            include_bytes!("../static/frontary/pumpkin/light/disabled-checked.svg");
+        rtn.push(("light/disabled-checked.svg", disabled_checked_light));
+
         let radio_unchecked = include_bytes!("../static/frontary/pumpkin/radio-unchecked.svg");
         rtn.push(("radio-unchecked.svg", radio_unchecked));
+
+        let radio_unchecked_light =
+            include_bytes!("../static/frontary/pumpkin/light/radio-unchecked.svg");
+        rtn.push(("light/radio-unchecked.svg", radio_unchecked_light));
 
         let radio_checked = include_bytes!("../static/frontary/pumpkin/radio-checked.svg");
         rtn.push(("radio-checked.svg", radio_checked));
 
+        let radio_checked_light =
+            include_bytes!("../static/frontary/pumpkin/light/radio-checked.svg");
+        rtn.push(("light/radio-checked.svg", radio_checked_light));
+
         let modal_divider = include_bytes!("../static/frontary/pumpkin/modal-divider.svg");
         rtn.push(("modal-divider.svg", modal_divider));
+
+        let modal_divider_light =
+            include_bytes!("../static/frontary/pumpkin/light/modal-divider.svg");
+        rtn.push(("light/modal-divider.svg", modal_divider_light));
 
         let modal_close = include_bytes!("../static/frontary/pumpkin/modal-close.svg");
         rtn.push(("modal-close.svg", modal_close));
 
+        let modal_close_light = include_bytes!("../static/frontary/pumpkin/light/modal-close.svg");
+        rtn.push(("light/modal-close.svg", modal_close_light));
+
         let list_add = include_bytes!("../static/frontary/pumpkin/list-add.svg");
         rtn.push(("list-add.svg", list_add));
+
+        let list_add_light = include_bytes!("../static/frontary/pumpkin/light/list-add.svg");
+        rtn.push(("light/list-add.svg", list_add_light));
 
         let list_sort_recently =
             include_bytes!("../static/frontary/pumpkin/list-sort-recently.svg");
         rtn.push(("list-sort-recently.svg", list_sort_recently));
 
+        let list_sort_recently_light =
+            include_bytes!("../static/frontary/pumpkin/light/list-sort-recently.svg");
+        rtn.push(("light/list-sort-recently.svg", list_sort_recently_light));
+
         let sort_unsorted = include_bytes!("../static/frontary/pumpkin/sort-unsorted.svg");
         rtn.push(("sort-unsorted.svg", sort_unsorted));
+
+        let sort_unsorted_light =
+            include_bytes!("../static/frontary/pumpkin/light/sort-unsorted.svg");
+        rtn.push(("light/sort-unsorted.svg", sort_unsorted_light));
 
         let sort_ascending = include_bytes!("../static/frontary/pumpkin/sort-ascending.svg");
         rtn.push(("sort-ascending.svg", sort_ascending));
 
+        let sort_ascending_light =
+            include_bytes!("../static/frontary/pumpkin/light/sort-ascending.svg");
+        rtn.push(("light/sort-ascending.svg", sort_ascending_light));
+
         let sort_descending = include_bytes!("../static/frontary/pumpkin/sort-descending.svg");
         rtn.push(("sort-descending.svg", sort_descending));
+
+        let sort_descending_light =
+            include_bytes!("../static/frontary/pumpkin/light/sort-descending.svg");
+        rtn.push(("light/sort-descending.svg", sort_descending_light));
 
         let sort_unsorted_hover =
             include_bytes!("../static/frontary/pumpkin/sort-unsorted-hover.svg");
         rtn.push(("sort-unsorted-hover.svg", sort_unsorted_hover));
 
+        let sort_unsorted_hover_light =
+            include_bytes!("../static/frontary/pumpkin/light/sort-unsorted-hover.svg");
+        rtn.push(("light/sort-unsorted-hover.svg", sort_unsorted_hover_light));
+
         let input_close = include_bytes!("../static/frontary/pumpkin/input-close.svg");
         rtn.push(("input-close.svg", input_close));
 
+        let input_close_light = include_bytes!("../static/frontary/pumpkin/light/input-close.svg");
+        rtn.push(("light/input-close.svg", input_close_light));
+
         let select_down = include_bytes!("../static/frontary/pumpkin/select-down.svg");
         rtn.push(("select-down.svg", select_down));
+
+        let select_down_light = include_bytes!("../static/frontary/pumpkin/light/select-down.svg");
+        rtn.push(("light/select-down.svg", select_down_light));
 
         let select_down_disabled =
             include_bytes!("../static/frontary/pumpkin/select-down-disabled.svg");
         rtn.push(("select-down-disabled.svg", select_down_disabled));
 
+        let select_down_disabled_light =
+            include_bytes!("../static/frontary/pumpkin/light/select-down-disabled.svg");
+        rtn.push(("light/select-down-disabled.svg", select_down_disabled_light));
+
         let magnifier = include_bytes!("../static/frontary/pumpkin/magnifier.svg");
         rtn.push(("magnifier.svg", magnifier));
+
+        let magnifier_light = include_bytes!("../static/frontary/pumpkin/light/magnifier.svg");
+        rtn.push(("light/magnifier.svg", magnifier_light));
 
         let collapse_list = include_bytes!("../static/frontary/pumpkin/collapse-list.svg");
         rtn.push(("collapse-list.svg", collapse_list));
 
+        let collapse_list_light =
+            include_bytes!("../static/frontary/pumpkin/light/collapse-list.svg");
+        rtn.push(("light/collapse-list.svg", collapse_list_light));
+
         let expand_list = include_bytes!("../static/frontary/pumpkin/expand-list.svg");
         rtn.push(("expand-list.svg", expand_list));
+
+        let expand_list_light = include_bytes!("../static/frontary/pumpkin/light/expand-list.svg");
+        rtn.push(("light/expand-list.svg", expand_list_light));
 
         let more_action_dots_hover =
             include_bytes!("../static/frontary/pumpkin/more-action-dots-hover.svg");
         rtn.push(("more-action-dots-hover.svg", more_action_dots_hover));
 
+        let more_action_dots_hover_light =
+            include_bytes!("../static/frontary/pumpkin/light/more-action-dots-hover.svg");
+        rtn.push((
+            "light/more-action-dots-hover.svg",
+            more_action_dots_hover_light,
+        ));
+
         let more_action_dots = include_bytes!("../static/frontary/pumpkin/more-action-dots.svg");
         rtn.push(("more-action-dots.svg", more_action_dots));
+
+        let more_action_dots_light =
+            include_bytes!("../static/frontary/pumpkin/light/more-action-dots.svg");
+        rtn.push(("light/more-action-dots.svg", more_action_dots_light));
 
         let edit = include_bytes!("../static/frontary/pumpkin/edit.svg");
         rtn.push(("edit.svg", edit));
 
+        let edit_light = include_bytes!("../static/frontary/pumpkin/light/edit.svg");
+        rtn.push(("light/edit.svg", edit_light));
+
         let delete_trash = include_bytes!("../static/frontary/pumpkin/delete-trash.svg");
         rtn.push(("delete-trash.svg", delete_trash));
 
+        let delete_trash_light =
+            include_bytes!("../static/frontary/pumpkin/light/delete-trash.svg");
+        rtn.push(("light/delete-trash.svg", delete_trash_light));
+
         let delete_x = include_bytes!("../static/frontary/pumpkin/delete-x.svg");
         rtn.push(("delete-x.svg", delete_x));
+
+        let delete_x_light = include_bytes!("../static/frontary/pumpkin/light/delete-x.svg");
+        rtn.push(("light/delete-x.svg", delete_x_light));
 
         let mini_select_list_down =
             include_bytes!("../static/frontary/pumpkin/mini-select-list-down.svg");
         rtn.push(("mini-select-list-down.svg", mini_select_list_down));
 
+        let mini_select_list_down_light =
+            include_bytes!("../static/frontary/pumpkin/light/mini-select-list-down.svg");
+        rtn.push((
+            "light/mini-select-list-down.svg",
+            mini_select_list_down_light,
+        ));
+
         let notification_error =
             include_bytes!("../static/frontary/pumpkin/notification-error.svg");
         rtn.push(("notification-error.svg", notification_error));
 
+        let notification_error_light =
+            include_bytes!("../static/frontary/pumpkin/light/notification-error.svg");
+        rtn.push(("light/notification-error.svg", notification_error_light));
+
         let select_down_alert = include_bytes!("../static/frontary/pumpkin/select-down-alert.svg");
         rtn.push(("select-down-alert.svg", select_down_alert));
+
+        let select_down_alert_light =
+            include_bytes!("../static/frontary/pumpkin/light/select-down-alert.svg");
+        rtn.push(("light/select-down-alert.svg", select_down_alert_light));
 
         let checkbox_link_up_line =
             include_bytes!("../static/frontary/pumpkin/checkbox-link-up-line.svg");
         rtn.push(("checkbox-link-up-line.svg", checkbox_link_up_line));
 
+        let checkbox_link_up_line_light =
+            include_bytes!("../static/frontary/pumpkin/light/checkbox-link-up-line.svg");
+        rtn.push((
+            "light/checkbox-link-up-line.svg",
+            checkbox_link_up_line_light,
+        ));
+
         let collapse_contents = include_bytes!("../static/frontary/pumpkin/collapse-contents.svg");
         rtn.push(("collapse-contents.svg", collapse_contents));
 
+        let collapse_contents_light =
+            include_bytes!("../static/frontary/pumpkin/light/collapse-contents.svg");
+        rtn.push(("light/collapse-contents.svg", collapse_contents_light));
+
         let expand_contents = include_bytes!("../static/frontary/pumpkin/expand-contents.svg");
         rtn.push(("expand-contents.svg", expand_contents));
+
+        let expand_contents_light =
+            include_bytes!("../static/frontary/pumpkin/light/expand-contents.svg");
+        rtn.push(("light/expand-contents.svg", expand_contents_light));
 
         let complex_select_pop =
             include_bytes!("../static/frontary/pumpkin/complex-select-pop.svg");
         rtn.push(("complex-select-pop.svg", complex_select_pop));
 
+        let complex_select_pop_light =
+            include_bytes!("../static/frontary/pumpkin/light/complex-select-pop.svg");
+        rtn.push(("light/complex-select-pop.svg", complex_select_pop_light));
+
         let complex_select_pop_alert =
             include_bytes!("../static/frontary/pumpkin/complex-select-pop-alert.svg");
         rtn.push(("complex-select-pop-alert.svg", complex_select_pop_alert));
 
+        let complex_select_pop_alert_light =
+            include_bytes!("../static/frontary/pumpkin/light/complex-select-pop-alert.svg");
+        rtn.push((
+            "light/complex-select-pop-alert.svg",
+            complex_select_pop_alert_light,
+        ));
+
         let tag_input_close = include_bytes!("../static/frontary/pumpkin/tag-input-close.svg");
         rtn.push(("tag-input-close.svg", tag_input_close));
+
+        let tag_input_close_light =
+            include_bytes!("../static/frontary/pumpkin/light/tag-input-close.svg");
+        rtn.push(("light/tag-input-close.svg", tag_input_close_light));
 
         let tag_select_edit_done_dim =
             include_bytes!("../static/frontary/pumpkin/tag-select-edit-done-dim.svg");
         rtn.push(("tag-select-edit-done-dim.svg", tag_select_edit_done_dim));
 
+        let tag_select_edit_done_dim_light =
+            include_bytes!("../static/frontary/pumpkin/light/tag-select-edit-done-dim.svg");
+        rtn.push((
+            "light/tag-select-edit-done-dim.svg",
+            tag_select_edit_done_dim_light,
+        ));
+
         let tag_select_edit_done =
             include_bytes!("../static/frontary/pumpkin/tag-select-edit-done.svg");
         rtn.push(("tag-select-edit-done.svg", tag_select_edit_done));
+
+        let tag_select_edit_done_light =
+            include_bytes!("../static/frontary/pumpkin/light/tag-select-edit-done.svg");
+        rtn.push(("light/tag-select-edit-done.svg", tag_select_edit_done_light));
 
         let radio_opener_checked =
             include_bytes!("../static/frontary/pumpkin/radio-opener-checked.svg");
         rtn.push(("radio-opener-checked.svg", radio_opener_checked));
 
+        let radio_opener_checked_light =
+            include_bytes!("../static/frontary/pumpkin/light/radio-opener-checked.svg");
+        rtn.push(("light/radio-opener-checked.svg", radio_opener_checked_light));
+
         let radio_opener_unchecked =
             include_bytes!("../static/frontary/pumpkin/radio-opener-unchecked.svg");
         rtn.push(("radio-opener-unchecked.svg", radio_opener_unchecked));
+
+        let radio_opener_unchecked_light =
+            include_bytes!("../static/frontary/pumpkin/light/radio-opener-unchecked.svg");
+        rtn.push((
+            "light/radio-opener-unchecked.svg",
+            radio_opener_unchecked_light,
+        ));
 
         let traffic_direction_dim =
             include_bytes!("../static/frontary/pumpkin/traffic-direction-dim.svg");
         rtn.push(("traffic-direction-dim.svg", traffic_direction_dim));
 
+        let traffic_direction_dim_light =
+            include_bytes!("../static/frontary/pumpkin/light/traffic-direction-dim.svg");
+        rtn.push((
+            "light/traffic-direction-dim.svg",
+            traffic_direction_dim_light,
+        ));
+
         let traffic_direction = include_bytes!("../static/frontary/pumpkin/traffic-direction.svg");
         rtn.push(("traffic-direction.svg", traffic_direction));
+
+        let traffic_direction_light =
+            include_bytes!("../static/frontary/pumpkin/light/traffic-direction.svg");
+        rtn.push(("light/traffic-direction.svg", traffic_direction_light));
 
         let traffic_direction_hover =
             include_bytes!("../static/frontary/pumpkin/traffic-direction-hover.svg");
         rtn.push(("traffic-direction-hover.svg", traffic_direction_hover));
+
+        let traffic_direction_hover_light =
+            include_bytes!("../static/frontary/pumpkin/light/traffic-direction-hover.svg");
+        rtn.push((
+            "light/traffic-direction-hover.svg",
+            traffic_direction_hover_light,
+        ));
 
         let off = include_bytes!("../static/frontary/off.png");
         rtn.push(("off.png", off));
@@ -165,21 +359,36 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let plus_for_add = include_bytes!("../static/frontary/pumpkin/plus-for-add.svg");
         rtn.push(("plus-for-add.svg", plus_for_add));
 
-        let nic_delete = include_bytes!("../static/frontary/pumpkin/nic-delete.svg");
-        rtn.push(("nic-delete.svg", nic_delete));
+        let plus_for_add_light =
+            include_bytes!("../static/frontary/pumpkin/light/plus-for-add.svg");
+        rtn.push(("light/plus-for-add.svg", plus_for_add_light));
 
         let notification_close =
             include_bytes!("../static/frontary/pumpkin/notification-close.svg");
         rtn.push(("notification-close.svg", notification_close));
 
+        let notification_close_light =
+            include_bytes!("../static/frontary/pumpkin/light/notification-close.svg");
+        rtn.push(("light/notification-close.svg", notification_close_light));
+
         let close_white = include_bytes!("../static/frontary/pumpkin/close-white.svg");
         rtn.push(("close-white.svg", close_white));
+
+        let close_white_light = include_bytes!("../static/frontary/pumpkin/light/close-white.svg");
+        rtn.push(("light/close-white.svg", close_white_light));
 
         let group_list_link_line_bottom =
             include_bytes!("../static/frontary/pumpkin/group-list-link-line-bottom.svg");
         rtn.push((
             "group-list-link-line-bottom.svg",
             group_list_link_line_bottom,
+        ));
+
+        let group_list_link_line_bottom_light =
+            include_bytes!("../static/frontary/pumpkin/light/group-list-link-line-bottom.svg");
+        rtn.push((
+            "light/group-list-link-line-bottom.svg",
+            group_list_link_line_bottom_light,
         ));
 
         let group_list_link_line_bottom_compact =
@@ -189,15 +398,37 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             group_list_link_line_bottom_compact,
         ));
 
+        let group_list_link_line_bottom_compact_light = include_bytes!(
+            "../static/frontary/pumpkin/light/group-list-link-line-bottom-compact.svg"
+        );
+        rtn.push((
+            "light/group-list-link-line-bottom-compact.svg",
+            group_list_link_line_bottom_compact_light,
+        ));
+
         let group_list_link_line_top =
             include_bytes!("../static/frontary/pumpkin/group-list-link-line-top.svg");
         rtn.push(("group-list-link-line-top.svg", group_list_link_line_top));
+
+        let group_list_link_line_top_light =
+            include_bytes!("../static/frontary/pumpkin/light/group-list-link-line-top.svg");
+        rtn.push((
+            "light/group-list-link-line-top.svg",
+            group_list_link_line_top_light,
+        ));
 
         let group_list_link_line_top_compact =
             include_bytes!("../static/frontary/pumpkin/group-list-link-line-top-compact.svg");
         rtn.push((
             "group-list-link-line-top-compact.svg",
             group_list_link_line_top_compact,
+        ));
+
+        let group_list_link_line_top_compact_light =
+            include_bytes!("../static/frontary/pumpkin/light/group-list-link-line-top-compact.svg");
+        rtn.push((
+            "light/group-list-link-line-top-compact.svg",
+            group_list_link_line_top_compact_light,
         ));
 
         let group_list_link_line_top_long =
@@ -207,11 +438,25 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             group_list_link_line_top_long,
         ));
 
+        let group_list_link_line_top_long_light =
+            include_bytes!("../static/frontary/pumpkin/light/group-list-link-line-top-long.svg");
+        rtn.push((
+            "light/group-list-link-line-top-long.svg",
+            group_list_link_line_top_long_light,
+        ));
+
         let trash_can = include_bytes!("../static/frontary/pumpkin/trash-can.svg");
         rtn.push(("trash-can.svg", trash_can));
 
+        let trash_can_light = include_bytes!("../static/frontary/pumpkin/light/trash-can.svg");
+        rtn.push(("light/trash-can.svg", trash_can_light));
+
         let addition_symbol = include_bytes!("../static/frontary/pumpkin/addition-symbol.svg");
         rtn.push(("addition-symbol.svg", addition_symbol));
+
+        let addition_symbol_light =
+            include_bytes!("../static/frontary/pumpkin/light/addition-symbol.svg");
+        rtn.push(("light/addition-symbol.svg", addition_symbol_light));
     } else {
         let theme = include_bytes!("../static/frontary/theme.css");
         rtn.push(("theme.css", theme));

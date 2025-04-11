@@ -10,7 +10,7 @@ use jiff::Timestamp;
 pub use whole::{MessageType, Model as WholeList, SortColumn, SortListKind};
 
 use crate::{
-    ViewString,
+    Theme, ViewString,
     checkbox::CheckStatus,
     input::{Comparison, InputNic},
 };
@@ -103,6 +103,7 @@ pub struct CheckboxColumn {
     pub children: Vec<Column>,
     pub display: Vec<String>,
     pub modal: Vec<ModalDisplay>,
+    pub theme: Option<Theme>,
 }
 
 #[derive(Clone, PartialEq)]

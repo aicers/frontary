@@ -12,7 +12,7 @@ use yew::{
 };
 
 use crate::{
-    InputTagGroup, Texts, language::Language, text, toggle_visibility, visible_tag_select,
+    InputTagGroup, Texts, Theme, language::Language, text, toggle_visibility, visible_tag_select,
 };
 
 pub struct Model<T> {
@@ -71,6 +71,8 @@ where
     pub width: Option<u32>,
     #[prop_or(DEFAULT_MAX_HEIGHT)]
     pub max_height: u32,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -318,11 +320,12 @@ where
     <T as Component>::Message: Clone + PartialEq,
 {
     fn view_tag_group(&self, ctx: &Context<Self>) -> Html {
+        let theme = ctx.props().theme;
         if let Ok(data) = ctx.props().input_data.try_borrow() {
             html! {
                 for self.view_order.iter().map(|key| {
                     if data.old.contains(key) {
-                        Self::view_item(ctx, key, ctx.props().prev_list.get(key).unwrap_or(key))
+                        Self::view_item(ctx, key, ctx.props().prev_list.get(key).unwrap_or(key), theme)
                     } else {
                         html! {}
                     }
@@ -333,19 +336,22 @@ where
         }
     }
 
-    fn view_item(ctx: &Context<Self>, key: &str, tag: &str) -> Html {
+    fn view_item(ctx: &Context<Self>, key: &str, tag: &str, theme: Option<Theme>) -> Html {
         let onclick_unselect = |key: String| {
             ctx.link()
                 .callback(move |_| Message::UnselectTag(key.clone()))
         };
+        let delete_img_file = if cfg!(feature = "pumpkin") {
+            "delete-x.svg"
+        } else {
+            "tag-input-close.png"
+        };
+        let delete_img = Theme::path(&theme, delete_img_file);
+
         html! {
             <div class="tag-group-input-item">
                 { tag }
-                if cfg!(feature = "pumpkin") {
-                    <img src="/frontary/pumpkin/delete-x.svg" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
-                } else {
-                    <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
-                }
+                <img src={delete_img} class="tag-input-close" onclick={onclick_unselect(key.to_string())} />
             </div>
         }
     }
@@ -406,6 +412,12 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn view_select(&self, ctx: &Context<Self>) -> Html {
+        let theme = ctx.props().theme;
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
+        } else {
+            "png"
+        };
         html! {
             <div id={self.id.clone()} class="tag-group-input-select">
             {
@@ -421,17 +433,14 @@ where
                             .batch_callback(move |e: KeyboardEvent| (e.key() == "Enter").then_some(Message::EditDone));
                         let onclick_cancel_edit = ctx.link().callback(|_| Message::CancelEdit);
                         let onclick_edit_done = ctx.link().callback(move |_| Message::EditDone);
-                        let done_img = if self.input_edit.is_empty() {
-                            if cfg!(feature = "pumpkin") {
-                                "/frontary/pumpkin/tag-select-edit-done-dim.svg"
-                            } else {
-                                "/frontary/tag-select-edit-done-dim.png"
-                            }
-                        } else if cfg!(feature = "pumpkin") {
-                            "/frontary/pumpkin/tag-select-edit-done.svg"
+                        let done_img_file = if self.input_edit.is_empty() {
+                            "tag-select-edit-done-dim"
                         } else {
-                            "/frontary/tag-select-edit-done.png"
+                            "tag-select-edit-done"
                         };
+                        let done_img = Theme::path(&theme, &format!("{done_img_file}.{ext}"));
+                        let close_img = Theme::path(&theme,&format!("tag-input-close.{ext}"));
+
                         html! {
                             <div class="tag-group-input-select-item-outer-edit">
                                 <div class="tag-group-input-select-item-edit">
@@ -444,15 +453,11 @@ where
                                         />
                                     </div>
                                     <div class="tag-group-input-select-item-edit-img">
-                                    if !cfg!(feature = "pumpkin") {
-                                        <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
-                                    }
-                                        <img src={done_img} class="tag-select-edit-done" onclick={onclick_edit_done} />
-                                        if cfg!(feature = "pumpkin") {
-                                            <img src="/frontary/pumpkin/tag-input-close.svg" class="tag-input-close" onclick={onclick_cancel_edit} />
-                                        } else {
-                                            <img src="/frontary/tag-input-close.png" class="tag-input-close" onclick={onclick_cancel_edit} />
+                                        if !cfg!(feature = "pumpkin") {
+                                            <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
                                         }
+                                        <img src={done_img} class="tag-select-edit-done" onclick={onclick_edit_done} />
+                                        <img src={close_img} class="tag-input-close" onclick={onclick_cancel_edit} />
                                     </div>
                                 </div>
                                 {
@@ -487,6 +492,11 @@ where
                             ctx.link()
                                 .callback(move |_| Message::DeleteTag(key.clone()))
                         };
+                        let edit_img = Theme::path(&theme, "edit.svg");
+                        let delete_trash_img = Theme::path(&theme, "delete-trash.svg");
+                        let bar_img = Theme::path(&theme, "tag-select-bar.png");
+                        let edit_bar_img = Theme::path(&theme, "tag-select-edit.png");
+                        let delete_trash_bar_img = Theme::path(&theme, "tag-select-trash.png");
                         html! {
                             <div class={class}>
                                 <div class="tag-group-input-select-item">
@@ -494,12 +504,12 @@ where
                                         { v.clone() }
                                     </div>
                                     if cfg!(feature = "pumpkin") {
-                                        <img src="/frontary/pumpkin/edit.svg" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
-                                        <img src="/frontary/pumpkin/delete-trash.svg" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
+                                        <img src={edit_img} class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
+                                        <img src={delete_trash_img} class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
                                     } else {
-                                        <img src="/frontary/tag-select-bar.png" class="tag-select-bar" />
-                                        <img src="/frontary/tag-select-edit.png" class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
-                                        <img src="/frontary/tag-select-trash.png" class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
+                                        <img src={bar_img} class="tag-select-bar" />
+                                        <img src={edit_bar_img} class="tag-select-edit" onclick={ onclick_edit(k.clone()) } />
+                                        <img src={delete_trash_bar_img} class="tag-select-trash" onclick={ onclick_delete(k.clone()) } />
                                     }
                                 </div>
                             </div>

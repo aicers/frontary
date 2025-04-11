@@ -10,7 +10,7 @@ use super::{
     CheckStatus, Comparison, HostNetwork, InputConfig, InputHostNetworkGroup, InputNic,
     InputTagGroup, parse_host_network,
 };
-use crate::list::Column;
+use crate::{Theme, list::Column};
 
 #[derive(Clone, PartialEq, Default)]
 pub struct TextItem {
@@ -848,12 +848,21 @@ impl GroupItem {
 pub struct CheckboxItem {
     status: CheckStatus,
     children: Vec<Rc<RefCell<InputItem>>>,
+    theme: Option<Theme>,
 }
 
 impl CheckboxItem {
     #[must_use]
-    pub fn new(status: CheckStatus, children: Vec<Rc<RefCell<InputItem>>>) -> Self {
-        Self { status, children }
+    pub fn new(
+        status: CheckStatus,
+        children: Vec<Rc<RefCell<InputItem>>>,
+        theme: Option<Theme>,
+    ) -> Self {
+        Self {
+            status,
+            children,
+            theme,
+        }
     }
 
     #[must_use]
@@ -862,10 +871,14 @@ impl CheckboxItem {
     }
 
     #[must_use]
-    pub fn default_with_children(children: Vec<Rc<RefCell<InputItem>>>) -> Self {
+    pub fn default_with_children(
+        children: Vec<Rc<RefCell<InputItem>>>,
+        theme: Option<Theme>,
+    ) -> Self {
         Self {
             status: CheckStatus::Unchecked,
             children,
+            theme,
         }
     }
 
@@ -1068,6 +1081,7 @@ impl InputItem {
 }
 
 impl From<&Column> for InputItem {
+    #[allow(clippy::too_many_lines)]
     fn from(col: &Column) -> Self {
         match col {
             Column::Text(txt) => Self::Text(TextItem::new(txt.text.to_string())),
@@ -1114,6 +1128,7 @@ impl From<&Column> for InputItem {
                     .iter()
                     .map(|child| Rc::new(RefCell::new(InputItem::from(child))))
                     .collect::<Vec<Rc<RefCell<InputItem>>>>(),
+                cb.theme,
             )),
             Column::Radio(rd) => Self::Radio(RadioItem::new(
                 rd.selected.to_string(),
