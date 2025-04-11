@@ -1182,7 +1182,7 @@ where
                                 }
                             }
                             if !different {
-                                self.unique_msg.insert(BigUint::from(index + 1));
+                                self.unique_msg.insert(BigUint::from(index));
                                 unique.push(true);
                             }
                         }

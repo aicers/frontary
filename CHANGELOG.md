@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed overflow error when `NotificationType::ErrorList` has an empty errors.
 - Fixed notifications not re-rendering when a new notification is given without
   a timeout.
+- Fixed missing duplicate validation in modals caused by incorrect index
+  calculation from an extra `+1` offset.
 
 ## [0.10.1]
 
