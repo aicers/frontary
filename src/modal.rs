@@ -1,7 +1,7 @@
-use std::{marker::PhantomData, rc::Rc};
+use std::{marker::PhantomData, rc::Rc, str::FromStr};
 
 use json_gettext::get_text;
-use yew::{Component, Context, Html, Properties, classes, html};
+use yew::{AttrValue, Component, Context, Html, Properties, classes, html};
 
 use crate::{Texts, define_u32_consts, language::Language, text};
 
@@ -36,6 +36,7 @@ pub enum TextStyle {
     Key,
     RawNormal,
     RawBold,
+    RawHtml,
 }
 
 #[derive(PartialEq, Eq)]
@@ -54,6 +55,8 @@ where
     pub language: Language,
     #[prop_or(DEFAULT_WIDTH)]
     pub width: u32,
+    #[prop_or(None)]
+    pub height: Option<u32>,
     #[prop_or(DEFAULT_MIN_HEIGHT)]
     pub min_height: u32,
     #[prop_or(DEFAULT_MIN_OPTION_WIDTH)]
@@ -122,7 +125,14 @@ where
             AlignButton::Column => ("modal-buttons-column", "modal-button-item-column"),
         };
         let style = if cfg!(feature = "pumpkin") {
-            format!("width: {}px", ctx.props().width)
+            format!(
+                "width: {}px;{}",
+                ctx.props().width,
+                ctx.props()
+                    .height
+                    .map(|h| format!(" height: {h}px;"))
+                    .unwrap_or_default()
+            )
         } else {
             format!(
                 "width: {}px; min-height: {}px; max-height: {}px;",
@@ -163,7 +173,9 @@ where
                             <img src="/frontary/pumpkin/modal-close.svg" class="modal-close" onclick={onclick_close} />
                         </div>
                     </div>
-                    <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                    if ctx.props().height.is_none() {
+                        <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                    }
                 } else {
                     <div class="modal-close">
                         <img src="/frontary/modal-close.png" class="modal-close" onclick={onclick_close} />
@@ -179,6 +191,9 @@ where
                                 <div class="modal-message-item">
                                 {
                                     for ms.iter().map(|(m, t)| {
+                                        let v_node = Html::from_html_unchecked(
+                                            AttrValue::from_str(m).expect("AttrValue never returns Err.")
+                                        );
                                         match t {
                                             TextStyle::Key => html! {
                                                 { text!(txt, ctx.props().language, m) }
@@ -188,6 +203,9 @@ where
                                             },
                                             TextStyle::RawBold => html! {
                                                 <b> { m } </b>
+                                            },
+                                            TextStyle::RawHtml => html! {
+                                                { v_node }
                                             }
                                         }
                                     })
@@ -198,7 +216,9 @@ where
                     }
                     </div>
                     if cfg!(feature="pumpkin") {
-                        <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                        if ctx.props().height.is_none() {
+                            <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                        }
                     }
                     <div class={align_class}>
                     {
