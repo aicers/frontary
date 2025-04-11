@@ -4,7 +4,7 @@ use std::{cell::RefCell, marker::PhantomData};
 use json_gettext::get_text;
 use yew::{html, Component, Context, Html, Properties};
 
-use crate::{language::Language, text, Texts, ViewString};
+use crate::{language::Language, text, theme::Theme, Texts, ViewString};
 
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Message {
@@ -28,6 +28,7 @@ where
     pub value: Option<ViewString>,
     pub index: usize,
     pub selected_index: Rc<RefCell<Option<usize>>>,
+    pub theme: Option<Theme>,
 }
 
 impl<T> PartialEq for Props<T>
@@ -80,12 +81,12 @@ where
         } else {
             false
         };
-        let pumpkin = cfg!(feature = "pumpkin");
-        let img = match (checked, pumpkin) {
-            (true, true) => "/frontary/pumpkin/radio-checked.svg",
-            (true, false) => "/frontary/radio-checked.png",
-            (false, true) => "/frontary/pumpkin/radio-unchecked.svg",
-            (false, false) => "/frontary/radio-unchecked.png",
+        let theme = ctx.props().theme.unwrap_or(Theme::Dark);
+        let img = match (checked, cfg!(feature = "pumpkin")) {
+            (true, true) => theme.themed_path("radio-checked.svg"),
+            (true, false) => theme.themed_path("radio-checked.png"),
+            (false, true) => theme.themed_path("radio-unchecked.svg"),
+            (false, false) => theme.themed_path("radio-unchecked.png"),
         };
 
         let txt = ctx.props().txt.txt.clone();

@@ -9,7 +9,9 @@ use json_gettext::get_text;
 use num_traits::ToPrimitive;
 use yew::{html, Component, Context, Html, Properties};
 
-use crate::{define_u32_consts, language::Language, text, window_inner_height, Texts};
+use crate::{
+    define_u32_consts, language::Language, text, theme::Theme, window_inner_height, Texts,
+};
 
 #[cfg(feature = "pumpkin")]
 define_u32_consts! {
@@ -42,7 +44,8 @@ pub struct NotificationItem {
     pub sub_message: String,
     pub status_code: Option<u16>,
     pub time: Option<Duration>,
-    pub category: Category, // color differs according to Category
+    pub category: Category,   // color differs according to Category
+    pub theme: Option<Theme>, // Add theme here
 }
 
 pub const TIMEOUT_SECS: Duration = Duration::from_secs(10);
@@ -59,6 +62,8 @@ pub struct Props {
     pub serial: usize,
     #[prop_or(DEFAULT_NOTIFICATION_WIDTH)]
     pub width: u32,
+    #[prop_or_default]
+    pub theme: Option<Theme>,
 }
 
 impl Component for Model {
@@ -171,12 +176,14 @@ impl Model {
 
         let onclick_close = ctx.link().callback(move |_| Message::Close(serial));
         let onclick_done = ctx.link().callback(move |_| Message::Close(serial));
-        let (prefix, extension) = if cfg!(feature = "pumpkin") {
-            ("pumpkin/", "svg")
+        let theme = ctx.props().theme.unwrap_or(Theme::Dark);
+        let extension = if cfg!(feature = "pumpkin") {
+            "svg"
         } else {
-            ("", "png")
+            "png"
         };
-        let close_img = format!("/frontary/{prefix}notification-close.{extension}");
+        let close_img = theme.themed_path(&format!("notification-close.{extension}"));
+        let error_img = theme.themed_path("notification-error.svg");
 
         html! {
             <table class="notification">
@@ -187,7 +194,7 @@ impl Model {
                                 if noti.time.is_none() {
                                     html! {
                                         <div class="clumit-notification-error">
-                                            <img src="/frontary/pumpkin/notification-error.svg" class="clumit-notification-error"/>
+                                            <img src={error_img} class="clumit-notification-error"/>
                                             { text!(txt, ctx.props().language, "Error") }
                                             if cfg!(feature = "pumpkin") {
                                                 <td class="notification-contents-text-close">
@@ -271,7 +278,7 @@ pub enum NotificationType {
 }
 
 #[must_use]
-pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
+pub fn gen_notifications(noti: NotificationType, theme: Option<Theme>) -> NotificationItem {
     match noti {
         NotificationType::CommonError(msg) => match msg {
             CommonError::GraphQLResponseError => NotificationItem {
@@ -280,6 +287,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                 status_code: None,
                 time: None,
                 category: Category::Fail,
+                theme: Some(theme.unwrap_or(Theme::Dark)),
             },
             CommonError::SendGraphQLQueryError => NotificationItem {
                 message: "Invalid GraphQL query".to_string(),
@@ -287,6 +295,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                 status_code: None,
                 time: None,
                 category: Category::Fail,
+                theme: Some(theme.unwrap_or(Theme::Dark)),
             },
             CommonError::HttpStatusNoSuccess(status) => NotificationItem {
                 message: "No success HTTPS status code".to_string(),
@@ -294,6 +303,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                 status_code: Some(status),
                 time: None,
                 category: Category::Fail,
+                theme: Some(theme.unwrap_or(Theme::Dark)),
             },
             CommonError::UnknownError => NotificationItem {
                 message: "Unknown error".to_string(),
@@ -301,6 +311,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                 status_code: None,
                 time: None,
                 category: Category::Fail,
+                theme: Some(theme.unwrap_or(Theme::Dark)),
             },
             CommonError::GraphQLParseError => NotificationItem {
                 message: "GraphQL parse error".to_string(),
@@ -308,6 +319,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                 status_code: None,
                 time: None,
                 category: Category::Fail,
+                theme: Some(theme.unwrap_or(Theme::Dark)),
             },
         },
         NotificationType::ErrorList(message, errors) => {
@@ -332,6 +344,7 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
                 status_code: None,
                 time: None,
                 category: Category::Fail,
+                theme: Some(theme.unwrap_or(Theme::Dark)),
             }
         }
     }
