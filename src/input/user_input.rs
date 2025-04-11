@@ -1005,7 +1005,7 @@ pub fn view_asterisk(required: bool) -> Html {
     if required {
         html! {
             <div class="input-required-asterisk">
-                { "*" }
+                { "\u{00a0}*" }
             </div>
         }
     } else {
