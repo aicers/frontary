@@ -4,7 +4,7 @@ use std::{
 };
 
 use super::{HostNetworkKind, user_input_select::VecSelectListMap};
-use crate::{CheckStatus, ViewString};
+use crate::{CheckStatus, Theme, ViewString};
 
 #[derive(Clone, PartialEq)]
 pub struct Essential {
@@ -56,6 +56,7 @@ pub struct HostNetworkGroupConfig {
     /// The number of user inputs for `HostNetworkGroup`.
     pub num: Option<usize>,
     pub width: Option<u32>,
+    pub theme: Option<Theme>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -65,6 +66,7 @@ pub struct SelectSingleConfig {
     pub options: Vec<(String, ViewString)>,
     pub width: Option<u32>,
     pub preset: Option<String>,
+    pub theme: Option<Theme>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -78,6 +80,7 @@ pub struct SelectMultipleConfig {
     /// This represents whether all options are selected by default.
     pub all: bool,
     pub preset: Option<Vec<String>>,
+    pub theme: Option<Theme>,
 }
 
 /// `TagConfig` defines how `InputItem::Tag` works. `InputItem::Tag` items must belong to the top
@@ -88,6 +91,7 @@ pub struct TagConfig {
     pub ess: Essential,
     /// The map of tag's key and name.
     pub name_map: HashMap<String, String>,
+    pub theme: Option<Theme>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -183,6 +187,7 @@ pub struct GroupConfig {
     /// The list of width for each column. Some if fixed, None if not fixed.
     pub widths: Vec<Option<u32>>,
     pub items: Vec<Rc<InputConfig>>,
+    pub theme: Option<Theme>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -207,6 +212,7 @@ pub struct CheckboxConfig {
     pub always: Option<CheckStatus>,
     pub children: Option<CheckboxChildrenConfig>,
     pub preset: Option<CheckStatus>,
+    pub theme: Option<Theme>,
 }
 
 /// `RadioConfig` defines how `InputItem::Radio` works. `InputItem::Radio` has child items like
@@ -219,6 +225,7 @@ pub struct RadioConfig {
     /// The list of children group. Each option corresponds to one children of the group.
     pub children_group: Vec<Option<Vec<Rc<InputConfig>>>>,
     pub preset: Option<String>,
+    pub theme: Option<Theme>,
 }
 
 #[derive(Clone, PartialEq)]
