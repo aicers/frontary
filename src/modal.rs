@@ -3,7 +3,7 @@ use std::{marker::PhantomData, rc::Rc};
 use json_gettext::get_text;
 use yew::{Component, Context, Html, Properties, classes, html};
 
-use crate::{Texts, define_u32_consts, language::Language, text};
+use crate::{Texts, Theme, define_u32_consts, language::Language, text};
 
 const MAX_HEIGHT: u32 = 700;
 const DEFAULT_MIN_HEIGHT: u32 = 306;
@@ -68,6 +68,8 @@ where
     pub option_messages: Rc<Vec<String>>,
     pub parent_messages: Vec<T::Message>,
     pub parent_cancel_message: T::Message,
+    #[prop_or_default]
+    pub theme: Option<Theme>,
 }
 
 pub struct Model<T> {
@@ -142,7 +144,9 @@ where
         };
         let onclick_close = ctx.link().callback(|_| Message::Close);
         let txt = ctx.props().txt.txt.clone();
-
+        let theme = ctx.props().theme.map_or(Theme::Dark, |t| t);
+        let close_image_path = theme.themed_path("modal-close.svg");
+        let divider_image_path = theme.themed_path("modal-divider.svg");
         html! {
             <div class="modal-outer">
                 <div class="modal-contents" style={style}>
@@ -160,10 +164,10 @@ where
                         }
                         </div>
                         <div class="modal-close">
-                            <img src="/frontary/pumpkin/modal-close.svg" class="modal-close" onclick={onclick_close} />
+                            <img src={close_image_path} class="modal-close" onclick={onclick_close} />
                         </div>
                     </div>
-                    <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                    <img src={divider_image_path.clone()} class="modal-divider" />
                 } else {
                     <div class="modal-close">
                         <img src="/frontary/modal-close.png" class="modal-close" onclick={onclick_close} />
@@ -198,7 +202,7 @@ where
                     }
                     </div>
                     if cfg!(feature="pumpkin") {
-                        <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                        <img src={divider_image_path} class="modal-divider" />
                     }
                     <div class={align_class}>
                     {
