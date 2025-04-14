@@ -1058,6 +1058,8 @@ tr.list-whole-head {
 tr.list-whole-list-flat {
     background-color: #FFFFFF;
     border-bottom: 1px solid #EEEEEE;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 tr.list-whole-list-flat-border {
@@ -1091,6 +1093,8 @@ td.list-whole-head-title:hover {
 
 td.list-whole-head-title-inner-text {
     height: 30px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 td.list-whole-head-title-inner-sort {

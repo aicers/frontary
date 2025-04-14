@@ -1104,6 +1104,8 @@ td.list-whole-head-title:hover {
 
 td.list-whole-head-title-inner-text {
     height: 30px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 td.list-whole-head-title-inner-sort {
@@ -1205,6 +1207,8 @@ td.list-whole-list-flat {
     vertical-align: middle;
     padding: 12px 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 td.list-whole-list-flat-more-action {
