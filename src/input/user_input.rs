@@ -14,7 +14,7 @@ use super::{
     component::{InvalidMessage, Message, Model},
 };
 use crate::{
-    HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag,
+    HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag, Theme,
     input::component::Verification, text,
 };
 
@@ -845,9 +845,11 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        theme: Option<Theme>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
+        let theme = theme.map_or(Theme::Dark, |t| t);
         if let Some(buffer) = self.host_network_buffer.get(&my_index) {
             html! {
                 <div class="input-host-network-group">
@@ -869,6 +871,7 @@ where
                         parent_message_user_input={Some(Message::UserInputHostNetworkGroup(my_index.clone()))}
                         verify_to_save={self.verify_host_network_group}
                         is_required={self.required_msg.contains(&my_index)}
+                        theme={Some(theme)}
                     />
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
@@ -878,6 +881,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn view_tag_group(
         &self,
         ctx: &Context<Self>,
@@ -886,9 +890,11 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        theme: Option<Theme>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
+        let theme = theme.map_or(Theme::Dark, |t| t);
         if let Some(buffer) = self.tag_buffer.get(&my_index) {
             let prev_list = Rc::new(prev_list.clone());
             html! {
@@ -903,6 +909,7 @@ where
                         input_data={Rc::clone(buffer)}
                         input_notice={Some(ess.notice)}
                         parent_message={Some(Message::InputTagGroup(my_index.clone(), input_data.clone()))}
+                        theme={Some(theme)}
                     />
                     { self.view_required_msg(ctx, &my_index) }
                 </div>

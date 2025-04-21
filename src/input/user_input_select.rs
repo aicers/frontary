@@ -10,7 +10,8 @@ use super::{
     user_input::view_asterisk,
 };
 use crate::{
-    InputEssential, Item, SelectSearchable, SelectSearchableKind, VecSelect, ViewString, text,
+    InputEssential, Item, SelectSearchable, SelectSearchableKind, Theme, VecSelect, ViewString,
+    text,
 };
 
 const PADDING_SUM: u32 = 66; // left + right paddings
@@ -36,9 +37,11 @@ where
         layer_index: usize,
         depth: u32,
         group: bool,
+        theme: Option<Theme>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
+        let theme = theme.map_or(Theme::Dark, |t| t);
         let list_clone = Rc::new(list.to_vec());
         let mut list = list
             .iter()
@@ -103,6 +106,7 @@ where
                                     selected={Rc::clone(selected)}
                                     allow_empty={!ess.required}
                                     parent_message={Some(Message::InputMultipleSelect(my_index.clone(), input_data.clone(), Rc::clone(&list_clone)))}
+                                    theme={Some(theme)}
                                 />
                             }
                         } else {
@@ -121,6 +125,7 @@ where
                                     selected={Rc::clone(selected)}
                                     allow_empty={!ess.required}
                                     parent_message={Some(Message::InputSingleSelect(my_index.clone(), input_data.clone(), Rc::clone(&list_clone)))}
+                                    theme={Some(theme)}
                                 />
                             }
                         }

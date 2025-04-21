@@ -5,7 +5,7 @@ use json_gettext::get_text;
 use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, Properties, html};
 
-use crate::{Texts, ViewString, language::Language, text};
+use crate::{Texts, Theme, ViewString, language::Language, text};
 
 #[derive(PartialEq, Eq)]
 pub enum Message {
@@ -35,6 +35,8 @@ where
     pub width_item: Option<u32>,
     #[prop_or(false)]
     pub allow_empty: bool,
+    #[prop_or_default]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -83,17 +85,18 @@ where
                     } else {
                         false
                     };
-                    let img = if checked {
-                        if cfg!(feature="pumpkin") {
-                            "/frontary/pumpkin/radio-checked.svg"
-                        } else {
-                            "/frontary/radio-checked.png"
-                        }
-                    } else if cfg!(feature="pumpkin") {
-                            "/frontary/pumpkin/radio-unchecked.svg"
+                    let theme = ctx.props().theme.map_or(Theme::Dark, |t| t);
+                    let extension = if cfg!(feature = "pumpkin") {
+                        "svg"
                     } else {
-                            "/frontary/radio-unchecked.png"
+                        "png"
                     };
+                    let image_base = if checked {
+                        "radio-checked"
+                    } else {
+                        "radio-unchecked"
+                    };
+                    let img = theme.themed_path(&format!("{image_base}.{extension}"));
                     let txt = ctx.props().txt.txt.clone();
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
                     let style = ctx.props().width_item.map_or_else(String::new, |w| format!("width: {w}px;"));
