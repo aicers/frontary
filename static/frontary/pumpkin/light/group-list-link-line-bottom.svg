@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <svg width="15" height="6" viewBox="0 0 15 6" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_8051_106521)">
 <path d="M12.5 5C13.6046 5 14.5 4.10457 14.5 3C14.5 1.89543 13.6046 1 12.5 1C11.3954 1 10.5 1.89543 10.5 3C10.5 4.10457 11.3954 5 12.5 5Z" fill="#7C8492" stroke="#7C8492"/>
@@ -6,6 +7,16 @@
 <defs>
 <clipPath id="clip0_8051_106521">
 <rect width="15" height="5" fill="white" transform="translate(0 0.5)"/>
+=======
+<svg width="16" height="5" viewBox="0 0 16 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_7865_9492)">
+<path d="M13 4.5C14.1046 4.5 15 3.60457 15 2.5C15 1.39543 14.1046 0.5 13 0.5C11.8954 0.5 11 1.39543 11 2.5C11 3.60457 11.8954 4.5 13 4.5Z" fill="#7C8492" stroke="#7C8492"/>
+<path d="M10.5 2.5H0.5" stroke="#7C8492"/>
+</g>
+<defs>
+<clipPath id="clip0_7865_9492">
+<rect width="15" height="5" fill="white" transform="translate(0.5)"/>
+>>>>>>> 924f384 (Refactor CSS images for theme support)
 </clipPath>
 </defs>
 </svg>
