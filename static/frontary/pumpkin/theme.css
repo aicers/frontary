@@ -154,68 +154,57 @@ input[type=text].searchable-select-top-input:hover {
     cursor: pointer;
 }
 
-input[type=text].searchable-select-input {
+input[type=text].searchable-select-input,
+input[type=text].searchable-select-input-empty,
+input[type=text].searchable-select-input-empty-disabled,
+input[type=text].searchable-select-input-empty-alert {
     height: 40px;
     border: none;
-    background-image: url('/frontary/pumpkin/select-down.svg');
-    background-size: 32px 32px;
-    background-position: right 8px top 4px;
-    background-repeat: no-repeat;
     padding: 8px 12px;
-    color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
     background-color: var(--Transparent-Mid-Grey);
+    background-size: 32px 32px;
+    background-position: right 8px top 4px;
+    background-repeat: no-repeat;
+}
+
+input[type=text].searchable-select-input {
+    color: var(--Text-Primary);
 }
 
 input[type=text].searchable-select-input-empty {
-    height: 40px;
-    border: none;
-    background-image: url('/frontary/pumpkin/select-down.svg');
-    background-size: 32px 32px;
-    background-position: right 8px top 4px;
-    background-repeat: no-repeat;
-    padding: 8px 12px;
     color: var(--Dark-30);
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
+}
+
+input[type=text].searchable-select-input,
+input[type=text].searchable-select-input-empty {
+    background-image: url('/frontary/pumpkin/select-down.svg');
+}
+
+html.light input[type=text].searchable-select-input,
+html.light input[type=text].searchable-select-input-empty {
+    background-image: url('/frontary/pumpkin/light/select-down.svg');
 }
 
 input[type=text].searchable-select-input-empty-disabled {
-    height: 40px;
-    border: none;
     background-image: url('/frontary/pumpkin/select-down-disabled.svg');
-    background-size: 32px 32px;
-    background-position: right 8px top 4px;
-    background-repeat: no-repeat;
-    padding: 8px 12px;
     color: var(--Dark-50);
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
+}
+
+html.light input[type=text].searchable-select-input-empty-disabled {
+    background-image: url('/frontary/pumpkin/light/select-down-disabled.svg');
 }
 
 input[type=text].searchable-select-input-empty-alert {
-    height: 40px;
-    padding: 8px 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    background-image: url(/frontary/pumpkin/select-down-alert.svg);
-    background-size: 32px 32px;
-    background-position: right 8px top 4px;
-    background-color: var(--Transparent-Mid-Grey);
-    background-repeat: no-repeat;
-    border: none;
-    line-height: 24px;
+    background-image: url('/frontary/pumpkin/select-down-alert.svg');
     color: var(--Dark-30);
-    font-weight: 400;
+}
+
+html.light input[type=text].searchable-select-input-empty-alert {
+    background-image: url('/frontary/pumpkin/light/select-down-alert.svg');
 }
 
 div.searchable-select-list-down {
@@ -239,6 +228,10 @@ div.searchable-select-list-search {
     background-size: 32px 32px;
     background-position: 12px 10px;
     background-repeat: no-repeat;
+}
+
+html.light div.searchable-select-list-search {
+    background-image: url('/frontary/pumpkin/light/magnifier.svg');
 }
 
 input[type=text].searchable-select-search {
@@ -364,36 +357,39 @@ input[type=text].complex-select-input {
     border: none;
 }
 
-input[type=text].complex-select-input-empty {
-    height: 40px;
-    padding: 8px 12px;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    color: var(--Dark-20);
-    border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
-    background-image: url('/frontary/pumpkin/complex-select-pop.svg');
-    background-size: 32px 32px;
-    background-position: right 8px top 3px;
-    background-repeat: no-repeat;
-    border: none;
-}
-
+input[type=text].complex-select-input-empty,
 input[type=text].complex-select-input-empty-alert {
     height: 40px;
     padding: 8px 12px;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: var(--Dark-30);
-    background-color: var(--Transparent-Mid-Grey);
-    border: 2px solid var(--Red-60);
     border-radius: 8px;
-    background-image: url('/frontary/pumpkin/complex-select-pop-alert.svg');
+    background-color: var(--Transparent-Mid-Grey);
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
+}
+
+input[type=text].complex-select-input-empty {
+    color: var(--Dark-20);
+    border: none;
+    background-image: url('/frontary/pumpkin/complex-select-pop.svg');
+}
+
+html.light input[type=text].complex-select-input,
+html.light input[type=text].complex-select-input-empty {
+    background-image: url('/frontary/pumpkin/light/complex-select-pop.svg');
+}
+
+input[type=text].complex-select-input-empty-alert {
+    color: var(--Dark-30);
+    border: 2px solid var(--Red-60);
+    background-image: url('/frontary/pumpkin/complex-select-pop-alert.svg');
+}
+
+html.light input[type=text].complex-select-input-empty-alert {
+    background-image: url('/frontary/pumpkin/light/complex-select-pop-alert.svg');
 }
 
 div.complex-select-pop {
@@ -442,6 +438,10 @@ div.complex-select-pop-head-close-icon {
     background-image: url('/frontary/pumpkin/modal-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
+}
+
+html.light div.complex-select-pop-head-close-icon {
+    background-image: url('/frontary/pumpkin/light/modal-close.svg');
 }
 
 div.complex-select-pop-all {
@@ -583,11 +583,15 @@ input[type=text].complex-select-search {
     background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
-    background-image: url(/frontary/pumpkin/magnifier.svg);
+    background-image: url('/frontary/pumpkin/magnifier.svg');
     background-size: 32px 32px;
     background-position: right 12px top 5px;
     background-repeat: no-repeat;
     color: var(--Text-Primary);
+}
+
+html.light input[type=text].complex-select-search {
+    background-image: url('/frontary/pumpkin/light/magnifier.svg');
 }
 
 input[type=text].complex-select-search::placeholder {
@@ -624,6 +628,10 @@ div.complex-select-pop-input-input-plus {
     background-size: 40px 40px;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+html.light div.complex-select-pop-input-input-plus {
+    background-image: url('/frontary/pumpkin/light/plus-for-add.svg');
 }
 
 div.complex-select-pop-input-input-message {
@@ -692,6 +700,10 @@ div.complex-select-pop-input-list-delete {
     background-image: url('/frontary/pumpkin/delete-x.svg');
     background-position: 2px 2px;
     background-repeat: no-repeat;
+}
+
+html.light div.complex-select-pop-input-list-delete {
+    background-image: url('/frontary/pumpkin/light/delete-x.svg');
 }
 
 div.mini-select {
@@ -828,30 +840,38 @@ div.mini-select-top-direction-text-deactive {
     margin-right: 4px;
 }
 
-div.mini-select-top-direction-icon {
-    width: 24px;
-    height: 24px;
-    float: right;
-    margin-left: 4px;
-    background-image: url('/frontary/pumpkin/traffic-direction.svg');
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
+div.mini-select-top-direction-icon,
 div.mini-select-top-direction-icon-deactive {
     width: 24px;
     height: 24px;
     float: right;
     margin-left: 4px;
-    background-image: url('/frontary/pumpkin/traffic-direction-dim.svg');
     background-position: center;
     background-repeat: no-repeat;
 }
 
+div.mini-select-top-direction-icon {
+    background-image: url('/frontary/pumpkin/traffic-direction.svg');
+}
+
+html.light div.mini-select-top-direction-icon {
+    background-image: url('/frontary/pumpkin/light/traffic-direction.svg');
+}
+
+div.mini-select-top-direction-icon-deactive {
+    background-image: url('/frontary/pumpkin/traffic-direction-dim.svg');
+}
+
+html.light div.mini-select-top-direction-icon-deactive {
+    background-image: url('/frontary/pumpkin/light/traffic-direction-dim.svg');
+}
+
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
     background-image: url('/frontary/pumpkin/traffic-direction-hover.svg');
-    background-position: center;
-    background-repeat: no-repeat;
+}
+
+html.light div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
+    background-image: url('/frontary/pumpkin/light/traffic-direction-hover.svg');
 }
 
 div.mini-select-basic {
@@ -904,14 +924,16 @@ div.mini-select-basic-icon {
     background-repeat: no-repeat;
 }
 
-div.mini-select-basic-icon-basic {
+div.mini-select-basic-icon-basic,
+div.mini-select-basic-icon-square {
     background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
     background-size: 32px 32px;
 }
 
-div.mini-select-basic-icon-square {
-    background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
-    background-size: 32px 32px;
+html.light div.mini-select-basic-icon-basic,
+html.light div.mini-select-basic-icon-square,
+html.light td.mini-select-item-direction-icon {
+    background-image: url('/frontary/pumpkin/light/mini-select-list-down.svg');
 }
 
 div.mini-select-item-direction {
@@ -956,6 +978,10 @@ div.mini-select-list-sort-recently-icon {
     background-color: var(--Transparent-Mid-Grey);
 }
 
+html.light div.mini-select-list-sort-recently-icon {
+    background-image: url('/frontary/pumpkin/light/list-sort-recently.svg');
+}
+
 div.mini-select-list-sort-recently-text {
     height: 40px;
     background-color: var(--Transparent-Mid-Grey);
@@ -972,6 +998,10 @@ div.mini-select-list-sort-recently-text-icon {
     background-size: 24px 24px;
     background-repeat: no-repeat;
     margin-right: 4px;
+}
+
+html.light div.mini-select-list-sort-recently-text-icon {
+    background-image: url('/frontary/pumpkin/light/list-sort-recently.svg');
 }
 
 div.mini-select-list-sort-recently-text-text {
@@ -993,23 +1023,7 @@ div.mini-select-list-sort-recently-text:hover {
     align-items: center;
 }
 
-div.mini-select-more-action {
-    width: 32px;
-    height: 32px;
-    background-image: url('/frontary/pumpkin/more-action-dots.svg');
-    background-size: 32px 32px;
-    background-repeat: no-repeat;
-}
-
-div.mini-select-more-action:hover {
-    width: 32px;
-    height: 32px;
-    background-image: url('/frontary/pumpkin/more-action-dots-hover.svg');
-    background-size: 32px 32px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-}
-
+div.mini-select-more-action,
 div.mini-select-on-off-action {
     width: 32px;
     height: 32px;
@@ -1018,13 +1032,20 @@ div.mini-select-on-off-action {
     background-repeat: no-repeat;
 }
 
+html.light div.mini-select-more-action,
+html.light div.mini-select-on-off-action {
+    background-image: url('/frontary/pumpkin/light/more-action-dots.svg');
+}
+
+div.mini-select-more-action:hover,
 div.mini-select-on-off-action:hover {
-    width: 32px;
-    height: 32px;
     background-image: url('/frontary/pumpkin/more-action-dots-hover.svg');
-    background-size: 32px 32px;
-    background-repeat: no-repeat;
     cursor: pointer;
+}
+
+html.light div.mini-select-more-action:hover,
+html.light div.mini-select-on-off-action:hover {
+    background-image: url('/frontary/pumpkin/light/more-action-dots-hover.svg');
 }
 
 div.list-title {
@@ -1385,61 +1406,56 @@ div.list-whole-tag-item {
     line-height: 24px;
 }
 
-div.basic-sort-unsorted {
-    width: 18px;
-    height: 22px;
-    background-image: url('/frontary/pumpkin/sort-unsorted.svg');
-    background-size: 18px 22px;
-    background-repeat: no-repeat;
-    border: 0;
-}
-
-div.basic-sort-ascending {
-    width: 18px;
-    height: 22px;
-    background-image: url('/frontary/pumpkin/sort-ascending.svg');
-    background-size: 18px 22px;
-    background-repeat: no-repeat;
-    border: 0;
-}
-
+div.basic-sort-unsorted,
+div.basic-sort-ascending,
 div.basic-sort-descending {
     width: 18px;
     height: 22px;
-    background-image: url('/frontary/pumpkin/sort-descending.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
 }
 
-div.basic-sort-unsorted:hover {
-    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
-    background-size: 18px 22px;
-    background-repeat: no-repeat;
+div.basic-sort-unsorted {
+    background-image: url('/frontary/pumpkin/sort-unsorted.svg');
 }
 
-div.basic-sort-ascending:hover {
-    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
-    background-size: 18px 22px;
-    background-repeat: no-repeat;
+html.light div.basic-sort-unsorted {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted.svg');
 }
 
-div.basic-sort-descending:hover {
-    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
-    background-size: 18px 22px;
-    background-repeat: no-repeat;
+div.basic-sort-ascending {
+    background-image: url('/frontary/pumpkin/sort-ascending.svg');
 }
 
-td.list-whole-head-title:hover div.basic-sort-unsorted {
-    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
+html.light div.basic-sort-ascending {
+    background-image: url('/frontary/pumpkin/light/sort-ascending.svg');
 }
 
-td.list-whole-head-title:hover div.basic-sort-ascending {
-    background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
+div.basic-sort-descending {
+    background-image: url('/frontary/pumpkin/sort-descending.svg');
 }
 
+html.light div.basic-sort-descending {
+    background-image: url('/frontary/pumpkin/light/sort-descending.svg');
+}
+
+div.basic-sort-unsorted:hover,
+div.basic-sort-ascending:hover,
+div.basic-sort-descending:hover,
+td.list-whole-head-title:hover div.basic-sort-unsorted,
+td.list-whole-head-title:hover div.basic-sort-ascending,
 td.list-whole-head-title:hover div.basic-sort-descending {
     background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
+}
+
+html.light div.basic-sort-unsorted:hover,
+html.light div.basic-sort-ascending:hover,
+html.light div.basic-sort-descending:hover,
+html.light td.list-whole-head-title:hover div.basic-sort-unsorted,
+html.light td.list-whole-head-title:hover div.basic-sort-ascending,
+html.light td.list-whole-head-title:hover div.basic-sort-descending {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
 }
 
 table.list-whole-group {
@@ -1564,6 +1580,10 @@ td.input-close-x {
     background-size: 40px 40px;
     background-repeat: no-repeat;
     background-position: 0px 0px;
+}
+
+html.light td.input-close-x {
+    background-image: url('/frontary/pumpkin/light/input-close.svg');
 }
 
 td.input-close-x:hover {
@@ -2422,6 +2442,10 @@ div.input-checkbox-link-line {
     background-repeat: no-repeat;
 }
 
+html.light div.input-checkbox-link-line {
+    background-image: url('/frontary/pumpkin/light/checkbox-link-up-line.svg');
+}
+
 div.input-checkbox-link-line-right {
     position: relative;
     top: 12px;
@@ -2585,6 +2609,10 @@ div.input-trash-can-delete {
     border-radius: 8px;
 }
 
+html.light div.input-trash-can-delete {
+    background-image: url('/frontary/pumpkin/light/trash-can.svg');
+}
+
 div.input-trash-can-delete:hover {
     background-color: var(--Transparent-Mid-Grey);
     box-shadow: 0px 0px 6px 0px rgba(255, 255, 255, 0.2);
@@ -2603,6 +2631,10 @@ td.group-list-link-line-bottom {
     margin-top: calc((40px - 8px) / 2);
 }
 
+html.light td.group-list-link-line-bottom {
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-bottom.svg');
+}
+
 td.group-list-link-line-bottom.compact {
     height: 13px;
     width: 25px;
@@ -2612,6 +2644,10 @@ td.group-list-link-line-bottom.compact {
     background-repeat: no-repeat;
     margin-top: 16px;
     position: relative;
+}
+
+html.light td.group-list-link-line-bottom.compact {
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-bottom-compact.svg');
 }
 
 td.group-list-link-cell {
@@ -2634,6 +2670,10 @@ div.group-list-link-line-top {
     margin-top: calc((40px - 8px) / 2);
 }
 
+html.light div.group-list-link-line-top {
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-top.svg');
+}
+
 div.group-list-link-line-top.compact {
     position: absolute;
     display: block;
@@ -2647,6 +2687,10 @@ div.group-list-link-line-top.compact {
     margin-top: 18px;
 }
 
+html.light div.group-list-link-line-top.compact {
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-top-compact.svg');
+}
+
 div.group-list-link-line-top.first-row {
     margin-top: 45px;
 }
@@ -2655,6 +2699,10 @@ div.group-list-link-line-top.long {
     height: 91px;
     background-size: 15px 80px;
     background-image: url('/frontary/pumpkin/group-list-link-line-top-long.svg');
+}
+
+html.light div.group-list-link-line-top.long {
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-top-long.svg');
 }
 
 th.input-group-empty-header {
