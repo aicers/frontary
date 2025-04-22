@@ -10,7 +10,7 @@ use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, Properties, classes, events::InputEvent, html};
 
 use crate::{
-    CheckStatus, Checkbox, Item, Texts, language::Language, shorten_text, text, text_width,
+    CheckStatus, Checkbox, Item, Texts, Theme, language::Language, shorten_text, text, text_width,
     toggle_visibility,
 };
 
@@ -76,6 +76,8 @@ where
 
     #[prop_or(None)]
     pub parent_message: Option<T::Message>,
+    #[prop_or_default]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -277,6 +279,7 @@ where
         };
         let onclick = ctx.link().callback(|_| Message::Click);
         let txt = ctx.props().txt.txt.clone();
+        let theme = ctx.props().theme.map_or(Theme::Dark, |t| t);
         let mut class_input = "searchable-select-input";
         let value = if let (Ok(selected), Ok(list)) = (
             ctx.props().selected.try_borrow(),
@@ -343,7 +346,7 @@ where
                 <div onclick={onclick} class="searchable-select-top">
                     <input type="text" class={classes!("searchable-select-top-input", class_input)} readonly={true} value={value.clone()} style={style} />
                 </div>
-                { self.view_searchable_list(ctx, &value) }
+                { self.view_searchable_list(ctx, &value, theme) }
             </div>
         }
     }
@@ -380,7 +383,7 @@ where
     }
 
     #[allow(clippy::too_many_lines)]
-    fn view_searchable_list(&self, ctx: &Context<Self>, value: &str) -> Html {
+    fn view_searchable_list(&self, ctx: &Context<Self>, value: &str, theme: Theme) -> Html {
         let width = Self::caculate_width(ctx);
         let list_len = ctx
             .props()
@@ -557,7 +560,7 @@ where
                                         <tr>
                                             <td class="searchable-select-list-checkbox">
                                                 <div onclick={onclick_all}>
-                                                    <Checkbox status={check_status} />
+                                                    <Checkbox status={check_status} theme={Some(theme)}/>
                                                 </div>
                                             </td>
                                             <td class="searchable-select-list-item">
@@ -601,7 +604,7 @@ where
                                         <tr>
                                             <td class="searchable-select-list-checkbox">
                                                 <div onclick={onclick_item(item.id().clone())}>
-                                                    <Checkbox status={check_status} />
+                                                    <Checkbox status={check_status} theme={Some(theme)}/>
                                                 </div>
                                             </td>
                                             <td class="searchable-select-list-item">
@@ -631,7 +634,7 @@ where
                                             <tr>
                                                 <td class="searchable-select-list-checkbox">
                                                     <div onclick={onclick_item(item.id().clone())}>
-                                                        <Checkbox status={check_status} />
+                                                        <Checkbox status={check_status} theme={Some(theme)} />
                                                     </div>
                                                 </td>
                                                 <td class="searchable-select-list-item">

@@ -12,7 +12,7 @@ use super::{
     component::{InvalidMessage, Message, Model},
     user_input::view_asterisk,
 };
-use crate::{InputEssential, InputNic, ViewString, input::component::Verification, text};
+use crate::{InputEssential, InputNic, Theme, ViewString, input::component::Verification, text};
 
 const INTERFACE_NOTICE: &str = "x.x.x.x/x";
 const GATEWAY_NOTICE: &str = "x.x.x.x";
@@ -86,7 +86,9 @@ where
         base_index: Option<&BigUint>,
         layer_index: usize,
         depth: u32,
+        theme: Option<Theme>,
     ) -> Html {
+        let theme = theme.map_or(Theme::Dark, |t| t);
         match (list, nics) {
             (Some(list), None) => self.view_select_searchable(
                 ctx,
@@ -99,6 +101,7 @@ where
                 layer_index,
                 depth,
                 false,
+                Some(theme),
             ),
             (None, Some(nics)) => {
                 let list = if let Some(nics) = ctx.props().input_data.get(nics) {
@@ -139,6 +142,7 @@ where
                         layer_index,
                         depth,
                         false,
+                        Some(theme),
                     )
                 } else {
                     html! {}

@@ -7,7 +7,7 @@ use web_sys::{Event, HtmlElement};
 use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, NodeRef, Properties, classes, html};
 
-use crate::{Texts, ViewString, language::Language, text, toggle_visibility};
+use crate::{Texts, Theme, ViewString, language::Language, text, toggle_visibility};
 
 pub struct Model<T, U> {
     click_listener: Option<EventListener>,
@@ -91,6 +91,8 @@ where
     pub value_text_color: AttrValue,
     #[prop_or(DEFAULT_LIST_TEXT_COLOR.into())]
     pub list_text_color: AttrValue,
+    #[prop_or_default]
+    pub theme: Option<Theme>,
 }
 
 impl<T, U> Component for Model<T, U>
@@ -169,6 +171,7 @@ where
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let txt = ctx.props().txt.txt.clone();
+        let theme = ctx.props().theme.map_or(Theme::Dark, |t| t);
         let msg = text!(txt, ctx.props().language, "Select one").to_string();
         let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
             selected.map_or(msg.clone(), |value| {
@@ -206,7 +209,7 @@ where
                     Kind::Round | Kind::Soft => Self::view_basic(ctx,&value),
                 }
             }
-            { Self::view_list(ctx,&value) }
+            { Self::view_list(ctx,&value, theme) }
             </div>
         }
     }
@@ -219,7 +222,7 @@ where
     <U as Component>::Message: Clone + PartialEq,
 {
     #[allow(clippy::too_many_lines)]
-    fn view_list(ctx: &Context<Self>, value: &str) -> Html {
+    fn view_list(ctx: &Context<Self>, value: &str, theme: Theme) -> Html {
         let list = ctx.props().list.clone();
         let onclick_item = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
         let style_width = ctx
@@ -282,20 +285,11 @@ where
                                     if ctx.props().kind == Kind::MoreAction {
                                         match item {
                                             ViewString::Key(key) => {
-                                                let icon = if key == "Edit" {
-                                                    if cfg!(feature = "pumpkin") {
-                                                        "/frontary/pumpkin/edit.svg"
-                                                    } else {
-                                                        "/frontary/edit.png"
-                                                    }
-                                                } else if key == "Delete" {
-                                                    if cfg!(feature = "pumpkin") {
-                                                        "/frontary/pumpkin/delete-trash.svg"
-                                                    } else {
-                                                        "/frontary/delete-trash.png"
-                                                    }
-                                                } else {
-                                                    ""
+                                                let extension = if cfg!(feature = "pumpkin") { "svg" } else { "png" };
+                                                let icon = match key.as_ref() {
+                                                    "Edit" => theme.themed_path(&format!("edit.{extension}")),
+                                                    "Delete" => theme.themed_path(&format!("delete-trash.{extension}")),
+                                                    _ => String::new(),
                                                 };
                                                 html! {
                                                     <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>

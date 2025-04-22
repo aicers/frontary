@@ -4,7 +4,9 @@ use strum_macros::{AsRefStr, Display, EnumString};
 
 const STORAGE_KEY: &str = "aice.theme";
 
-#[derive(Clone, Copy, PartialEq, Eq, Deserialize, Serialize, EnumString, AsRefStr, Display)]
+#[derive(
+    Clone, Copy, PartialEq, Eq, Deserialize, Serialize, EnumString, AsRefStr, Display, Debug,
+)]
 #[strum(serialize_all = "lowercase")]
 pub enum Theme {
     Dark,
@@ -19,5 +21,17 @@ impl Theme {
 
     pub fn save_to_browser(theme: Theme) {
         let _ = LocalStorage::set(STORAGE_KEY, theme);
+    }
+
+    #[must_use]
+    pub fn themed_path(&self, file: &str) -> String {
+        if cfg!(feature = "pumpkin") {
+            match self {
+                Theme::Light => format!("/frontary/pumpkin/light/{file}"),
+                Theme::Dark => format!("/frontary/pumpkin/{file}"),
+            }
+        } else {
+            format!("/frontary/{file}")
+        }
     }
 }

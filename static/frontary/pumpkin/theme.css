@@ -168,10 +168,42 @@ input[type=text].searchable-select-input {
     background-color: var(--Transparent-Mid-Grey);
 }
 
+html.light input[type=text].searchable-select-input {
+    height: 40px;
+    border: none;
+    background-image: url('/frontary/pumpkin/light/select-down.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 4px;
+    background-repeat: no-repeat;
+    padding: 8px 12px;
+    color: var(--Text-Primary);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+}
+
 input[type=text].searchable-select-input-empty {
     height: 40px;
     border: none;
     background-image: url('/frontary/pumpkin/select-down.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 4px;
+    background-repeat: no-repeat;
+    padding: 8px 12px;
+    color: var(--Dark-30);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+}
+
+html.light input[type=text].searchable-select-input-empty {
+    height: 40px;
+    border: none;
+    background-image: url('/frontary/pumpkin/light/select-down.svg');
     background-size: 32px 32px;
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
@@ -200,14 +232,46 @@ input[type=text].searchable-select-input-empty-disabled {
     background-color: var(--Transparent-Mid-Grey);
 }
 
+html.light input[type=text].searchable-select-input-empty-disabled {
+    height: 40px;
+    border: none;
+    background-image: url('/frontary/pumpkin/light/select-down-disabled.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 4px;
+    background-repeat: no-repeat;
+    padding: 8px 12px;
+    color: var(--Dark-50);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+}
+
 input[type=text].searchable-select-input-empty-alert {
     height: 40px;
     padding: 8px 12px;
     font-size: 16px;
     border-radius: 8px;
-    background-image: url(/frontary/pumpkin/select-down-alert.svg);
+    background-image: url('/frontary/pumpkin/select-down-alert.svg');
     background-size: 32px 32px;
-    background-position: right 7px top 3px;
+    background-position: right 8px top 4px;
+    background-color: var(--Transparent-Mid-Grey);
+    background-repeat: no-repeat;
+    border: none;
+    line-height: 24px;
+    color: var(--Dark-30);
+    font-weight: 400;
+}
+
+html.light input[type=text].searchable-select-input-empty-alert {
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-image: url('/frontary/pumpkin/light/select-down-alert.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 4px;
     background-color: var(--Transparent-Mid-Grey);
     background-repeat: no-repeat;
     border: none;
@@ -234,6 +298,17 @@ div.searchable-select-list-search {
     padding: 8px;
     height: 48px;
     background-image: url('/frontary/pumpkin/magnifier.svg');
+    background-size: 32px 32px;
+    background-position: 12px 10px;
+    background-repeat: no-repeat;
+}
+
+html.light div.searchable-select-list-search {
+    margin-top: 6px;
+    margin-bottom: 3px;
+    padding: 8px;
+    height: 48px;
+    background-image: url('/frontary/pumpkin/light/magnifier.svg');
     background-size: 32px 32px;
     background-position: 12px 10px;
     background-repeat: no-repeat;
@@ -362,6 +437,22 @@ input[type=text].complex-select-input {
     border: none;
 }
 
+html.light input[type=text].complex-select-input {
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--Text-Primary);
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+    background-image: url('/frontary/pumpkin/light/complex-select-pop.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 3px;
+    background-repeat: no-repeat;
+    border: none;
+}
+
 input[type=text].complex-select-input-empty {
     height: 40px;
     padding: 8px 12px;
@@ -372,6 +463,22 @@ input[type=text].complex-select-input-empty {
     border-radius: 8px;
     background-color: var(--Transparent-Mid-Grey);
     background-image: url('/frontary/pumpkin/complex-select-pop.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 3px;
+    background-repeat: no-repeat;
+    border: none;
+}
+
+html.light input[type=text].complex-select-input-empty {
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--Dark-20);
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+    background-image: url('/frontary/pumpkin/light/complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -389,6 +496,22 @@ input[type=text].complex-select-input-empty-alert {
     border: 2px solid var(--Red-60);
     border-radius: 8px;
     background-image: url('/frontary/pumpkin/complex-select-pop-alert.svg');
+    background-size: 32px 32px;
+    background-position: right 8px top 3px;
+    background-repeat: no-repeat;
+}
+
+html.light input[type=text].complex-select-input-empty-alert {
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--Dark-30);
+    background-color: var(--Transparent-Mid-Grey);
+    border: 2px solid var(--Red-60);
+    border-radius: 8px;
+    background-image: url('/frontary/pumpkin/light/complex-select-pop-alert.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
     background-repeat: no-repeat;
@@ -438,6 +561,14 @@ div.complex-select-pop-head-close-icon {
     width: 40px;
     height: 40px;
     background-image: url('/frontary/pumpkin/modal-close.svg');
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+}
+
+html.light div.complex-select-pop-head-close-icon {
+    width: 40px;
+    height: 40px;
+    background-image: url('/frontary/pumpkin/light/modal-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
 }
@@ -581,7 +712,21 @@ input[type=text].complex-select-search {
     background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
-    background-image: url(/frontary/pumpkin/magnifier.svg);
+    background-image: url('/frontary/pumpkin/magnifier.svg');
+    background-size: 32px 32px;
+    background-position: right 12px top 5px;
+    background-repeat: no-repeat;
+    color: var(--Text-Primary);
+}
+
+html.light input[type=text].complex-select-search {
+    height: 40px;
+    margin-left: 24px;
+    padding: 4px 12px;
+    background-color: var(--Transparent-Mid-Grey);
+    border: none;
+    border-radius: 8px;
+    background-image: url('/frontary/pumpkin/light/magnifier.svg');
     background-size: 32px 32px;
     background-position: right 12px top 5px;
     background-repeat: no-repeat;
@@ -619,6 +764,16 @@ div.complex-select-pop-input-input-plus {
     width: 40px;
     height: 40px;
     background-image: url('/frontary/pumpkin/plus-for-add.svg');
+    background-size: 40px 40px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+html.light div.complex-select-pop-input-input-plus {
+    float: right;
+    width: 40px;
+    height: 40px;
+    background-image: url('/frontary/pumpkin/light/plus-for-add.svg');
     background-size: 40px 40px;
     background-position: center;
     background-repeat: no-repeat;
@@ -688,6 +843,15 @@ div.complex-select-pop-input-list-delete {
     height: 24px;
     float: right;
     background-image: url('/frontary/pumpkin/delete-x.svg');
+    background-position: 2px 2px;
+    background-repeat: no-repeat;
+}
+
+html.light div.complex-select-pop-input-list-delete {
+    width: 24px;
+    height: 24px;
+    float: right;
+    background-image: url('/frontary/pumpkin/light/delete-x.svg');
     background-position: 2px 2px;
     background-repeat: no-repeat;
 }
@@ -836,6 +1000,16 @@ div.mini-select-top-direction-icon {
     background-repeat: no-repeat;
 }
 
+html.light div.mini-select-top-direction-icon {
+    width: 24px;
+    height: 24px;
+    float: right;
+    margin-left: 4px;
+    background-image: url('/frontary/pumpkin/light/traffic-direction.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 div.mini-select-top-direction-icon-deactive {
     width: 24px;
     height: 24px;
@@ -846,8 +1020,24 @@ div.mini-select-top-direction-icon-deactive {
     background-repeat: no-repeat;
 }
 
+html.light div.mini-select-top-direction-icon-deactive {
+    width: 24px;
+    height: 24px;
+    float: right;
+    margin-left: 4px;
+    background-image: url('/frontary/pumpkin/light/traffic-direction-dim.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
     background-image: url('/frontary/pumpkin/traffic-direction-hover.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+html.light div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
+    background-image: url('/frontary/pumpkin/light/traffic-direction-hover.svg');
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -904,11 +1094,22 @@ div.mini-select-basic-icon {
 
 div.mini-select-basic-icon-basic {
     background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
+    background-size: 32px 32px;
+}
+
+html.light div.mini-select-basic-icon-basic {
+    background-image: url('/frontary/pumpkin/light/mini-select-list-down.svg');
+    background-size: 32px 32px;
 }
 
 div.mini-select-basic-icon-square {
     background-image: url('/frontary/pumpkin/mini-select-list-down.svg');
-    background-size: 24px 24px;
+    background-size: 32px 32px;
+}
+
+html.light div.mini-select-basic-icon-square {
+    background-image: url('/frontary/pumpkin/light/mini-select-list-down.svg');
+    background-size: 32px 32px;
 }
 
 div.mini-select-item-direction {
@@ -942,10 +1143,30 @@ td.mini-select-item-direction-icon {
     background-repeat: no-repeat;
 }
 
+html.light td.mini-select-item-direction-icon {
+    width: 24px;
+    height: 24px;
+    background-image: url('/frontary/pumpkin/light/mini-select-list-down.svg');
+    background-size: 24px 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 div.mini-select-list-sort-recently-icon {
     width: 40px;
     height: 40px;
     background-image: url('/frontary/pumpkin/list-sort-recently.svg');
+    background-size: 24px 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+}
+
+html.light div.mini-select-list-sort-recently-icon {
+    width: 40px;
+    height: 40px;
+    background-image: url('/frontary/pumpkin/light/list-sort-recently.svg');
     background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
@@ -966,6 +1187,15 @@ div.mini-select-list-sort-recently-text-icon {
     width: 24px;
     height: 24px;
     background-image: url('/frontary/pumpkin/list-sort-recently.svg');
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    margin-right: 4px;
+}
+
+html.light div.mini-select-list-sort-recently-text-icon {
+    width: 24px;
+    height: 24px;
+    background-image: url('/frontary/pumpkin/light/list-sort-recently.svg');
     background-size: 24px 24px;
     background-repeat: no-repeat;
     margin-right: 4px;
@@ -998,10 +1228,27 @@ div.mini-select-more-action {
     background-repeat: no-repeat;
 }
 
+html.light div.mini-select-more-action {
+    width: 32px;
+    height: 32px;
+    background-image: url('/frontary/pumpkin/light/more-action-dots.svg');
+    background-size: 32px 32px;
+    background-repeat: no-repeat;
+}
+
 div.mini-select-more-action:hover {
     width: 32px;
     height: 32px;
     background-image: url('/frontary/pumpkin/more-action-dots-hover.svg');
+    background-size: 32px 32px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+html.light div.mini-select-more-action:hover {
+    width: 32px;
+    height: 32px;
+    background-image: url('/frontary/pumpkin/light/more-action-dots-hover.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1015,10 +1262,27 @@ div.mini-select-on-off-action {
     background-repeat: no-repeat;
 }
 
+html.light div.mini-select-on-off-action {
+    width: 32px;
+    height: 32px;
+    background-image: url('/frontary/pumpkin/light/more-action-dots.svg');
+    background-size: 32px 32px;
+    background-repeat: no-repeat;
+}
+
 div.mini-select-on-off-action:hover {
     width: 32px;
     height: 32px;
     background-image: url('/frontary/pumpkin/more-action-dots-hover.svg');
+    background-size: 32px 32px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+html.light div.mini-select-on-off-action:hover {
+    width: 32px;
+    height: 32px;
+    background-image: url('/frontary/pumpkin/light/more-action-dots-hover.svg');
     background-size: 32px 32px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1399,10 +1663,28 @@ div.basic-sort-unsorted {
     border: 0;
 }
 
+html.light div.basic-sort-unsorted {
+    width: 18px;
+    height: 22px;
+    background-image: url('/frontary/pumpkin/light/sort-unsorted.svg');
+    background-size: 18px 22px;
+    background-repeat: no-repeat;
+    border: 0;
+}
+
 div.basic-sort-ascending {
     width: 18px;
     height: 22px;
     background-image: url('/frontary/pumpkin/sort-ascending.svg');
+    background-size: 18px 22px;
+    background-repeat: no-repeat;
+    border: 0;
+}
+
+html.light div.basic-sort-ascending {
+    width: 18px;
+    height: 22px;
+    background-image: url('/frontary/pumpkin/light/sort-ascending.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
     border: 0;
@@ -1417,8 +1699,23 @@ div.basic-sort-descending {
     border: 0;
 }
 
+html.light div.basic-sort-descending {
+    width: 18px;
+    height: 22px;
+    background-image: url('/frontary/pumpkin/light/sort-descending.svg');
+    background-size: 18px 22px;
+    background-repeat: no-repeat;
+    border: 0;
+}
+
 div.basic-sort-unsorted:hover {
     background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
+    background-size: 18px 22px;
+    background-repeat: no-repeat;
+}
+
+html.light div.basic-sort-unsorted:hover {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
@@ -1429,8 +1726,20 @@ div.basic-sort-ascending:hover {
     background-repeat: no-repeat;
 }
 
+html.light div.basic-sort-ascending:hover {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
+    background-size: 18px 22px;
+    background-repeat: no-repeat;
+}
+
 div.basic-sort-descending:hover {
     background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
+    background-size: 18px 22px;
+    background-repeat: no-repeat;
+}
+
+html.light div.basic-sort-descending:hover {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
     background-size: 18px 22px;
     background-repeat: no-repeat;
 }
@@ -1439,12 +1748,24 @@ td.list-whole-head-title:hover div.basic-sort-unsorted {
     background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
 }
 
+html.light td.list-whole-head-title:hover div.basic-sort-unsorted {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
+}
+
 td.list-whole-head-title:hover div.basic-sort-ascending {
     background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
 }
 
+html.light td.list-whole-head-title:hover div.basic-sort-ascending {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
+}
+
 td.list-whole-head-title:hover div.basic-sort-descending {
     background-image: url('/frontary/pumpkin/sort-unsorted-hover.svg');
+}
+
+html.light td.list-whole-head-title:hover div.basic-sort-descending {
+    background-image: url('/frontary/pumpkin/light/sort-unsorted-hover.svg');
 }
 
 table.list-whole-group {
@@ -1560,6 +1881,15 @@ td.input-close-x {
     width: 40px;
     height: 40px;
     background-image: url('/frontary/pumpkin/input-close.svg');
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+}
+
+html.light td.input-close-x {
+    width: 40px;
+    height: 40px;
+    background-image: url('/frontary/pumpkin/light/input-close.svg');
     background-size: 40px 40px;
     background-repeat: no-repeat;
     background-position: 0px 0px;
@@ -2412,6 +2742,16 @@ div.input-checkbox-link-line {
     background-repeat: no-repeat;
 }
 
+html.light div.input-checkbox-link-line {
+    position: relative;
+    top: -10px;
+    width: 30px;
+    height: 25px;
+    background-image: url('/frontary/pumpkin/light/checkbox-link-up-line.svg');
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+}
+
 div.input-checkbox-link-line-right {
     position: relative;
     top: 12px;
@@ -2548,6 +2888,18 @@ div.input-trash-can-delete {
     border-radius: 8px;
 }
 
+html.light div.input-trash-can-delete {
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    background-image: url('/frontary/pumpkin/light/trash-can.svg');
+    background-size: 24px 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--Transparent-Mid-Grey);
+    border-radius: 8px;
+}
+
 div.input-trash-can-delete:hover {
     background-color: var(--Transparent-Mid-Grey);
     box-shadow: 0px 0px 6px 0px rgba(255, 255, 255, 0.2);
@@ -2565,12 +2917,33 @@ div.group-list-link-line-bottom {
     background-repeat: no-repeat;
 }
 
+html.light div.group-list-link-line-bottom {
+    position: relative;
+    width: 25px;
+    height: 30px;
+    top: 16px;
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-bottom.svg');
+    background-size: 20px 5px;
+    background-repeat: no-repeat;
+}
+
 div.group-list-link-line-top {
     position: relative;
     height: 56px;
     width: 25px;
     top: 29px;
     background-image: url('/frontary/pumpkin/group-list-link-line-top.svg');
+    background-size: 20px 56px;
+    background-repeat: no-repeat;
+    transform: scale(1, -1.05);
+}
+
+html.light div.group-list-link-line-top {
+    position: relative;
+    height: 56px;
+    width: 25px;
+    top: 29px;
+    background-image: url('/frontary/pumpkin/light/group-list-link-line-top.svg');
     background-size: 20px 56px;
     background-repeat: no-repeat;
     transform: scale(1, -1.05);
