@@ -26,12 +26,14 @@ use std::rc::Rc;
 use std::str::FromStr;
 
 use anyhow::Result;
+use gloo_events::EventListener;
+use gloo_timers::callback::Timeout;
 use ipnet::Ipv4Net;
 use json_gettext::{JSONGetText, get_text};
 use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::JsCast;
-use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::{JsCast, prelude::wasm_bindgen};
+use web_sys::{Document, HtmlElement, window};
 use yew::Properties;
 
 pub use crate::checkbox::{CheckStatus, Model as Checkbox};
@@ -533,11 +535,205 @@ impl Eq for Texts {}
 
 const NBSP: &str = "&nbsp;";
 
-#[wasm_bindgen(module = "/static/frontary/custom-select.js")]
-extern "C" {
-    fn toggle_visibility(id: &str);
-    fn toggle_visibility_complex(id: &str);
-    fn visible_tag_select(id: &str);
+// HIGHLIGHT: global listener containers allowing toggling
+thread_local! {
+    static CLICK_LISTENER: RefCell<Option<EventListener>> =
+    const { RefCell::new(None) };
+    static CLICK_LISTENER_COMPLEX: RefCell<Option<EventListener>> =
+    const { RefCell::new(None) };
+}
+
+#[wasm_bindgen]
+pub fn visible_tag_select(id: &str) {
+    wasm_logger::init(wasm_logger::Config::default());
+    log::info!("visible_tag_select({id})");
+    if let Some(document) = window().and_then(|w| w.document()) {
+        if let Some(el) = document.get_element_by_id(id) {
+            if let Ok(html_el) = el.dyn_into::<HtmlElement>() {
+                html_el.style().set_property("display", "block").ok();
+                add_listen_click();
+            }
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn toggle_visibility_complex(id: &str) {
+    if let Some(document) = window().and_then(|w| w.document()) {
+        if let Some(el) = document.get_element_by_id(id) {
+            if let Ok(html_el) = el.dyn_into::<HtmlElement>() {
+                let display = html_el
+                    .style()
+                    .get_property_value("display")
+                    .unwrap_or_default();
+
+                if display == "none" {
+                    html_el.style().set_property("display", "block").ok();
+                    add_listen_click_complex();
+                } else {
+                    html_el.style().set_property("display", "none").ok();
+                    remove_listen_click_complex();
+                }
+            }
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn toggle_visibility(id: &str) {
+    if let Some(document) = window().and_then(|w| w.document()) {
+        if let Some(el) = document.get_element_by_id(id) {
+            if let Ok(html_el) = el.dyn_into::<HtmlElement>() {
+                let display = html_el
+                    .style()
+                    .get_property_value("display")
+                    .unwrap_or_default();
+
+                if display == "none" || display.is_empty() {
+                    hide_all_dropdowns(&document);
+                    html_el.style().set_property("display", "block").ok();
+                    add_listen_click();
+                } else {
+                    html_el.style().set_property("display", "none").ok();
+                    remove_listen_click();
+                }
+            }
+        }
+    }
+}
+
+fn hide_elements_by_class(document: &Document, class: &str) {
+    let elements = document.get_elements_by_class_name(class);
+    for i in 0..elements.length() {
+        if let Some(el) = elements.item(i) {
+            if let Ok(html_el) = el.dyn_into::<HtmlElement>() {
+                let _ = html_el.style().set_property("display", "none");
+                remove_listen_click();
+            }
+        }
+    }
+}
+
+fn hide_all_dropdowns(document: &Document) {
+    hide_elements_by_class(document, "searchable-select-list-down");
+    hide_elements_by_class(document, "mini-select-list-down");
+    hide_elements_by_class(document, "tag-group-input-select");
+}
+
+fn close_custom_select(event: &web_sys::Event) {
+    if let Some(target) = event.target() {
+        let target = target.dyn_into::<HtmlElement>().ok();
+        if let Some(target) = target {
+            if target.parent_element().is_none() {
+                return;
+            }
+            let class_name = target.class_name();
+            if class_name == "tag-select-edit"
+                || class_name == "tag-select-edit-done"
+                || class_name == "tag-input-close"
+            {
+                return;
+            }
+            if let Some(document) = window().and_then(|w| w.document()) {
+                for class in ["searchable-select", "mini-select", "tag-group-input-outer"] {
+                    let containers = document.get_elements_by_class_name(class);
+                    for i in 0..containers.length() {
+                        if let Some(container) = containers.item(i) {
+                            let mut node = Some(target.clone().into());
+                            while let Some(current) = node {
+                                if container.is_equal_node(Some(&current)) {
+                                    break;
+                                }
+                                node = current.parent_node();
+                            }
+                        }
+                    }
+                }
+                hide_all_dropdowns(&document);
+                remove_listen_click();
+            }
+        }
+    }
+}
+
+fn close_custom_select_complex(event: &web_sys::Event) {
+    if let Some(target) = event.target() {
+        let target = target.dyn_into::<HtmlElement>().ok();
+        if let Some(target) = target {
+            if target.parent_element().is_none() {
+                return;
+            }
+            if let Some(document) = window().and_then(|w| w.document()) {
+                let containers = document.get_elements_by_class_name("complex-select");
+                for i in 0..containers.length() {
+                    if let Some(container) = containers.item(i) {
+                        let mut node = Some(target.clone().into());
+                        while let Some(current) = node {
+                            if container.is_equal_node(Some(&current)) {
+                                break;
+                            }
+                            node = current.parent_node();
+                        }
+                    }
+                }
+                let dropdowns = document.get_elements_by_class_name("coplex-select-pop");
+                for i in 0..dropdowns.length() {
+                    if let Some(dropdown) = dropdowns.item(i) {
+                        if let Ok(html_el) = dropdown.dyn_into::<HtmlElement>() {
+                            html_el.style().set_property("display", "none").ok();
+                        }
+                    }
+                }
+                remove_listen_click_complex();
+            }
+        }
+    }
+}
+
+fn add_listen_click() {
+    if let Some(document) = window().and_then(|w| w.document()) {
+        Timeout::new(0, move || {
+            CLICK_LISTENER.with(|listener| {
+                if listener.borrow().is_none() {
+                    let event_listener = EventListener::new(&document, "click", move |event| {
+                        log::info!("add_listen_click event");
+                        close_custom_select(event);
+                    });
+                    *listener.borrow_mut() = Some(event_listener);
+                }
+            });
+        })
+        .forget();
+    }
+}
+
+fn add_listen_click_complex() {
+    if let Some(document) = window().and_then(|w| w.document()) {
+        Timeout::new(0, move || {
+            CLICK_LISTENER_COMPLEX.with(|listener| {
+                if listener.borrow().is_none() {
+                    let event_listener = EventListener::new(&document, "click", move |event| {
+                        log::info!("add_listen_click_complex event");
+                        close_custom_select_complex(event);
+                    });
+                    *listener.borrow_mut() = Some(event_listener);
+                }
+            });
+        })
+        .forget();
+    }
+}
+
+fn remove_listen_click_complex() {
+    CLICK_LISTENER_COMPLEX.with(|listener| {
+        *listener.borrow_mut() = None;
+    });
+}
+
+fn remove_listen_click() {
+    CLICK_LISTENER.with(|listener| {
+        *listener.borrow_mut() = None;
+    });
 }
 
 fn window_inner_height() -> u32 {
