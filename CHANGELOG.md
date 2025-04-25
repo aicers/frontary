@@ -12,6 +12,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Replaced `pumpkin-dark` and `pumpkin-light` features with a single
   `pumpkin` feature for unified theme handling.
 - Updated to Rust 2024 edition.
+- Add height to `Modal` and support HTML in `TextStyle`.
 
 ### Fixed
 
