@@ -14,6 +14,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Updated to Rust 2024 edition.
 - Add height to `Modal` and support HTML in `TextStyle`.
 - Add `MsgType::None` for modal and set title header when not pumpkin.
+- Added an `immutable` flag to `TextConfig` — when true, disables the associated
+  input field in the edit modal.
 
 ### Fixed
 
