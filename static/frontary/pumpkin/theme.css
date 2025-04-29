@@ -1619,6 +1619,7 @@ div.input-contents-item-title-no-margin {
 div.input-required-asterisk {
     display: inline-block;
     color: var(--Red-70);
+    margin-left: 0.3em;
 }
 
 input[type=text].frontary-input-text {

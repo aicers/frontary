@@ -1637,6 +1637,7 @@ div.input-contents-item-title {
 div.input-required-asterisk {
     display: inline-block;
     color: var(--alert-required-color);
+    margin-left: 0.2em;
 }
 
 input[type=text].frontary-input-text {
