@@ -13,6 +13,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `pumpkin` feature for unified theme handling.
 - Updated to Rust 2024 edition.
 - Add height to `Modal` and support HTML in `TextStyle`.
+- Added an `immutable` flag to `TextConfig` — when true, disables the associated
+  input field in the edit modal.
 
 ### Fixed
 

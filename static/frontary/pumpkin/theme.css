@@ -1636,6 +1636,11 @@ input[type=text].frontary-input-text {
     color: var(--Text-Primary);
 }
 
+input[type=text].frontary-input-text:disabled {
+    background: var(--Transparent-Light-Grey);
+    color: var(--Dark-50);
+}
+
 input[type=text].frontary-input-text::placeholder {
     color: var(--Dark-30);
 }

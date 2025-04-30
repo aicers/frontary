@@ -1631,7 +1631,7 @@ div.input-contents-item-title {
     height: 16px;
     font-weight: normal;
     font-size: 11px;
-    color: #666666;
+    color: #A9A9A9;
 }
 
 div.input-required-asterisk {
@@ -1649,6 +1649,10 @@ input[type=text].frontary-input-text {
     outline: none;
     border: 1px solid #CECECE;
     border-radius: 2px;
+}
+
+input[type=text].frontary-input-text:disabled {
+    color: #A9A9A9;
 }
 
 input[type=text].frontary-input-text::placeholder {
