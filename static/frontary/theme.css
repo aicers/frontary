@@ -2730,6 +2730,20 @@ div.modal-contents {
     grid-template-rows: 24px 48px minmax(96px, auto) minmax(120px, auto);
 }
 
+div.modal-contents-text {
+    overflow: auto;
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: #FFFFFF;
+    border-radius: 2px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 div.modal-close {
     width: 100%;
     height: 24px;
@@ -2753,12 +2767,32 @@ div.modal-icon {
     align-items: center;
 }
 
+div.modal-icon-close {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    margin-bottom: 20px;
+}
+
+div.modal-title-header {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    color: var(--title-text-color);
+    font-size: 16px;
+    font-style: normal;
+    line-height: 22px;
+    font-weight: 700;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
 div.modal-messages {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow:auto;
+    overflow: auto;
     gap: 8px;
 }
 

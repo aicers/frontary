@@ -23,6 +23,7 @@ define_u32_consts! {
 pub enum MsgType {
     Alert,
     Info,
+    TextOnly,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -119,12 +120,22 @@ where
         let (icon, icon_class) = match ctx.props().kind {
             MsgType::Info => ("/frontary/modal-info.png", "modal-info"),
             MsgType::Alert => ("/frontary/modal-alert.png", "modal-alert"),
+            MsgType::TextOnly => ("", ""),
         };
         let (align_class, button_class) = match ctx.props().align_button {
             AlignButton::Row => ("modal-buttons-row", "modal-button-item-row"),
             AlignButton::Column => ("modal-buttons-column", "modal-button-item-column"),
         };
         let style = if cfg!(feature = "pumpkin") {
+            format!(
+                "width: {}px;{}",
+                ctx.props().width,
+                ctx.props()
+                    .height
+                    .map(|h| format!(" height: {h}px;"))
+                    .unwrap_or_default()
+            )
+        } else if matches!(ctx.props().kind, MsgType::TextOnly) {
             format!(
                 "width: {}px;{}",
                 ctx.props().width,
@@ -152,38 +163,63 @@ where
         };
         let onclick_close = ctx.link().callback(|_| Message::Close);
         let txt = ctx.props().txt.txt.clone();
-
+        let title_header = if let Some(title_header) = ctx.props().title_header {
+            html! {
+                <div class="modal-title-header">
+                    { text!(txt, ctx.props().language, title_header) }
+                </div>
+            }
+        } else {
+            html! {}
+        };
+        let modal_close = html! {
+            <div class="modal-close">
+                <img
+                    src={ if cfg!(feature = "pumpkin") {
+                        "/frontary/pumpkin/modal-close.svg"
+                    } else {
+                        "/frontary/modal-close.png"
+                    } }
+                    class="modal-close"
+                    onclick={onclick_close}
+                />
+            </div>
+        };
+        let divider = if cfg!(feature = "pumpkin") && ctx.props().height.is_none() {
+            html! {
+                <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+            }
+        } else {
+            html! {}
+        };
+        let modal_contents =
+            if matches!(ctx.props().kind, MsgType::TextOnly) && !cfg!(feature = "pumpkin") {
+                "modal-contents-text"
+            } else {
+                "modal-contents"
+            };
         html! {
             <div class="modal-outer">
-                <div class="modal-contents" style={style}>
-                if cfg!(feature="pumpkin") {
-                    <div class="modal-icon-close">
-                        <div class="modal-icon">
-                        {
-                            if let Some(title_header) = ctx.props().title_header {
-                                html! {
-                                    { text!(txt, ctx.props().language, title_header) }
-                                }
-                            } else {
-                                html! {}
-                            }
+                <div class={modal_contents} style={style}>
+                    if cfg!(feature="pumpkin") {
+                        <div class="modal-icon-close">
+                            { title_header }
+                            { modal_close }
+                        </div>
+                        { divider }
+                    } else {
+                        if matches!(ctx.props().kind, MsgType::TextOnly) {
+                            <div class="modal-icon-close">
+                                { title_header }
+                                { modal_close }
+                            </div>
+                        } else {
+                            { modal_close }
+                            <div class="modal-icon">
+                                <img src={icon} class={icon_class} />
+                            </div>
                         }
-                        </div>
-                        <div class="modal-close">
-                            <img src="/frontary/pumpkin/modal-close.svg" class="modal-close" onclick={onclick_close} />
-                        </div>
-                    </div>
-                    if ctx.props().height.is_none() {
-                        <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
                     }
-                } else {
-                    <div class="modal-close">
-                        <img src="/frontary/modal-close.png" class="modal-close" onclick={onclick_close} />
-                    </div>
-                    <div class="modal-icon">
-                        <img src={icon} class={icon_class} />
-                    </div>
-                }
                     <div class="modal-messages">
                     {
                         for ctx.props().title_messages.iter().map(|ms| {

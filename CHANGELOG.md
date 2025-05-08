@@ -13,6 +13,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `pumpkin` feature for unified theme handling.
 - Updated to Rust 2024 edition.
 - Add height to `Modal` and support HTML in `TextStyle`.
+- Add `MsgType::None` for modal and set title header when not pumpkin.
 
 ### Fixed
 

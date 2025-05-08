@@ -2806,7 +2806,7 @@ div.modal-icon-close {
     align-self: stretch;
 }
 
-div.modal-icon {
+div.modal-title-header {
     width: 100%;
     display: flex;
     align-items: flex-end;
@@ -2814,6 +2814,8 @@ div.modal-icon {
     font-size: 18px;
     font-weight: 500;
     line-height: 24px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 div.modal-close {
@@ -2851,7 +2853,7 @@ div.modal-messages {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    overflow:auto;
+    overflow: auto;
     gap: 8px;
 }
 
