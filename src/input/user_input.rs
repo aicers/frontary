@@ -60,6 +60,7 @@ where
         layer_index: usize,
         autofocus: bool,
         group: bool,
+        immutable: bool,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let my_index_clone = my_index.clone();
@@ -103,6 +104,7 @@ where
             width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
 
+        let is_edit_mode = ctx.props().input_id.is_some();
         html! {
             <div class={class_item}>
                 {
@@ -135,6 +137,7 @@ where
                                     autocomplete="off"
                                     oninput={oninput}
                                     maxlength={length.to_string()}
+                                    disabled={is_edit_mode && immutable}
                                 />
                                 { Self::view_explanation_msg(ctx)}
                             </>
@@ -148,6 +151,7 @@ where
                                     autofocus={autofocus}
                                     autocomplete="off"
                                     oninput={oninput}
+                                    disabled={is_edit_mode && immutable}
                                 />
                                 { Self::view_explanation_msg(ctx)}
                             </>

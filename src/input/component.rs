@@ -1030,7 +1030,7 @@ where
                 match &**input_conf {
                     InputConfig::Text(config) => {
                         self.view_text(ctx, &config.ess, config.length, config.width, input_data,
-                            None, index, index == 0, false)
+                            None, index, index == 0, false, config.immutable)
                     }
                     InputConfig::Password(config) => {
                         self.view_password(ctx, &config.ess, config.width, input_data, None, index,
