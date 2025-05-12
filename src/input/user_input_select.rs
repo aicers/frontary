@@ -135,6 +135,7 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::too_many_lines)]
     pub(super) fn view_vec_select(
         &self,
         ctx: &Context<Self>,
@@ -199,7 +200,9 @@ where
             .map(|(index, _)| Message::InputVecSelect(my_index.clone(), index, input_data.clone()))
             .collect::<Vec<_>>();
         let class_item = if group { "" } else { "input-select-vector" };
-        let class_vec = if self.required_msg.contains(&my_index) {
+        let class_vec = if cfg!(feature = "pumpkin") {
+            "input-select-vector-vec"
+        } else if self.required_msg.contains(&my_index) {
             "input-select-vector-vec-required"
         } else {
             "input-select-vector-vec"
@@ -207,7 +210,13 @@ where
         let style = if let Some(width) = width {
             format!("width: {width}px;")
         } else {
-            "width: 100%;".to_string()
+            String::new()
+        };
+        let (show_required_msg, required_msg_html) = if cfg!(feature = "pumpkin") {
+            let show = self.required_msg.contains(&my_index);
+            (show, show.then(|| self.view_required_msg(ctx, &my_index)))
+        } else {
+            (false, None)
         };
 
         html! {
@@ -238,9 +247,13 @@ where
                         list={Rc::new(list)}
                         selected={selected.clone()}
                         parent_message={parent_message}
+                        show_required_msg={show_required_msg}
+                        required_msg_html={required_msg_html}
                     />
                 </div>
-                { self.view_required_msg(ctx, &my_index) }
+                if !cfg!(feature = "pumpkin") {
+                    { self.view_required_msg(ctx, &my_index) }
+                }
             </div>
         }
     }

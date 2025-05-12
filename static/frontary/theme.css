@@ -1870,7 +1870,7 @@ div.input-select-searchable {
 div.input-select-searchable-required {
     width: fit-content;
     border: 2px solid var(--alert-text-color);
-    border-radius: 8px;
+    border-radius: 3px;
 }
 
 div.input-select-vector {
@@ -1889,6 +1889,7 @@ div.input-select-vector-vec-required {
     justify-content: center;
     background-color: #FFE9E9;
     border: 2px solid var(--alert-text-color);
+    border-radius: 3px;
 }
 
 div.input-contents-item-general-title {
@@ -2593,6 +2594,7 @@ th.input-group-heading-delete {
 
 td.input-group {
     padding: 4px;
+    vertical-align: top;
 }
 
 div.input-group-item-outer {
