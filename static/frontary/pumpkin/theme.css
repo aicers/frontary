@@ -1149,7 +1149,6 @@ td.list-whole-list-first-check {
     height: 30px;
     padding-left: 9px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-first-expand {
@@ -1157,7 +1156,6 @@ td.list-whole-list-first-expand {
     height: 30px;
     padding-left: 22px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 div.list-whole-list-first-expand {
@@ -1180,19 +1178,16 @@ td.list-whole-list-first-layer {
     color: var(--Text-Primary);
     padding: 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-first-layer-more-action {
     vertical-align: middle;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
     padding: 12px 16px;
 }
 
 td.list-whole-list-layered-second {
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-flat-check {
@@ -1200,7 +1195,6 @@ td.list-whole-list-flat-check {
     height: 30px;
     padding-left: 9px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-flat {
@@ -1211,14 +1205,12 @@ td.list-whole-list-flat {
     vertical-align: middle;
     padding: 12px 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-flat-more-action {
     vertical-align: middle;
     padding: 12px 16px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 div.list-whole-list-flat-more-action {
@@ -1237,12 +1229,10 @@ td.list-whole-list-pages {
 
 td.list-whole-list-second-page-checkbox {
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-second-page-caret-down {
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-second-pages {
@@ -1250,12 +1240,10 @@ td.list-whole-list-second-pages {
     vertical-align: middle;
     padding: 8px;
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 td.list-whole-list-second-page-last-column {
     box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
-    -webkit-box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
 div.list-whole-list-second-add {
