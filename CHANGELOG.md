@@ -2,20 +2,23 @@
 
 This file documents recent notable changes to this project. The format of this
 file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
-this project adheres to [Semantic
-Versioning](https://semver.org/spec/v2.0.0.html).
+this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
 ### Changed
 
-- Replaced `pumpkin-dark` and `pumpkin-light` features with a single
-  `pumpkin` feature for unified theme handling.
+- Replaced `pumpkin-dark` and `pumpkin-light` features with a single `pumpkin`
+  feature for unified theme handling.
 - Updated to Rust 2024 edition.
 - Add height to `Modal` and support HTML in `TextStyle`.
 - Add `MsgType::None` for modal and set title header when not pumpkin.
 - Added an `immutable` flag to `TextConfig` — when true, disables the associated
   input field in the edit modal.
+- Refined layout and validation styling in `user_input_composite`,
+  `user_input_comparison`, `user_input_select`, `user_input` and
+  `vec_searchable` modules to align with updated design standards.
 
 ### Fixed
 
@@ -58,8 +61,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Moved `Essential::unique` to `TextConfig`, because only `TextConfig` needs it.
 - Replaced deprecated Clumit color variable names with new color naming
   conventions.
-- Moved Clumit images to the pumpkin directory, removed the `clumit-` prefix
-  for consistency, and updated references accordingly.
+- Moved Clumit images to the pumpkin directory, removed the `clumit-` prefix for
+  consistency, and updated references accordingly.
 - Changed file input extension handling to avoid hardcoding extension values.
 - Changed the variants of `Column` to use structs instead of tuples.
 - Changed styling for `user_input_composite.rs` and `user_input.rs` to enahnce
@@ -143,18 +146,18 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed the wrong directory of delete-x.png file from `frotary`
-  to `frontary` in `theme.css`.
+- Fixed the wrong directory of delete-x.png file from `frotary` to `frontary` in
+  `theme.css`.
 - Fixed `Modal` error for title header.
 
 ### Changed
 
 - Applied `cargo fmt` with `--config group_imports=StdExternalCrate` for
   consistent import grouping.
-- Updated CI process to include `--config group_imports=StdExternalCrate`
-  with the `cargo fmt -- --check` command for enforcing import grouping rules.
-- Changed `expect` message in `text` macro to show the invalid key name
-  if `test` feature is enabled
+- Updated CI process to include `--config group_imports=StdExternalCrate` with
+  the `cargo fmt -- --check` command for enforcing import grouping rules.
+- Changed `expect` message in `text` macro to show the invalid key name if
+  `test` feature is enabled
 - Removed the scrollbar in `WholeList` and adjusted the width size for
   `TabMenu`.
 
@@ -186,16 +189,16 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed `SelectSingle` and `SelectMini` component to compare what value the
-  user has selected with the pre-shortened value of the item selected instead
-  of the shortend value.
+- Fixed `SelectSingle` and `SelectMini` component to compare what value the user
+  has selected with the pre-shortened value of the item selected instead of the
+  shortend value.
 
 ## [0.7.4] - 2023-09-12
 
 ### Changed
 
-- Changed `SelectSingle` and `SelectMini` component to display what value
-  the user has selected and adjusted height.
+- Changed `SelectSingle` and `SelectMini` component to display what value the
+  user has selected and adjusted height.
 
 ## [0.7.3] - 2023-09-07
 
@@ -260,8 +263,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Security
 
 - Turned off the default features of chrono that might casue SEGFAULT. See
-  [RUSTSEC-2020-0071](https://rustsec.org/advisories/RUSTSEC-2020-0071)
-  for details.
+  [RUSTSEC-2020-0071](https://rustsec.org/advisories/RUSTSEC-2020-0071) for
+  details.
 
 ## [0.4.0] - 2023-01-24
 
