@@ -198,6 +198,19 @@ where
             } else {
                 "modal-contents"
             };
+        let class = if cfg!(feature = "pumpkin") {
+            "modal-messages"
+        } else {
+            let has_raw_normal_or_html = ctx.props().title_messages.iter().any(|ms| {
+                ms.iter()
+                    .any(|(_, t)| matches!(t, TextStyle::RawNormal | TextStyle::RawHtml))
+            });
+            if has_raw_normal_or_html {
+                "modal-raw-messages"
+            } else {
+                "modal-messages"
+            }
+        };
         html! {
             <div class="modal-outer">
                 <div class={modal_contents} style={style}>
@@ -220,7 +233,7 @@ where
                             </div>
                         }
                     }
-                    <div class="modal-messages">
+                    <div {class}>
                     {
                         for ctx.props().title_messages.iter().map(|ms| {
                             html! {
