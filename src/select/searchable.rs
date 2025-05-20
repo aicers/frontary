@@ -313,9 +313,7 @@ where
                         Kind::Single => {
                             let key = selected.iter().next().cloned();
 
-                            let value = if let (Some(key), Ok(list)) =
-                                (key, ctx.props().list.try_borrow())
-                            {
+                            if let (Some(key), Ok(list)) = (key, ctx.props().list.try_borrow()) {
                                 let mut value = String::new();
                                 for l in list.iter() {
                                     if l.id() == &key {
@@ -326,9 +324,7 @@ where
                                 value
                             } else {
                                 String::new()
-                            };
-
-                            value
+                            }
                         }
                     }
                 }
