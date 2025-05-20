@@ -16,6 +16,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add `MsgType::None` for modal and set title header when not pumpkin.
 - Added an `immutable` flag to `TextConfig` — when true, disables the associated
   input field in the edit modal.
+- Migrated from Chrono to Jiff (v0.2.0) for datetime handling, with minimal
+  features enabled (serde, js) to reduce binary size.
 
 ### Fixed
 
