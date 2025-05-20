@@ -14,10 +14,6 @@ test = []
 [dependencies]
 anyhow = "1"
 bincode = "1"
-chrono = { version = "0.4.35", default-features = false, features = [
-    "serde",
-    "wasmbind",
-] }
 data-encoding = "2"
 gloo-events = "0.2"
 gloo-file = "0.3"
@@ -26,6 +22,7 @@ gloo-timers = "0.3"
 gloo-utils = "0.2"
 htmlescape = "0.3"
 ipnet = { version = "2", features = ["serde"] }
+jiff = { version = "0.2", default-features = false, features = ["serde", "js"] }
 js-sys = "0.3"
 json-gettext = "4"
 num-bigint = "0.4"
