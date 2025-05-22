@@ -2804,6 +2804,15 @@ div.modal-messages {
     gap: 8px;
 }
 
+div.modal-raw-messages {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: auto;
+    gap: 8px;
+}
+
 img.modal-info {
     width: 36px;
     height: 36px;
