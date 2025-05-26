@@ -105,7 +105,12 @@ where
             Message::InputComparisonComparisionKind(my_index.clone(), input_data.clone()),
         ];
         let txt = ctx.props().txt.txt.clone();
-
+        let (show_required_msg, required_msg_html) = if cfg!(feature = "pumpkin") {
+            let show = self.required_msg.contains(&my_index);
+            (show, show.then(|| self.view_required_msg(ctx, &my_index)))
+        } else {
+            (false, None)
+        };
         html! {
             <div class="input-comparison-outer">
                 {
@@ -135,10 +140,14 @@ where
                         list={list}
                         selected={selected}
                         parent_message={parent_message}
+                        show_required_msg={show_required_msg}
+                        required_msg_html={required_msg_html}
                     />
                     { self.view_comparison_value(ctx, input_data, &my_index) }
                 </div>
-                { self.view_required_msg(ctx, &my_index) }
+                if !cfg!(feature = "pumpkin") {
+                    { self.view_required_msg(ctx, &my_index) }
+                }
             </div>
         }
     }

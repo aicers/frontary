@@ -16,6 +16,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add `MsgType::None` for modal and set title header when not pumpkin.
 - Added an `immutable` flag to `TextConfig` — when true, disables the associated
   input field in the edit modal.
+- Refined layout and validation styling in `user_input_composite`,
+  `user_input_comparison`, `user_input_select`, `user_input` and
+  `vec_searchable` modules to align with updated design standards.
 
 ### Fixed
 
