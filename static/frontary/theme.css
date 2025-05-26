@@ -2804,6 +2804,10 @@ div.modal-messages {
     gap: 8px;
 }
 
+div.modal-messages.modal-messages-raw {
+    justify-content: flex-start;
+}
+
 img.modal-info {
     width: 36px;
     height: 36px;

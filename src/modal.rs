@@ -198,6 +198,17 @@ where
             } else {
                 "modal-contents"
             };
+        let class = classes!(
+            "modal-messages",
+            (!cfg!(feature = "pumpkin")
+                && ctx
+                    .props()
+                    .title_messages
+                    .iter()
+                    .flatten()
+                    .any(|(_, t)| { matches!(t, TextStyle::RawNormal | TextStyle::RawHtml) }))
+            .then_some("modal-messages-raw")
+        );
         html! {
             <div class="modal-outer">
                 <div class={modal_contents} style={style}>
@@ -220,7 +231,7 @@ where
                             </div>
                         }
                     }
-                    <div class="modal-messages">
+                    <div {class}>
                     {
                         for ctx.props().title_messages.iter().map(|ms| {
                             html! {
