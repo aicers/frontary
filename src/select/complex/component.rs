@@ -335,7 +335,7 @@ impl Component for Model {
                     }
                 } else {
                     self.input_wrong_msg = Some(
-                        "Invalid input (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)",
+                        "Invalid input (valid examples: 10.84.1.7, 10.1.1.1 - 10.1.1.20, 192.168.10.0/24)",
                     );
                 }
             }
