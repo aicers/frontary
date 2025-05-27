@@ -16,6 +16,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Add `MsgType::None` for modal and set title header when not pumpkin.
 - Added an `immutable` flag to `TextConfig` — when true, disables the associated
   input field in the edit modal.
+- `creation_time` in `ListItem` no longer uses `DateTime<Utc>` from `chrono`; it
+  now uses `Timestamp` from `jiff`.
 
 ### Fixed
 

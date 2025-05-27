@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::collections::hash_map::Entry::Vacant;
 use std::rc::Rc;
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use yew::{Component, Context};
 
 use super::{Message, Model, SortColumn, ViewInputStatus, component::SortListKind};
@@ -165,7 +165,7 @@ where
             (Some(s.index), s.status == SortStatus::Ascending)
         });
 
-        let mut keys: Vec<(String, String, Option<DateTime<Utc>>)> = ctx
+        let mut keys: Vec<(String, String, Option<Timestamp>)> = ctx
             .props()
             .data
             .iter()
