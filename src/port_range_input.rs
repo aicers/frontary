@@ -145,8 +145,8 @@ impl Model {
 }
 
 fn check_input(input: &str) -> Option<PortRange> {
-    if input.contains('~') {
-        input.split_once('~').and_then(|(start, end)| {
+    if input.contains('-') {
+        input.split_once('-').and_then(|(start, end)| {
             if let (Ok(start), Ok(end)) = (i64::from_str(start.trim()), i64::from_str(end.trim())) {
                 (start < end).then_some(PortRange {
                     start: Some(start),

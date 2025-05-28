@@ -140,8 +140,8 @@ impl Model {
 }
 
 fn check_input(input: &str) -> Option<IpRange> {
-    if input.contains('~') {
-        input.split_once('~').and_then(|(start, end)| {
+    if input.contains('-') {
+        input.split_once('-').and_then(|(start, end)| {
             if let (Ok(start), Ok(end)) = (
                 Ipv4Addr::from_str(start.trim()),
                 Ipv4Addr::from_str(end.trim()),

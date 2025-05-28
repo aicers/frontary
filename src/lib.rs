@@ -153,7 +153,7 @@ pub fn parse_host_network(input: &str) -> Option<HostNetwork> {
     if Ipv4Net::from_str(input).is_ok() {
         return Some(HostNetwork::Network(input.to_string()));
     }
-    if let Some((start, end)) = input.split_once('~') {
+    if let Some((start, end)) = input.split_once('-') {
         let (start, end) = (start.trim(), end.trim());
         if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(start), Ipv4Addr::from_str(end)) {
             if start < end {
@@ -197,7 +197,7 @@ fn validate_ip_range(txt: &str, del: char) -> Option<String> {
         let (ip_start, ip_end) = (ip_start.trim(), ip_end.trim());
         if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(ip_start), Ipv4Addr::from_str(ip_end)) {
             if start < end {
-                return Some(format!("{ip_start} ~ {ip_end}"));
+                return Some(format!("{ip_start} - {ip_end}"));
             }
         }
     }
@@ -353,7 +353,7 @@ impl Ord for IpRange {
 
 impl fmt::Display for IpRange {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} ~ {}", self.start, self.end)
+        write!(f, "{} - {}", self.start, self.end)
     }
 }
 
