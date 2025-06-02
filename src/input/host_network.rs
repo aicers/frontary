@@ -53,14 +53,14 @@ pub enum DeleteIndex {
 const DEFAULT_MAX_HEIGHT: u32 = 280;
 const EXIST_MSG: &str = "The input already exists.";
 const INVALID_INPUT_MSG: &str =
-    "Invalid input (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)";
+    "Invalid input (valid examples: 10.84.1.7, 10.1.1.1 - 10.1.1.20, 192.168.10.0/24)";
 const INVALID_INPUT_MSG_HOST: &str = "Invalid IP address";
-const INVALID_INPUT_MSG_RANGE: &str = "Invalid input (valid examples: 10.1.1.1 ~ 10.1.1.20)";
+const INVALID_INPUT_MSG_RANGE: &str = "Invalid input (valid examples: 10.1.1.1 - 10.1.1.20)";
 const MAX_NUM_MSG: &str = "The maximum number of input was reached.";
 const INPUT_ALL_NOTICE: &str =
-    "Multiple inputs possible (valid examples: 10.84.1.7, 10.1.1.1 ~ 10.1.1.20, 192.168.10.0/24)";
+    "Multiple inputs possible (valid examples: 10.84.1.7, 10.1.1.1 - 10.1.1.20, 192.168.10.0/24)";
 const INPUT_HOST_NOTICE: &str = "Multiple IP addresses possible";
-const INPUT_RANGE_NOTICE: &str = "(Input Example: 192.168.1.100 ~ 192.168.1.200)";
+const INPUT_RANGE_NOTICE: &str = "(Input Example: 192.168.1.100 - 192.168.1.200)";
 const INPUT_NETWORK_NOTICE: &str = "(Input Example: 192.168.10.0/24)";
 
 #[derive(Clone, PartialEq, Properties)]

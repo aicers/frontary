@@ -339,7 +339,7 @@ impl Model {
                                         {
                                             for networks.ranges.iter().map(|r| html! {
                                                 <>
-                                                    { r.start.clone() } { " ~ " } { r.end.clone() } <br/>
+                                                    { r.start.clone() } { " - " } { r.end.clone() } <br/>
                                                 </>
                                             })
                                         }
