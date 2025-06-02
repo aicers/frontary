@@ -445,10 +445,8 @@ where
             .for_each(|((index, input_data), input_conf)| {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     if let InputItem::Tag(_) = *item {
-                        if let (InputConfig::Tag(config), Some(buffer)) = (
-                            &**input_conf,
-                            self.tag_buffer.get(&(BigUint::from(index + 1))),
-                        )
+                        if let (InputConfig::Tag(config), Some(buffer)) =
+                            (&**input_conf, self.tag_buffer.get(&(BigUint::from(index))))
                         // HIGHLIGHT: Since Tag is always on the first layer, don't need to check recursively
                         {
                             let reverse = config
