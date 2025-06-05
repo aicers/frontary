@@ -458,42 +458,54 @@ where
         } else {
             "input-contents-item-title-no-margin"
         };
+        let asterisk = if cfg!(feature = "pumpkin") {
+            html! {}
+        } else {
+            view_asterisk(ess.required)
+        };
+        let style_for = |index: usize| {
+            widths
+                .get(index)
+                .and_then(|w| w.map(|v| format!("width: {v}px;")))
+                .unwrap_or_default()
+        };
 
         html! {
             <div class="input-item">
                 <div class={input_contents_item_title}>
-                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                    { text!(txt, ctx.props().language, ess.title()) }
+                    { asterisk }
                 </div>
-                <div class="input-text-message">
-                    { self.view_required_msg(ctx, &this_index) }
-                </div>
+                if !cfg!(feature="pumpkin") {
+                    <div class="input-text-message">
+                        { self.view_required_msg(ctx, &this_index.clone()) }
+                    </div>
+                }
                 <div class={input_group}>
                     <div>
                         <table class="input-group">
                             if cfg!(feature = "debug") {
                                 { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, this_index.to_string()) }
                             }
-                            if display_titles {
-                                <tr>
-                                    <th class={classes!("input-group-heading" ,"input-group-empty-header")}>
-                                    </th>
-                                    {
-                                        for items_conf.iter().enumerate().map(|(col_index, each)| {
-                                            let style = if let Some(Some(width)) = widths.get(col_index) {
-                                                format!("width: {}px;", *width)
-                                            } else {
-                                                String::new()
-                                            };
-                                            html! {
-                                                <th class="input-group-heading" style={style}>
-                                                    { text!(txt, ctx.props().language, each.title()) }{ view_asterisk(each.required()) }
-                                                </th>
-                                            }
-                                        })
-                                    }
-                                    <th class="input-group-heading-delete">
-                                    </th>
-                                </tr>
+                            if !cfg!(feature = "pumpkin") {
+                                if display_titles {
+                                    <tr>
+                                        <th class={classes!("input-group-heading" ,"input-group-empty-header")}>
+                                        </th>
+                                        {
+                                            for items_conf.iter().enumerate().map(|(col_index, each)| {
+                                                let style = style_for(col_index);
+                                                html! {
+                                                    <th class="input-group-heading" style={style}>
+                                                        { text!(txt, ctx.props().language, each.title()) }{ view_asterisk(each.required()) }
+                                                    </th>
+                                                }
+                                            })
+                                        }
+                                        <th class="input-group-heading-delete">
+                                        </th>
+                                    </tr>
+                                }
                             }
                             {
                                 for input_data.iter().enumerate().map(move |(row_index, row)| {
@@ -510,16 +522,57 @@ where
                                         )
                                     });
                                     let row_rep_index = cal_index(Some(&this_index), row_index);
+                                    let row_has_error = row.iter().enumerate().any(|(i, _)| {
+                                        self.required_msg.contains(&cal_index(Some(&row_rep_index), i))
+                                    });
+                                    let line_class = match (row_index == 0, row_has_error) {
+                                        (true, true) => "group-list-link-line-top first-row long",
+                                        (true, false) => "group-list-link-line-top first-row",
+                                        (false, true) => "group-list-link-line-top long",
+                                        (false, false) => "group-list-link-line-top",
+                                    };
+                                    let delete_cell_class = if row_index == 0 {
+                                        classes!("input-trash-can-delete", "first-row")
+                                    } else {
+                                        classes!("input-trash-can-delete")
+                                    };
 
                                     if one_row {
                                         html! {
                                             <tr>
-                                                <div class="group-list-link-line-top"></div>
+                                                {
+                                                    if cfg!(feature = "pumpkin") {
+                                                        html! {
+                                                            <td class="group-list-link-cell">
+                                                                <div class={line_class}></div>
+                                                            </td>
+                                                        }
+                                                    } else {
+                                                        html! {
+                                                            <div class="group-list-link-line-top"></div>
+                                                        }
+                                                    }
+                                                }
                                                 {
                                                     for row.iter().zip(items_conf.iter()).enumerate().map(|(col_index, (each_item, each_conf))| {
+                                                        let txt = Rc::clone(&ctx.props().txt.txt);
+                                                        let should_render_title = cfg!(feature = "pumpkin") && row_index == 0;
+                                                        let style = style_for(col_index);
                                                         html! {
-                                                            <td class="input-group">
+                                                            <td class="input-group" {style}>
                                                                 <div class="input-group-item-outer">
+                                                                {
+                                                                    if should_render_title {
+                                                                        html! {
+                                                                            <div class="input-group-heading">
+                                                                                { text!(txt, ctx.props().language, each_conf.title()) }
+                                                                                { view_asterisk(each_conf.required()) }
+                                                                            </div>
+                                                                        }
+                                                                    } else {
+                                                                        html! {}
+                                                                    }
+                                                                }
                                                                 {
                                                                     match &**each_conf {
                                                                         InputConfig::Text(config) => {
@@ -586,7 +639,7 @@ where
                                                 {
                                                     if cfg!(feature = "pumpkin") {
                                                         html! {
-                                                            <td class="input-trash-can-delete">
+                                                            <td class={delete_cell_class}>
                                                                 <div class="input-trash-can-delete-outer">
                                                                     <div class="input-trash-can-delete" onclick={onclick_delete}>
                                                                     </div>
@@ -634,7 +687,7 @@ where
                     if cfg!(feature = "pumpkin") {
                         html!{
                             <div class={input_add_class}>
-                            <div class="group-list-link-line-bottom"></div>
+                                <td class="group-list-link-line-bottom"></td>
                                 <div class="input-add-item" onclick={onclick_add}>
                                     <img src="/frontary/pumpkin/addition-symbol.svg" />
                                     { text!(txt, ctx.props().language, add_message) }
