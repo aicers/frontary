@@ -2633,7 +2633,7 @@ div.notification {
     display: flex;
     overflow: hidden;
     flex-direction: column-reverse;
-    z-index: 99999;
+    z-index: 90;
     padding-top: 5px;
     padding-bottom: 5px;
     padding-right: 10px;
