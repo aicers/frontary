@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   input field in the edit modal.
 - Adjusted `notification` z-index from 99999 to 90 to ensure better layering and
   compatibility with other UI components.
+- Added `overflow-y: auto` to `input-inner` to enhance vertical scrolling and
+  layout behavior.
 
 ### Fixed
 
@@ -26,6 +28,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   a timeout.
 - Fixed missing duplicate validation in modals and tags caused by incorrect index
   calculation from an extra `+1` offset.
+
+### Removed
+
+- Removed unnecessary inline styles from `input-contents` to simplify layout adjustments.
 
 ## [0.10.1]
 
