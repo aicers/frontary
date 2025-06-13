@@ -27,6 +27,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed missing duplicate validation in modals and tags caused by incorrect index
   calculation from an extra `+1` offset.
 
+### Removed
+
+- Removed unnecessary inline styles from `input-contents` to simplify layout adjustments.
+
 ## [0.10.1]
 
 ### Changed

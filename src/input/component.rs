@@ -967,20 +967,7 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = if cfg!(feature = "pumpkin") {
-            format!("width: {}px;", ctx.props().width)
-        } else {
-            format!(
-                "width: {}px; max-height: {}px;",
-                ctx.props().width,
-                ctx.props().height
-            )
-        };
-        let style_input = if cfg!(feature = "pumpkin") {
-            String::new()
-        } else {
-            format!("height: {}px;", ctx.props().height - 166)
-        };
+        let style = format!("width: {}px;", ctx.props().width);
         let txt = ctx.props().txt.txt.clone();
         let onclick_escape = ctx.link().callback(|_| Message::Escape);
         let onclick_save = ctx.link().callback(|_| Message::TrySave);
@@ -1000,7 +987,7 @@ where
                             </td>
                         </tr>
                     </table>
-                    <div class="input-contents" style={style_input}>
+                    <div class="input-contents">
                         { self.view_input(ctx) }
                     </div>
                     <div class="input-cancel-save"> // margin-top: 16, height: 30
