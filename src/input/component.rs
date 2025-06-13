@@ -971,15 +971,10 @@ where
             format!("width: {}px;", ctx.props().width)
         } else {
             format!(
-                "width: {}px; max-height: {}px;",
+                "width: {}px; max-height: {}px; overflow-y: auto;",
                 ctx.props().width,
                 ctx.props().height
             )
-        };
-        let style_input = if cfg!(feature = "pumpkin") {
-            String::new()
-        } else {
-            format!("height: {}px;", ctx.props().height - 166)
         };
         let txt = ctx.props().txt.txt.clone();
         let onclick_escape = ctx.link().callback(|_| Message::Escape);
@@ -1000,7 +995,7 @@ where
                             </td>
                         </tr>
                     </table>
-                    <div class="input-contents" style={style_input}>
+                    <div class="input-contents">
                         { self.view_input(ctx) }
                     </div>
                     <div class="input-cancel-save"> // margin-top: 16, height: 30
