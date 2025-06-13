@@ -20,4 +20,13 @@ impl Theme {
     pub fn save_to_browser(theme: Theme) {
         let _ = LocalStorage::set(STORAGE_KEY, theme);
     }
+
+    #[must_use]
+    pub fn path(theme: &Option<Theme>, file: &str) -> String {
+        match theme {
+            Some(Theme::Light) => format!("/frontary/pumpkin/light/{file}"),
+            Some(Theme::Dark) => format!("/frontary/pumpkin/{file}"),
+            None => format!("/frontary/{file}"),
+        }
+    }
 }
