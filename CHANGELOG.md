@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   input field in the edit modal.
 - Adjusted `notification` z-index from 99999 to 90 to ensure better layering and
   compatibility with other UI components.
+- `creation_time` in `ListItem` no longer uses `DateTime<Utc>` from `chrono`; it
+  now uses `Timestamp` from `jiff`.
 
 ### Fixed
 
