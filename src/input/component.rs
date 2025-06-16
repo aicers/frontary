@@ -162,13 +162,13 @@ pub enum Message {
     InputText(BigUint, String, Rc<RefCell<InputItem>>),
     InputPassword(BigUint, String, Rc<RefCell<InputItem>>),
     InputConfirmPassword(BigUint, String),
-    InputUnsigned32(BigUint, u32, Rc<RefCell<InputItem>>),
-    InputUnsigned8(BigUint, u8, Rc<RefCell<InputItem>>),
-    InputFloat64(BigUint, f64, Rc<RefCell<InputItem>>),
+    InputUnsigned32(BigUint, Option<u32>, Rc<RefCell<InputItem>>),
+    InputUnsigned8(BigUint, Option<u8>, Rc<RefCell<InputItem>>),
+    InputFloat64(BigUint, Option<f64>, Rc<RefCell<InputItem>>),
     InvalidInputUnsigned32,
     InvalidInputUnsigned8,
     InvalidInputFloat64,
-    InputPercentage(BigUint, f32, Rc<RefCell<InputItem>>),
+    InputPercentage(BigUint, Option<f32>, Rc<RefCell<InputItem>>),
     InvalidInputPercentage,
     InputRadio(BigUint, Rc<RefCell<InputItem>>),
     InputHostNetworkGroup(BigUint, Rc<RefCell<InputItem>>),
@@ -557,7 +557,7 @@ where
             }
             Message::InputUnsigned32(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Unsigned32(Unsigned32Item::new(Some(value)));
+                    *item = InputItem::Unsigned32(Unsigned32Item::new(value));
                 }
                 self.remove_required_msg(&id, false);
                 self.remove_group_required(ctx);
@@ -565,7 +565,7 @@ where
             }
             Message::InputUnsigned8(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Unsigned8(Unsigned8Item::new(Some(value)));
+                    *item = InputItem::Unsigned8(Unsigned8Item::new(value));
                 }
                 self.remove_required_msg(&id, false);
                 self.remove_group_required(ctx);
@@ -573,7 +573,7 @@ where
             }
             Message::InputFloat64(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Float64(Float64Item::new(Some(value)));
+                    *item = InputItem::Float64(Float64Item::new(value));
                 }
                 self.remove_required_msg(&id, false);
                 self.unique_msg.remove(&id);
@@ -585,7 +585,7 @@ where
             | Message::InvalidInputComparisonValue => return false,
             Message::InputPercentage(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Percentage(PercentageItem::new(Some(value)));
+                    *item = InputItem::Percentage(PercentageItem::new(value));
                 }
                 self.remove_required_msg(&id, false);
                 self.unique_msg.remove(&id);

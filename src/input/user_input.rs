@@ -328,10 +328,17 @@ where
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    if let Ok(value) = input.value().parse::<u32>() {
+                    let value = input.value();
+                    if value.is_empty() {
                         Message::InputUnsigned32(
                             my_index_clone.clone(),
-                            value,
+                            None,
+                            input_data_clone.clone(),
+                        )
+                    } else if let Ok(parsed) = value.parse::<u32>() {
+                        Message::InputUnsigned32(
+                            my_index_clone.clone(),
+                            Some(parsed),
                             input_data_clone.clone(),
                         )
                     } else {
@@ -463,10 +470,17 @@ where
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    if let Ok(value) = input.value().parse::<u8>() {
+                    let value = input.value();
+                    if value.is_empty() {
                         Message::InputUnsigned8(
                             my_index_clone.clone(),
-                            value,
+                            None,
+                            input_data_clone.clone(),
+                        )
+                    } else if let Ok(parsed) = value.parse::<u8>() {
+                        Message::InputUnsigned8(
+                            my_index_clone.clone(),
+                            Some(parsed),
                             input_data_clone.clone(),
                         )
                     } else {
@@ -597,10 +611,17 @@ where
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    if let Ok(value) = input.value().parse::<f64>() {
+                    let value = input.value();
+                    if value.is_empty() {
                         Message::InputFloat64(
                             my_index_clone.clone(),
-                            value,
+                            None,
+                            input_data_clone.clone(),
+                        )
+                    } else if let Ok(parsed) = value.parse::<f64>() {
+                        Message::InputFloat64(
+                            my_index_clone.clone(),
+                            Some(parsed),
                             input_data_clone.clone(),
                         )
                     } else {
@@ -728,10 +749,17 @@ where
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
                 .map_or(Message::InputError, |input| {
-                    if let Ok(value) = input.value().parse::<f32>() {
+                    let input_value = input.value();
+                    if input_value.is_empty() {
                         Message::InputPercentage(
                             my_index_clone.clone(),
-                            value / 100.0,
+                            None,
+                            input_data_clone.clone(),
+                        )
+                    } else if let Ok(value) = input_value.parse::<f32>() {
+                        Message::InputPercentage(
+                            my_index_clone.clone(),
+                            Some(value / 100.0),
                             input_data_clone.clone(),
                         )
                     } else {

@@ -239,14 +239,20 @@ where
                     let value = match value_kind {
                         ValueKind::String => Some(ComparisonValue::String(Some(input.value()))),
                         ValueKind::Integer => {
-                            if let Ok(value) = input.value().parse::<i64>() {
+                            let input_value = input.value();
+                            if input_value.is_empty() {
+                                Some(ComparisonValue::Integer(None))
+                            } else if let Ok(value) = input_value.parse::<i64>() {
                                 Some(ComparisonValue::Integer(Some(value)))
                             } else {
                                 None
                             }
                         }
                         ValueKind::Float => {
-                            if let Ok(value) = input.value().parse::<f64>() {
+                            let input_value = input.value();
+                            if input_value.is_empty() {
+                                Some(ComparisonValue::Float(None))
+                            } else if let Ok(value) = input_value.parse::<f64>() {
                                 Some(ComparisonValue::Float(Some(value)))
                             } else {
                                 None
