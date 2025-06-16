@@ -1614,6 +1614,7 @@ div.input-contents {
     display: flex;
     flex-direction: column;
     overflow: auto;
+    max-height: 430px;
 }
 
 div.input-item {
