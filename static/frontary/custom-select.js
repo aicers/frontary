@@ -129,7 +129,11 @@ function close_custom_select(elmnt) {
 
 function close_custom_select_complex(elmnt) {
     // HIGHLIGHT: in case when elmnt has been removed after it was clicked.
-    if (elmnt.target.parentNode == null) return;
+    if (
+        elmnt.target.parentNode == null ||
+        !document.body.contains(elmnt.target)
+    )
+        return;
 
     var elems = document.getElementsByClassName("complex-select");
     var i;
