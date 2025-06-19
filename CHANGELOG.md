@@ -20,6 +20,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   compatibility with other UI components.
 - Added `overflow-y: auto` to `input-inner` to enhance vertical scrolling and
   layout behavior.
+- Added `UInteger`, `Vector`, `IpAddr`, `Bool` to `ValueKind`.
 
 ### Fixed
 
