@@ -45,7 +45,7 @@ pub enum Message {
     InputError,
 }
 
-const DEFAULT_MAX_HEIGHT: u32 = 280;
+const DEFAULT_MAX_HEIGHT: u32 = 275;
 const EXIST_MSG: &str = "The input already exists.";
 const ID: &str = "tag-group-input-select";
 
@@ -297,15 +297,11 @@ where
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style = if cfg!(feature = "pumpkin") {
-            String::new()
-        } else {
-            format!("max-height: {}px;", ctx.props().max_height)
-        };
+        let style = format!("max-height: {}px;", ctx.props().max_height);
         html! {
             <div class="tag-group-input-outer">
-                <div class="tag-group-input" style={style}>
-                    <div class="tag-list">
+                <div class="tag-group-input">
+                    <div class="tag-list" style={style}>
                         { self.view_tag_group(ctx) }
                     </div>
                     { self.view_input(ctx) }

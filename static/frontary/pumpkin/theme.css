@@ -2090,7 +2090,6 @@ div.tag-group-input {
 div.tag-list {
     overflow-x: hidden;
     overflow-y: auto;
-    max-height: 275px;
     display: flex;
     flex-wrap: wrap;
 }
