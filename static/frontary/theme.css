@@ -2013,6 +2013,7 @@ div.input-tag-group {
 
 div.tag-group-input-outer {
     position: relative;
+    width: 100%;
 }
 
 div.tag-group-input {
@@ -2033,7 +2034,6 @@ div.tag-group-input {
 div.tag-list {
     overflow-x: hidden;
     overflow-y: auto;
-    max-height: 275px;
     display: flex;
     flex-wrap: wrap;
 }
@@ -2080,7 +2080,7 @@ img.tag-group-close {
 }
 
 input[type=text].tag-group-input-input-input {
-    width: 230px;
+    width: 100%;
     height: 22px;
     padding-left: 4px;
     background-color: #FFFFFF;
