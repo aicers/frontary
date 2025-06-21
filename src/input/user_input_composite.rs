@@ -298,6 +298,15 @@ where
                     </div>
                 }
             }
+            InputConfig::DomainName(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_domain_name(ctx, &config.ess, config.width, child_data, Some(base_index), layer_index, false) }
+                    </div>
+                }
+            }
             InputConfig::HostNetworkGroup(config) => {
                 html! {
                     <div class={class_child}>

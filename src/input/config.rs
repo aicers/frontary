@@ -37,6 +37,13 @@ pub struct TextConfig {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct DomainNameConfig {
+    pub ess: Essential,
+    pub width: Option<u32>,
+    pub preset: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct PasswordConfig {
     pub ess: Essential,
     pub width: Option<u32>,
@@ -217,6 +224,7 @@ pub struct RadioConfig {
 #[derive(Clone, PartialEq)]
 pub enum InputConfig {
     Text(TextConfig),
+    DomainName(DomainNameConfig),
     Password(PasswordConfig),
     HostNetworkGroup(HostNetworkGroupConfig),
     SelectSingle(SelectSingleConfig),
@@ -240,6 +248,7 @@ impl InputConfig {
     pub fn required(&self) -> bool {
         match self {
             Self::Text(config) => config.ess.required,
+            Self::DomainName(config) => config.ess.required,
             Self::Password(config) => config.ess.required,
             Self::HostNetworkGroup(config) => config.ess.required,
             Self::SelectSingle(config) => config.ess.required,
@@ -263,6 +272,7 @@ impl InputConfig {
     pub fn title(&self) -> &str {
         match self {
             Self::Text(config) => config.ess.title(),
+            Self::DomainName(config) => config.ess.title(),
             Self::Password(config) => config.ess.title(),
             Self::HostNetworkGroup(config) => config.ess.title(),
             Self::SelectSingle(config) => config.ess.title(),

@@ -7,6 +7,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Added `DomainNameItem` and `DomainNameConfig` for domain name input validation.
+  Provides built-in validation according to RFC standards including label length
+  limits, allowed characters, and overall domain name structure validation.
+
 ### Changed
 
 - Replaced `pumpkin-dark` and `pumpkin-light` features with a single
