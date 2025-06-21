@@ -19,17 +19,18 @@ use std::{collections::HashSet, fmt};
 use bincode::Options;
 pub use component::{InputSecondId, Model};
 pub use config::{
-    CheckboxChildrenConfig, CheckboxConfig, ChildrenPosition, ComparisonConfig, Essential,
-    FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig, InputConfig, NicConfig,
-    PasswordConfig, PercentageConfig, RadioConfig, SelectMultipleConfig, SelectSingleConfig,
-    TagConfig, TextConfig, Unsigned8Config, Unsigned32Config, VecSelectConfig,
+    CheckboxChildrenConfig, CheckboxConfig, ChildrenPosition, ComparisonConfig, DomainNameConfig,
+    Essential, FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig, InputConfig,
+    NicConfig, PasswordConfig, PercentageConfig, RadioConfig, SelectMultipleConfig,
+    SelectSingleConfig, TagConfig, TextConfig, Unsigned8Config, Unsigned32Config, VecSelectConfig,
 };
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;
 pub use item::{
-    CheckboxItem, ComparisonItem, FileItem, Float64Item, GroupItem, HostNetworkGroupItem,
-    InputItem, NicItem, PasswordItem, PercentageItem, RadioItem, SelectMultipleItem,
-    SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned32Item, VecSelectItem,
+    CheckboxItem, ComparisonItem, DomainNameItem, FileItem, Float64Item, GroupItem,
+    HostNetworkGroupItem, InputItem, NicItem, PasswordItem, PercentageItem, RadioItem,
+    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned32Item,
+    VecSelectItem,
 };
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -517,6 +518,7 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
         .map(|conf| {
             Rc::new(RefCell::new(match &**conf {
                 InputConfig::Text(_) => InputItem::Text(TextItem::default()),
+                InputConfig::DomainName(_) => InputItem::DomainName(DomainNameItem::default()),
                 InputConfig::Password(_) => InputItem::Password(PasswordItem::default()),
                 InputConfig::HostNetworkGroup(_) => {
                     InputItem::HostNetworkGroup(HostNetworkGroupItem::default())
@@ -591,6 +593,9 @@ fn group_item_list_preset(confs: &[Rc<InputConfig>]) -> Vec<Rc<RefCell<InputItem
 fn item_preset(conf: &Rc<InputConfig>) -> InputItem {
     match &**conf {
         InputConfig::Text(conf) => InputItem::Text(TextItem::new(
+            conf.preset.as_deref().unwrap_or_default().to_string(),
+        )),
+        InputConfig::DomainName(conf) => InputItem::DomainName(DomainNameItem::new(
             conf.preset.as_deref().unwrap_or_default().to_string(),
         )),
         InputConfig::HostNetworkGroup(_) => {
