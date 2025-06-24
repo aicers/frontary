@@ -9,9 +9,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- **BREAKING**: Changed `PortRange` struct fields from `Option<i64>` to
-  `Option<u16>` for improved type safety and accuracy, as port numbers range
-  from 0 to 65535.
+- Changed `PortRange` struct fields from `Option<i64>` to `Option<u16>` for
+  improved type safety and accuracy, as port numbers range from 0 to 65535.
 - Replaced `pumpkin-dark` and `pumpkin-light` features with a single
   `pumpkin` feature for unified theme handling.
 - Updated to Rust 2024 edition.
