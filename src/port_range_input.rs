@@ -10,8 +10,8 @@ const DEFAULT_MAX_HEIGHT: u32 = 280;
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct PortRange {
-    pub start: Option<i64>,
-    pub end: Option<i64>,
+    pub start: Option<u16>,
+    pub end: Option<u16>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -147,7 +147,7 @@ impl Model {
 fn check_input(input: &str) -> Option<PortRange> {
     if input.contains('-') {
         input.split_once('-').and_then(|(start, end)| {
-            if let (Ok(start), Ok(end)) = (i64::from_str(start.trim()), i64::from_str(end.trim())) {
+            if let (Ok(start), Ok(end)) = (u16::from_str(start.trim()), u16::from_str(end.trim())) {
                 (start < end).then_some(PortRange {
                     start: Some(start),
                     end: Some(end),
@@ -157,7 +157,7 @@ fn check_input(input: &str) -> Option<PortRange> {
             }
         })
     } else {
-        i64::from_str(input.trim()).ok().map(|port| PortRange {
+        u16::from_str(input.trim()).ok().map(|port| PortRange {
             start: Some(port),
             end: None,
         })
