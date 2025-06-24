@@ -12,9 +12,7 @@ mod user_input_nic;
 mod user_input_select;
 
 use core::panic;
-use std::sync::LazyLock;
-use std::{cell::RefCell, rc::Rc};
-use std::{collections::HashSet, fmt};
+use std::{cell::RefCell, collections::HashSet, fmt, net::IpAddr, rc::Rc, sync::LazyLock};
 
 use bincode::Options;
 pub use component::{InputSecondId, Model};
@@ -198,14 +196,22 @@ pub struct InputTag {
 pub enum ValueKind {
     String,
     Integer,
+    UInteger,
+    Vector,
     Float,
+    IpAddr,
+    Bool,
 }
 
 #[derive(Clone, PartialEq)]
 pub enum Value {
     String(Option<String>),
     Integer(Option<i64>),
+    UInteger(Option<u64>),
+    Vector(Option<Vec<u8>>),
     Float(Option<f64>),
+    IpAddr(Option<IpAddr>),
+    Bool(Option<bool>),
 }
 
 impl Value {
@@ -214,7 +220,11 @@ impl Value {
         match self {
             Self::String(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
             Self::Integer(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::UInteger(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Vector(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
             Self::Float(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::IpAddr(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Bool(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
             _ => None,
         }
     }
@@ -225,7 +235,11 @@ impl fmt::Display for Value {
         match self {
             Self::String(Some(v)) => write!(f, "{v}"),
             Self::Integer(Some(v)) => write!(f, "{v}"),
+            Self::UInteger(Some(v)) => write!(f, "{v}"),
+            Self::Vector(Some(v)) => write!(f, "{v:?}",),
             Self::Float(Some(v)) => write!(f, "{v}"),
+            Self::IpAddr(Some(v)) => write!(f, "{v}"),
+            Self::Bool(Some(v)) => write!(f, "{v}"),
             _ => write!(f, ""),
         }
     }
@@ -434,7 +448,11 @@ impl Comparison {
             | Self::NotRightOpenRange(v, _) => match v {
                 Value::String(_) => ValueKind::String,
                 Value::Integer(_) => ValueKind::Integer,
+                Value::UInteger(_) => ValueKind::UInteger,
+                Value::Vector(_) => ValueKind::Vector,
                 Value::Float(_) => ValueKind::Float,
+                Value::IpAddr(_) => ValueKind::IpAddr,
+                Value::Bool(_) => ValueKind::Bool,
             },
         }
     }

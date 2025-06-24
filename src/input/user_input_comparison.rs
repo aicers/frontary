@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc, str::FromStr};
+use std::{cell::RefCell, collections::HashMap, net::IpAddr, rc::Rc, str::FromStr};
 
 use json_gettext::get_text;
 use num_bigint::BigUint;
@@ -216,6 +216,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn view_comparison_value_each(
         &self,
         ctx: &Context<Self>,
@@ -248,12 +249,56 @@ where
                                 None
                             }
                         }
+                        ValueKind::UInteger => {
+                            let input_value = input.value();
+                            if input_value.is_empty() {
+                                Some(ComparisonValue::UInteger(None))
+                            } else if let Ok(value) = input_value.parse::<u64>() {
+                                Some(ComparisonValue::UInteger(Some(value)))
+                            } else {
+                                None
+                            }
+                        }
+                        ValueKind::Vector => {
+                            let input_value = input.value();
+                            if input_value.is_empty() {
+                                Some(ComparisonValue::Vector(None))
+                            } else if let Ok(value) = input_value
+                                .split(',')
+                                .map(|s| s.trim().parse::<u8>())
+                                .collect()
+                            {
+                                Some(ComparisonValue::Vector(Some(value)))
+                            } else {
+                                None
+                            }
+                        }
                         ValueKind::Float => {
                             let input_value = input.value();
                             if input_value.is_empty() {
                                 Some(ComparisonValue::Float(None))
                             } else if let Ok(value) = input_value.parse::<f64>() {
                                 Some(ComparisonValue::Float(Some(value)))
+                            } else {
+                                None
+                            }
+                        }
+                        ValueKind::IpAddr => {
+                            let input_value = input.value();
+                            if input_value.is_empty() {
+                                Some(ComparisonValue::IpAddr(None))
+                            } else if let Ok(value) = input_value.parse::<IpAddr>() {
+                                Some(ComparisonValue::IpAddr(Some(value)))
+                            } else {
+                                None
+                            }
+                        }
+                        ValueKind::Bool => {
+                            let input_value = input.value();
+                            if input_value.is_empty() {
+                                Some(ComparisonValue::Bool(None))
+                            } else if let Ok(value) = input_value.parse::<bool>() {
+                                Some(ComparisonValue::Bool(Some(value)))
                             } else {
                                 None
                             }
@@ -288,18 +333,25 @@ where
         };
 
         match value_kind {
-            ValueKind::String => html! {
+            ValueKind::String | ValueKind::Vector | ValueKind::IpAddr => html! {
                 <input type="text"
                     class="frontary-input-text"
                     oninput={oninput}
                     value={value}
                 />
             },
-            ValueKind::Integer | ValueKind::Float => html! {
+            ValueKind::Integer | ValueKind::UInteger | ValueKind::Float => html! {
                 <input type="number"
                     class={input_class}
                     oninput={oninput}
                     value={value}
+                />
+            },
+            ValueKind::Bool => html! {
+                <input type="checkbox"
+                    class="frontary-input-checkbox"
+                    oninput={oninput}
+                    checked={value.parse::<bool>().unwrap_or_default()}
                 />
             },
         }
@@ -316,7 +368,11 @@ where
         let value = match kind {
             ValueKind::String => ComparisonValue::String(None),
             ValueKind::Integer => ComparisonValue::Integer(None),
+            ValueKind::UInteger => ComparisonValue::UInteger(None),
+            ValueKind::Vector => ComparisonValue::Vector(None),
             ValueKind::Float => ComparisonValue::Float(None),
+            ValueKind::IpAddr => ComparisonValue::IpAddr(None),
+            ValueKind::Bool => ComparisonValue::Bool(None),
         };
         self.clear_comparison_value(data_id, input_data);
         let set = if let Some(buf) = self.comparison_cmp(data_id) {
