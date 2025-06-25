@@ -45,3 +45,6 @@ web-sys = { version = "0.3", features = [
     "TextMetrics",
 ] }
 yew = "0.21"
+
+[lints.clippy]
+pedantic = "warn"
