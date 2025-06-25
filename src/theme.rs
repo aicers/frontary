@@ -29,10 +29,13 @@ impl Theme {
 
     #[must_use]
     pub fn path(theme: &Option<Theme>, file: &str) -> String {
-        match theme {
-            Some(Theme::Light) => format!("/frontary/pumpkin/light/{file}"),
-            Some(Theme::Dark) => format!("/frontary/pumpkin/{file}"),
-            None => format!("/frontary/{file}"),
+        if cfg!(feature = "pumpkin") {
+            match theme {
+                Some(Theme::Light) => format!("/frontary/pumpkin/light/{file}"),
+                Some(Theme::Dark) | None => format!("/frontary/pumpkin/{file}"),
+            }
+        } else {
+            format!("/frontary/{file}")
         }
     }
 }
