@@ -880,7 +880,7 @@ where
                                     <Input<Self>
                                         txt={ctx.props().txt.clone()}
                                         language={ctx.props().language}
-                                        data={Rc::clone(&ctx.props().data)}
+                                        data={Some(Rc::clone(&ctx.props().data))}
                                         title={title}
                                         width={ctx.props().input_width}
                                         height={ctx.props().input_height}
@@ -926,7 +926,7 @@ where
                                     <Input<Self>
                                         txt={ctx.props().txt.clone()}
                                         language={ctx.props().language}
-                                        data={Rc::clone(&ctx.props().data)}
+                                        data={Some(Rc::clone(&ctx.props().data))}
                                         title={title}
                                         width={ctx.props().input_width}
                                         height={ctx.props().input_height}
