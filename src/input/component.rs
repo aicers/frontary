@@ -956,12 +956,27 @@ where
                 }
                 self.file_reader = None;
             }
-            // TODO: issue #5
             Message::FailLoadFile => {
+                let msg = ctx
+                    .props()
+                    .extra_messages
+                    .as_ref()
+                    .and_then(|m| m.get(&MessageType::FileLoadError).cloned());
+                if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
+                    parent.clone().downcast::<T>().send_message(msg);
+                }
                 return false;
             }
-            // TODO: issue #5
-            Message::InputError => {}
+            Message::InputError => {
+                let msg = ctx
+                    .props()
+                    .extra_messages
+                    .as_ref()
+                    .and_then(|m| m.get(&MessageType::InputError).cloned());
+                if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
+                    parent.clone().downcast::<T>().send_message(msg);
+                }
+            }
         }
         true
     }

@@ -261,6 +261,8 @@ pub enum CommonError {
     GraphQLResponseError,
     GraphQLParseError,
     UnknownError,
+    InputProcessingError,
+    FileLoadingError,
 }
 
 #[allow(clippy::module_name_repetitions)]
@@ -304,6 +306,20 @@ pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
             },
             CommonError::GraphQLParseError => NotificationItem {
                 message: "GraphQL parse error".to_string(),
+                sub_message: String::new(),
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            },
+            CommonError::InputProcessingError => NotificationItem {
+                message: "Input processing error".to_string(),
+                sub_message: String::new(),
+                status_code: None,
+                time: None,
+                category: Category::Fail,
+            },
+            CommonError::FileLoadingError => NotificationItem {
+                message: "File loading error".to_string(),
                 sub_message: String::new(),
                 status_code: None,
                 time: None,
