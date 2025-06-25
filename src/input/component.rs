@@ -371,7 +371,7 @@ where
     pub txt: Texts,
     pub language: Language,
 
-    pub data: Rc<HashMap<String, ListItem>>,
+    pub data: Option<Rc<HashMap<String, ListItem>>>,
     #[prop_or(None)]
     pub input_id: Option<AttrValue>, // Some: Edit, None: Add
     #[prop_or(None)]
@@ -1162,27 +1162,39 @@ where
         );
 
         for (index, t) in ctx.props().input_conf.iter().enumerate() {
-            if let InputConfig::Text(conf) = &(**t)
-                && let Some(data) = ctx.props().input_data.get(index)
-                && let Ok(input) = data.try_borrow()
-                && conf.unique
-            {
-                let mut different = true;
-                for (key, item) in &*ctx.props().data {
-                    if id.as_ref().is_none_or(|id| id != key)
-                        && let Some(other) = item.columns.get(index)
-                        && let (Column::Text(other_value), InputItem::Text(value)) =
-                            (other, &(*input))
-                        && let ViewString::Raw(other_value) = &other_value.text
-                        && value == other_value
-                    {
-                        different = false;
-                        break;
+            if let InputConfig::Text(conf) = &(**t) {
+                if let Some(data) = ctx.props().input_data.get(index) {
+                    if let Ok(input) = data.try_borrow() {
+                        if conf.unique {
+                            let mut different = true;
+                            if let Some(data) = ctx.props().data.as_ref() {
+                                for (key, item) in &**data {
+                                    if id.as_ref().is_none_or(|id| id != key) {
+                                        if let Some(other) = item.columns.get(index) {
+                                            if let (
+                                                Column::Text(other_value),
+                                                InputItem::Text(value),
+                                            ) = (other, &(*input))
+                                            {
+                                                if let ViewString::Raw(other_value) =
+                                                    &other_value.text
+                                                {
+                                                    if value == other_value {
+                                                        different = false;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if !different {
+                                self.unique_msg.insert(BigUint::from(index));
+                                unique.push(true);
+                            }
+                        }
                     }
-                }
-                if !different {
-                    self.unique_msg.insert(BigUint::from(index));
-                    unique.push(true);
                 }
             }
         }
