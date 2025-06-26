@@ -9,6 +9,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added `visible_sort_options` property to `WholeList` for configuring which
+  sort options are displayed in the dropdown menu.
 - Added `DomainNameItem` and `DomainNameConfig` for domain name input validation.
   Provides built-in validation according to RFC standards including label length
   limits, allowed characters, and overall domain name structure validation.
