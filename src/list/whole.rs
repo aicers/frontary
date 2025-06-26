@@ -5,6 +5,7 @@ mod view;
 use component::Message;
 pub use component::Model;
 pub use component::SortColumn;
+pub use component::SortListKind;
 use component::ViewInputStatus;
 
 #[cfg(not(feature = "test"))]
