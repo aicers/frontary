@@ -103,6 +103,10 @@ where
                                                 self.vec_select_to_buffer(&item_index, data);
                                             }
                                             (InputItem::Text(_), InputConfig::Text(_))
+                                            | (
+                                                InputItem::DomainName(_),
+                                                InputConfig::DomainName(_),
+                                            )
                                             | (InputItem::Password(_), InputConfig::Password(_))
                                             | (InputItem::Tag(_), InputConfig::Tag(_))
                                             | (
@@ -162,6 +166,7 @@ where
                             }
                         }
                         (InputItem::Text(_), InputConfig::Text(_))
+                        | (InputItem::DomainName(_), InputConfig::DomainName(_))
                         | (InputItem::Password(_), InputConfig::Password(_))
                         | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
@@ -198,6 +203,13 @@ where
                     let this_index = cal_index(base_index, index);
                     match (&mut *item, &**input_conf) {
                         (InputItem::Text(item), InputConfig::Text(config)) => {
+                            if let Some(preset) = &config.preset {
+                                if parent_checked {
+                                    item.set(preset);
+                                }
+                            }
+                        }
+                        (InputItem::DomainName(item), InputConfig::DomainName(config)) => {
                             if let Some(preset) = &config.preset {
                                 if parent_checked {
                                     item.set(preset);
@@ -413,6 +425,7 @@ where
                 if parent_checked {
                     let empty = match (&(*item), &**input_conf) {
                         (InputItem::Text(_), InputConfig::Text(_))
+                        | (InputItem::DomainName(_), InputConfig::DomainName(_))
                         | (InputItem::SelectSingle(_), InputConfig::SelectSingle(_))
                         | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_))
                         | (InputItem::Tag(_), InputConfig::Tag(_))
@@ -539,6 +552,7 @@ where
         .iter()
         .map(|t| match &(**t) {
             InputConfig::Text(_)
+            | InputConfig::DomainName(_)
             | InputConfig::HostNetworkGroup(_)
             | InputConfig::SelectSingle(_)
             | InputConfig::SelectMultiple(_)
@@ -573,6 +587,7 @@ where
                     if let Ok(col) = col.try_borrow() {
                         match &*col {
                             InputItem::Text(_)
+                            | InputItem::DomainName(_)
                             | InputItem::HostNetworkGroup(_)
                             | InputItem::SelectSingle(_)
                             | InputItem::SelectMultiple(_)
@@ -707,6 +722,19 @@ where
                                         );
                                         rtn = false;
                                     }
+                                }
+                            }
+                        }
+                        (InputItem::DomainName(domain), InputConfig::DomainName(_)) => {
+                            if parent_checked && !domain.is_empty() {
+                                if domain.is_valid() {
+                                    self.verification.insert(item_index, Verification::Valid);
+                                } else {
+                                    self.verification.insert(
+                                        item_index,
+                                        Verification::Invalid(InvalidMessage::InvalidDomain),
+                                    );
+                                    rtn = false;
                                 }
                             }
                         }
@@ -1055,6 +1083,13 @@ where
                             // `Unchecked`, because `this_checked`` may be changed later depending
                             // on its children.
                             (InputItem::Text(user), InputConfig::Text(config)) => {
+                                if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
+                                    if let Some(preset) = &config.preset {
+                                        user.set(preset);
+                                    }
+                                }
+                            }
+                            (InputItem::DomainName(user), InputConfig::DomainName(config)) => {
                                 if user.is_empty() || this_checked == Some(CheckStatus::Unchecked) {
                                     if let Some(preset) = &config.preset {
                                         user.set(preset);

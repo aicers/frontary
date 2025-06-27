@@ -7,6 +7,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.11.0] - 2025-06-25
 
+### Added
+
+- Added `DomainNameItem` and `DomainNameConfig` for domain name input validation.
+  Provides built-in validation according to RFC standards including label length
+  limits, allowed characters, and overall domain name structure validation.
+
 ### Changed
 
 - Changed `PortRange` struct fields from `Option<i64>` to `Option<u16>` for
