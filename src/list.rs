@@ -7,7 +7,7 @@ use std::{
 };
 
 use chrono::{DateTime, Utc};
-pub use whole::{MessageType, Model as WholeList, SortColumn};
+pub use whole::{MessageType, Model as WholeList, SortColumn, SortListKind};
 
 use crate::{
     ViewString,
