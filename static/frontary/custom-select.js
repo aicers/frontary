@@ -45,9 +45,11 @@ export function toggle_visibility_complex(id) {
         if (elemDisplay == "none") {
             elem.style.display = "block";
             add_listen_click_complex();
+            add_listen_mousedown_complex();
         } else {
             elem.style.display = "none";
             remove_listen_click_complex();
+            remove_listen_mousedown_complex();
         }
     }
 }
@@ -151,6 +153,7 @@ function close_custom_select_complex(elmnt) {
     for (i = 0; i < elems.length; i++) {
         elems[i].style.display = "none";
         remove_listen_click_complex();
+        remove_listen_mousedown_complex();
     }
 }
 
@@ -168,4 +171,20 @@ function add_listen_click_complex() {
 
 function remove_listen_click_complex() {
     document.removeEventListener("click", close_custom_select_complex);
+}
+
+function mousedown_handler(e) {
+    const isInput = e.target.tagName === 'INPUT';
+    if (!isInput) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+}
+
+function add_listen_mousedown_complex() {
+    document.addEventListener("mousedown", mousedown_handler);
+}
+
+function remove_listen_mousedown_complex() {
+    document.removeEventListener("mousedown", mousedown_handler);
 }
