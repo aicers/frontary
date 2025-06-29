@@ -14,7 +14,7 @@ use super::{
     component::{InvalidMessage, Message, Model},
 };
 use crate::{
-    HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag,
+    HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag, Theme,
     input::component::Verification, text,
 };
 
@@ -877,6 +877,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        theme: Option<Theme>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
@@ -901,6 +902,7 @@ where
                         parent_message_user_input={Some(Message::UserInputHostNetworkGroup(my_index.clone()))}
                         verify_to_save={self.verify_host_network_group}
                         is_required={self.required_msg.contains(&my_index)}
+                        {theme}
                     />
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
@@ -910,6 +912,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn view_tag_group(
         &self,
         ctx: &Context<Self>,
@@ -918,6 +921,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        theme: Option<Theme>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
@@ -935,6 +939,7 @@ where
                         input_data={Rc::clone(buffer)}
                         input_notice={Some(ess.notice)}
                         parent_message={Some(Message::InputTagGroup(my_index.clone(), input_data.clone()))}
+                        {theme}
                     />
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
