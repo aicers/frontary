@@ -30,4 +30,7 @@ pub enum MessageType {
     AddTag,
     EditTag,
     DeleteTag,
+
+    InputError,
+    FileLoadError,
 }

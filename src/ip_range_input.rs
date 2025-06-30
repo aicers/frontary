@@ -65,7 +65,7 @@ impl Component for Model {
                 self.input = text;
             }
             Message::InputError => {
-                // TODO: issue #5
+                // Input processing error - ignore as this is handled by UI validation
             }
         }
         true

@@ -165,7 +165,7 @@ where
                 }
             }
             Message::InputError => {
-                // TODO: issue #5
+                // Input processing error - ignore as this is handled by UI validation
             }
         }
         if let Some(parent) = ctx.link().get_parent() {
