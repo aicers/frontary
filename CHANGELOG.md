@@ -5,6 +5,16 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **BREAKING**: Made the `data` field in `input::component::Props` optional
+  to support standalone usage of the `Input` component. When the `Input`
+  component is used independently without requiring uniqueness checks against
+  other list items, the `data` prop can now be set to `None`. Existing code
+  must wrap the `data` prop with `Some()`.
+
 ## [0.11.0] - 2025-06-25
 
 ### Changed
