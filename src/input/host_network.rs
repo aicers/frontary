@@ -263,19 +263,23 @@ where
                         ctx.props().parent_message_save.as_ref(),
                         ctx.props().parent_message_no_save.as_ref(),
                     ) {
-                        parent
-                            .clone()
-                            .downcast::<T>()
-                            .send_message(verify.map_or_else(
-                                || msg_save.clone(),
-                                |verify| {
-                                    if verify {
-                                        msg_save.clone()
-                                    } else {
-                                        msg_no_save.clone()
-                                    }
-                                },
-                            ));
+                        let msg_to_send = match verify {
+                            Some(true) => msg_save.clone(),
+                            Some(false) => msg_no_save.clone(),
+                            None => {
+                                if ctx
+                                    .props()
+                                    .input_data
+                                    .try_borrow()
+                                    .is_ok_and(|d| !d.is_empty())
+                                {
+                                    msg_save.clone()
+                                } else {
+                                    msg_no_save.clone()
+                                }
+                            }
+                        };
+                        parent.clone().downcast::<T>().send_message(msg_to_send);
                     }
                 }
             }
