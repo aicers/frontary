@@ -444,12 +444,15 @@ where
                         (InputItem::HostNetworkGroup(n), InputConfig::HostNetworkGroup(_)) => {
                             // HIGHTLIGHT: if empty, HostNetworkHtml may return
                             // Message::RightHostNetworkGroup
-                            input_conf.required()
-                                && n.is_empty()
-                                && self
-                                    .verification_host_network
+                            if input_conf.required() && n.is_empty() {
+                                true
+                            } else if !n.is_empty() {
+                                self.verification_host_network
                                     .get(&this_index)
                                     .is_some_and(|&v| v != Some(true))
+                            } else {
+                                false
+                            }
                         }
                         (InputItem::Nic(n), InputConfig::Nic(_)) => {
                             input_conf.required()
