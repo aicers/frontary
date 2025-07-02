@@ -21,8 +21,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed required field validation for network fields that was incorrectly
-  skipped when text input was empty but no network items were added.
+- Fixed network field validation logic to properly handle both required and
+  optional fields - required empty fields now correctly trigger validation
+  errors, while optional fields are only validated when non-empty.
 
 ## [0.11.0] - 2025-06-25
 
