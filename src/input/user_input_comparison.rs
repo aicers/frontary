@@ -105,7 +105,12 @@ where
             Message::InputComparisonComparisionKind(my_index.clone(), input_data.clone()),
         ];
         let txt = ctx.props().txt.txt.clone();
-
+        let (show_required_msg, required_msg_html) = if cfg!(feature = "pumpkin") {
+            let show = self.required_msg.contains(&my_index);
+            (show, show.then(|| self.view_required_msg(ctx, &my_index)))
+        } else {
+            (false, None)
+        };
         html! {
             <div class="input-comparison-outer">
                 {
@@ -135,10 +140,14 @@ where
                         list={list}
                         selected={selected}
                         parent_message={parent_message}
+                        show_required_msg={show_required_msg}
+                        required_msg_html={required_msg_html}
                     />
                     { self.view_comparison_value(ctx, input_data, &my_index) }
                 </div>
-                { self.view_required_msg(ctx, &my_index) }
+                if !cfg!(feature = "pumpkin") {
+                    { self.view_required_msg(ctx, &my_index) }
+                }
             </div>
         }
     }
@@ -182,37 +191,61 @@ where
             "input-comparison-value-indicator"
         };
 
-        if cmp_kind.chain_cmp() {
-            html! {
-                <div class="input-comparison-value">
-                    <div class="input-comparison-value-indicator">
-                        { cmp_statement_head(cmp_kind) }
-                    </div>
-                    <div class="input-comparison-value-value">
-                        { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind, cmp_kind) }
-                    </div>
-                    <div class={indicator_class}>
-                        { cmp_statement_symbol(cmp_kind) }
-                    </div>
-                    <div class="input-comparison-value-value">
-                        { self.view_comparison_value_each(ctx, input_data, data_id, 1, value_kind, cmp_kind) }
-                    </div>
-                    <div class="input-comparison-value-indicator" style={last_elem_style}>
-                        { cmp_statement_tail(cmp_kind) }
-                    </div>
-                </div>
-            }
-        } else {
-            html! {
-                <div class="input-comparison-value">
-                    <div class={indicator_single_class}>
-                        { cmp_statement_symbol(cmp_kind) }
-                    </div>
-                    <div class="input-comparison-value-value">
-                        { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind, cmp_kind) }
-                    </div>
-                </div>
-            }
+        let input_comparison_wrapper =
+            if self.required_msg.contains(data_id) && cfg!(feature = "pumpkin") {
+                "input-comparison-value-value input-required"
+            } else {
+                "input-comparison-value-value"
+            };
+
+        html! {
+            <div class="input-comparison-value-wrapper">
+                {
+                    if cmp_kind.chain_cmp() {
+                        html! {
+                            <div class="input-comparison-value">
+                                <div class="input-comparison-value-indicator">
+                                    { cmp_statement_head(cmp_kind) }
+                                </div>
+                                <div class={input_comparison_wrapper}>
+                                    { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind, cmp_kind) }
+                                </div>
+                                <div class={indicator_class}>
+                                    { cmp_statement_symbol(cmp_kind) }
+                                </div>
+                                <div class={input_comparison_wrapper}>
+                                    { self.view_comparison_value_each(ctx, input_data, data_id, 1, value_kind, cmp_kind) }
+                                </div>
+                                <div class="input-comparison-value-indicator" style={last_elem_style}>
+                                    { cmp_statement_tail(cmp_kind) }
+                                </div>
+                            </div>
+                        }
+                    } else {
+                        html! {
+                            <div class="input-comparison-value">
+                                <div class={indicator_single_class}>
+                                    { cmp_statement_symbol(cmp_kind) }
+                                </div>
+                                <div class={input_comparison_wrapper}>
+                                    { self.view_comparison_value_each(ctx, input_data, data_id, 0, value_kind, cmp_kind) }
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+                {
+                    if self.required_msg.contains(data_id) && cfg!(feature = "pumpkin") {
+                        html! {
+                            <div class="input-required-msg">
+                                { self.view_required_msg(ctx, data_id) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+            </div>
         }
     }
 

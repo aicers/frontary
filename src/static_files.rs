@@ -179,6 +179,13 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             include_bytes!("../static/frontary/pumpkin/group-list-link-line-top.svg");
         rtn.push(("group-list-link-line-top.svg", group_list_link_line_top));
 
+        let group_list_link_line_top_long =
+            include_bytes!("../static/frontary/pumpkin/group-list-link-line-top-long.svg");
+        rtn.push((
+            "group-list-link-line-top-long.svg",
+            group_list_link_line_top_long,
+        ));
+
         let trash_can = include_bytes!("../static/frontary/pumpkin/trash-can.svg");
         rtn.push(("trash-can.svg", trash_can));
 

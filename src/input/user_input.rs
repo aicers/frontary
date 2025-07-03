@@ -649,10 +649,14 @@ where
         } else {
             "input-item"
         };
-        let style = format!(
-            "width: {};",
-            width.map_or("100%".to_string(), |w| format!("{w}px"))
-        );
+        let style = if cfg!(feature = "pumpkin") {
+            None
+        } else {
+            Some(format!(
+                "width: {};",
+                width.map_or("100%".to_string(), |w| format!("{w}px"))
+            ))
+        };
         let step = step.unwrap_or(FLOAT64_STEP_DEFAULT);
 
         html! {

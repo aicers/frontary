@@ -36,6 +36,9 @@ where
     #[prop_or(Vec::new())]
     pub sized_value: Vec<bool>,
     pub parent_message: Vec<T::Message>,
+    pub show_required_msg: bool,
+    #[prop_or(None)]
+    pub required_msg_html: Option<Html>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -86,6 +89,7 @@ where
         true
     }
 
+    #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
         let keys = ctx
             .props()
@@ -134,26 +138,49 @@ where
                     } else {
                         "searchable-select-vector-margin"
                     };
+                    let show_error = ctx.props().show_required_msg
+                        && selected.borrow().as_ref().is_none_or(HashSet::is_empty)
+                        && (index == 0 || ctx.props().selected.get(index - 1).is_some_and(|prev| {
+                            prev.borrow().as_ref().is_some_and(|set| !set.is_empty())
+                        }));
+                    let field_class = if show_error {
+                        "input-select-vector-vec-required"
+                    } else {
+                        "input-select-field"
+                    };
+                    let show_error_msg = ctx.props().required_msg_html.clone().filter(|_| show_error).unwrap_or_default();
+                    let select_component = html! {
+                        <SelectSearchable<Self>
+                            txt={ctx.props().txt.clone()}
+                            language={ctx.props().language}
+                            id={format!("{}-{index}-{}", ctx.props().id.clone(), self.rerender_serial)}
+                            kind={kind}
+                            title={title.clone()}
+                            empty_msg={empty_msg.clone()}
+                            top_width={*top_width}
+                            max_width={*max_width}
+                            max_height={*max_height}
+                            list={list}
+                            selected={Rc::clone(selected)}
+                            allow_empty={*allow_empty}
+                            default_all={false}
+                            sized_value={sized_value}
+                            parent_message={Message::Select(index)}
+                        />
+                    };
 
                     html! {
                         <div class={class}>
-                            <SelectSearchable<Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                id={format!("{}-{index}-{}", ctx.props().id.clone(), self.rerender_serial)}
-                                kind={kind}
-                                title={title.clone()}
-                                empty_msg={empty_msg.clone()}
-                                top_width={*top_width}
-                                max_width={*max_width}
-                                max_height={*max_height}
-                                list={list}
-                                selected={Rc::clone(selected)}
-                                allow_empty={*allow_empty}
-                                default_all={false}
-                                sized_value={sized_value}
-                                parent_message={Message::Select(index)}
-                            />
+                            if cfg!(feature = "pumpkin") {
+                                <div class={field_class}>
+                                    { select_component }
+                                </div>
+                            } else {
+                                { select_component }
+                            }
+                            if cfg!(feature = "pumpkin") {
+                                { show_error_msg }
+                            }
                         </div>
                     }
                 })
