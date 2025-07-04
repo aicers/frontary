@@ -19,6 +19,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `user_input_comparison`, `user_input_select`, `user_input` and
   `vec_searchable` modules to align with updated design standards.
 
+### Fixed
+
+- Fixed Safari scroll chaining in `complex-select` component popup to prevent
+  unintended parent container scrolling when clicking on popup elements.
+
 ## [0.11.0] - 2025-06-25
 
 ### Changed
