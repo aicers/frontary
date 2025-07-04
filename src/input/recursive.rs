@@ -449,7 +449,7 @@ where
                                 && self
                                     .verification_host_network
                                     .get(&this_index)
-                                    .is_some_and(|&v| v != Some(true))
+                                    .is_some_and(|&v| v != Some(false))
                         }
                         (InputItem::Nic(n), InputConfig::Nic(_)) => {
                             input_conf.required()

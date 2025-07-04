@@ -19,6 +19,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `user_input_comparison`, `user_input_select`, `user_input` and
   `vec_searchable` modules to align with updated design standards.
 
+### Fixed
+
+- Fixed network field validation logic to properly handle required fields
+
 ## [0.11.0] - 2025-06-25
 
 ### Changed
