@@ -178,6 +178,99 @@ where
 
     #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
+    pub(super) fn view_domain_name(
+        &self,
+        ctx: &Context<Self>,
+        ess: &InputEssential,
+        width: Option<u32>,
+        input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<&BigUint>,
+        layer_index: usize,
+        autofocus: bool,
+    ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
+        let my_index_clone = my_index.clone();
+        let txt = ctx.props().txt.txt.clone();
+        let input_data_clone = input_data.clone();
+        let oninput = ctx.link().callback(move |e: InputEvent| {
+            e.target()
+                .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
+                .map_or(Message::InputError, |input| {
+                    Message::InputDomainName(
+                        my_index_clone.clone(),
+                        input.value(),
+                        input_data_clone.clone(),
+                    )
+                })
+        });
+        let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
+        let value = if let Ok(input_data) = input_data.try_borrow() {
+            if let InputItem::DomainName(data) = &(*input_data) {
+                data.to_string()
+            } else {
+                String::new()
+            }
+        } else {
+            String::new()
+        };
+
+        let class = if self.required_msg.contains(&my_index)
+            || self.verification.get(&my_index)
+                == Some(&Verification::Invalid(InvalidMessage::InvalidDomain))
+        {
+            "frontary-input-text-alert"
+        } else {
+            "frontary-input-text"
+        };
+        let style = format!(
+            "width: {};",
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
+        );
+
+        html! {
+            <div class="input-item">
+                {
+                    if ess.title.is_empty() {
+                        html! {}
+                    } else {
+                        html! {
+                            if cfg!(feature = "pumpkin") {
+                                <div class="input-contents-text-item-title">
+                                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                                </div>
+                            } else {
+                                <div class="input-contents-item-title">
+                                    { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                                </div>
+                            }
+                        }
+                    }
+                }
+                <input type="text" class={class} style={style}
+                    value={value}
+                    placeholder={placeholder}
+                    autofocus={autofocus}
+                    autocomplete="off"
+                    oninput={oninput}
+                />
+                { Self::view_explanation_msg(ctx)}
+                {
+                    if self.verification.get(&my_index) == Some(&Verification::Invalid(InvalidMessage::InvalidDomain)) {
+                        html! {
+                            <div class="input-error-msg">
+                                { text!(txt, ctx.props().language, "Invalid domain name") }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+            </div>
+        }
+    }
+
+    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn view_password(
         &self,
         ctx: &Context<Self>,

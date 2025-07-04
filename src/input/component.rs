@@ -12,10 +12,10 @@ use num_bigint::BigUint;
 use yew::{Component, Context, Html, Properties, html, virtual_dom::AttrValue};
 
 use super::{
-    FileItem, Float64Item, HostNetworkGroupItem, InputConfig, InputHostNetworkGroup, InputItem,
-    InputTag, InputTagGroup, PasswordItem, PercentageItem, SelectMultipleItem, SelectSingleItem,
-    TagItem, TextItem, Unsigned8Item, Unsigned32Item, Value as ComparisonValue, cal_index,
-    group_item_list_preset,
+    DomainNameItem, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
+    InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
+    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned32Item,
+    Value as ComparisonValue, cal_index, group_item_list_preset,
 };
 use crate::{
     InputNic, InvalidPasswordKind, MessageType, Rerender, Texts, ViewString,
@@ -27,6 +27,7 @@ use crate::{
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum InvalidMessage {
     InvalidInput,
+    InvalidDomain,
     InvalidPassword(InvalidPasswordKind),
     InterfaceNameRequired,
     InterfaceRequired,
@@ -160,6 +161,7 @@ pub enum Message {
     Save,
     TrySave,
     InputText(BigUint, String, Rc<RefCell<InputItem>>),
+    InputDomainName(BigUint, String, Rc<RefCell<InputItem>>),
     InputPassword(BigUint, String, Rc<RefCell<InputItem>>),
     InputConfirmPassword(BigUint, String),
     InputUnsigned32(BigUint, Option<u32>, Rc<RefCell<InputItem>>),
@@ -222,6 +224,9 @@ impl Clone for Message {
             Self::Save => Self::Save,
             Self::TrySave => Self::TrySave,
             Self::InputText(a, b, c) => Self::InputText(a.clone(), b.clone(), c.clone()),
+            Self::InputDomainName(a, b, c) => {
+                Self::InputDomainName(a.clone(), b.clone(), c.clone())
+            }
             Self::InputPassword(a, b, c) => Self::InputPassword(a.clone(), b.clone(), c.clone()),
             Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(a.clone(), b.clone()),
             Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(a.clone(), *b, c.clone()),
@@ -294,6 +299,7 @@ impl PartialEq for Message {
             (Self::UserInputHostNetworkGroup(s1), Self::UserInputHostNetworkGroup(o1))
             | (Self::WrongHostNetworkGroup(s1), Self::WrongHostNetworkGroup(o1)) => s1 == o1,
             (Self::InputText(s1, s2, s3), Self::InputText(o1, o2, o3))
+            | (Self::InputDomainName(s1, s2, s3), Self::InputDomainName(o1, o2, o3))
             | (Self::InputPassword(s1, s2, s3), Self::InputPassword(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
@@ -543,6 +549,13 @@ where
                     *item = InputItem::Text(TextItem::new(txt.clone()));
                 }
                 self.remove_required_msg(&id, txt.is_empty());
+                self.unique_msg.remove(&id);
+            }
+            Message::InputDomainName(id, domain, input_data) => {
+                if let Ok(mut item) = input_data.try_borrow_mut() {
+                    *item = InputItem::DomainName(DomainNameItem::new(domain.clone()));
+                }
+                self.remove_required_msg(&id, domain.is_empty());
                 self.unique_msg.remove(&id);
             }
             Message::InputPassword(id, txt, input_data) => {
@@ -1024,6 +1037,10 @@ where
                     InputConfig::Text(config) => {
                         self.view_text(ctx, &config.ess, config.length, config.width, input_data,
                             None, index, index == 0, false, config.immutable)
+                    }
+                    InputConfig::DomainName(config) => {
+                        self.view_domain_name(ctx, &config.ess, config.width, input_data,
+                            None, index, index == 0)
                     }
                     InputConfig::Password(config) => {
                         self.view_password(ctx, &config.ess, config.width, input_data, None, index,

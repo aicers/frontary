@@ -77,6 +77,170 @@ impl TextItem {
     }
 }
 
+fn is_valid_domain_name(domain: &str) -> bool {
+    if domain.is_empty() {
+        return false;
+    }
+
+    // Domain names must be between 1 and 253 characters long
+    if domain.len() > 253 {
+        return false;
+    }
+
+    // Domain names cannot start or end with a hyphen or dot
+    if domain.starts_with('-')
+        || domain.ends_with('-')
+        || domain.starts_with('.')
+        || domain.ends_with('.')
+    {
+        return false;
+    }
+
+    // Split into labels and validate each
+    let labels: Vec<&str> = domain.split('.').collect();
+
+    for label in &labels {
+        // Each label must be between 1 and 63 characters
+        if label.is_empty() || label.len() > 63 {
+            return false;
+        }
+
+        // Labels cannot start or end with hyphens
+        if label.starts_with('-') || label.ends_with('-') {
+            return false;
+        }
+
+        // Labels can only contain alphanumeric characters and hyphens
+        if !label.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+            return false;
+        }
+    }
+
+    // Top-level domain should contain at least one letter (not all numbers)
+    if let Some(tld) = labels.last() {
+        if tld.chars().all(|c| c.is_ascii_digit()) {
+            return false;
+        }
+    }
+
+    true
+}
+
+#[derive(Clone, PartialEq, Default)]
+pub struct DomainNameItem {
+    domain: String,
+}
+
+impl PartialEq<String> for DomainNameItem {
+    fn eq(&self, other: &String) -> bool {
+        &self.domain == other
+    }
+}
+
+impl PartialEq<&String> for DomainNameItem {
+    fn eq(&self, other: &&String) -> bool {
+        &self.domain == *other
+    }
+}
+
+impl PartialEq<&str> for DomainNameItem {
+    fn eq(&self, other: &&str) -> bool {
+        self.domain == *other
+    }
+}
+
+impl PartialEq<DomainNameItem> for String {
+    fn eq(&self, other: &DomainNameItem) -> bool {
+        self == &other.domain
+    }
+}
+
+impl PartialEq<DomainNameItem> for &str {
+    fn eq(&self, other: &DomainNameItem) -> bool {
+        *self == other.domain
+    }
+}
+
+impl Deref for DomainNameItem {
+    type Target = String;
+
+    fn deref(&self) -> &Self::Target {
+        &self.domain
+    }
+}
+
+impl DerefMut for DomainNameItem {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.domain
+    }
+}
+
+impl DomainNameItem {
+    #[must_use]
+    pub fn new(domain: String) -> Self {
+        Self { domain }
+    }
+
+    pub fn set(&mut self, domain: &str) {
+        self.domain = domain.to_string();
+    }
+
+    #[must_use]
+    pub fn is_valid(&self) -> bool {
+        is_valid_domain_name(&self.domain)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_domain_name_validation() {
+        // Valid domain names
+        assert!(is_valid_domain_name("example.com"));
+        assert!(is_valid_domain_name("sub.example.com"));
+        assert!(is_valid_domain_name("test-site.example.org"));
+        assert!(is_valid_domain_name("a.b"));
+        assert!(is_valid_domain_name("test123.example.com"));
+
+        // Invalid domain names
+        assert!(!is_valid_domain_name(""));
+        assert!(!is_valid_domain_name(".example.com"));
+        assert!(!is_valid_domain_name("example.com."));
+        assert!(!is_valid_domain_name("-example.com"));
+        assert!(!is_valid_domain_name("example-.com"));
+        assert!(!is_valid_domain_name("example.com-"));
+        assert!(!is_valid_domain_name("exam ple.com"));
+        assert!(!is_valid_domain_name("example..com"));
+        assert!(!is_valid_domain_name("example.123"));
+
+        // Length tests
+        let long_label = "a".repeat(64);
+        assert!(!is_valid_domain_name(&format!("{long_label}.com")));
+
+        let long_domain = "a".repeat(250) + ".com";
+        assert!(!is_valid_domain_name(&long_domain));
+
+        // Special characters
+        assert!(!is_valid_domain_name("example@.com"));
+        assert!(!is_valid_domain_name("example.c*m"));
+    }
+
+    #[test]
+    fn test_domain_name_item() {
+        let mut item = DomainNameItem::new("example.com".to_string());
+        assert!(item.is_valid());
+        assert_eq!(item.as_str(), "example.com");
+
+        item.set("invalid..domain");
+        assert!(!item.is_valid());
+
+        item.set("valid-domain.org");
+        assert!(item.is_valid());
+    }
+}
+
 #[derive(Clone, PartialEq, Default)]
 pub struct PasswordItem {
     password: String,
@@ -802,6 +966,7 @@ impl RadioItem {
 #[derive(Clone, PartialEq)]
 pub enum InputItem {
     Text(TextItem),
+    DomainName(DomainNameItem),
     Password(PasswordItem),
     HostNetworkGroup(HostNetworkGroupItem),
     SelectSingle(SelectSingleItem),
@@ -824,6 +989,7 @@ impl InputItem {
     pub fn clear(&mut self) {
         match self {
             InputItem::Text(txt) => txt.clear(),
+            InputItem::DomainName(domain) => domain.clear(),
             InputItem::Password(pw) => pw.clear(),
             InputItem::HostNetworkGroup(group) => group.clear(),
             InputItem::SelectSingle(selected) => selected.clear(),
@@ -847,6 +1013,7 @@ impl InputItem {
     pub fn is_empty(&self) -> bool {
         match self {
             InputItem::Text(txt) => txt.is_empty(),
+            InputItem::DomainName(domain) => domain.is_empty(),
             InputItem::Password(pw) => pw.is_empty(),
             InputItem::HostNetworkGroup(group) => group.is_empty(),
             InputItem::SelectSingle(selected) => selected.is_empty(),
@@ -869,6 +1036,7 @@ impl InputItem {
     fn default_from_conf(conf: &InputConfig) -> Self {
         match conf {
             InputConfig::Text(_) => Self::Text(TextItem::default()),
+            InputConfig::DomainName(_) => Self::DomainName(DomainNameItem::default()),
             InputConfig::Password(_) => Self::Password(PasswordItem::default()),
             InputConfig::HostNetworkGroup(_) => {
                 Self::HostNetworkGroup(HostNetworkGroupItem::default())
