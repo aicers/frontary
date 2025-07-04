@@ -6,7 +6,7 @@ use std::{
     fmt::{self, Write},
 };
 
-use jiff::Timestamp;
+use chrono::{DateTime, Utc};
 pub use whole::{MessageType, Model as WholeList, SortColumn};
 
 use crate::{
@@ -21,7 +21,7 @@ const NUM_OF_DECIMALS_DEFAULT: usize = 2;
 pub struct ListItem {
     pub columns: Vec<Column>,
     pub sub_items: Vec<Vec<Column>>,
-    pub creation_time: Option<Timestamp>,
+    pub creation_time: Option<DateTime<Utc>>,
 }
 
 #[derive(Clone, PartialEq)]
