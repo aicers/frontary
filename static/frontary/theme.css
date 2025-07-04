@@ -2062,13 +2062,11 @@ div.tag-group-input-item {
     flex-direction: row;
     align-items: center;
     background-color: #95B3BA;
-    /* HIGHLIGHT
-    if border-radius is greater than max(width, height),
-    it makes half size of min(width, height) */
-    border-radius: 999px;
+    border-radius: 10px;
     font-weight: normal;
     font-size: 11px;
     color: #FFFFFF;
+    text-align: left;
     word-break: break-word;
     overflow-wrap: break-word;
 }
@@ -2157,14 +2155,16 @@ div.tag-group-input-select-item {
     padding-left: 8px;
     padding-right: 8px;
     background-color: #95B3BA;
-    /* HIGHLIGHT
-    if border-radius is greater than max(width, height),
-    it makes half size of min(width, height) */
-    border-radius: 999px;
+    border-radius: 10px;
     font-size: 11px;
     color: #FFFFFF;
+    text-align: left;
     word-break: break-word;
     overflow-wrap: break-word;
+}
+
+div.tag-group-input-select-item-text {
+    text-align: left;
 }
 
 div.tag-group-input-select-item-text:hover {
