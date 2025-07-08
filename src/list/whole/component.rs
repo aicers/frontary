@@ -118,6 +118,8 @@ where
     pub data: Rc<HashMap<String, ListItem>>, // (key of a row, item of the row)
     #[prop_or(None)]
     pub sort: Option<SortColumn>,
+    #[prop_or(vec![SortListKind::LatestFirst, SortListKind::Ascending, SortListKind::Descending])]
+    pub visible_sort_options: Vec<SortListKind>,
     pub display_info: Rc<DisplayInfo>,
     #[prop_or(DEFAULT_NUM_PER_PAGE)]
     pub num_per_page: usize,
@@ -791,26 +793,28 @@ where
                 get_text!(txt, ctx.props().language.tag(), t)
                     .map_or_else(String::new, |t| t.to_string())
             });
-        let sort_list_kind_list = Rc::new(vec![
-            ViewString::Key("Latest".to_string()),
-            ViewString::Raw(format!(
-                "{} ({})",
-                get_text!(txt, ctx.props().language.tag(), "A ➝ Z")
-                    .map_or("A ➝ Z".to_string(), |t| t.to_string()),
-                &sort_column
-            )),
-            ViewString::Raw(format!(
-                "{} ({})",
-                get_text!(txt, ctx.props().language.tag(), "Z ➝ A")
-                    .map_or("Z ➝ A".to_string(), |t| t.to_string()),
-                &sort_column
-            )),
-        ]);
-        let value_candidates = Rc::new(vec![
-            SortListKind::LatestFirst,
-            SortListKind::Ascending,
-            SortListKind::Descending,
-        ]);
+        let sort_list_kind_list = Rc::new(
+            ctx.props()
+                .visible_sort_options
+                .iter()
+                .map(|&option| match option {
+                    SortListKind::LatestFirst => ViewString::Key("Latest".to_string()),
+                    SortListKind::Ascending => ViewString::Raw(format!(
+                        "{} ({})",
+                        get_text!(txt, ctx.props().language.tag(), "A ➝ Z")
+                            .map_or("A ➝ Z".to_string(), |t| t.to_string()),
+                        &sort_column
+                    )),
+                    SortListKind::Descending => ViewString::Raw(format!(
+                        "{} ({})",
+                        get_text!(txt, ctx.props().language.tag(), "Z ➝ A")
+                            .map_or("Z ➝ A".to_string(), |t| t.to_string()),
+                        &sort_column
+                    )),
+                })
+                .collect::<Vec<_>>(),
+        );
+        let value_candidates = Rc::new(ctx.props().visible_sort_options.clone());
         let list_top = if cfg!(feature = "pumpkin") { 42 } else { 38 };
 
         match ctx.props().kind {
