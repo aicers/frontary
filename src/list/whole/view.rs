@@ -550,8 +550,7 @@ where
                                             <div class="cell-modal-wrapper">
                                                 <div class="cell-modal-header">
                                                     <span>{&modal.0}</span>
-                                                    <div onclick={onclick_close}>
-                                                        <div class="complex-select-pop-head-close-icon"></div>
+                                                    <div onclick={onclick_close} class="complex-select-pop-head-close-icon">
                                                     </div>
                                                 </div>
                                                 <div class="cell-modal-body">

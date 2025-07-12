@@ -2620,6 +2620,27 @@ td.group-list-link-cell {
     height: 0;
 }
 
+td.group-list-link-cell.group-list-link-line-top {
+    position: relative;
+    display: block;
+    height: 54px;
+    width: 25px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-top.svg');
+    background-size: 15px 66px;
+    background-repeat: no-repeat;
+    background-position: center calc((40px - 8px) / 2);
+}
+
+td.group-list-link-cell.group-list-link-line-top.first-row {
+    background-position: center 45px;
+}
+
+td.group-list-link-cell.group-list-link-line-top.long {
+    height: 91px;
+    background-size: 15px 80px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-top-long.svg');
+}
+
 div.group-list-link-line-top {
     position: absolute;
     display: block;

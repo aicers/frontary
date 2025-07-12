@@ -569,8 +569,7 @@ where
                                                 {
                                                     if cfg!(feature = "pumpkin") {
                                                         html! {
-                                                            <td class="group-list-link-cell">
-                                                                <div class={top_line_class}></div>
+                                                            <td class={classes!("group-list-link-cell", top_line_class)}>
                                                             </td>
                                                         }
                                                     } else {
