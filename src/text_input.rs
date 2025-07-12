@@ -17,6 +17,7 @@ pub enum Message {
 
 pub struct Model {
     input: String,
+    is_invalid: bool,
 }
 
 #[derive(Clone, Eq, PartialEq, Properties)]
@@ -36,6 +37,10 @@ pub struct Props {
     pub placeholder_message: Option<String>,
     #[prop_or(false)]
     pub required: bool,
+    #[prop_or(None)]
+    pub warning_message: Option<String>,
+    #[prop_or(None)]
+    pub validator: Option<fn(&str) -> bool>,
 }
 
 impl Component for Model {
@@ -45,6 +50,7 @@ impl Component for Model {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             input: String::new(),
+            is_invalid: false,
         }
     }
 
@@ -55,8 +61,17 @@ impl Component for Model {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Message::InputString(text) => {
+                let trimmed_text = text.trim().to_string();
+
+                // Validate input if validator is provided
+                self.is_invalid = if let Some(validator) = ctx.props().validator {
+                    !validator(&trimmed_text)
+                } else {
+                    false
+                };
+
                 if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
-                    data.replace(text.trim().to_string());
+                    data.replace(trimmed_text);
                 }
                 self.input = text;
             }
@@ -89,7 +104,7 @@ impl Component for Model {
                 {Self::view_title(ctx)}
                 <div class="input-item-group" >
                     <input type="text"
-                        class="frontary-input-text"
+                        class={if self.is_invalid { "frontary-input-text-alert" } else { "frontary-input-text" }}
                         value={self.input.clone()}
                         style={style.clone()}
                         placeholder={placeholder}
@@ -97,6 +112,7 @@ impl Component for Model {
                     />
                 </div>
                 {Self::view_explanation_msg(ctx)}
+                {Self::view_warning_msg(ctx, self.is_invalid)}
             </div>
         }
     }
@@ -123,6 +139,27 @@ impl Model {
                 <div class="simple-input-input-notice">
                     { text!(txt, ctx.props().language, example_message)}
                 </div>
+            }
+        } else {
+            html! {}
+        }
+    }
+
+    fn view_warning_msg(ctx: &Context<Self>, is_invalid: bool) -> Html {
+        let txt = ctx.props().txt.txt.clone();
+        if is_invalid {
+            if let Some(warning_message) = &ctx.props().warning_message {
+                html! {
+                    <div class="input-contents-item-alert-message">
+                        { text!(txt, ctx.props().language, warning_message) }
+                    </div>
+                }
+            } else {
+                html! {
+                    <div class="input-contents-item-alert-message">
+                        { text!(txt, ctx.props().language, "Invalid input") }
+                    </div>
+                }
             }
         } else {
             html! {}
