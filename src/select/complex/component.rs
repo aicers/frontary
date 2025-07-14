@@ -33,6 +33,15 @@ pub struct Model {
 
     pub(super) view_list: bool,
     pub(super) view_input: bool,
+
+    pub(super) selection_state: SelectionState,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub enum SelectionState {
+    Default,
+    AllSelected,
+    Partial,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -91,7 +100,14 @@ impl Component for Model {
             view_input: false,
             direction: Rc::new(RefCell::new(None)),
             direction_items: HashMap::new(),
+            selection_state: SelectionState::Default,
         };
+        if cfg!(feature = "pumpkin") {
+            if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut() {
+                *predefined =
+                    Some(HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new());
+            }
+        }
         s.buffer_direction_items(ctx);
 
         s
@@ -172,6 +188,9 @@ impl Component for Model {
                 }
             }
             Message::ClickItem(key) => {
+                if cfg!(feature = "pumpkin") {
+                    self.selection_state = SelectionState::Partial;
+                }
                 if let (Ok(mut sel), Ok(list)) = (
                     ctx.props().selected.predefined.try_borrow_mut(),
                     ctx.props().list.try_borrow(),
@@ -233,12 +252,21 @@ impl Component for Model {
                     if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut() {
                         *predefined = None;
                     }
+                    if cfg!(feature = "pumpkin") {
+                        self.selection_state = SelectionState::AllSelected;
+                    }
+                } else {
+                    self.selection_state = SelectionState::Partial;
                 }
                 self.buffer_direction_items(ctx);
             }
             Message::ClickAll => {
                 match self.check_status(ctx, false) {
                     CheckStatus::Checked => {
+                        if cfg!(feature = "pumpkin") {
+                            self.selection_state = SelectionState::Partial;
+                        }
+
                         if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
                         {
                             *predefined = Some(HashMap::<
@@ -248,7 +276,30 @@ impl Component for Model {
                         }
                     }
                     CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                        if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+                        if cfg!(feature = "pumpkin") {
+                            self.selection_state = SelectionState::AllSelected;
+                            if let (Ok(list), Ok(mut predefined)) = (
+                                ctx.props().list.try_borrow(),
+                                ctx.props().selected.predefined.try_borrow_mut(),
+                            ) {
+                                let full_select: HashMap<
+                                    String,
+                                    Rc<RefCell<Option<SelectionExtraInfo>>>,
+                                > = list
+                                    .iter()
+                                    .map(|item| {
+                                        (
+                                            item.id().clone(),
+                                            Rc::new(RefCell::new(Some(
+                                                SelectionExtraInfo::Network(EndpointKind::Both),
+                                            ))),
+                                        )
+                                    })
+                                    .collect();
+                                *predefined = Some(full_select);
+                            }
+                        } else if let Ok(mut predefined) =
+                            ctx.props().selected.predefined.try_borrow_mut()
                         {
                             *predefined = None;
                         }
@@ -256,7 +307,11 @@ impl Component for Model {
                 }
                 self.buffer_direction_items(ctx);
             }
+
             Message::ClickAllBelow => {
+                if cfg!(feature = "pumpkin") {
+                    self.selection_state = SelectionState::Partial;
+                }
                 if let Some(search) = self.search_result.as_ref() {
                     let check_status = self.check_status(ctx, true);
                     if let (Ok(mut sel), Ok(list)) = (
@@ -316,6 +371,15 @@ impl Component for Model {
                 }
             }
             Message::ClickAddInput => {
+                if cfg!(feature = "pumpkin") {
+                    self.selection_state = SelectionState::Partial;
+                    if !self.view_input {
+                        self.view_input = true;
+                    }
+                    if self.view_list {
+                        self.view_list = false;
+                    }
+                }
                 if self.validate_user_input(ctx) {
                     if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                         match custom.entry(self.input_text.clone()) {
@@ -340,9 +404,15 @@ impl Component for Model {
                 }
             }
             Message::DeleteInputItem(key) => {
+                if cfg!(feature = "pumpkin") {
+                    self.selection_state = SelectionState::Partial;
+                }
                 if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                     if let Occupied(entry) = custom.entry(key) {
                         entry.remove_entry();
+                    }
+                    if custom.is_empty() {
+                        self.view_input = false;
                     }
                 }
             }
@@ -375,18 +445,55 @@ impl Component for Model {
         let mut class_input = "complex-select-input";
         let txt = ctx.props().txt.txt.clone();
         let check_status = self.check_status(ctx, false);
-        let value = if let Ok(list) = ctx.props().list.try_borrow() {
+        let value = if cfg!(feature = "pumpkin") {
+            if let Ok(list) = ctx.props().list.try_borrow() {
+                if list.is_empty() {
+                    class_input = "complex-select-input-empty";
+                    text!(txt, ctx.props().language, "None").to_string()
+                } else {
+                    match self.selection_state {
+                        SelectionState::Default => {
+                            text!(txt, ctx.props().language, "All").to_string()
+                        }
+                        SelectionState::AllSelected => {
+                            let custom_len = ctx.props().selected.custom.borrow().len();
+                            let total_len = list.len() + custom_len;
+                            format!(
+                                "({}) {} - {}",
+                                total_len,
+                                text!(txt, ctx.props().language, "Selected Filters"),
+                                text!(txt, ctx.props().language, "All")
+                            )
+                        }
+                        SelectionState::Partial => {
+                            if ctx.props().selected.is_empty() {
+                                if ctx.props().allow_empty {
+                                    class_input = "complex-select-input-empty";
+                                } else {
+                                    class_input = "complex-select-input-empty-alert";
+                                }
+                                text!(txt, ctx.props().language, &ctx.props().empty_msg).to_string()
+                            } else {
+                                format!(
+                                    "({}) {}",
+                                    Self::selected_len(ctx),
+                                    text!(txt, ctx.props().language, &ctx.props().title)
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                "complex-select-input-empty".to_string()
+            }
+        } else if let Ok(list) = ctx.props().list.try_borrow() {
             if list.is_empty() {
                 class_input = "complex-select-input-empty";
                 text!(txt, ctx.props().language, "None").to_string()
             } else if check_status == CheckStatus::Checked {
                 text!(txt, ctx.props().language, "All").to_string()
             } else if ctx.props().selected.is_empty() {
-                if ctx.props().allow_empty {
-                    class_input = "complex-select-input-empty";
-                } else {
-                    class_input = "complex-select-input-empty-alert";
-                }
+                class_input = "complex-select-input-empty";
                 text!(txt, ctx.props().language, &ctx.props().empty_msg).to_string()
             } else {
                 format!(
@@ -402,7 +509,13 @@ impl Component for Model {
         html! {
             <div class="complex-select">
                 <div onclick={onclick} class="complex-select-top">
-                    <input type="text" class={classes!("complex-select-top-input", class_input)} readonly={true} value={value} style={style} />
+                    <input
+                        type="text"
+                        class={classes!("complex-select-top-input", class_input)}
+                        readonly={true}
+                        value={value}
+                        style={style}
+                    />
                 </div>
                 { self.view_pop(ctx) }
             </div>
@@ -575,11 +688,9 @@ impl Model {
                 .direction_items
                 .iter()
                 .filter_map(|(k, v)| {
-                    if let Ok(v) = v.try_borrow() {
-                        Some((k.clone(), Rc::new(RefCell::new(*v))))
-                    } else {
-                        None
-                    }
+                    v.try_borrow()
+                        .ok()
+                        .and_then(|v| (*v).map(|val| (k.clone(), Rc::new(RefCell::new(Some(val))))))
                 })
                 .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>();
             *predefined = Some(s);

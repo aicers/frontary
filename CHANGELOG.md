@@ -11,6 +11,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
+- Added `SelectionState` enum to clarify Network/IP filter states.
+
+### Changed
+
+- Changed functions and icons related with Network/IP filter to latest Figma design.
 
 ### Fixed
 
