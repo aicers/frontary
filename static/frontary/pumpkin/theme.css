@@ -397,6 +397,7 @@ input[type=text].complex-select-input-empty-alert {
 }
 
 div.complex-select-pop {
+    overflow: auto;
     display: none;
     position: fixed;
     z-index: 20;
@@ -408,14 +409,15 @@ div.complex-select-pop {
 }
 
 div.complex-select-pop-head {
-    height: 70px;
-    width: 100%;
+    padding-left: 24px;
+    padding-right: 16px;
+    padding-top: 16px;
+    padding-bottom: 16px;
 }
 
 td.complex-select-pop-head-text {
-    height: 70px;
-    padding-left: 24px;
-    padding-right: 20px;
+    width: 100%;
+    padding-right: 12px;
     background-color: var(--Dark-80);
     vertical-align: middle;
     font-size: 16px;
@@ -427,12 +429,9 @@ span.complex-select-pop-head-color {
 }
 
 td.complex-select-pop-head-close {
-    height: 70px;
-    width: 34px;
-    padding-top: 10px;
-    padding-right: 10px;
+    height: 40px;
+    width: 40px;
     background-color: var(--Dark-80);
-    vertical-align: top;
     font-size: 16px;
 }
 
@@ -445,51 +444,97 @@ div.complex-select-pop-head-close-icon {
 }
 
 div.complex-select-pop-all {
-    height: 48px;
-    margin-top: 6px;
+    height: 72px;
     padding-left: 24px;
     padding-right: 24px;
-}
-
-div.complex-select-pop-all-text {
-    float: left;
-    height: 42px;
-    padding-top: 12px;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 20px;
-    color: var(--Text-Primary);
+    padding-bottom: 24px;
 }
 
 div.complex-select-pop-all-button {
-    float: right;
+    float: left;
     width: 48px;
     height: 48px;
     background-size: 48px 48px;
     background-repeat: no-repeat;
 }
 
-div.complex-select-pop-list-head {
+div.complex-select-pop-all-text {
+    display: flex;
+    align-items: center;
     height: 48px;
+    padding-left: 8px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--Text-Primary);
+}
+
+div.complex-select-pop-list-head {
     width: 100%;
     font-size: 16px;
     font-weight: 500;
     color: var(--Text-Primary);
     line-height: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div.complex-select-pop-head-1st {
+    flex: 1 0 0;
+    padding-right: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+div.complex-select-pop-head-2nd {
+    color: var(--Blue-40);
+    text-align: right;
+    padding-right: 4px;
+}
+
+div.complex-select-pop-head-3rd {
+    width: 24px;
+    height: 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.complex-select-pop-subtext {
+    color: var(--Text-Secondary);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 12px;
+}
+
+div.complex-select-pop-divider {
+    height: 1px;
+    background: var(--Dark-70);
+    margin: 24px;
+    margin-top: 12px;
 }
 
 div.complex-select-pop-input-head {
-    height: 48px;
     width: 100%;
     font-size: 16px;
     font-weight: 500;
     color: var(--Text-Primary);
     line-height: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 div.complex-select-pop-input-head-bottom {
-    height: 48px;
-    width: 100%;
     position: fixed;
     bottom: 0px;
     font-size: 14px;
@@ -498,19 +543,12 @@ div.complex-select-pop-input-head-bottom {
     color: var(--Text-Primary);
 }
 
-td.complex-select-pop-head-1st {
-    width: 125px;
-    height: 42px;
-    padding-left: 24px;
-    vertical-align: middle;
-}
-
-td.complex-select-pop-head-2nd {
-    height: 42px;
-    width: 22px;
-    background-size: 22px 22px;
-    background-position: 0px 10px;
-    background-repeat: no-repeat;
+div.complex-select-pop-list-empty {
+    padding: 4px 24px 12px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--Dark-30);
 }
 
 div.complex-select-pop-list-search {
@@ -518,9 +556,8 @@ div.complex-select-pop-list-search {
 }
 
 div.complex-select-pop-list-list-all {
-    padding-left: 26px;
-    padding-right: 26px;
-    height: 42px;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
 table.complex-select-pop-list-list-all {
@@ -531,9 +568,9 @@ table.complex-select-pop-list-list-all {
 
 div.complex-select-pop-list-list-items {
     overflow: auto;
-    padding-left: 26px;
-    padding-right: 26px;
-    padding-bottom: 20px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 12px;
 }
 
 td.complex-select-pop-list-list-all-checkbox {
@@ -549,24 +586,21 @@ td.complex-select-pop-list-list-all-item {
 }
 
 td.complex-select-pop-list-list-items-checkbox {
-    width: 19px;
     vertical-align: top;
-    padding-top: 13px;
 }
 
 td.complex-select-pop-list-list-items-item {
-    padding-top: 20px;
+    padding-top: 8px;
     font-size: 16px;
     font-weight: 400;
     line-height: 20px;
     color: var(--Text-Primary);
-    vertical-align: top;
+    height: 48px;
 }
 
 td.complex-select-pop-list-list-items-direction {
-    width: 70px;
-    vertical-align: top;
-    padding-top: 20px;
+    width: 86px;
+    padding-top: 8px;
 }
 
 div.complex-select-pop-list-networks {
@@ -578,8 +612,10 @@ div.complex-select-pop-list-networks {
 
 input[type=text].complex-select-search {
     height: 40px;
+    margin-top: 4px;
     margin-left: 24px;
-    padding: 4px 12px;
+    margin-right: 24px;
+    padding: 8px 12px;
     background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
@@ -599,11 +635,8 @@ input[type=text].complex-select-search:focus {
     outline: none;
 }
 
-div.complex-select-pop-input {
-    margin-top: 9px;
-}
-
 div.complex-select-pop-input-input {
+    display: flex;
     height: 30px;
     margin-bottom: 8px;
     padding-left: 24px;
@@ -628,11 +661,28 @@ div.complex-select-pop-input-input-plus {
 
 div.complex-select-pop-input-input-message {
     font-size: 12px;
-    padding-left: 26px;
-    padding-right: 26px;
-    padding-top: 15px;
-    height: 30px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 8px;
     color: var(--Red-60);
+}
+
+div.complex-select-pop-input-empty {
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--Dark-30);
+}
+
+div.complex-select-pop-input-input-head {
+    padding: 8px 24px;
+    font-size: 16px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-weight: 500;
+    color: var(--Text-Primary);
 }
 
 input[type=text].complex-select-pop-input {
@@ -663,20 +713,18 @@ div.complex-select-pop-input-list {
     padding-left: 24px;
     padding-right: 24px;
     padding-bottom: 20px;
-    font-size: 13px;
+    font-size: 16px;
 }
 
 td.complex-select-pop-input-list-networks {
+    width: 100%;
     background-color: var(--Transparent-Mid-Grey);
     border-radius: 8px;
     color: var(--Text-Primary);
 }
 
 div.complex-select-pop-input-list-text {
-    padding-top: 6px;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 6px;
+    padding: 8px 12px;
 }
 
 td.complex-select-pop-input-list-direction {
@@ -690,7 +738,7 @@ div.complex-select-pop-input-list-delete {
     height: 24px;
     float: right;
     background-image: url('/frontary/pumpkin/delete-x.svg');
-    background-position: 2px 2px;
+    background-position: -4px 4px;
     background-repeat: no-repeat;
 }
 
@@ -914,10 +962,8 @@ div.mini-select-basic-icon-square {
 }
 
 div.mini-select-item-direction {
-    float: right;
-    padding: 4px 12px;
+    padding: 8px 12px;
     border-radius: 8px;
-    white-space: nowrap;
 }
 
 div.mini-select-item-direction:hover {
@@ -925,14 +971,15 @@ div.mini-select-item-direction:hover {
 }
 
 td.mini-select-item-direction {
-    height: 32px;
+    height: 24px;
     vertical-align: middle;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 24px;
     color: var(--Text-Primary);
     font-weight: 400;
-    padding-right: 5px;
+    padding-right: 4px;
+    white-space: nowrap;
 }
 
 td.mini-select-item-direction-icon {

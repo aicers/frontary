@@ -30,27 +30,29 @@ impl Model {
         );
         let style = format!("width: {}px;", ctx.props().pop_width);
         let style_pop = format!(
-            "widht: {}px; height: {}px;",
+            "width: {}px; height: {}px;",
             ctx.props().pop_width,
             std::cmp::max(MIN_POP_HEIGHT, window_inner_height())
         );
         let style_head_title = format!("width: {}px;", ctx.props().pop_width - 34);
-        let (style_list, style_input) = if self.view_list {
-            if cfg!(feature = "pumpkin") {
-                (
-                    "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
-                    "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
-                )
+        let (style_list, style_input) = if cfg!(feature = "pumpkin") {
+            let style_list = if self.view_list {
+                "background-image: url('/frontary/pumpkin/collapse-contents.svg');"
             } else {
-                (
-                    "background-image: url('/frontary/collapse-contents.png');",
-                    "background-image: url('/frontary/collapse-contents.png');",
-                )
-            }
-        } else if cfg!(feature = "pumpkin") {
+                "background-image: url('/frontary/pumpkin/expand-contents.svg');"
+            };
+
+            let style_input = if self.view_input {
+                "background-image: url('/frontary/pumpkin/collapse-contents.svg');"
+            } else {
+                "background-image: url('/frontary/pumpkin/expand-contents.svg');"
+            };
+
+            (style_list, style_input)
+        } else if self.view_list {
             (
-                "background-image: url('/frontary/pumpkin/expand-contents.svg');",
-                "background-image: url('/frontary/pumpkin/expand-contents.svg');",
+                "background-image: url('/frontary/collapse-contents.png');",
+                "background-image: url('/frontary/collapse-contents.png');",
             )
         } else {
             (
@@ -58,10 +60,11 @@ impl Model {
                 "background-image: url('/frontary/expand-contents.png');",
             )
         };
-        let class_input_head = if self.view_list {
-            "complex-select-pop-input-head-bottom"
-        } else {
+
+        let class_input_head = if cfg!(feature = "pumpkin") || !self.view_list {
             "complex-select-pop-input-head"
+        } else {
+            "complex-select-pop-input-head-bottom"
         };
 
         let onclick_input = ctx.link().callback(|_| Message::ToggleInput);
@@ -69,44 +72,147 @@ impl Model {
         let onclick_all = ctx.link().callback(|_| Message::ClickAll);
         let onclick_close = ctx.link().callback(|_| Message::Close);
 
+        let style_width_input = if cfg!(feature = "pumpkin") {
+            format!("width: {}px", ctx.props().pop_width - 100)
+        } else {
+            format!("width: {}px", ctx.props().pop_width - 86)
+        };
+        let input_notice = text!(
+            txt,
+            ctx.props().language,
+            "Enter an IP (e.g., 192.168.0.1/24)"
+        )
+        .to_string();
+        let oninput_input = ctx.link().callback(|e: InputEvent| {
+            e.target()
+                .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
+                .map_or(Message::InputError, |input| {
+                    Message::InputInput(input.value())
+                })
+        });
+        let onclick_add = ctx.link().callback(|_| Message::ClickAddInput);
+        let onkeyup = ctx.link().batch_callback(move |e: KeyboardEvent| {
+            (e.key() == "Enter").then_some(Message::ClickAddInput)
+        });
+        let style_msg = if cfg!(feature = "pumpkin") {
+            format!("width: {}px; height: {}px;", ctx.props().pop_width, {
+                if self.input_wrong_msg.is_some() {
+                    40
+                } else {
+                    12
+                }
+            })
+        } else {
+            format!("width: {}px; height: {}px;", ctx.props().pop_width, {
+                if self.input_wrong_msg.is_some() {
+                    40
+                } else {
+                    15
+                }
+            })
+        };
+
         html! {
             <div id={ctx.props().id.clone()} class="complex-select-pop" style={style_pop}>
                 <div class="complex-select-pop-head">
                     <table>
-                        <tr style={style.clone()}>
-                            <td class="complex-select-pop-head-text" style={style_head_title}>
-                                { text!(txt, ctx.props().language, &ctx.props().title) }
-                                { decode_html(NBSP).expect("safely-selected character") }
-                                <span class="complex-select-pop-head-color">
-                                    { "(" } { Self::selected_len(ctx) } { ")" }
-                                </span>
-                            </td>
-                            <td class="complex-select-pop-head-close" onclick={onclick_close}>
-                                <div class="complex-select-pop-head-close-icon">
-                                </div>
-                            </td>
-                        </tr>
+                        {
+                            if cfg!(feature = "pumpkin") {
+                                html! {
+                                    <tr>
+                                        <td class="complex-select-pop-head-text">
+                                            { text!(txt, ctx.props().language, &ctx.props().title) }
+                                            { decode_html(NBSP).expect("safely-selected character") }
+                                            <span class="complex-select-pop-head-color">
+                                                { "(" } { Self::selected_len(ctx) } { ")" }
+                                            </span>
+                                        </td>
+                                        <td class="complex-select-pop-head-close" onclick={onclick_close}>
+                                            <div class="complex-select-pop-head-close-icon"></div>
+                                        </td>
+                                    </tr>
+                                }
+                            } else {
+                                html! {
+                                    <tr style={style.clone()}>
+                                        <td class="complex-select-pop-head-text" style={style_head_title}>
+                                            { text!(txt, ctx.props().language, &ctx.props().title) }
+                                            { decode_html(NBSP).expect("safely-selected character") }
+                                            <span class="complex-select-pop-head-color">
+                                                { "(" } { Self::selected_len(ctx) } { ")" }
+                                            </span>
+                                        </td>
+                                        <td class="complex-select-pop-head-close" onclick={onclick_close}>
+                                            <div class="complex-select-pop-head-close-icon"></div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
                     </table>
                 </div>
+
                 // All for the entire
-                <div class="complex-select-pop-all" style={style.clone()} >
-                    <div class="complex-select-pop-all-text">
-                        { text!(txt, ctx.props().language, "Select All") }
-                    </div>
-                    <div class="complex-select-pop-all-button" style={style_all} onclick={onclick_all}>
-                    </div>
-                </div>
-                <div class="complex-select-pop-list-head">
-                    <table>
-                        <tr onclick={onclick_list}>
-                            <td class="complex-select-pop-head-1st">
-                                { text!(txt, ctx.props().language, "Choose ones (in the list)") }
-                            </td>
-                            <td class="complex-select-pop-head-2nd" style={style_list}>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                {
+                    if cfg!(feature = "pumpkin") {
+                        html! {
+                            <div class="complex-select-pop-all">
+                                <div class="complex-select-pop-all-button" style={style_all} onclick={onclick_all}>
+                                </div>
+                                <div class="complex-select-pop-all-text">
+                                    { text!(txt, ctx.props().language, "Include all registered and custom IPs") }
+                                </div>
+                            </div>
+                        }
+                    } else {
+                        html! {
+                            <div class="complex-select-pop-all" style={style.clone()} >
+                                <div class="complex-select-pop-all-text">
+                                    { text!(txt, ctx.props().language, "Select All") }
+                                </div>
+                                <div class="complex-select-pop-all-button" style={style_all} onclick={onclick_all}>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+
+                // List head
+                {
+                    if cfg!(feature = "pumpkin") {
+                        html! {
+                            <>
+                                <div class="complex-select-pop-list-head" onclick={onclick_list}>
+                                    <div class="complex-select-pop-head-1st">
+                                        { text!(txt, ctx.props().language, "Select from Registered") }
+                                    </div>
+                                    <div class="complex-select-pop-head-2nd">
+                                        { text!(txt, ctx.props().language, "Show IPs") }
+                                    </div>
+                                    <div class="complex-select-pop-head-3rd" style={style_list}>
+                                    </div>
+                                </div>
+                                <div class="complex-select-pop-subtext">
+                                    { text!(txt, ctx.props().language, "Choose from networks previously registered in your environment.") }
+                                </div>
+                            </>
+                        }
+                    } else {
+                        html! {
+                            <div class="complex-select-pop-list-head">
+                                <table>
+                                    <tr onclick={onclick_list}>
+                                        <td class="complex-select-pop-head-1st">
+                                            { text!(txt, ctx.props().language, "Choose ones (in the list)") }
+                                        </td>
+                                        <td class="complex-select-pop-head-2nd" style={style_list}>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
+                    }
+                }
                 {
                     if self.view_list {
                         self.view_list(ctx)
@@ -114,17 +220,64 @@ impl Model {
                         html! {}
                     }
                 }
-                <div class={class_input_head}>
-                    <table>
-                        <tr onclick={onclick_input}>
-                            <td class="complex-select-pop-head-1st">
-                                { text!(txt, ctx.props().language, "Input yourself") }
-                            </td>
-                            <td class="complex-select-pop-head-2nd" style={style_input}>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                {
+                    if cfg!(feature = "pumpkin") {
+                        html! {
+                            <>
+                                <div class="complex-select-pop-divider"></div>
+                                <div class={class_input_head} onclick={onclick_input}>
+                                    <div class="complex-select-pop-head-1st">
+                                        { text!(txt, ctx.props().language, "Add Custom IP") }
+                                    </div>
+                                    <div class="complex-select-pop-head-2nd">
+                                        { text!(txt, ctx.props().language, "Show IPs") }
+                                    </div>
+                                    <div class="complex-select-pop-head-3rd" style={style_input}>
+                                    </div>
+                                </div>
+                                <div class="complex-select-pop-subtext">
+                                    { text!(txt, ctx.props().language, "Specify a custom IP address or range.") }
+                                </div>
+                                <div class="complex-select-pop-input-input">
+                                    <div class="complex-select-pop-input-input-text">
+                                        <input type="text" class="complex-select-pop-input"
+                                            placeholder={input_notice}
+                                            style={style_width_input}
+                                            oninput={oninput_input}
+                                            onkeyup={onkeyup}
+                                            value={self.input_text.clone()}
+                                        />
+                                    </div>
+                                    <div class="complex-select-pop-input-input-plus" onclick={onclick_add}>
+                                    </div>
+                                </div>
+                                <div class="complex-select-pop-input-input-message" style={style_msg}>
+                                    {
+                                        if let Some(msg) = self.input_wrong_msg.as_ref() {
+                                            html! { text!(txt, ctx.props().language, msg) }
+                                        } else {
+                                            html! {}
+                                        }
+                                    }
+                                </div>
+                            </>
+                        }
+                    } else {
+                        html! {
+                            <div class={class_input_head}>
+                                <table>
+                                    <tr onclick={onclick_input}>
+                                        <td class="complex-select-pop-head-1st">
+                                            { text!(txt, ctx.props().language, "Input yourself") }
+                                        </td>
+                                        <td class="complex-select-pop-head-2nd" style={style_input}>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
+                    }
+                }
                 {
                     if self.view_input {
                         self.view_input(ctx)
@@ -137,23 +290,79 @@ impl Model {
     }
 
     fn view_list(&self, ctx: &Context<Self>) -> Html {
-        let style = format!("width: {}px;", ctx.props().pop_width);
-        let style_width_search = format!("width: {}px", ctx.props().pop_width - 48);
-        let style_pop_list = format!(
-            "width: {}px; height: {}px",
-            ctx.props().pop_width,
-            std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 202
-        );
-        let style_pop_list_list = format!(
-            "width: {}px; height: {}px",
-            ctx.props().pop_width,
-            std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 244
-        );
-        let style_pop_list_list_items = format!(
-            "width: {}px; height: {}px",
-            ctx.props().pop_width,
-            std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 286
-        );
+        let (
+            style,
+            style_width_search,
+            style_pop_list,
+            style_pop_list_list,
+            style_pop_list_list_items,
+        ) = if cfg!(feature = "pumpkin") {
+            (
+                format!("width: {}px;", ctx.props().pop_width),
+                format!("width: {}px", ctx.props().pop_width - 48),
+                format!("width: {}px", ctx.props().pop_width),
+                format!("width: {}px;", ctx.props().pop_width),
+                format!("width: {}px;", ctx.props().pop_width),
+            )
+        } else {
+            (
+                format!("width: {}px;", ctx.props().pop_width),
+                format!("width: {}px", ctx.props().pop_width - 48),
+                format!(
+                    "width: {}px; height: {}px",
+                    ctx.props().pop_width,
+                    std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 202
+                ),
+                format!(
+                    "width: {}px; height: {}px",
+                    ctx.props().pop_width,
+                    std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 244
+                ),
+                format!(
+                    "width: {}px; height: {}px",
+                    ctx.props().pop_width,
+                    std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 286
+                ),
+            )
+        };
+
+        let txt = ctx.props().txt.txt.clone();
+
+        html! {
+            <div class="complex-select-pop-list" style={style_pop_list}>
+                {
+                    if let Ok(list) = ctx.props().list.try_borrow() {
+                        if cfg!(feature = "pumpkin") && list.is_empty() {
+                            html! {
+                                <div class="complex-select-pop-list-empty">
+                                    { text!(txt, ctx.props().language, "No registered networks.") }
+                                </div>
+                            }
+                        } else {
+                            self.view_registered_list(
+                                ctx,
+                                style,
+                                style_width_search,
+                                style_pop_list_list,
+                                style_pop_list_list_items,
+                            )
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+            </div>
+        }
+    }
+
+    fn view_registered_list(
+        &self,
+        ctx: &Context<Self>,
+        style: String,
+        style_width_search: String,
+        style_pop_list_list: String,
+        style_pop_list_list_items: String,
+    ) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let search_notice = text!(txt, ctx.props().language, "Search").to_string();
         let oninput_search = ctx.link().callback(|e: InputEvent| {
@@ -170,7 +379,7 @@ impl Model {
         };
 
         html! {
-            <div class="complex-select-pop-list" style={style_pop_list}>
+            <>
                 <div class="complex-select-pop-list-search" style={style}>
                     <input type="text" class="complex-select-search"
                         placeholder={search_notice}
@@ -198,7 +407,7 @@ impl Model {
                                                 { text!(txt, ctx.props().language, "Select All") }
                                             </td>
                                             <td>
-                                            { self.view_direction(ctx) }
+                                                { self.view_direction(ctx) }
                                             </td>
                                         </tr>
                                     </table>
@@ -232,7 +441,7 @@ impl Model {
                     }
                     </div>
                 </div>
-            </div>
+            </>
         }
     }
 
@@ -302,9 +511,10 @@ impl Model {
             ctx.link()
                 .callback(move |_| Message::ClickItem(key.clone()))
         };
-        let style_item_width = match ctx.props().kind {
-            SelectComplexKind::NetworkIp => "width: 209px;",
-            SelectComplexKind::Basic => "width: 279px",
+        let style_item_width = match (ctx.props().kind, cfg!(feature = "pumpkin")) {
+            (SelectComplexKind::NetworkIp, true) => "width: 268px;",
+            (SelectComplexKind::NetworkIp, false) => "width: 209px;",
+            (SelectComplexKind::Basic, _) => "width: 279px;",
         };
 
         html! {
@@ -384,7 +594,7 @@ impl Model {
                 SelectionExtraInfo::Network(EndpointKind::Source),
                 SelectionExtraInfo::Network(EndpointKind::Destination),
             ]);
-            let top_width = if cfg!(feature = "pumpkin") { 90 } else { 70 };
+            let top_width = if cfg!(feature = "pumpkin") { 86 } else { 70 };
             if let Some(selected) = self.direction_items.get(id) {
                 html! {
                     <SelectMini::<SelectionExtraInfo, Self>
@@ -417,67 +627,101 @@ impl Model {
             ctx.props().pop_width,
             std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 196,
         );
-        let style_pop_input_list = format!("width: {}px; height: {}px", ctx.props().pop_width, {
+        let style_pop_input_list = format!(
+            "width: {}px; height: {}px",
+            ctx.props().pop_width,
             if self.input_wrong_msg.is_some() {
                 std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 226 - 40
             } else {
                 std::cmp::max(MIN_POP_HEIGHT, window_inner_height()) - 226 - 15
             }
-        });
-        let style_width_input = if cfg!(feature = "pumpkin") {
-            format!("width: {}px", ctx.props().pop_width - 100)
-        } else {
-            format!("width: {}px", ctx.props().pop_width - 86)
-        };
-        let style_msg = format!("width: {}px; height: {}px;", ctx.props().pop_width, {
-            if self.input_wrong_msg.is_some() {
-                40
-            } else {
-                15
-            }
-        });
+        );
         let txt = ctx.props().txt.txt.clone();
-        let input_notice = text!(txt, ctx.props().language, "Network/IP Details").to_string();
-        let oninput_input = ctx.link().callback(|e: InputEvent| {
-            e.target()
-                .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
-                .map_or(Message::InputError, |input| {
-                    Message::InputInput(input.value())
-                })
-        });
-        let onclick_add = ctx.link().callback(|_| Message::ClickAddInput);
-        let onkeyup = ctx.link().batch_callback(move |e: KeyboardEvent| {
-            (e.key() == "Enter").then_some(Message::ClickAddInput)
-        });
 
-        html! {
-            <div class="complex-select-pop-input" style={style_pop_input}>
-                <div class="complex-select-pop-input-input">
-                    <div class="complex-select-pop-input-input-text">
-                        <input type="text" class="complex-select-pop-input"
-                            placeholder={input_notice}
-                            style={style_width_input}
-                            oninput={oninput_input}
-                            onkeyup={onkeyup}
-                            value={self.input_text.clone()}
-                        />
+        if cfg!(feature = "pumpkin") {
+            let custom_keys = ctx
+                .props()
+                .selected
+                .custom
+                .try_borrow()
+                .map(|custom| custom.keys().cloned().collect::<Vec<String>>())
+                .unwrap_or_default();
+
+            let custom_is_empty = custom_keys.is_empty();
+
+            html! {
+                <div style={style_pop_input}>
+                    <div class="complex-select-pop-input-input-head">
+                        { text!(txt, ctx.props().language, "Specified IP address") }
                     </div>
-                    <div class="complex-select-pop-input-input-plus" onclick={onclick_add}>
-                    </div>
-                </div>
-                <div class="complex-select-pop-input-input-message" style={style_msg}>
-                {
-                    if let Some(msg) = self.input_wrong_msg.as_ref() {
-                        html! { text!(txt, ctx.props().language, msg) }
-                    } else {
-                        html! {}
+                    {
+                        if custom_is_empty {
+                            html! {
+                                <div class="complex-select-pop-input-empty">
+                                    { text!(txt, ctx.props().language, "No custom IPs added.") }
+                                </div>
+                            }
+                        } else {
+                            html! {
+                                <div class="complex-select-pop-input-list" style={style_pop_input_list}>
+                                    { Self::view_input_list(ctx) }
+                                </div>
+                            }
+                        }
                     }
+                </div>
+            }
+        } else {
+            let style_width_input = format!("width: {}px", ctx.props().pop_width - 86);
+            let style_msg = format!("width: {}px; height: {}px;", ctx.props().pop_width, {
+                if self.input_wrong_msg.is_some() {
+                    40
+                } else {
+                    15
                 }
+            });
+            let input_notice = text!(txt, ctx.props().language, "Network/IP Details").to_string();
+            let oninput_input = ctx.link().callback(|e: InputEvent| {
+                e.target()
+                    .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
+                    .map_or(Message::InputError, |input| {
+                        Message::InputInput(input.value())
+                    })
+            });
+            let onclick_add = ctx.link().callback(|_| Message::ClickAddInput);
+            let onkeyup = ctx.link().batch_callback(move |e: KeyboardEvent| {
+                (e.key() == "Enter").then_some(Message::ClickAddInput)
+            });
+
+            html! {
+                <div class="complex-select-pop-input" style={style_pop_input}>
+                    <div class="complex-select-pop-input-input">
+                        <div class="complex-select-pop-input-input-text">
+                            <input type="text" class="complex-select-pop-input"
+                                placeholder={input_notice}
+                                style={style_width_input}
+                                oninput={oninput_input}
+                                onkeyup={onkeyup}
+                                value={self.input_text.clone()}
+                            />
+                        </div>
+                        <div class="complex-select-pop-input-input-plus" onclick={onclick_add}>
+                        </div>
+                    </div>
+                    <div class="complex-select-pop-input-input-message" style={style_msg}>
+                        {
+                            if let Some(msg) = self.input_wrong_msg.as_ref() {
+                                html! { text!(txt, ctx.props().language, msg) }
+                            } else {
+                                html! {}
+                            }
+                        }
+                    </div>
+                    <div class="complex-select-pop-input-list" style={style_pop_input_list}>
+                        { Self::view_input_list(ctx) }
+                    </div>
                 </div>
-                <div class="complex-select-pop-input-list" style={style_pop_input_list}>
-                    { Self::view_input_list(ctx) }
-                </div>
-            </div>
+            }
         }
     }
 
