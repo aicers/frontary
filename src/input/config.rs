@@ -34,6 +34,7 @@ pub struct TextConfig {
     pub preset: Option<String>,
     pub unique: bool,
     pub immutable: bool,
+    pub warning_message: Option<String>,
 }
 
 #[derive(Clone, PartialEq)]

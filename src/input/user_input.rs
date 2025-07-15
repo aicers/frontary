@@ -61,6 +61,7 @@ where
         autofocus: bool,
         group: bool,
         immutable: bool,
+        warning_message: Option<&String>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let my_index_clone = my_index.clone();
@@ -166,6 +167,17 @@ where
                         html! {
                             <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, EXISTING_MSG)}
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                {
+                    if let Some(warning_msg) = warning_message {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                                { text!(txt, ctx.props().language, warning_msg)}
                             </div>
                         }
                     } else {
