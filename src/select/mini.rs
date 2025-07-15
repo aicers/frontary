@@ -314,17 +314,9 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 let icon = if key == "On" {
-                                                    if cfg!(feature = "pumpkin") {
-                                                        "/frontary/pumpkin/on.png"
-                                                    } else {
-                                                        "/frontary/on.png"
-                                                    }
+                                                    "/frontary/on.png"
                                                 } else if key == "Off" {
-                                                    if cfg!(feature = "pumpkin") {
-                                                        "/frontary/pumpkin/off.png"
-                                                    } else {
-                                                        "/frontary/off.png"
-                                                    }
+                                                    "/frontary/off.png"
                                                 } else {
                                                     ""
                                                 };
