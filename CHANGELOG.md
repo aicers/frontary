@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Refined layout and validation styling in `user_input_composite`,
   `user_input_comparison`, `user_input_select`, `user_input` and
   `vec_searchable` modules to align with updated design standards.
+- `creation_time` in `ListItem` no longer uses `DateTime<Utc>` from `chrono`; it
+  now uses `Timestamp` from `jiff`.
 
 ### Fixed
 
@@ -43,8 +45,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `overflow-y: auto` to `input-inner` to enhance vertical scrolling and
   layout behavior.
 - Added `UInteger`, `Vector`, `IpAddr`, `Bool` to `ValueKind`.
-- `creation_time` in `ListItem` no longer uses `DateTime<Utc>` from `chrono`; it
-  now uses `Timestamp` from `jiff`.
 
 ### Fixed
 
