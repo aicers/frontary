@@ -2612,6 +2612,15 @@ div.input-group-add {
     padding-bottom: 4px;
 }
 
+/* Layout-specific overrides for default theme */
+td.input-group-delete.multi-row {
+    padding: 2px;
+}
+
+td.input-group-delete.one-row {
+    padding: 4px;
+}
+
 div.input-comparison-outer {
     display: flex;
     flex-direction: column;
