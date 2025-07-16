@@ -12,10 +12,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `DomainNameItem` and `DomainNameConfig` for domain name input validation.
   Provides built-in validation according to RFC standards including label length
   limits, allowed characters, and overall domain name structure validation.
-- Added warning message display for text input components created by `TextConfig`.
-  Text inputs generated through the `WholeList` component using `TextConfig` now
-  support a `warning_message` field to display custom warning messages below the
-  input field, using the same styling as other alert messages.
+- Added dynamic validation rule system for text input components. Text inputs now
+  support a `validation_rules` field that automatically generates appropriate
+  warning messages based on input validation failures. The initial implementation
+  includes `UsernameFormat` validation with rules for character restrictions,
+  length limits, and format requirements.
 
 ### Changed
 
