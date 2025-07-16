@@ -534,16 +534,17 @@ where
                                     let row_has_error = row.iter().enumerate().any(|(i, _)| {
                                         self.required_msg.contains(&cal_index(Some(&row_rep_index), i))
                                     });
+                                    let layout_modifier = if one_row { "one-row" } else { "multi-row" };
                                     let line_class = match (row_index == 0, row_has_error) {
-                                        (true, true) => "group-list-link-line-top first-row long",
-                                        (true, false) => "group-list-link-line-top first-row",
-                                        (false, true) => "group-list-link-line-top long",
-                                        (false, false) => "group-list-link-line-top",
+                                        (true, true) => format!("group-list-link-line-top first-row long {layout_modifier}"),
+                                        (true, false) => format!("group-list-link-line-top first-row {layout_modifier}"),
+                                        (false, true) => format!("group-list-link-line-top long {layout_modifier}"),
+                                        (false, false) => format!("group-list-link-line-top {layout_modifier}"),
                                     };
                                     let delete_cell_class = if row_index == 0 {
-                                        classes!("input-trash-can-delete", "first-row")
+                                        classes!("input-trash-can-delete", "first-row", layout_modifier)
                                     } else {
-                                        classes!("input-trash-can-delete")
+                                        classes!("input-trash-can-delete", layout_modifier)
                                     };
 
                                     if one_row {
@@ -553,7 +554,7 @@ where
                                                     if cfg!(feature = "pumpkin") {
                                                         html! {
                                                             <td class="group-list-link-cell">
-                                                                <div class={line_class}></div>
+                                                                <div class={line_class.clone()}></div>
                                                             </td>
                                                         }
                                                     } else {
@@ -658,7 +659,7 @@ where
                                                     }
                                                     else {
                                                         html!{
-                                                            <td class="input-group-delete">
+                                                            <td class={classes!("input-group-delete", layout_modifier)}>
                                                                 <div class="input-nic-delete-outer">
                                                                     <div class="input-nic-delete" onclick={onclick_delete}>
                                                                     </div>
