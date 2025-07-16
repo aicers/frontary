@@ -375,7 +375,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index) }
+                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index, config.class_name.as_deref(),) }
                     </div>
                 }
             }
@@ -422,12 +422,13 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        class_name: Option<&str>,
     ) -> Html {
         let this_index = cal_index(base_index, layer_index); // == my_index
         let this_index_clone = this_index.clone();
         let input_data_clone = input_data.clone();
         let input_data_clone_ref = &(input_data.clone());
-        let items_conf_clone = items_conf.to_vec();
+        let items_conf_clone: Vec<Rc<InputConfig>> = items_conf.to_vec();
         let items_conf_clone_ref = &(items_conf_clone.clone());
 
         let Ok(input_data) = input_data.try_borrow() else {
@@ -477,6 +478,11 @@ where
                 .get(index)
                 .and_then(|w| w.map(|v| format!("width: {v}px;")))
                 .unwrap_or_default()
+        };
+        let bottom_line_class = if class_name == Some("compact-group") {
+            "group-list-link-line-bottom compact-group"
+        } else {
+            "group-list-link-line-bottom"
         };
 
         html! {
@@ -534,14 +540,23 @@ where
                                     let row_has_error = row.iter().enumerate().any(|(i, _)| {
                                         self.required_msg.contains(&cal_index(Some(&row_rep_index), i))
                                     });
-                                    let line_class = match (row_index == 0, row_has_error) {
-                                        (true, true) => "group-list-link-line-top first-row long",
-                                        (true, false) => "group-list-link-line-top first-row",
-                                        (false, true) => "group-list-link-line-top long",
-                                        (false, false) => "group-list-link-line-top",
+                                    let is_compact_group = class_name == Some("compact-group");
+                                    let top_line_class = if is_compact_group {
+                                        "group-list-link-line-top compact-group"
+                                    } else {
+                                        match (row_index == 0, row_has_error) {
+                                            (true, true) => "group-list-link-line-top first-row long",
+                                            (true, false) => "group-list-link-line-top first-row",
+                                            (false, true) => "group-list-link-line-top long",
+                                            (false, false) => "group-list-link-line-top",
+                                        }
                                     };
                                     let delete_cell_class = if row_index == 0 {
-                                        classes!("input-trash-can-delete", "first-row")
+                                        if is_compact_group {
+                                            classes!("input-trash-can-delete", "first-row", "compact-group")
+                                        } else {
+                                            classes!("input-trash-can-delete", "first-row")
+                                        }
                                     } else {
                                         classes!("input-trash-can-delete")
                                     };
@@ -553,7 +568,7 @@ where
                                                     if cfg!(feature = "pumpkin") {
                                                         html! {
                                                             <td class="group-list-link-cell">
-                                                                <div class={line_class}></div>
+                                                                <div class={top_line_class}></div>
                                                             </td>
                                                         }
                                                     } else {
@@ -696,7 +711,7 @@ where
                     if cfg!(feature = "pumpkin") {
                         html!{
                             <div class={input_add_class}>
-                                <td class="group-list-link-line-bottom"></td>
+                                <td class={bottom_line_class}></td>
                                 <div class="input-add-item" onclick={onclick_add}>
                                     <img src="/frontary/pumpkin/addition-symbol.svg" />
                                     { text!(txt, ctx.props().language, add_message) }
