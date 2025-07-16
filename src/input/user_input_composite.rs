@@ -375,7 +375,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index) }
+                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index, config.spacing_variant.as_deref()) }
                     </div>
                 }
             }
@@ -422,6 +422,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        spacing_variant: Option<&str>,
     ) -> Html {
         let this_index = cal_index(base_index, layer_index); // == my_index
         let this_index_clone = this_index.clone();
@@ -540,10 +541,25 @@ where
                                         (false, true) => "group-list-link-line-top long",
                                         (false, false) => "group-list-link-line-top",
                                     };
-                                    let delete_cell_class = if row_index == 0 {
-                                        classes!("input-trash-can-delete", "first-row")
+                                    let line_class = if let Some(variant) = spacing_variant {
+                                        format!("{line_class} {variant}")
                                     } else {
-                                        classes!("input-trash-can-delete")
+                                        line_class.to_string()
+                                    };
+                                    let delete_cell_class = if row_index == 0 {
+                                        let base_classes = "input-trash-can-delete first-row";
+                                        if let Some(variant) = spacing_variant {
+                                            format!("{base_classes} {variant}")
+                                        } else {
+                                            base_classes.to_string()
+                                        }
+                                    } else {
+                                        let base_classes = "input-trash-can-delete";
+                                        if let Some(variant) = spacing_variant {
+                                            format!("{base_classes} {variant}")
+                                        } else {
+                                            base_classes.to_string()
+                                        }
                                     };
 
                                     if one_row {

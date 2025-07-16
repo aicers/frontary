@@ -5,6 +5,15 @@ file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added `spacing_variant` field to `GroupConfig` to support flexible layout
+  spacing adjustments for group rows and delete cells in `input_conf` module.
+  New CSS classes `compact` and `spacious` are available for customizing
+  alignment and padding.
+
 ## [0.12.0] - 2025-07-15
 
 ### Added
@@ -333,6 +342,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
+[Unreleased]: https://github.com/aicers/frontary/compare/0.12.0...main
 [0.12.0]: https://github.com/aicers/frontary/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/aicers/frontary/compare/0.10.1...0.11.0
 [0.10.1]: https://github.com/aicers/frontary/compare/0.10.0...0.10.1

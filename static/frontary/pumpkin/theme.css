@@ -2536,6 +2536,23 @@ td.input-trash-can-delete.first-row div.input-trash-can-delete-outer {
     padding-top: 28px;
 }
 
+/* Delete cell spacing variants for flexible layout adjustments */
+td.input-trash-can-delete.compact {
+    padding-right: 2px;
+}
+
+td.input-trash-can-delete.first-row.compact div.input-trash-can-delete-outer {
+    padding-top: 20px;
+}
+
+td.input-trash-can-delete.spacious {
+    padding-right: 4px;
+}
+
+td.input-trash-can-delete.first-row.spacious div.input-trash-can-delete-outer {
+    padding-top: 36px;
+}
+
 div.input-trash-can-delete-outer {
     width: 100%;
     height: 100%;
@@ -2602,6 +2619,23 @@ div.group-list-link-line-top.long {
     height: 91px;
     background-size: 15px 80px;
     background-image: url('/frontary/pumpkin/group-list-link-line-top-long.svg');
+}
+
+/* Group spacing variants for flexible layout adjustments */
+div.group-list-link-line-top.compact {
+    margin-top: calc((40px - 16px) / 2);
+}
+
+div.group-list-link-line-top.first-row.compact {
+    margin-top: 37px;
+}
+
+div.group-list-link-line-top.spacious {
+    margin-top: calc((40px - 4px) / 2);
+}
+
+div.group-list-link-line-top.first-row.spacious {
+    margin-top: 53px;
 }
 
 th.input-group-empty-header {

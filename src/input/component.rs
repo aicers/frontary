@@ -1093,7 +1093,7 @@ where
                     }
                     InputConfig::Group(config) => {
                         self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths,
-                            &config.items, input_data, None, index)
+                            &config.items, input_data, None, index, config.spacing_variant.as_deref())
                     }
                     InputConfig::Checkbox(config) => {
                         let both = ctx.props().input_conf.get(index + 1).map_or(Some(false),|next| {
