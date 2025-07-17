@@ -155,6 +155,13 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let traffic_direction_hover =
             include_bytes!("../static/frontary/pumpkin/traffic-direction-hover.svg");
         rtn.push(("traffic-direction-hover.svg", traffic_direction_hover));
+
+        let off = include_bytes!("../static/frontary/pumpkin/off.png");
+        rtn.push(("off.png", off));
+
+        let on = include_bytes!("../static/frontary/pumpkin/on.png");
+        rtn.push(("on.png", on));
+
         let plus_for_add = include_bytes!("../static/frontary/pumpkin/plus-for-add.svg");
         rtn.push(("plus-for-add.svg", plus_for_add));
 
