@@ -9,9 +9,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-- Fixed Group Row and Delete Cell alignment in `input_conf` by adding conditional CSS classes
-  for different layout variations. The hardcoded padding values in `line_class` and
-  `delete_cell_class` now support both one-row and multi-row group layouts more flexibly.
+- Added `group_kind` to `GroupConfig` and updated `user_input_composite` to
+ conditionally apply `line_class` and `delete_cell_class` for compact layout,
+ improving alignment and flexibility.
 
 ## [0.12.0] - 2025-07-15
 
