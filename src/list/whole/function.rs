@@ -289,20 +289,29 @@ where
     pub(super) fn set_sort_list_kind(&mut self, ctx: &Context<Self>) {
         if ctx.props().kind != Kind::LayeredSecond {
             if let Ok(mut kind) = self.sort_list_kind.try_borrow_mut() {
-                if let Some(sort) = self.sort {
+                let desired_kind = if let Some(sort) = self.sort {
                     if sort.index == 0 {
                         match sort.status {
-                            SortStatus::Ascending => *kind = Some(SortListKind::Ascending),
-                            SortStatus::Descending => *kind = Some(SortListKind::Descending),
-                            SortStatus::Unsorted => {
-                                *kind = None; // unreachable
-                            }
+                            SortStatus::Ascending => Some(SortListKind::Ascending),
+                            SortStatus::Descending => Some(SortListKind::Descending),
+                            SortStatus::Unsorted => None, // unreachable
                         }
                     } else {
-                        *kind = None;
+                        None
                     }
                 } else {
-                    *kind = Some(SortListKind::LatestFirst);
+                    Some(SortListKind::LatestFirst)
+                };
+
+                if let Some(desired) = desired_kind {
+                    if ctx.props().visible_sort_options.contains(&desired) {
+                        *kind = Some(desired);
+                    } else {
+                        // Fall back to the first available option
+                        *kind = ctx.props().visible_sort_options.first().copied();
+                    }
+                } else {
+                    *kind = None;
                 }
             }
         }
