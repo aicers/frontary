@@ -183,6 +183,7 @@ pub struct GroupConfig {
     /// The list of width for each column. Some if fixed, None if not fixed.
     pub widths: Vec<Option<u32>>,
     pub items: Vec<Rc<InputConfig>>,
+    pub compact: bool,
 }
 
 #[derive(Clone, PartialEq)]

@@ -375,7 +375,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index) }
+                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index, config.compact) }
                     </div>
                 }
             }
@@ -422,6 +422,7 @@ where
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
+        compact: bool,
     ) -> Html {
         let this_index = cal_index(base_index, layer_index); // == my_index
         let this_index_clone = this_index.clone();
@@ -478,6 +479,17 @@ where
                 .and_then(|w| w.map(|v| format!("width: {v}px;")))
                 .unwrap_or_default()
         };
+        let (bottom_line_class, input_group_table_class) = if compact {
+            (
+                "group-list-link-line-bottom compact".to_string(),
+                "input-group compact".to_string(),
+            )
+        } else {
+            (
+                "group-list-link-line-bottom".to_string(),
+                "input-group".to_string(),
+            )
+        };
 
         html! {
             <div class="input-item">
@@ -492,7 +504,7 @@ where
                 }
                 <div class={input_group}>
                     <div>
-                        <table class="input-group">
+                        <table class={input_group_table_class}>
                             if cfg!(feature = "debug") {
                                 { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, this_index.to_string()) }
                             }
@@ -534,17 +546,21 @@ where
                                     let row_has_error = row.iter().enumerate().any(|(i, _)| {
                                         self.required_msg.contains(&cal_index(Some(&row_rep_index), i))
                                     });
-                                    let layout_modifier = if one_row { "one-row" } else { "multi-row" };
-                                    let line_class = match (row_index == 0, row_has_error) {
-                                        (true, true) => format!("group-list-link-line-top first-row long {layout_modifier}"),
-                                        (true, false) => format!("group-list-link-line-top first-row {layout_modifier}"),
-                                        (false, true) => format!("group-list-link-line-top long {layout_modifier}"),
-                                        (false, false) => format!("group-list-link-line-top {layout_modifier}"),
+                                    let top_line_class = match (compact, row_index == 0, row_has_error) {
+                                        (true, _, _) => "group-list-link-line-top compact",
+                                        (false, true, true) => "group-list-link-line-top first-row long",
+                                        (false, true, false) => "group-list-link-line-top first-row",
+                                        (false, false, true) => "group-list-link-line-top long",
+                                        (false, false, false) => "group-list-link-line-top",
                                     };
                                     let delete_cell_class = if row_index == 0 {
-                                        classes!("input-trash-can-delete", "first-row", layout_modifier)
+                                        if compact {
+                                            classes!("input-trash-can-delete", "first-row", "compact")
+                                        } else {
+                                            classes!("input-trash-can-delete", "first-row")
+                                        }
                                     } else {
-                                        classes!("input-trash-can-delete", layout_modifier)
+                                        classes!("input-trash-can-delete")
                                     };
 
                                     if one_row {
@@ -554,7 +570,7 @@ where
                                                     if cfg!(feature = "pumpkin") {
                                                         html! {
                                                             <td class="group-list-link-cell">
-                                                                <div class={line_class.clone()}></div>
+                                                                <div class={top_line_class}></div>
                                                             </td>
                                                         }
                                                     } else {
@@ -659,7 +675,7 @@ where
                                                     }
                                                     else {
                                                         html!{
-                                                            <td class={classes!("input-group-delete", layout_modifier)}>
+                                                            <td class="input-group-delete">
                                                                 <div class="input-nic-delete-outer">
                                                                     <div class="input-nic-delete" onclick={onclick_delete}>
                                                                     </div>
@@ -697,7 +713,7 @@ where
                     if cfg!(feature = "pumpkin") {
                         html!{
                             <div class={input_add_class}>
-                                <td class="group-list-link-line-bottom"></td>
+                                <td class={bottom_line_class}></td>
                                 <div class="input-add-item" onclick={onclick_add}>
                                     <img src="/frontary/pumpkin/addition-symbol.svg" />
                                     { text!(txt, ctx.props().language, add_message) }
