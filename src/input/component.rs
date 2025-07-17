@@ -1036,7 +1036,7 @@ where
                 match &**input_conf {
                     InputConfig::Text(config) => {
                         self.view_text(ctx, &config.ess, config.length, config.width, input_data,
-                            None, index, index == 0, false, config.immutable)
+                            None, index, index == 0, false, config.immutable, config.warning_message.as_ref())
                     }
                     InputConfig::DomainName(config) => {
                         self.view_domain_name(ctx, &config.ess, config.width, input_data,
