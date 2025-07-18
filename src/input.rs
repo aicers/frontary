@@ -572,10 +572,10 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
                         if children.children.is_empty() {
                             InputItem::Checkbox(CheckboxItem::default())
                         } else {
-                            InputItem::Checkbox(CheckboxItem::default_with_children(default_items(
-                                &children.children,
-                                level + 1,
-                            )))
+                            InputItem::Checkbox(CheckboxItem::default_with_children(
+                                default_items(&children.children, level + 1),
+                                conf.theme,
+                            ))
                         }
                     } else {
                         InputItem::Checkbox(CheckboxItem::default())
