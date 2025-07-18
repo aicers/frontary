@@ -2736,8 +2736,19 @@ div.modal-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.55);
     z-index: 99;
+}
+
+div.modal-outer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.09;
+    background-color: rgba(0, 0, 0, 0.55);
+    z-index: -1;
 }
 
 div.modal-contents {
@@ -2748,7 +2759,6 @@ div.modal-contents {
     padding-bottom: 20px;
     background-color: #FFFFFF;
     border-radius: 2px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 24px 48px minmax(96px, auto) minmax(120px, auto);
@@ -2762,7 +2772,6 @@ div.modal-contents-text {
     padding-bottom: 20px;
     background-color: #FFFFFF;
     border-radius: 2px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     display: inline-flex;
     flex-direction: column;
     gap: 20px;
