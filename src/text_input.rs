@@ -17,7 +17,6 @@ pub enum Message {
 
 pub struct Model {
     input: String,
-    is_invalid: bool,
 }
 
 #[derive(Clone, Eq, PartialEq, Properties)]
@@ -46,7 +45,6 @@ impl Component for Model {
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             input: String::new(),
-            is_invalid: false,
         }
     }
 
@@ -57,10 +55,8 @@ impl Component for Model {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Message::InputString(text) => {
-                let trimmed_text = text.trim().to_string();
-
                 if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
-                    data.replace(trimmed_text);
+                    data.replace(text.trim().to_string());
                 }
                 self.input = text;
             }
@@ -93,7 +89,7 @@ impl Component for Model {
                 {Self::view_title(ctx)}
                 <div class="input-item-group" >
                     <input type="text"
-                        class={if self.is_invalid { "frontary-input-text-alert" } else { "frontary-input-text" }}
+                        class="frontary-input-text"
                         value={self.input.clone()}
                         style={style.clone()}
                         placeholder={placeholder}
@@ -132,5 +128,4 @@ impl Model {
             html! {}
         }
     }
-
 }

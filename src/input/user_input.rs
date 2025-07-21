@@ -1170,7 +1170,10 @@ fn validate_extensions(extensions: &[String]) -> Vec<String> {
         .collect()
 }
 
-fn validate_text(input: &str, validation_rule: Option<&ValidationRule>) -> Option<ValidationError> {
+pub fn validate_text(
+    input: &str,
+    validation_rule: Option<&ValidationRule>,
+) -> Option<ValidationError> {
     match validation_rule {
         Some(ValidationRule::UsernameFormat) => validate_username(input),
         None => None,
