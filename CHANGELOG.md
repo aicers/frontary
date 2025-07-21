@@ -13,7 +13,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   Provides built-in validation according to RFC standards including label length
   limits, allowed characters, and overall domain name structure validation.
 - Added dynamic validation rule system for text input components. Text inputs now
-  support a `validation_rules` field that automatically generates appropriate
+  support a `validation_rule` field that automatically generates appropriate
   warning messages based on input validation failures. The initial implementation
   includes `UsernameFormat` validation with rules for character restrictions,
   length limits, and format requirements.

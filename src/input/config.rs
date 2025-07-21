@@ -34,9 +34,22 @@ pub struct TextConfig {
     pub preset: Option<String>,
     pub unique: bool,
     pub immutable: bool,
-    pub warning_message: Option<String>,
+    pub validation_rule: Option<ValidationRule>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ValidationRule {
+    UsernameFormat,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ValidationError {
+    InvalidCharacters,
+    ConsecutiveSpecialChars,
+    SpecialCharAtEnd,
+    MustStartWithLetter,
+    InvalidLength,
+}
 #[derive(Clone, PartialEq)]
 pub struct DomainNameConfig {
     pub ess: Essential,

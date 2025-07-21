@@ -294,7 +294,7 @@ where
                         // TODO: issue #111
                         <div class={class_line}>
                         </div>
-                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, Some(base_index), layer_index, false, false, config.immutable, config.warning_message.as_ref()) }
+                        { self.view_text(ctx, &config.ess, config.length, config.width, child_data, Some(base_index), layer_index, false, false, config.immutable, config.validation_rule.as_ref()) }
                     </div>
                 }
             }
@@ -588,7 +588,7 @@ where
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_text(ctx, &ess, config.length, config.width, each_item,
-                                                                                Some(&row_rep_index), col_index, false, true, config.immutable, config.warning_message.as_ref())
+                                                                                Some(&row_rep_index), col_index, false, true, config.immutable, config.validation_rule.as_ref())
                                                                         }
                                                                         InputConfig::HostNetworkGroup(config) => {
                                                                             let mut ess = config.ess.clone();

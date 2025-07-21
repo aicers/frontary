@@ -20,7 +20,8 @@ pub use config::{
     CheckboxChildrenConfig, CheckboxConfig, ChildrenPosition, ComparisonConfig, DomainNameConfig,
     Essential, FileConfig, Float64Config, GroupConfig, HostNetworkGroupConfig, InputConfig,
     NicConfig, PasswordConfig, PercentageConfig, RadioConfig, SelectMultipleConfig,
-    SelectSingleConfig, TagConfig, TextConfig, Unsigned8Config, Unsigned32Config, VecSelectConfig,
+    SelectSingleConfig, TagConfig, TextConfig, Unsigned8Config, Unsigned32Config, ValidationError,
+    ValidationRule, VecSelectConfig,
 };
 pub use host_network::Kind as HostNetworkKind;
 pub use host_network::Model as HostNetworkHtml;

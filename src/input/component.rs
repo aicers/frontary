@@ -1035,8 +1035,7 @@ where
             for ctx.props().input_data.iter().enumerate().zip(ctx.props().input_conf.iter()).map(|((index , input_data), input_conf)| {
                 match &**input_conf {
                     InputConfig::Text(config) => {
-                        self.view_text(ctx, &config.ess, config.length, config.width, input_data,
-                            None, index, index == 0, false, config.immutable, config.warning_message.as_ref())
+                        self.view_text(ctx, &config.ess, config.length, config.width, input_data, None, index, index == 0, false, config.immutable, config.validation_rule.as_ref())
                     }
                     InputConfig::DomainName(config) => {
                         self.view_domain_name(ctx, &config.ess, config.width, input_data,

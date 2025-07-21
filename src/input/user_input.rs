@@ -1,6 +1,6 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::{cell::RefCell, collections::HashSet};
 
 use gloo_file::File;
 use json_gettext::get_text;
@@ -15,7 +15,11 @@ use super::{
 };
 use crate::{
     HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag,
-    input::component::Verification, text,
+    input::{
+        component::Verification,
+        config::{ValidationError, ValidationRule},
+    },
+    text,
 };
 
 const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input a new one.";
@@ -61,7 +65,7 @@ where
         autofocus: bool,
         group: bool,
         immutable: bool,
-        warning_message: Option<&String>,
+        validation_rule: Option<&ValidationRule>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let my_index_clone = my_index.clone();
@@ -132,7 +136,7 @@ where
                         html! {
                             <>
                                 <input type="text" class={class} style={style}
-                                    value={value}
+                                    value={value.clone()}
                                     placeholder={placeholder}
                                     autofocus={autofocus}
                                     autocomplete="off"
@@ -147,7 +151,7 @@ where
                         html! {
                             <>
                                 <input type="text" class={class} style={style}
-                                    value={value}
+                                    value={value.clone()}
                                     placeholder={placeholder}
                                     autofocus={autofocus}
                                     autocomplete="off"
@@ -169,15 +173,10 @@ where
                                 { text!(txt, ctx.props().language, EXISTING_MSG)}
                             </div>
                         }
-                    } else {
-                        html! {}
-                    }
-                }
-                {
-                    if let Some(warning_msg) = warning_message {
+                    } else if let Some(validation_error) = validate_text(&value, validation_rule) {
                         html! {
                             <div class="input-contents-item-alert-message">
-                                { text!(txt, ctx.props().language, warning_msg)}
+                                { text!(txt, ctx.props().language, get_validation_error_message(&validation_error)) }
                             </div>
                         }
                     } else {
@@ -1169,4 +1168,62 @@ fn validate_extensions(extensions: &[String]) -> Vec<String> {
             }
         })
         .collect()
+}
+
+fn validate_text(input: &str, validation_rule: Option<&ValidationRule>) -> Option<ValidationError> {
+    match validation_rule {
+        Some(ValidationRule::UsernameFormat) => validate_username(input),
+        None => None,
+    }
+}
+
+fn validate_username(input: &str) -> Option<ValidationError> {
+    let input = input.trim_end();
+
+    if input.len() < 3 || input.len() > 30 {
+        return Some(ValidationError::InvalidLength);
+    }
+
+    let special_chars: HashSet<char> = ['.', '-', '_'].into_iter().collect();
+    let mut prev_was_special = false;
+    for ch in input.chars() {
+        if !ch.is_ascii_lowercase() && !ch.is_ascii_digit() && !special_chars.contains(&ch) {
+            return Some(ValidationError::InvalidCharacters);
+        }
+
+        let is_special = special_chars.contains(&ch);
+        if is_special && prev_was_special {
+            return Some(ValidationError::ConsecutiveSpecialChars);
+        }
+
+        prev_was_special = is_special;
+    }
+
+    if !input.chars().next().is_some_and(|c| c.is_ascii_lowercase()) {
+        return Some(ValidationError::MustStartWithLetter);
+    }
+
+    if let Some(last_char) = input.chars().last() {
+        if special_chars.contains(&last_char) {
+            return Some(ValidationError::SpecialCharAtEnd);
+        }
+    }
+    None
+}
+
+fn get_validation_error_message(error: &ValidationError) -> String {
+    match error {
+        ValidationError::InvalidCharacters => {
+            "Only lowercase letters, digits, and special characters (., -, _) are allowed"
+                .to_string()
+        }
+        ValidationError::ConsecutiveSpecialChars => {
+            "Consecutive special characters are not allowed".to_string()
+        }
+        ValidationError::SpecialCharAtEnd => {
+            "Special characters at the end are not allowed".to_string()
+        }
+        ValidationError::MustStartWithLetter => "ID must start with a lowercase letter".to_string(),
+        ValidationError::InvalidLength => "Length must be between 3 and 30 characters".to_string(),
+    }
 }
