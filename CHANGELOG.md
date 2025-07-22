@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
+- Prevent multiple pagination requests before previous one completes.
 
 ### Fixed
 
