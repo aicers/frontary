@@ -4,8 +4,8 @@ use std::{cell::RefCell, marker::PhantomData};
 
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, KeyboardEvent};
-use yew::{Component, Context, Html, Properties, events::InputEvent, html};
+use web_sys::{HtmlInputElement, KeyboardEvent, MouseEvent};
+use yew::{Callback, Component, Context, Html, Properties, events::InputEvent, html};
 
 use crate::{Texts, language::Language, text};
 
@@ -69,6 +69,19 @@ pub struct Model<T> {
     phantom: PhantomData<T>,
 }
 
+fn page_button(class: &str, label: &str, onclick: Callback<MouseEvent>, disable: bool) -> Html {
+    let adjust_class = if disable {
+        format!("{class} disabled")
+    } else {
+        class.to_string()
+    };
+    html! {
+        <div class={adjust_class} {onclick}>
+            { label }
+        </div>
+    }
+}
+
 impl<T> Component for Model<T>
 where
     T: Clone + Component + PartialEq,
@@ -110,18 +123,12 @@ where
                 info.current = info.start;
             }
             Message::Previous => {
-                info.start = if info.start > num_pages + 1 {
-                    info.start - num_pages
+                info.end = info.end.saturating_sub(num_pages);
+                info.start = if info.end >= num_pages {
+                    info.end - num_pages + 1
                 } else {
                     1
                 };
-                let end_offset = info.end % num_pages;
-                let end_offset = if end_offset > 0 {
-                    end_offset
-                } else {
-                    num_pages
-                };
-                info.end -= end_offset;
                 info.current = info.end;
             }
             Message::First => {
@@ -185,14 +192,9 @@ where
             let onclick_first = ctx.link().callback(|_| Message::First);
             let onclick_last = ctx.link().callback(|_| Message::Last);
             let onclick_page = |page: usize| ctx.link().callback(move |_| Message::Page(page));
-            let class_disable = if ctx.props().disable {
-                "page-outer disable-outer"
-            } else {
-                "page-outer"
-            };
 
             html! {
-                <div class={class_disable}>
+                <div class="page-outer">
                     <div class="page-number">
                     {
                         if info.start > 1 {
@@ -200,22 +202,14 @@ where
                                 <>
                                 {
                                     if ctx.props().to_ends {
-                                        html! {
-                                            <div class="page-unselected" onclick={onclick_first}>
-                                                { "1" }
-                                            </div>
-                                        }
+                                        page_button("page-unselected", "1", onclick_first, ctx.props().disable)
                                     } else {
                                         html! {}
                                     }
                                 }
                                 {
                                     if info.start > 2 {
-                                        html! {
-                                            <div class="page-unselected" onclick={onclick_prev}>
-                                                { "•••" }
-                                            </div>
-                                        }
+                                        page_button("page-unselected", "•••", onclick_prev, ctx.props().disable)
                                     } else {
                                         html! {}
                                     }
@@ -234,11 +228,7 @@ where
                                 "page-unselected"
                             };
 
-                            html! {
-                                <div class={class} onclick={onclick_page(page)}>
-                                    { page }
-                                </div>
-                            }
+                            page_button(class, &page.to_string(), onclick_page(page), ctx.props().disable)
                         })
                     }
                     {
@@ -247,22 +237,15 @@ where
                                 <>
                                 {
                                     if info.end + 1 < info.total {
-                                        html! {
-                                            <div class="page-unselected" onclick={onclick_next}>
-                                                { "•••" }
-                                            </div>
-                                        }
+                                        page_button("page-unselected", "•••", onclick_next, ctx.props().disable)
                                     } else {
                                         html! {}
                                     }
                                 }
                                 {
                                     if ctx.props().to_ends {
-                                        html! {
-                                            <div class="page-unselected" onclick={onclick_last}>
-                                                { info.total }
-                                            </div>
-                                        }
+                                        page_button("page-unselected", &info.total.to_string(), onclick_last,
+                                        ctx.props().disable)
                                     } else {
                                         html! {}
                                     }
