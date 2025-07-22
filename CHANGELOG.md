@@ -12,6 +12,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
 
+### Fixed
+
+- Fixed a bug where `PasswordItem` was not cleared when iterating through items
+  in the `WholeList` component.
+
 ## [0.12.0] - 2025-07-15
 
 ### Added
