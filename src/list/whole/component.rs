@@ -696,15 +696,16 @@ where
                                         if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
                                             let mut index: usize = 0;
                                             for item in &ctx.props().input_data {
-                                                if let (Some(list), Ok(mut item)) = (
+                                                if let (Some(col), Ok(mut item)) = (
                                                     current.columns.get(index),
                                                     item.try_borrow_mut(),
                                                 ) {
                                                     // HIGHLIGHT: Currently, the only exception is InputItem::Password. But so might be some more.
                                                     if let InputItem::Password(_) = *item {
+                                                        item.clear();
                                                         continue;
                                                     }
-                                                    *item = list.into();
+                                                    *item = col.into();
                                                     index += 1;
                                                 }
                                             }
