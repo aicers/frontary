@@ -552,14 +552,11 @@ where
                                                 {
                                                     if cfg!(feature = "pumpkin") {
                                                         html! {
-                                                            <td class="group-list-link-cell">
-                                                                <div class={line_class}></div>
+                                                            <td class={classes!("group-list-link-cell", line_class)}>
                                                             </td>
                                                         }
                                                     } else {
-                                                        html! {
-                                                            <div class="group-list-link-line-top"></div>
-                                                        }
+                                                        html! {}
                                                     }
                                                 }
                                                 {

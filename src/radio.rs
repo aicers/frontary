@@ -109,16 +109,7 @@ where
                                     }
                                 }
                             </div>
-                            {
-                                if index < ctx.props().list.len() - 1 {
-                                    html! {
-                                        <div class="radio-space">
-                                        </div>
-                                    }
-                                } else {
-                                    html! {}
-                                }
-                            }
+                            { html! {} }
                         </>
                     }
                 })
