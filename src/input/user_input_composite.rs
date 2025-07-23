@@ -573,9 +573,7 @@ where
                                                             </td>
                                                         }
                                                     } else {
-                                                        html! {
-                                                            <div class="group-list-link-line-top"></div>
-                                                        }
+                                                        html! {}
                                                     }
                                                 }
                                                 {

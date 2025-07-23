@@ -82,8 +82,6 @@ impl Model {
                                 </span>
                             </td>
                             <td class="complex-select-pop-head-close" onclick={onclick_close}>
-                                <div class="complex-select-pop-head-close-icon">
-                                </div>
                             </td>
                         </tr>
                     </table>

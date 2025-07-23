@@ -113,12 +113,6 @@ where
                                 html! {
                                     <td class={classes!("tab-menu-selected", class_last)} style={style_menu.clone()}>
                                         { text!(txt, ctx.props().language, title) }
-                                        if cfg!(feature ="pumpkin") {
-                                            <div class="selected-background">
-                                            </div>
-                                            <div class="selected-bar">
-                                            </div>
-                                        }
                                     </td>
                                 }
                             } else {
