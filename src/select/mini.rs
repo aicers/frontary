@@ -537,8 +537,6 @@ where
         if let Some(value) = value {
             html! {
                 <div onclick={onclick} class="mini-select-list-sort-recently-text">
-                    <div class="mini-select-list-sort-recently-text-icon">
-                    </div>
                     <div class="mini-select-list-sort-recently-text-text">
                         { value }
                     </div>
