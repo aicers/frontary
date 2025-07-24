@@ -62,6 +62,8 @@ where
     pub input: bool,
     #[prop_or(false)]
     pub disable: bool,
+    #[prop_or(Rc::new(RefCell::new(false)))]
+    pub is_page_loading: Rc<RefCell<bool>>,
 }
 
 pub struct Model<T> {
@@ -103,13 +105,23 @@ where
         let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() else {
             return false;
         };
+        let Ok(mut is_page_loading) = ctx.props().is_page_loading.try_borrow_mut() else {
+            return false;
+        };
+
+        if *is_page_loading {
+            return false;
+        }
+
         match msg {
             Message::Next => {
+                *is_page_loading = true;
                 info.start += num_pages;
                 info.end = std::cmp::min(info.end + num_pages, info.total);
                 info.current = info.start;
             }
             Message::Previous => {
+                *is_page_loading = true;
                 info.start = if info.start > num_pages + 1 {
                     info.start - num_pages
                 } else {
@@ -125,11 +137,13 @@ where
                 info.current = info.end;
             }
             Message::First => {
+                *is_page_loading = true;
                 info.start = 1;
                 info.current = 1;
                 info.end = std::cmp::min(num_pages, info.total);
             }
             Message::Last => {
+                *is_page_loading = true;
                 info.start = if info.total > num_pages {
                     let last_page_display_count = info.total % num_pages;
                     let last_page_display_count = if last_page_display_count == 0 {
@@ -145,6 +159,9 @@ where
                 info.end = info.total;
             }
             Message::Page(page) => {
+                if page != info.current {
+                    *is_page_loading = true;
+                }
                 info.current = page;
             }
             Message::InputPage(text) => self.go_to_page = usize::from_str(&text).unwrap_or(0),
