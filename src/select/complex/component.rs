@@ -316,6 +316,14 @@ impl Component for Model {
                 }
             }
             Message::ClickAddInput => {
+                if cfg!(feature = "pumpkin") {
+                    if !self.view_input {
+                        self.view_input = true;
+                    }
+                    if self.view_list {
+                        self.view_list = false;
+                    }
+                }
                 if self.validate_user_input(ctx) {
                     if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                         match custom.entry(self.input_text.clone()) {
@@ -343,6 +351,9 @@ impl Component for Model {
                 if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                     if let Occupied(entry) = custom.entry(key) {
                         entry.remove_entry();
+                    }
+                    if custom.is_empty() {
+                        self.view_input = false;
                     }
                 }
             }
