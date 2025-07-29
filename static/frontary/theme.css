@@ -2950,6 +2950,10 @@ td.tab-menu-unselected {
     border-bottom: 1px solid #D7D7D7;
 }
 
+td.tab-menu-unselected:hover {
+    cursor: pointer;
+}
+
 td.tab-menu-before-last {
     border-right: 0px;
 }
