@@ -2504,6 +2504,15 @@ table.input-group {
     table-layout: fixed;
 }
 
+table.input-group.compact {
+    width: 85%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    table-layout: fixed;
+}
+
 th.input-group-heading {
     font-size: 16px;
     color: var(--Text-Primary);
@@ -2534,6 +2543,19 @@ td.input-trash-can-delete.first-row div.input-trash-can-delete-outer {
     display: flex;
     align-items: flex-start;
     padding-top: 28px;
+}
+
+
+td.input-trash-can-delete.first-row.compact div.input-trash-can-delete-outer {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 0;
+}
+
+td.input-trash-can-delete.first-row.compact {
+    padding-right: 0px;
+    width: 40px;
+    vertical-align: bottom;
 }
 
 div.input-trash-can-delete-outer {
@@ -2574,6 +2596,17 @@ td.group-list-link-line-bottom {
     margin-top: calc((40px - 8px) / 2);
 }
 
+td.group-list-link-line-bottom.compact {
+    height: 13px;
+    width: 25px;
+    background-image: url('/frontary/pumpkin/group-list-link-line-bottom-compact.svg');
+    background-size: 18px 11px;
+    left: 0px;
+    background-repeat: no-repeat;
+    margin-top: 16px;
+    position: relative;
+}
+
 td.group-list-link-cell {
     position: relative;
     padding: 0;
@@ -2592,6 +2625,19 @@ div.group-list-link-line-top {
     background-size: 15px 66px;
     background-repeat: no-repeat;
     margin-top: calc((40px - 8px) / 2);
+}
+
+div.group-list-link-line-top.compact {
+    position: absolute;
+    display: block;
+    height: 58px;
+    width: 25px;
+    top: 0;
+    left: 0;
+    background-image: url('/frontary/pumpkin/group-list-link-line-top-compact.svg');
+    background-size: 18px 67px;
+    background-repeat: no-repeat;
+    margin-top: 18px;
 }
 
 div.group-list-link-line-top.first-row {
