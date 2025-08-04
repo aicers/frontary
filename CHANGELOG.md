@@ -11,6 +11,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
+- Added maximum item limit enforcement for input item hierarchies. `Group` items
+  now prevent addition when the maximum limit (64 items per layer) is reached.
+  `VecSelect`, `Checkbox`, and `Radio` items now panic during initialization if
+  configured with more than the maximum allowed items.
 
 ### Fixed
 
