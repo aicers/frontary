@@ -822,8 +822,9 @@ where
                 if let Ok(mut input_data) = input_data.try_borrow_mut()
                     && let InputItem::Group(data) = &mut *input_data
                 {
-                    if data.len() == 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER) {
-                        // TODO: issue #188
+                    if data.len() >= 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER) {
+                        // User notification: Maximum number of input items has been reached
+                        // Prevent addition when maximum limit is reached
                         return false;
                     }
                     let new_row = group_item_list_preset(&items_conf);

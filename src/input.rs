@@ -45,7 +45,119 @@ static MAX_NUM_OF_LAYER: LazyLock<BigUint> =
 
 #[cfg(test)]
 mod tests {
+    use std::rc::Rc;
+
     use num_traits::ToPrimitive;
+
+    use super::*;
+    use crate::ViewString;
+
+    #[test]
+    #[should_panic(expected = "VecSelect item exceeds maximum number of allowed items: 64")]
+    fn test_vecselect_max_items_panic() {
+        let mut items_ess_list = Vec::new();
+        for _ in 0..65 {
+            items_ess_list.push(Essential {
+                title: "test".to_string(),
+                notice: "",
+                required: false,
+            });
+        }
+
+        let config = VecSelectConfig {
+            ess: Essential {
+                title: "test".to_string(),
+                notice: "",
+                required: false,
+            },
+            items_ess_list,
+            last: false,
+            map_list: Vec::new(),
+            full_width: None,
+            widths: Vec::new(),
+            max_widths: Vec::new(),
+            max_heights: Vec::new(),
+            preset: None,
+        };
+
+        let confs = vec![Rc::new(InputConfig::VecSelect(config))];
+        let _ = gen_default_items_from_confs(&confs);
+    }
+
+    #[test]
+    #[should_panic(expected = "Checkbox item exceeds maximum number of allowed items: 64")]
+    fn test_checkbox_max_items_panic() {
+        let mut children = Vec::new();
+        for _ in 0..65 {
+            children.push(Rc::new(InputConfig::Text(TextConfig {
+                ess: Essential {
+                    title: "test".to_string(),
+                    notice: "",
+                    required: false,
+                },
+                length: None,
+                width: None,
+                preset: None,
+                unique: false,
+                immutable: false,
+            })));
+        }
+
+        let config = CheckboxConfig {
+            ess: Essential {
+                title: "test".to_string(),
+                notice: "",
+                required: false,
+            },
+            language: false,
+            always: None,
+            children: Some(CheckboxChildrenConfig {
+                position: ChildrenPosition::Right,
+                children,
+            }),
+            preset: None,
+            theme: None,
+        };
+
+        let confs = vec![Rc::new(InputConfig::Checkbox(config))];
+        let _ = gen_default_items_from_confs(&confs);
+    }
+
+    #[test]
+    #[should_panic(expected = "Radio item exceeds maximum number of allowed items: 64")]
+    fn test_radio_max_items_panic() {
+        let mut children_group = Vec::new();
+        for _ in 0..65 {
+            children_group.push(Some(vec![Rc::new(InputConfig::Text(TextConfig {
+                ess: Essential {
+                    title: "test".to_string(),
+                    notice: "",
+                    required: false,
+                },
+                length: None,
+                width: None,
+                preset: None,
+                unique: false,
+                immutable: false,
+            }))]));
+        }
+
+        let config = RadioConfig {
+            ess: Essential {
+                title: "test".to_string(),
+                notice: "",
+                required: false,
+            },
+            options: vec![ViewString::Raw("Option".to_string())],
+            children_group,
+            preset: None,
+            theme: None,
+        };
+
+        let confs = vec![Rc::new(InputConfig::Radio(config))];
+        let _ = gen_default_items_from_confs(&confs);
+    }
+
     fn cal_index_first_ver(base_index: Option<usize>, layer_index: usize) -> usize {
         // `base_index` means parent's index
         if let Some(base_index) = base_index {
@@ -56,7 +168,7 @@ mod tests {
             let base = base_index.to_f64().expect("usize to f64 is safe.");
             let base = base.log(max).floor();
             let Some(base) = base.to_u32() else {
-                panic!("Too many levels in hierarchy of input items");
+                std::panic!("Too many levels in hierarchy of input items");
             };
             let base = 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER).pow(base + 1);
             base_index + base * (1 + layer_index)
@@ -115,7 +227,7 @@ fn cal_index(base_index: Option<&BigUint>, layer_index: usize) -> BigUint {
                 .to_u64()
                 .expect("u32 to u64 is safe.");
         let Some(base) = base.to_u32() else {
-            panic!("Too many levels in hierarchy of input items.");
+            std::panic!("Too many levels in hierarchy of input items.");
         };
         let base = MAX_NUM_OF_LAYER.pow(base + 1);
         base_index + base * (BigUint::from(1u32) + BigUint::from(layer_index))
@@ -555,10 +667,13 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
                 InputConfig::Nic(_) => InputItem::Nic(NicItem::default()),
                 InputConfig::File(_) => InputItem::File(FileItem::default()),
                 InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::default()),
-                InputConfig::VecSelect(conf) => InputItem::VecSelect(VecSelectItem::new(vec![
+                InputConfig::VecSelect(conf) => {
+                    assert!(conf.items_ess_list.len() <= 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER), "VecSelect item exceeds maximum number of allowed items: {}", 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER));
+                    InputItem::VecSelect(VecSelectItem::new(vec![
                         HashSet::new();
                         conf.items_ess_list.len()
-                    ])),
+                    ]))
+                }
                 InputConfig::Group(conf) => {
                     if level == 0 {
                         let items = vec![default_items(&conf.items, level + 1)];
@@ -569,6 +684,7 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
                 }
                 InputConfig::Checkbox(conf) => {
                     if let Some(children) = conf.children.as_ref() {
+                        assert!(children.children.len() <= 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER), "Checkbox item exceeds maximum number of allowed items: {}", 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER));
                         if children.children.is_empty() {
                             InputItem::Checkbox(CheckboxItem::default())
                         } else {
@@ -582,6 +698,7 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
                     }
                 }
                 InputConfig::Radio(conf) => {
+                    assert!(conf.children_group.len() <= 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER), "Radio item exceeds maximum number of allowed items: {}", 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER));
                     if conf.children_group.is_empty() {
                         InputItem::Radio(RadioItem::default())
                     } else {
@@ -590,7 +707,10 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
                             .iter()
                             .map(|c| {
                                 c.as_ref()
-                                    .map_or_else(Vec::new, |c| default_items(c, level + 1))
+                                    .map_or_else(Vec::new, |c| {
+                                        assert!(c.len() <= 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER), "Radio item child group exceeds maximum number of allowed items: {}", 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER));
+                                        default_items(c, level + 1)
+                                    })
                             })
                             .collect::<Vec<_>>();
                         InputItem::Radio(RadioItem::default_with_children(children))
@@ -633,6 +753,11 @@ fn item_preset(conf: &Rc<InputConfig>) -> InputItem {
         InputConfig::Percentage(conf) => InputItem::Percentage(PercentageItem::new(conf.preset)),
         InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::new(None)),
         InputConfig::VecSelect(config) => {
+            assert!(
+                config.items_ess_list.len() <= 2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER),
+                "VecSelect item exceeds maximum number of allowed items: {}",
+                2_usize.pow(POWER_OF_MAX_NUM_OF_LAYER)
+            );
             InputItem::VecSelect(VecSelectItem::new(config.preset.as_ref().map_or_else(
                 || vec![HashSet::new(); config.items_ess_list.len()],
                 Clone::clone,
