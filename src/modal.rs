@@ -1,3 +1,8 @@
+//! Modal dialog components for displaying overlaid content.
+//!
+//! This module provides modal dialog functionality with customizable styling,
+//! button layouts, and content types.
+
 use std::{marker::PhantomData, rc::Rc, str::FromStr};
 
 use json_gettext::get_text;
@@ -19,24 +24,36 @@ define_u32_consts! {
     DEFAULT_WIDTH => 714
 }
 
+/// Type of modal dialog determining icon and styling.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum MsgType {
+    /// Alert modal with warning styling
     Alert,
+    /// Info modal with informational styling
     Info,
+    /// Text-only modal without icon
     TextOnly,
 }
 
+/// Button alignment in the modal dialog.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum AlignButton {
+    /// Buttons arranged horizontally in a row
     Row,
+    /// Buttons arranged vertically in a column
     Column,
 }
 
+/// Text styling options for modal content.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum TextStyle {
+    /// Text is a translation key to be looked up
     Key,
+    /// Raw text with normal styling
     RawNormal,
+    /// Raw text with bold styling
     RawBold,
+    /// Raw HTML content
     RawHtml,
 }
 

@@ -1,3 +1,45 @@
+//! # Frontary
+//!
+//! Frontary is a comprehensive UI component library for building web applications
+//! using the Yew framework. It provides a rich set of reusable components for
+//! forms, lists, modals, and other common UI patterns.
+//!
+//! ## Features
+//!
+//! - **Form Components**: Input fields, checkboxes, radio buttons, selects
+//! - **List Management**: Sortable and filterable data lists
+//! - **Modal Dialogs**: Customizable modal windows with various styles
+//! - **Theming Support**: Built-in theme system with customization options
+//! - **Internationalization**: Multi-language support for UI text
+//! - **Network Input**: Specialized components for IP addresses and ranges
+//!
+//! ## Quick Start
+//!
+//! ```rust
+//! use frontary::{Checkbox, CheckStatus};
+//! use yew::prelude::*;
+//!
+//! #[function_component(App)]
+//! fn app() -> Html {
+//!     html! {
+//!         <Checkbox status={CheckStatus::Checked} />
+//!     }
+//! }
+//! ```
+//!
+//! ## Module Organization
+//!
+//! The crate provides the following public components and utilities:
+//!
+//! - [`Checkbox`] - Checkbox components with various states
+//! - [`Input`] - Generic input components and configurations
+//! - [`WholeList`] - Data list components with sorting and filtering
+//! - [`Modal`] - Modal dialog components
+//! - [`Notification`] - Notification and alert components
+//! - [`language`] - Internationalization support
+//! - [`theme`] - Theme management and styling
+//! - [`static_files`] - Static asset management
+
 mod checkbox;
 mod input;
 mod ip_range_input;
@@ -79,17 +121,31 @@ pub use crate::tab_menu::Model as TabMenu;
 pub use crate::text_input::Model as TextInput;
 pub use crate::theme::Theme;
 
+/// Enum representing different types of password validation errors.
+///
+/// Used by the password validation system to indicate specific reasons
+/// why a password failed validation.
 #[derive(Clone, Copy, PartialEq)]
 pub enum InvalidPasswordKind {
+    /// Password contains whitespace characters
     HasSpace,
+    /// Password contains control characters
     HasControlCharacter,
+    /// Password confirmation does not match the original
     NotMatch,
+    /// Password is shorter than the minimum required length
     TooShort,
+    /// Password lacks lowercase letters
     NoLowercaseLetter,
+    /// Password lacks uppercase letters
     NoUppercaseLetter,
+    /// Password lacks numeric characters
     NoNumber,
+    /// Password lacks symbol characters
     NoSymbol,
+    /// Password contains consecutive identical letters
     HasConsecutiveLetters,
+    /// Password contains adjacent letters in alphabetical order
     HasAdjacentLetters,
 }
 
@@ -102,21 +158,38 @@ pub fn alert(msg: &str) {
         .expect("Alert should show up");
 }
 
+/// Actions available in context menus and action buttons.
+///
+/// Used throughout the UI to represent common user actions.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MoreAction {
+    /// Edit the selected item
     Edit,
+    /// Delete the selected item
     Delete,
 }
 
+/// Binary state actions for toggleable components.
+///
+/// Used for components that can be enabled or disabled.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum OnOffAction {
+    /// Enable or turn on the component
     On,
+    /// Disable or turn off the component
     Off,
 }
 
+/// A string value that can be either a translation key or raw text.
+///
+/// Used throughout the UI to support internationalization. The string
+/// can either be a key that gets looked up in translation files or
+/// raw text that is displayed as-is.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ViewString {
+    /// A translation key to be looked up in language files
     Key(String),
+    /// Raw text to be displayed directly
     Raw(String),
 }
 
@@ -130,6 +203,19 @@ impl fmt::Display for ViewString {
 }
 
 impl ViewString {
+    /// Converts the view string to a localized string.
+    ///
+    /// If this is a translation key, looks it up in the provided translation
+    /// context. If it's raw text, returns the text as-is.
+    ///
+    /// # Arguments
+    ///
+    /// * `txt` - Translation context for looking up keys
+    /// * `language` - Target language for translation
+    ///
+    /// # Returns
+    ///
+    /// The localized string, or empty string if translation key is not found.
     #[must_use]
     pub fn to_string_txt(&self, txt: &JSONGetText<'static>, language: Language) -> String {
         match self {
@@ -141,12 +227,50 @@ impl ViewString {
     }
 }
 
+/// Represents different types of network identifiers.
+///
+/// Used for parsing and validating network input that can be either
+/// a single host, a network range, or an IP address range.
 pub enum HostNetwork {
+    /// A single host identifier (IP address or hostname)
     Host(String),
+    /// A network in CIDR notation (e.g., "192.168.1.0/24")
     Network(String),
+    /// An IP address range with start and end addresses
     Range(IpRange),
 }
 
+/// Parses a string into a `HostNetwork` variant.
+///
+/// Attempts to parse the input as an IPv4 address, network in CIDR notation,
+/// or IP address range separated by a hyphen.
+///
+/// # Arguments
+///
+/// * `input` - The string to parse as a network identifier
+///
+/// # Returns
+///
+/// Returns `Some(HostNetwork)` if the input can be parsed as a valid network
+/// identifier, or `None` if the format is not recognized.
+///
+/// # Examples
+///
+/// ```rust
+/// use frontary::{parse_host_network, HostNetwork};
+///
+/// // Parse a single IP address
+/// let host = parse_host_network("192.168.1.1");
+/// assert!(matches!(host, Some(HostNetwork::Host(_))));
+///
+/// // Parse a network in CIDR notation
+/// let network = parse_host_network("192.168.1.0/24");
+/// assert!(matches!(network, Some(HostNetwork::Network(_))));
+///
+/// // Parse an IP range
+/// let range = parse_host_network("192.168.1.1-192.168.1.10");
+/// assert!(matches!(range, Some(HostNetwork::Range(_))));
+/// ```
 #[must_use]
 pub fn parse_host_network(input: &str) -> Option<HostNetwork> {
     if Ipv4Addr::from_str(input).is_ok() {
@@ -170,6 +294,34 @@ pub fn parse_host_network(input: &str) -> Option<HostNetwork> {
     None
 }
 
+/// Validates and normalizes a host network string.
+///
+/// Checks if the input string represents a valid host, network, or IP range.
+/// If valid, it may return a normalized version of the input.
+///
+/// # Arguments
+///
+/// * `input` - The string to validate as a network identifier
+///
+/// # Returns
+///
+/// Returns a tuple containing:
+/// - `bool` - `true` if the input is valid, `false` otherwise
+/// - `Option<String>` - A normalized version of the input if normalization was performed
+///
+/// # Examples
+///
+/// ```rust
+/// use frontary::validate_host_network;
+///
+/// let (valid, normalized) = validate_host_network("192.168.1.1");
+/// assert!(valid);
+/// assert_eq!(normalized, None); // No normalization needed
+///
+/// let (valid, normalized) = validate_host_network("192.168.1.1~192.168.1.10");
+/// assert!(valid);
+/// assert!(normalized.is_some()); // Range was normalized
+/// ```
 #[must_use]
 pub fn validate_host_network(input: &str) -> (bool, Option<String>) {
     if Ipv4Addr::from_str(input).is_ok() {
@@ -229,6 +381,33 @@ pub(crate) fn text_width(text: &str, font: &str) -> Result<u32, ()> {
         .ok_or(())
 }
 
+/// Shortens text to fit within a specified width using ellipsis.
+///
+/// Truncates the input text and adds "..." if it would exceed the given width
+/// when rendered with the specified font. Uses canvas text measurement for accuracy.
+///
+/// # Arguments
+///
+/// * `item_org` - The original text to potentially shorten
+/// * `width` - The maximum allowed width in pixels
+/// * `font` - CSS font specification for measurement
+/// * `margin` - Additional margin to account for in pixels
+///
+/// # Returns
+///
+/// Returns the original text if it fits, or a shortened version with "..." appended.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use frontary::shorten_text;
+///
+/// let short = shorten_text("Hello", 200, "12px Arial", 10);
+/// // Will likely return "Hello" as it fits
+///
+/// let long = shorten_text("Very long text that exceeds width", 50, "12px Arial", 10);
+/// // Will return something like "Very..."
+/// ```
 #[must_use]
 pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> String {
     if item_org.len() > 4 {
@@ -250,10 +429,17 @@ pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> Stri
     }
 }
 
+/// Specifies the direction or type of network endpoint.
+///
+/// Used in network-related components to indicate whether an endpoint
+/// represents the source, destination, or both directions of network traffic.
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub enum EndpointKind {
+    /// Traffic originating from this endpoint
     Source,
+    /// Traffic destined for this endpoint
     Destination,
+    /// Traffic in both directions (source and destination)
     Both,
 }
 
@@ -263,21 +449,41 @@ impl Default for EndpointKind {
     }
 }
 
+/// Additional information associated with a selection.
+///
+/// Provides context for selected items, particularly in network-related
+/// selections where endpoint direction matters.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum SelectionExtraInfo {
+    /// Network selection with endpoint direction information
     Network(EndpointKind),
+    /// Basic selection without additional context
     Basic,
 }
 
 pub type RefSelectionExtraInfo = Rc<RefCell<Option<SelectionExtraInfo>>>;
 
+/// A complex selection state that manages both predefined and custom selections.
+///
+/// Used in advanced selection components where users can choose from
+/// predefined options and also create custom selections. Each selection
+/// can have associated extra information.
 #[derive(Default, Clone, PartialEq, Eq, Debug)]
 pub struct ComplexSelection {
+    /// Predefined selections available to the user
     pub predefined: Rc<RefCell<Option<HashMap<String, RefSelectionExtraInfo>>>>,
+    /// Custom selections created by the user
     pub custom: Rc<RefCell<HashMap<String, RefSelectionExtraInfo>>>,
 }
 
 impl ComplexSelection {
+    /// Returns the length of predefined and custom selections.
+    ///
+    /// # Returns
+    ///
+    /// A tuple containing:
+    /// - `Option<usize>` - Number of predefined selections (None if not initialized)
+    /// - `usize` - Number of custom selections
     #[must_use]
     pub fn len(&self) -> (Option<usize>, usize) {
         if let (Ok(predefined), Ok(custom)) =
@@ -292,15 +498,22 @@ impl ComplexSelection {
         }
     }
 
+    /// Checks if both predefined and custom selections are empty.
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == (Some(0), 0)
     }
 }
 
+/// Represents an IP address range with start and end addresses.
+///
+/// Used for defining ranges of IP addresses, such as "192.168.1.1-192.168.1.100".
+/// The range is inclusive of both start and end addresses.
 #[derive(Deserialize, Serialize, Clone, Default, Eq, PartialEq)]
 pub struct IpRange {
+    /// The starting IP address of the range
     pub start: String,
+    /// The ending IP address of the range
     pub end: String,
 }
 
@@ -360,6 +573,12 @@ impl fmt::Display for IpRange {
 }
 
 impl IpRange {
+    /// Validates that the IP range has valid start and end addresses.
+    ///
+    /// # Returns
+    ///
+    /// `true` if both start and end are valid IPv4 addresses and start < end,
+    /// `false` otherwise.
     #[must_use]
     pub fn is_valid(&self) -> bool {
         if let (Ok(start), Ok(end)) = (
@@ -373,7 +592,15 @@ impl IpRange {
     }
 }
 
+/// Trait for types that can contain collections of network identifiers.
+///
+/// Provides common functionality for validating and accessing different
+/// types of network identifiers (hosts, networks, and ranges).
 pub trait HostNetworkGroupTrait {
+    /// Validates that all network identifiers in the group are well-formed.
+    ///
+    /// Checks that all hosts are valid IP addresses, all networks are valid
+    /// CIDR notation, and all ranges have valid start/end addresses.
     fn is_valid(&self) -> bool {
         for h in self.hosts() {
             if Ipv4Addr::from_str(h).is_err() {
@@ -394,6 +621,10 @@ pub trait HostNetworkGroupTrait {
         true
     }
 
+    /// Converts all network identifiers to a single vector of strings.
+    ///
+    /// Combines hosts, networks, and ranges into one unified list for
+    /// display or processing purposes.
     fn to_string_vec(&self) -> Vec<String> {
         let mut elems = Vec::<String>::new();
         for host in self.hosts() {
@@ -408,12 +639,39 @@ pub trait HostNetworkGroupTrait {
         elems
     }
 
+    /// Returns a slice of host IP addresses.
     fn hosts(&self) -> &[String];
+    /// Returns a slice of network addresses in CIDR notation.
     fn networks(&self) -> &[String];
-    // should return Vec because most structs implementing this trait return a converted, i.e. newly created, Vec instead of a Vec field.
+    /// Returns a vector of IP address ranges.
+    ///
+    /// Note: Returns `Vec` rather than slice because most implementations
+    /// need to convert from internal representation.
     fn ranges(&self) -> Vec<IpRange>;
 }
 
+/// Sorts a vector of host IP addresses in ascending order and removes duplicates.
+///
+/// Parses each string as an IPv4 address for proper numeric sorting.
+/// Invalid IP addresses are treated as 0.0.0.0 for sorting purposes.
+///
+/// # Arguments
+///
+/// * `hosts` - A mutable reference to a vector of IP address strings
+///
+/// # Examples
+///
+/// ```rust
+/// use frontary::sort_hosts;
+///
+/// let mut hosts = vec![
+///     "192.168.1.10".to_string(),
+///     "192.168.1.2".to_string(),
+///     "192.168.1.10".to_string(), // duplicate
+/// ];
+/// sort_hosts(&mut hosts);
+/// assert_eq!(hosts, vec!["192.168.1.2", "192.168.1.10"]);
+/// ```
 pub fn sort_hosts(hosts: &mut Vec<String>) {
     hosts.sort_unstable_by_key(|h| {
         if let Ok(addr) = Ipv4Addr::from_str(h) {
@@ -425,8 +683,29 @@ pub fn sort_hosts(hosts: &mut Vec<String>) {
     hosts.dedup();
 }
 
+/// Sorts a vector of network addresses in ascending order and removes duplicates.
+///
+/// Parses each string as an IPv4 network in CIDR notation for proper sorting.
+/// Invalid network addresses are treated as 0.0.0.0/32 for sorting purposes.
+///
+/// # Arguments
+///
+/// * `networks` - A mutable reference to a vector of network address strings in CIDR notation
+///
+/// # Examples
+///
+/// ```rust
+/// use frontary::sort_networks;
+///
+/// let mut networks = vec![
+///     "192.168.2.0/24".to_string(),
+///     "192.168.1.0/24".to_string(),
+///     "192.168.2.0/24".to_string(), // duplicate
+/// ];
+/// sort_networks(&mut networks);
+/// assert_eq!(networks, vec!["192.168.1.0/24", "192.168.2.0/24"]);
+/// ```
 #[allow(clippy::missing_panics_doc)] // because it never happens
-/// Sorts networks by the network address.
 pub fn sort_networks(networks: &mut Vec<String>) {
     networks.sort_unstable_by_key(|n| {
         if let Ok(network) = Ipv4Net::from_str(n) {
@@ -438,35 +717,66 @@ pub fn sort_networks(networks: &mut Vec<String>) {
     networks.dedup();
 }
 
+/// A collection of network identifiers including hosts, networks, and ranges.
+///
+/// Used to group different types of network identifiers together for
+/// validation and processing.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct NetworkGroup {
+    /// Individual host IP addresses
     pub hosts: Vec<String>,
+    /// Network addresses in CIDR notation
     pub networks: Vec<String>,
+    /// IP address ranges
     pub ranges: Vec<IpRange>,
 }
 
+/// A generic item with an identifier and display value.
+///
+/// Used throughout the UI for selectable items in lists, dropdowns,
+/// and other components. The value can be either a translation key
+/// or raw display text.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Item {
+    /// Unique identifier for the item
     id: String,
+    /// Display value (translation key or raw text)
     value: ViewString,
 }
 
 impl Item {
+    /// Creates a new item with the specified ID and value.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - Unique identifier for the item
+    /// * `value` - Display value (translation key or raw text)
     #[must_use]
     pub fn new(id: String, value: ViewString) -> Self {
         Self { id, value }
     }
 
+    /// Returns the item's unique identifier.
     #[must_use]
     pub fn id(&self) -> &String {
         &self.id
     }
 
+    /// Returns the item's display value as a string.
     #[must_use]
     pub fn value(&self) -> String {
         self.value.to_string()
     }
 
+    /// Returns the item's display value with translation support.
+    ///
+    /// If the value is a translation key, it will be looked up in the
+    /// provided translation context. If it's raw text, it's returned as-is.
+    ///
+    /// # Arguments
+    ///
+    /// * `txt` - Translation context for looking up keys
+    /// * `language` - Target language for translation
     #[must_use]
     pub fn value_txt(&self, txt: &JSONGetText<'static>, language: Language) -> String {
         self.value.to_string_txt(txt, language)

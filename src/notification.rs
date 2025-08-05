@@ -1,3 +1,8 @@
+//! Notification system for displaying success and error messages.
+//!
+//! This module provides a notification component that can display timed messages
+//! with different categories (success/failure) and automatic dismissal.
+
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Write;
@@ -20,9 +25,12 @@ define_u32_consts! {
     DEFAULT_NOTIFICATION_WIDTH => 252
 }
 
+/// Category of notification determining visual styling.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Category {
+    /// Error or failure notification (red styling)
     Fail,
+    /// Success notification (green styling)
     Success,
 }
 
@@ -36,28 +44,43 @@ pub enum Message {
     CloseAll,
 }
 
+/// A single notification item with message content and metadata.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, PartialEq, Eq)]
 pub struct NotificationItem {
+    /// Primary notification message
     pub message: String,
+    /// Optional secondary message with additional details
     pub sub_message: String,
+    /// HTTP status code if this notification is related to a network request
     pub status_code: Option<u16>,
+    /// Optional timestamp for when the notification occurred
     pub time: Option<Duration>,
-    pub category: Category, // color differs according to Category
+    /// Notification category affecting visual styling
+    pub category: Category,
 }
 
+/// Default timeout duration for notifications before auto-dismissal
 pub const TIMEOUT_SECS: Duration = Duration::from_secs(10);
 
+/// Notification component model managing active notifications and their timers.
 pub struct Model {
+    /// Active timeouts for automatic notification dismissal
     timeouts: HashMap<usize, Timeout>,
 }
 
+/// Properties for the notification component.
 #[derive(Clone, Eq, PartialEq, Properties)]
 pub struct Props {
+    /// Translation context for localized text
     pub txt: Texts,
+    /// Current language for display
     pub language: Language,
+    /// List of active notifications with their IDs
     pub list: Rc<RefCell<Vec<(usize, NotificationItem)>>>,
+    /// Serial number for tracking updates
     pub serial: usize,
+    /// Width of the notification panel in pixels
     #[prop_or(DEFAULT_NOTIFICATION_WIDTH)]
     pub width: u32,
     #[prop_or(None)]
@@ -285,22 +308,54 @@ impl Model {
     }
 }
 
+/// Common error types that can be converted to notifications.
 #[derive(Clone, PartialEq, Eq)]
 pub enum CommonError {
+    /// Error sending GraphQL query
     SendGraphQLQueryError,
+    /// HTTP request returned non-success status code
     HttpStatusNoSuccess(u16),
+    /// Invalid GraphQL response received
     GraphQLResponseError,
+    /// Error parsing GraphQL response
     GraphQLParseError,
+    /// Unspecified error occurred
     UnknownError,
 }
 
+/// Types of notifications that can be generated.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, PartialEq, Eq)]
 pub enum NotificationType {
+    /// A common error type
     CommonError(CommonError),
+    /// A list of errors with a primary message
     ErrorList(String, Vec<String>),
 }
 
+/// Generates a notification item from a notification type.
+///
+/// Converts various error types into structured notification items
+/// with appropriate messages and styling.
+///
+/// # Arguments
+///
+/// * `noti` - The notification type to convert
+///
+/// # Returns
+///
+/// A `NotificationItem` ready for display
+///
+/// # Examples
+///
+/// ```rust
+/// use frontary::{gen_notifications, NotificationType, CommonError};
+///
+/// let notification = gen_notifications(
+///     NotificationType::CommonError(CommonError::UnknownError)
+/// );
+/// assert_eq!(notification.message, "Unknown error");
+/// ```
 #[must_use]
 pub fn gen_notifications(noti: NotificationType) -> NotificationItem {
     match noti {
