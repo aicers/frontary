@@ -1,14 +1,26 @@
+//! Language support and internationalization utilities.
+//!
+//! This module provides language detection, browser storage, and utilities
+//! for working with localized text in the UI.
+
 use gloo_storage::{LocalStorage, Result as GlooResult, Storage};
 use serde::{Deserialize, Serialize};
 
+/// Type alias for text parsing results
 type Text = Result<String, anyhow::Error>;
 
+/// Local storage key for persisting language preferences
 const STORAGE_KEY: &str = "aice.language";
 
-/// Supported languages.
+/// Supported languages for the UI.
+///
+/// Currently supports English and Korean with automatic detection
+/// from browser preferences.
 #[derive(Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Language {
+    /// English language (en-US)
     English,
+    /// Korean language (ko-KR)
     Korean,
 }
 
@@ -35,7 +47,11 @@ impl From<Language> for Text {
 }
 
 impl Language {
-    /// Returns the language subtag.
+    /// Returns the ISO 639-1 language subtag.
+    ///
+    /// # Returns
+    ///
+    /// The two-letter language code ("en" or "ko")
     #[must_use]
     pub fn language_subtag(self) -> &'static str {
         match self {
@@ -44,7 +60,11 @@ impl Language {
         }
     }
 
-    /// Returns the BCP 47 tag.
+    /// Returns the full BCP 47 language tag.
+    ///
+    /// # Returns
+    ///
+    /// The full language tag including region ("en-US" or "ko-KR")
     #[must_use]
     pub fn tag(self) -> &'static str {
         match self {
@@ -54,6 +74,14 @@ impl Language {
     }
 }
 
+/// Gets the current language preference from browser storage.
+///
+/// Falls back to English if no preference is stored or if the stored
+/// value is invalid.
+///
+/// # Returns
+///
+/// The user's preferred language or the default (English)
 #[must_use]
 pub fn get() -> Language {
     const DEFAULT_LANGUAGE: Language = Language::English;
@@ -62,6 +90,11 @@ pub fn get() -> Language {
     lang.unwrap_or(DEFAULT_LANGUAGE)
 }
 
+/// Saves the language preference to browser storage.
+///
+/// # Arguments
+///
+/// * `lang` - The language to save as the user's preference
 pub fn set(lang: Language) {
     let _rtn = LocalStorage::set(STORAGE_KEY, lang);
 }
