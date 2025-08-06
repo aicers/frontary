@@ -2732,6 +2732,24 @@ div.notification-contents-done-button {
 div.notification-contents-done-button:hover {
     cursor: pointer;
 }
+div.notification-close-all {
+    width: 100%;
+    padding: 5px 0px;
+    display: flex;
+    justify-content: flex-end;
+}
+div.notification-close-all-button {
+    padding: 4px 8px;
+    background-color: #FFFFFF;
+    border: 1px solid #CECECE;
+    border-radius: 2px;
+    font-size: 12px;
+    color: #333333;
+}
+div.notification-close-all-button:hover {
+    cursor: pointer;
+    background-color: #F0F0F0;
+}
 
 div.modal-outer {
     position: fixed;

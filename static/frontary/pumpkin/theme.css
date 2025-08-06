@@ -2873,6 +2873,26 @@ div.notification-contents-done-button:hover {
     border-color: var(--Blue-20);
     color: var(--Blue-80);
 }
+div.notification-close-all {
+    width: 100%;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+div.notification-close-all-button {
+    padding: 8px 16px;
+    background-color: var(--White);
+    border: 2px solid var(--Dark-10);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--Dark-70);
+}
+div.notification-close-all-button:hover {
+    cursor: pointer;
+    border-color: var(--Blue-20);
+    color: var(--Blue-80);
+}
 
 div.modal-outer {
     position: fixed;
