@@ -182,9 +182,23 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             group_list_link_line_bottom,
         ));
 
+        let group_list_link_line_bottom_compact =
+            include_bytes!("../static/frontary/pumpkin/group-list-link-line-bottom-compact.svg");
+        rtn.push((
+            "group-list-link-line-bottom-compact.svg",
+            group_list_link_line_bottom_compact,
+        ));
+
         let group_list_link_line_top =
             include_bytes!("../static/frontary/pumpkin/group-list-link-line-top.svg");
         rtn.push(("group-list-link-line-top.svg", group_list_link_line_top));
+
+        let group_list_link_line_top_compact =
+            include_bytes!("../static/frontary/pumpkin/group-list-link-line-top-compact.svg");
+        rtn.push((
+            "group-list-link-line-top-compact.svg",
+            group_list_link_line_top_compact,
+        ));
 
         let group_list_link_line_top_long =
             include_bytes!("../static/frontary/pumpkin/group-list-link-line-top-long.svg");
