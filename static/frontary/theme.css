@@ -1485,6 +1485,12 @@ div.page-selected {
     border-radius: 15px;
 }
 
+div.page-unselected.disabled,
+div.page-selected.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 div.page-unselected:hover {
     color: var(--page-unselected-hover-color);
     cursor: pointer;
@@ -2974,11 +2980,6 @@ td.tab-menu-last {
 td.tab-menu-right {
     border-bottom: 1px solid #D7D7D7;
     background-color: #FFFFFF;
-}
-
-.disable-outer {
-    filter: brightness(0.5);
-    pointer-events: none;
 }
 
 div.cell-modal-container {
