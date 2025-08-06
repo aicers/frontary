@@ -15,7 +15,9 @@ use super::{
     component::{InvalidMessage, Model, Verification},
     group_item_list_preset,
 };
-use crate::{InvalidPasswordKind as Kind, PASSWORD_MIN_LEN, is_adjacent};
+use crate::{
+    InvalidPasswordKind as Kind, PASSWORD_MIN_LEN, input::user_input::validate_text, is_adjacent,
+};
 
 type PropaChildren = Vec<(BigUint, usize, Rc<RefCell<InputItem>>, Rc<InputConfig>)>;
 
@@ -863,6 +865,21 @@ where
                                     {
                                         rtn = false;
                                     }
+                                }
+                            }
+                        }
+                        (InputItem::Text(value), InputConfig::Text(config)) => {
+                            if parent_checked {
+                                if let Some(_validation_error) =
+                                    validate_text(value, config.validation_rule.as_ref())
+                                {
+                                    self.verification.insert(
+                                        item_index,
+                                        Verification::Invalid(InvalidMessage::InvalidInput),
+                                    );
+                                    rtn = false;
+                                } else {
+                                    self.verification.insert(item_index, Verification::Valid);
                                 }
                             }
                         }
