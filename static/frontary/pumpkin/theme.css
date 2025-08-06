@@ -2830,8 +2830,19 @@ div.modal-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--Modal-Background);
     z-index: 99;
+}
+
+div.modal-outer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.09;
+    background-color: var(--Modal-Background);
+    z-index: -1;
 }
 
 div.modal-contents {
@@ -2839,7 +2850,6 @@ div.modal-contents {
     padding: 24px;
     background-color: var(--Dark-80);
     border-radius: 8px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     display: inline-flex;
     padding: 24px;
     flex-direction: column;
