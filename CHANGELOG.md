@@ -7,6 +7,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Removed
+
+- Removed `width_view` field from `DisplayInfo` struct.
+
 ### Changed
 
 - Centralized image path handling with `Theme::path`, supporting light/dark themes
