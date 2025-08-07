@@ -9,7 +9,7 @@ use yew::{Context, Html, events::InputEvent, html};
 use super::{MIN_POP_HEIGHT, Message, Model};
 use crate::{
     CheckStatus, Checkbox, EndpointKind, NBSP, NetworkItem, SelectComplexKind, SelectMini,
-    SelectMiniKind, SelectionExtraInfo, ViewString, text, window_inner_height,
+    SelectMiniKind, SelectionExtraInfo, Theme, ViewString, text, window_inner_height,
 };
 
 impl Model {
@@ -20,14 +20,14 @@ impl Model {
             CheckStatus::Checked => "checked",
             _ => "unchecked",
         };
-        let (prefix, extension) = if cfg!(feature = "pumpkin") {
-            ("pumpkin/", "svg")
+        let theme = ctx.props().theme;
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
         } else {
-            ("", "png")
+            "png"
         };
-        let style_all = format!(
-            "background-image: url('/frontary/{prefix}radio-opener-{postfix}.{extension}');"
-        );
+        let radio_opener = Theme::path(&theme, &format!("radio-opener-{postfix}.{ext}"));
+        let style_all = format!("background-image: url('{radio_opener}');");
         let style = format!("width: {}px;", ctx.props().pop_width);
         let style_pop = format!(
             "widht: {}px; height: {}px;",
@@ -35,29 +35,23 @@ impl Model {
             std::cmp::max(MIN_POP_HEIGHT, window_inner_height())
         );
         let style_head_title = format!("width: {}px;", ctx.props().pop_width - 34);
-        let (style_list, style_input) = if self.view_list {
-            if cfg!(feature = "pumpkin") {
-                (
-                    "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
-                    "background-image: url('/frontary/pumpkin/collapse-contents.svg');",
-                )
+        let theme = ctx.props().theme;
+        let get_expand_collapse_style = |visible: bool| {
+            let filename = if visible {
+                "collapse-contents"
             } else {
-                (
-                    "background-image: url('/frontary/collapse-contents.png');",
-                    "background-image: url('/frontary/collapse-contents.png');",
-                )
-            }
-        } else if cfg!(feature = "pumpkin") {
-            (
-                "background-image: url('/frontary/pumpkin/expand-contents.svg');",
-                "background-image: url('/frontary/pumpkin/expand-contents.svg');",
-            )
-        } else {
-            (
-                "background-image: url('/frontary/expand-contents.png');",
-                "background-image: url('/frontary/expand-contents.png');",
-            )
+                "expand-contents"
+            };
+            let ext = if cfg!(feature = "pumpkin") {
+                "svg"
+            } else {
+                "png"
+            };
+            let url = Theme::path(&theme, &format!("{filename}.{ext}"));
+            format!("background-image: url('{url}');")
         };
+        let style_list = get_expand_collapse_style(self.view_list);
+        let style_input = get_expand_collapse_style(self.view_input);
         let class_input_head = if self.view_list {
             "complex-select-pop-input-head-bottom"
         } else {
@@ -168,6 +162,7 @@ impl Model {
         } else {
             self.check_status(ctx, true)
         };
+        let theme = ctx.props().theme;
 
         html! {
             <div class="complex-select-pop-list" style={style_pop_list}>
@@ -191,7 +186,7 @@ impl Model {
                                             <td class="complex-select-pop-list-list-all-checkbox">
                                                 // All for the below list
                                                 <div onclick={onclick_all}>
-                                                    <Checkbox status={check_status} />
+                                                    <Checkbox status={check_status} {theme} />
                                                 </div>
                                             </td>
                                             <td class="complex-select-pop-list-list-all-item">
@@ -256,6 +251,7 @@ impl Model {
             CheckStatus::Checked | CheckStatus::Indeterminate => true,
             CheckStatus::Unchecked => false,
         };
+        let theme = ctx.props().theme;
         html! {
             <SelectMini::<EndpointKind, Self>
                 txt={ctx.props().txt.clone()}
@@ -271,6 +267,7 @@ impl Model {
                 align_left={false}
                 list_top={22}
                 kind={SelectMiniKind::DirectionAll}
+                {theme}
             />
         }
     }
@@ -306,13 +303,14 @@ impl Model {
             SelectComplexKind::NetworkIp => "width: 209px;",
             SelectComplexKind::Basic => "width: 279px",
         };
+        let theme = ctx.props().theme;
 
         html! {
             <table>
                 <tr>
                     <td class="complex-select-pop-list-list-items-checkbox">
                         <div onclick={onclick_item(key)}>
-                            <Checkbox status={checked} />
+                            <Checkbox status={checked} {theme} />
                         </div>
                     </td>
                     <td class="complex-select-pop-list-list-items-item" style={style_item_width}>
@@ -385,6 +383,7 @@ impl Model {
                 SelectionExtraInfo::Network(EndpointKind::Destination),
             ]);
             let top_width = if cfg!(feature = "pumpkin") { 90 } else { 70 };
+            let theme = ctx.props().theme;
             if let Some(selected) = self.direction_items.get(id) {
                 html! {
                     <SelectMini::<SelectionExtraInfo, Self>
@@ -401,6 +400,7 @@ impl Model {
                         {top_width}
                         list_min_width={Some(70)}
                         kind={SelectMiniKind::DirectionItem}
+                        {theme}
                     />
                 }
             } else {
@@ -517,6 +517,7 @@ impl Model {
                                             } else {
                                                 ("#F6F6F6", 70, 28)
                                             };
+                                            let theme = ctx.props().theme;
                                             html! {
                                                 <>
                                                     <tr>
@@ -544,6 +545,7 @@ impl Model {
                                                                 list_min_width={Some(70)}
                                                                 kind={SelectMiniKind::DirectionItem}
                                                                 {top_bg_color}
+                                                                {theme}
                                                             />
                                                         </td>
                                                     </tr>

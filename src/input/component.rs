@@ -18,7 +18,7 @@ use super::{
     Value as ComparisonValue, cal_index, group_item_list_preset,
 };
 use crate::{
-    InputNic, InvalidPasswordKind, MessageType, Rerender, Texts, ViewString,
+    InputNic, InvalidPasswordKind, MessageType, Rerender, Texts, Theme, ViewString,
     language::Language,
     list::{Column, ListItem},
     sort_hosts, sort_networks, text,
@@ -391,6 +391,8 @@ where
 
     #[prop_or(None)]
     pub example_message: Option<String>,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -1048,18 +1050,18 @@ where
                     }
                     InputConfig::HostNetworkGroup(config) => {
                         self.view_host_network_group(ctx, &config.ess, config.kind, config.num,
-                            config.width, input_data, None, index)
+                            config.width, input_data, None, index, config.theme)
                     }
                     InputConfig::SelectSingle(config) => {
                         self.view_select_searchable(ctx, false, &config.ess, config.width,
-                            &config.options, input_data, None, index, 0, false)
+                            &config.options, input_data, None, index, 0, false, config.theme)
                     }
                     InputConfig::SelectMultiple(config) => {
                         self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &config.ess,
-                            input_data, None, index, 0)
+                            input_data, None, index, 0, config.theme)
                     }
                     InputConfig::Tag(config) => {
-                        self.view_tag_group(ctx, &config.ess, &config.name_map, input_data, None, index)
+                        self.view_tag_group(ctx, &config.ess, &config.name_map, input_data, None, index, config.theme)
                     }
                     InputConfig::VecSelect(config) => {
                         self.view_vec_select(ctx, &config.ess, &config.items_ess_list, config.last,
@@ -1093,7 +1095,7 @@ where
                     }
                     InputConfig::Group(config) => {
                         self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths,
-                            &config.items, input_data, None, index, config.compact)
+                            &config.items, input_data, None, index, config.compact, config.theme)
                     }
                     InputConfig::Checkbox(config) => {
                         let both = ctx.props().input_conf.get(index + 1).map_or(Some(false),|next| {
@@ -1104,11 +1106,11 @@ where
                             }
                         });
                         self.view_checkbox(ctx, &config.ess, config.language, config.always, config.children.as_ref(),
-                            input_data, None, index, both, 1)
+                            input_data, None, index, both, 1, config.theme)
                     }
                     InputConfig::Radio(config) => {
                         self.view_radio(ctx, &config.ess, &config.options, &config.children_group,
-                            input_data, None, index, 1)
+                            input_data, None, index, 1, config.theme)
                     }
                 }
             })

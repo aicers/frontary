@@ -4,7 +4,7 @@ use std::{cell::RefCell, marker::PhantomData};
 use json_gettext::get_text;
 use yew::{Component, Context, Html, Properties, html};
 
-use crate::{Texts, ViewString, language::Language, text};
+use crate::{Texts, Theme, ViewString, language::Language, text};
 
 #[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Message {
@@ -28,6 +28,8 @@ where
     pub value: Option<ViewString>,
     pub index: usize,
     pub selected_index: Rc<RefCell<Option<usize>>>,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl<T> PartialEq for Props<T>
@@ -80,21 +82,25 @@ where
         } else {
             false
         };
-        let pumpkin = cfg!(feature = "pumpkin");
-        let img = match (checked, pumpkin) {
-            (true, true) => "/frontary/pumpkin/radio-checked.svg",
-            (true, false) => "/frontary/radio-checked.png",
-            (false, true) => "/frontary/pumpkin/radio-unchecked.svg",
-            (false, false) => "/frontary/radio-unchecked.png",
+        let theme = ctx.props().theme;
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
+        } else {
+            "png"
         };
-
+        let radio_img_file = if checked {
+            "radio-checked"
+        } else {
+            "radio-unchecked"
+        };
+        let radio_img = Theme::path(&theme, &format!("{radio_img_file}.{ext}"));
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(move |_| Message::ClickItem);
 
         html! {
             <div class="radio-outer" role="radiogroup">
                 <div role="radio" class="radio-item" onclick={onclick}>
-                    <img src={img} class="radio-separate-img" />
+                    <img src={radio_img} class="radio-separate-img" />
                     {
                         match ctx.props().value.as_ref() {
                             Some(ViewString::Key(key)) => html! { text!(txt, ctx.props().language, key) },

@@ -7,7 +7,7 @@ use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{Component, Context, Html, Properties, TargetCast, events::InputEvent, html};
 
 use crate::{
-    HostNetwork, InputHostNetworkGroup, Texts, language::Language, parse_host_network, text,
+    HostNetwork, InputHostNetworkGroup, Texts, Theme, language::Language, parse_host_network, text,
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -95,6 +95,8 @@ where
     pub verify_to_save: bool,
     #[prop_or(false)]
     pub is_required: bool,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -317,27 +319,28 @@ where
     <T as Component>::Message: Clone + PartialEq,
 {
     fn view_host_network_group(&self, ctx: &Context<Self>) -> Html {
+        let theme = ctx.props().theme;
         if let Ok(data) = ctx.props().input_data.try_borrow() {
             html! {
                 for self.view_order.iter().map(|item| {
                     match item {
                         ItemType::Host(index) => {
                             if let Some(host) = data.hosts.get(*index) {
-                                Self::view_item(ctx, DeleteIndex::Host(*index), host)
+                                Self::view_item(ctx, DeleteIndex::Host(*index), host, theme)
                             } else {
                                 html! {}
                             }
                         }
                         ItemType::Network(index) => {
                             if let Some(network) = data.networks.get(*index) {
-                                Self::view_item(ctx, DeleteIndex::Network(*index), network)
+                                Self::view_item(ctx, DeleteIndex::Network(*index), network, theme)
                             } else {
                                 html! {}
                             }
                         }
                         ItemType::Range(index) => {
                             if let Some(range) = data.ranges.get(*index) {
-                                Self::view_item(ctx, DeleteIndex::Range(*index), &range.to_string())
+                                Self::view_item(ctx, DeleteIndex::Range(*index), &range.to_string(), theme)
                             } else {
                                 html! {}
                             }
@@ -350,17 +353,25 @@ where
         }
     }
 
-    fn view_item(ctx: &Context<Self>, index: DeleteIndex, item: &str) -> Html {
+    fn view_item(
+        ctx: &Context<Self>,
+        index: DeleteIndex,
+        item: &str,
+        theme: Option<Theme>,
+    ) -> Html {
         let onclick_delete =
             |index: DeleteIndex| ctx.link().callback(move |_| Message::Delete(index));
+        let delete_img_file = if cfg!(feature = "pumpkin") {
+            "delete-x.svg"
+        } else {
+            "host-network-close.png"
+        };
+        let delete_img = Theme::path(&theme, delete_img_file);
+
         html! {
             <div class="host-network-group-input-item">
                 { item }
-                if cfg!(feature = "pumpkin") {
-                    <img src="/frontary/pumpkin/delete-x.svg" class="host-network-group-close" onclick={onclick_delete(index)} />
-                } else {
-                    <img src="/frontary/host-network-close.png" class="host-network-group-close" onclick={onclick_delete(index)} />
-                }
+                <img src={delete_img} class="host-network-group-close" onclick={onclick_delete(index)} />
             </div>
         }
     }

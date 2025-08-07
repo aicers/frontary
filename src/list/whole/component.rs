@@ -8,7 +8,7 @@ use yew::{Component, Context, Html, Properties, html, virtual_dom::AttrValue};
 use super::{DEFAULT_NUM_PAGES, DEFAULT_NUM_PER_PAGE, MessageType};
 use crate::{
     CheckStatus, Input, InputConfig, InputItem, InputTag, MoreAction, PagesInfo, SelectMini,
-    SelectMiniKind, SortStatus, Texts, ViewString,
+    SelectMiniKind, SortStatus, Texts, Theme, ViewString,
     input::InputSecondId,
     language::Language,
     list::{DataType, DisplayInfo, Kind, ListItem},
@@ -163,6 +163,8 @@ where
     pub input_second_type: Option<Vec<Rc<InputConfig>>>,
 
     pub messages: HashMap<MessageType, T::Message>,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -817,7 +819,13 @@ where
         );
         let value_candidates = Rc::new(ctx.props().visible_sort_options.clone());
         let list_top = if cfg!(feature = "pumpkin") { 42 } else { 38 };
-
+        let theme = ctx.props().theme;
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
+        } else {
+            "png"
+        };
+        let add_img = Theme::path(&theme, &format!("list-add.{ext}"));
         match ctx.props().kind {
             Kind::LayeredFirst | Kind::Flat => {
                 html! {
@@ -826,11 +834,7 @@ where
                             { text!(txt, ctx.props().language, &ctx.props().title) }
                         </div>
                         <div class="list-add" onclick={onclick_add}>
-                            if cfg!(feature = "pumpkin") {
-                                <img src="/frontary/pumpkin/list-add.svg" class="list-add" />
-                            } else {
-                                <img src="/frontary/list-add.png" class="list-add" />
-                            }
+                            <img src={add_img} class="list-add" />
                             { text!(txt, ctx.props().language, "Add") }
                         </div>
                         <div class="list-sort-recently">
@@ -847,6 +851,7 @@ where
                                 align_left={false}
                                 {list_top}
                                 kind={SelectMiniKind::SortList}
+                                {theme}
                             />
                         </div>
                         <div class="list-table" style={style_view}>

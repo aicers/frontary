@@ -5,7 +5,7 @@ use json_gettext::get_text;
 use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, Properties, html};
 
-use crate::{Texts, ViewString, language::Language, text};
+use crate::{Texts, Theme, ViewString, language::Language, text};
 
 #[derive(PartialEq, Eq)]
 pub enum Message {
@@ -35,6 +35,8 @@ where
     pub width_item: Option<u32>,
     #[prop_or(false)]
     pub allow_empty: bool,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 impl<T> Component for Model<T>
@@ -83,17 +85,18 @@ where
                     } else {
                         false
                     };
-                    let img = if checked {
-                        if cfg!(feature="pumpkin") {
-                            "/frontary/pumpkin/radio-checked.svg"
-                        } else {
-                            "/frontary/radio-checked.png"
-                        }
-                    } else if cfg!(feature="pumpkin") {
-                            "/frontary/pumpkin/radio-unchecked.svg"
+                    let theme = ctx.props().theme;
+                    let ext = if cfg!(feature = "pumpkin") {
+                        "svg"
                     } else {
-                            "/frontary/radio-unchecked.png"
+                        "png"
                     };
+                    let radio_img_file = if checked {
+                        "radio-checked"
+                    } else {
+                        "radio-unchecked"
+                    };
+                    let radio_img = Theme::path(&theme, &format!("{radio_img_file}.{ext}"));
                     let txt = ctx.props().txt.txt.clone();
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
                     let style = ctx.props().width_item.map_or_else(String::new, |w| format!("width: {w}px;"));
@@ -101,7 +104,7 @@ where
                     html! {
                         <>
                             <div class="radio-item" role="radio" onclick={onclick(index)} style={style}>
-                                <img src={img} class="radio-img" />
+                                <img src={radio_img} class="radio-img" />
                                 {
                                     match item {
                                         ViewString::Key(key) => html! { text!(txt, ctx.props().language, key) },

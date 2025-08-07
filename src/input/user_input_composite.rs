@@ -11,7 +11,7 @@ use super::{
     component::{Message, Model},
     user_input::view_asterisk,
 };
-use crate::{Checkbox, Radio, ViewString, text};
+use crate::{Checkbox, Radio, Theme, ViewString, text};
 
 impl<T> Model<T>
 where
@@ -29,6 +29,7 @@ where
         base_index: Option<&BigUint>,
         layer_index: usize,
         depth: u32,
+        theme: Option<Theme>,
     ) -> Html {
         let list = Rc::new(options.to_vec());
         let candidates = Rc::new(
@@ -86,6 +87,7 @@ where
                                 list={Rc::clone(&list)}
                                 candidate_values={Rc::clone(&candidates)}
                                 selected_value={Rc::clone(buffer_option)}
+                                {theme}
                             />
                             {
                                 if ess.notice.is_empty() {
@@ -147,6 +149,7 @@ where
         layer_index: usize,
         both_border: Option<bool>,
         depth: u32,
+        theme: Option<Theme>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let my_index_clone = my_index.clone();
@@ -212,6 +215,7 @@ where
                                         <Checkbox
                                             status={checked}
                                             {always}
+                                            {theme}
                                         />
                                         <div class="input-checkbox-me-title">
                                             { title }{ view_asterisk(ess.required) }
@@ -224,6 +228,7 @@ where
                                         <div class="input-checkbox-me-checkbox" onclick={onclick}>
                                             <Checkbox
                                                 status={checked}
+                                                {theme}
                                             />
                                         </div>
                                         <div class="input-checkbox-me-title">
@@ -312,7 +317,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, Some(base_index), layer_index) }
+                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, Some(base_index), layer_index, config.theme) }
                     </div>
                 }
             }
@@ -321,7 +326,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, Some(base_index), layer_index, depth, false) }
+                        { self.view_select_searchable(ctx, false, &config.ess, config.width, &config.options, child_data, Some(base_index), layer_index, depth, false, config.theme) }
                     </div>
                 }
             }
@@ -330,7 +335,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &config.ess, child_data, Some(base_index), layer_index, depth) }
+                        { self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &config.ess, child_data, Some(base_index), layer_index, depth, config.theme) }
                     </div>
                 }
             }
@@ -375,7 +380,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index, config.compact) }
+                        { self.view_group(ctx, &config.ess, config.all_in_one_row, &config.widths, &config.items, child_data, Some(base_index), layer_index, config.compact, config.theme) }
                     </div>
                 }
             }
@@ -384,7 +389,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_checkbox(ctx, &config.ess, config.language, config.always, config.children.as_ref(), child_data, Some(base_index), layer_index, None, depth + 1) }
+                        { self.view_checkbox(ctx, &config.ess, config.language, config.always, config.children.as_ref(), child_data, Some(base_index), layer_index, None, depth + 1, config.theme) }
                     </div>
                 }
             }
@@ -393,7 +398,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, Some(base_index), layer_index, depth + 1) }
+                        { self.view_radio(ctx, &config.ess, &config.options, &config.children_group, child_data, Some(base_index), layer_index, depth + 1, config.theme) }
                     </div>
                 }
             }
@@ -423,6 +428,7 @@ where
         base_index: Option<&BigUint>,
         layer_index: usize,
         compact: bool,
+        theme: Option<Theme>,
     ) -> Html {
         let this_index = cal_index(base_index, layer_index); // == my_index
         let this_index_clone = this_index.clone();
@@ -491,6 +497,12 @@ where
             )
         };
 
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
+        } else {
+            "png"
+        };
+        let addition_symbol_img = Theme::path(&theme, &format!("addition-symbol.{ext}"));
         html! {
             <div class="input-item">
                 <div class={input_contents_item_title}>
@@ -611,19 +623,19 @@ where
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, each_item,
-                                                                                Some(&row_rep_index), col_index)
+                                                                                Some(&row_rep_index), col_index, config.theme)
                                                                         }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_select_searchable(ctx, false, &ess, config.width, &config.options, each_item,
-                                                                                Some(&row_rep_index), col_index, 1, true)
+                                                                                Some(&row_rep_index), col_index, 1, true, config.theme)
                                                                         }
                                                                         InputConfig::SelectMultiple(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &ess, each_item,
-                                                                                Some(&row_rep_index), col_index, 1)
+                                                                                Some(&row_rep_index), col_index, 1, config.theme)
                                                                             }
                                                                         InputConfig::Unsigned32(config) => {
                                                                             let mut ess = config.ess.clone();
@@ -715,7 +727,7 @@ where
                             <div class={input_add_class}>
                                 <td class={bottom_line_class}></td>
                                 <div class="input-add-item" onclick={onclick_add}>
-                                    <img src="/frontary/pumpkin/addition-symbol.svg" />
+                                    <img src={addition_symbol_img} />
                                     { text!(txt, ctx.props().language, add_message) }
                                 </div>
                             </div>
