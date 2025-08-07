@@ -15,8 +15,6 @@ use crate::{
     text,
 };
 
-const DEFAULT_TABLE_WIDTH: u32 = 100;
-
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct SortColumn {
     pub index: usize,
@@ -766,17 +764,6 @@ where
 
     #[allow(clippy::too_many_lines)]
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let style_full = if cfg!(feature = "pumpkin") {
-            String::new()
-        } else {
-            format!("width: {}px;", ctx.props().display_info.width_full)
-        };
-        let style_view = if cfg!(feature = "pumpkin") {
-            format!("width: {DEFAULT_TABLE_WIDTH}%;")
-        } else {
-            format!("width: {}px;", ctx.props().display_info.width_view)
-        };
-
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(|_| Message::InputAdd);
         let input_id = ctx
@@ -851,8 +838,8 @@ where
                                 {theme}
                             />
                         </div>
-                        <div class="list-table" style={style_view}>
-                            <table class="list-table" style={style_full}>
+                        <div class="list-table">
+                            <table class="list-table">
                                 { self.view_head(ctx) }
                                 { self.view_list(ctx) }
                                 { self.view_pages(ctx, true) }

@@ -270,7 +270,6 @@ impl ColWidths {
 pub struct DisplayInfo {
     pub widths: Vec<ColWidths>, // The first row, widths[0] should be ColWidths::Pixel
     pub width_full: u32,        // sum of column widths
-    pub width_view: u32, // width for display. if width_full > width_view, x scroll bar shows up.
     pub height: u32,
     pub titles: Vec<&'static str>,
 }
