@@ -110,12 +110,11 @@ where
             click_count: 0,
             phantom: PhantomData,
         };
-        if let Some(value) = ctx.props().default_value {
-            if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
-                if selected.is_none() {
-                    *selected = Some(value);
-                }
-            }
+        if let Some(value) = ctx.props().default_value
+            && let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut()
+            && selected.is_none()
+        {
+            *selected = Some(value);
         }
         s
     }
@@ -124,13 +123,12 @@ where
         if !first_render {
             return;
         }
-        if let Some(home_div) = ctx.props().home_div.as_ref() {
-            if let Some(element) = home_div.cast::<HtmlElement>() {
-                let callback = ctx.link().callback(|_: Event| Message::ListenClick);
-                let listener =
-                    EventListener::new(&element, "click", move |e| callback.emit(e.clone()));
-                self.click_listener = Some(listener);
-            }
+        if let Some(home_div) = ctx.props().home_div.as_ref()
+            && let Some(element) = home_div.cast::<HtmlElement>()
+        {
+            let callback = ctx.link().callback(|_: Event| Message::ListenClick);
+            let listener = EventListener::new(&element, "click", move |e| callback.emit(e.clone()));
+            self.click_listener = Some(listener);
         }
     }
 

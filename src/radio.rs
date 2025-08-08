@@ -51,20 +51,20 @@ where
         let s = Self {
             phantom: PhantomData,
         };
-        if let Some(value) = ctx.props().default_value.as_ref() {
-            if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
-                *selected = value.as_ref().into();
-            }
+        if let Some(value) = ctx.props().default_value.as_ref()
+            && let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut()
+        {
+            *selected = value.as_ref().into();
         }
         s
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         let Message::ClickItem(index) = msg;
-        if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
-            if let Some(value) = ctx.props().candidate_values.get(index) {
-                selected.clone_from(value);
-            }
+        if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut()
+            && let Some(value) = ctx.props().candidate_values.get(index)
+        {
+            selected.clone_from(value);
         }
         if let (Some(msg), Some(parent)) =
             (ctx.props().parent_message.as_ref(), ctx.link().get_parent())

@@ -103,16 +103,15 @@ impl Component for Model {
         if let (Ok(mut sel), Ok(list)) = (
             ctx.props().selected.predefined.try_borrow_mut(),
             ctx.props().list.try_borrow(),
-        ) {
-            if let Some(predefined) = sel.as_mut() {
-                let list_tmp = list
-                    .iter()
-                    .map(NetworkItem::id)
-                    .collect::<HashSet<&String>>();
-                predefined.retain(|k, _| list_tmp.contains(k));
-                if self.check_status(ctx, false) == CheckStatus::Checked {
-                    *sel = None;
-                }
+        ) && let Some(predefined) = sel.as_mut()
+        {
+            let list_tmp = list
+                .iter()
+                .map(NetworkItem::id)
+                .collect::<HashSet<&String>>();
+            predefined.retain(|k, _| list_tmp.contains(k));
+            if self.check_status(ctx, false) == CheckStatus::Checked {
+                *sel = None;
             }
         }
         self.buffer_direction_items(ctx);
@@ -231,10 +230,10 @@ impl Component for Model {
                         *sel = Some(s);
                     }
                 }
-                if self.check_status(ctx, false) == CheckStatus::Checked {
-                    if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut() {
-                        *predefined = None;
-                    }
+                if self.check_status(ctx, false) == CheckStatus::Checked
+                    && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+                {
+                    *predefined = None;
                 }
                 self.buffer_direction_items(ctx);
             }
@@ -269,19 +268,19 @@ impl Component for Model {
                             match check_status {
                                 CheckStatus::Checked => {
                                     for &index in search {
-                                        if let Some(item) = list.get(index) {
-                                            if item.networks().is_some() {
-                                                predefined.remove(item.id());
-                                            }
+                                        if let Some(item) = list.get(index)
+                                            && item.networks().is_some()
+                                        {
+                                            predefined.remove(item.id());
                                         }
                                     }
                                 }
                                 CheckStatus::Unchecked | CheckStatus::Indeterminate => {
                                     for &index in search {
-                                        if let Some(item) = list.get(index) {
-                                            if item.networks().is_some() {
-                                                check_item_as_both(item.id(), predefined);
-                                            }
+                                        if let Some(item) = list.get(index)
+                                            && item.networks().is_some()
+                                        {
+                                            check_item_as_both(item.id(), predefined);
                                         }
                                     }
                                 }
@@ -290,10 +289,10 @@ impl Component for Model {
                             let mut s =
                                 HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new();
                             for item in list.iter() {
-                                if let Some(dir) = self.direction_items.get(item.id()) {
-                                    if let Ok(dir) = dir.try_borrow() {
-                                        s.insert(item.id().clone(), Rc::new(RefCell::new(*dir)));
-                                    }
+                                if let Some(dir) = self.direction_items.get(item.id())
+                                    && let Ok(dir) = dir.try_borrow()
+                                {
+                                    s.insert(item.id().clone(), Rc::new(RefCell::new(*dir)));
                                 }
                             }
                             for &index in search {
@@ -306,10 +305,9 @@ impl Component for Model {
                     }
                     if check_status != CheckStatus::Checked
                         && self.check_status(ctx, false) == CheckStatus::Checked
+                        && let Ok(mut sel) = ctx.props().selected.predefined.try_borrow_mut()
                     {
-                        if let Ok(mut sel) = ctx.props().selected.predefined.try_borrow_mut() {
-                            *sel = None;
-                        }
+                        *sel = None;
                     }
                     self.buffer_direction_items(ctx);
                 } else {
@@ -342,10 +340,10 @@ impl Component for Model {
                 }
             }
             Message::DeleteInputItem(key) => {
-                if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
-                    if let Occupied(entry) = custom.entry(key) {
-                        entry.remove_entry();
-                    }
+                if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
+                    && let Occupied(entry) = custom.entry(key)
+                {
+                    entry.remove_entry();
                 }
             }
             Message::SetDirection => {
@@ -499,33 +497,31 @@ impl Model {
         if ctx.props().kind != Kind::NetworkIp {
             return;
         }
-        if let Ok(direction) = self.direction.try_borrow() {
-            if let Some(direction) = direction.as_ref() {
-                if let (Some(search), Ok(list)) =
-                    (self.search_result.as_ref(), ctx.props().list.try_borrow())
-                {
-                    for &index in search {
-                        if let Some(item) = list.get(index) {
-                            if item.networks().is_some() {
-                                let value = self.direction_items.get(&item.id);
-                                if let Some(value) = value {
-                                    if let Ok(mut value) = value.try_borrow_mut() {
-                                        if let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
-                                        {
-                                            *value = Some(SelectionExtraInfo::Network(*direction));
-                                        }
-                                    }
-                                }
-                            }
+        if let Ok(direction) = self.direction.try_borrow()
+            && let Some(direction) = direction.as_ref()
+        {
+            if let (Some(search), Ok(list)) =
+                (self.search_result.as_ref(), ctx.props().list.try_borrow())
+            {
+                for &index in search {
+                    if let Some(item) = list.get(index)
+                        && item.networks().is_some()
+                    {
+                        let value = self.direction_items.get(&item.id);
+                        if let Some(value) = value
+                            && let Ok(mut value) = value.try_borrow_mut()
+                            && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
+                        {
+                            *value = Some(SelectionExtraInfo::Network(*direction));
                         }
                     }
-                } else {
-                    for value in self.direction_items.values() {
-                        if let Ok(mut value) = value.try_borrow_mut() {
-                            if let Some(SelectionExtraInfo::Network(_)) = value.as_ref() {
-                                *value = Some(SelectionExtraInfo::Network(*direction));
-                            }
-                        }
+                }
+            } else {
+                for value in self.direction_items.values() {
+                    if let Ok(mut value) = value.try_borrow_mut()
+                        && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
+                    {
+                        *value = Some(SelectionExtraInfo::Network(*direction));
                     }
                 }
             }
@@ -586,10 +582,10 @@ impl Model {
                 .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>();
             *predefined = Some(s);
         }
-        if self.check_status(ctx, false) == CheckStatus::Checked {
-            if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut() {
-                *predefined = None;
-            }
+        if self.check_status(ctx, false) == CheckStatus::Checked
+            && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+        {
+            *predefined = None;
         }
     }
 

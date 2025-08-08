@@ -503,17 +503,17 @@ where
             return;
         };
         if cmp.chain_cmp() {
-            if let (Some(first), Some(second)) = (&*first, &*second) {
-                if let Ok(data) = Comparison::try_new(cmp, first.clone(), Some(second.clone())) {
-                    *input_data = ComparisonItem::new(Some(data));
-                    self.required_msg.remove(data_id);
-                }
-            }
-        } else if let Some(first) = &*first {
-            if let Ok(data) = Comparison::try_new(cmp, first.clone(), None) {
+            if let (Some(first), Some(second)) = (&*first, &*second)
+                && let Ok(data) = Comparison::try_new(cmp, first.clone(), Some(second.clone()))
+            {
                 *input_data = ComparisonItem::new(Some(data));
                 self.required_msg.remove(data_id);
             }
+        } else if let Some(first) = &*first
+            && let Ok(data) = Comparison::try_new(cmp, first.clone(), None)
+        {
+            *input_data = ComparisonItem::new(Some(data));
+            self.required_msg.remove(data_id);
         }
     }
 

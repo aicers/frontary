@@ -114,12 +114,11 @@ where
                 }
             }
             for new_key in ctx.props().prev_list.keys() {
-                if !self.prev_list.contains_key(new_key) {
-                    if let Ok(data) = ctx.props().input_data.try_borrow() {
-                        if data.old.contains(new_key) {
-                            self.view_order.push(new_key.clone());
-                        }
-                    }
+                if !self.prev_list.contains_key(new_key)
+                    && let Ok(data) = ctx.props().input_data.try_borrow()
+                    && data.old.contains(new_key)
+                {
+                    self.view_order.push(new_key.clone());
                 }
             }
             self.prev_list = ctx.props().prev_list.clone();
@@ -197,18 +196,18 @@ where
                     }
                 }
                 "Tab" => {
-                    if let Some(index) = self.search_cursor {
-                        if let Some((k, _)) = self.search_list.get(index) {
-                            ctx.link().send_message(Message::SelectTag(k.clone()));
-                            return false;
-                        }
+                    if let Some(index) = self.search_cursor
+                        && let Some((k, _)) = self.search_list.get(index)
+                    {
+                        ctx.link().send_message(Message::SelectTag(k.clone()));
+                        return false;
                     }
                 }
                 "Backspace" => {
-                    if self.input.is_empty() {
-                        if let Some(last) = self.view_order.last() {
-                            ctx.link().send_message(Message::UnselectTag(last.clone()));
-                        }
+                    if self.input.is_empty()
+                        && let Some(last) = self.view_order.last()
+                    {
+                        ctx.link().send_message(Message::UnselectTag(last.clone()));
                     }
                     return false;
                 }

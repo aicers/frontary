@@ -57,13 +57,13 @@ where
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        if msg == Message::ClickItem {
-            if let Ok(mut selected_index) = ctx.props().selected_index.try_borrow_mut() {
-                if *selected_index == Some(ctx.props().index) {
-                    *selected_index = None;
-                } else {
-                    *selected_index = Some(ctx.props().index);
-                }
+        if msg == Message::ClickItem
+            && let Ok(mut selected_index) = ctx.props().selected_index.try_borrow_mut()
+        {
+            if *selected_index == Some(ctx.props().index) {
+                *selected_index = None;
+            } else {
+                *selected_index = Some(ctx.props().index);
             }
         }
         if let Some(parent) = ctx.link().get_parent() {

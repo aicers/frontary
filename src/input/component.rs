@@ -451,38 +451,36 @@ where
             .enumerate()
             .zip(ctx.props().input_conf.iter())
             .for_each(|((index, input_data), input_conf)| {
-                if let Ok(mut item) = input_data.try_borrow_mut() {
-                    if let InputItem::Tag(_) = *item {
-                        if let (InputConfig::Tag(config), Some(buffer)) =
-                            (&**input_conf, self.tag_buffer.get(&(BigUint::from(index))))
-                        // HIGHLIGHT: Since Tag is always on the first layer, don't need to check recursively
-                        {
-                            let reverse = config
-                                .name_map // This is the updated one.
-                                .iter()
-                                .map(|(k, v)| (v.clone(), k.clone()))
-                                .collect::<HashMap<String, String>>();
+                if let Ok(mut item) = input_data.try_borrow_mut()
+                    && let InputItem::Tag(_) = *item
+                    && let (InputConfig::Tag(config), Some(buffer)) =
+                        (&**input_conf, self.tag_buffer.get(&(BigUint::from(index))))
+                // HIGHLIGHT: Since Tag is always on the first layer, don't need to check recursively
+                {
+                    let reverse = config
+                        .name_map // This is the updated one.
+                        .iter()
+                        .map(|(k, v)| (v.clone(), k.clone()))
+                        .collect::<HashMap<String, String>>();
 
-                            if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                                let deleted = buffer.delete.clone();
-                                if let Some(deleted) = deleted {
-                                    buffer.old.remove(&deleted);
-                                }
-                                buffer.delete = None;
-                                *item = InputItem::Tag(TagItem::new((*buffer).clone()));
-                            }
-                            if let Ok(mut buffer) = buffer.try_borrow_mut() {
-                                if let Some(new) = buffer.new.as_ref() {
-                                    if let Some(key) = reverse.get(new) {
-                                        buffer.old.insert(key.clone());
-                                        buffer.new = None;
-                                    }
-                                }
-                                // no need to verify the value has been actually edited right.
-                                buffer.edit = None;
-                                *item = InputItem::Tag(TagItem::new((*buffer).clone()));
-                            }
+                    if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                        let deleted = buffer.delete.clone();
+                        if let Some(deleted) = deleted {
+                            buffer.old.remove(&deleted);
                         }
+                        buffer.delete = None;
+                        *item = InputItem::Tag(TagItem::new((*buffer).clone()));
+                    }
+                    if let Ok(mut buffer) = buffer.try_borrow_mut() {
+                        if let Some(new) = buffer.new.as_ref()
+                            && let Some(key) = reverse.get(new)
+                        {
+                            buffer.old.insert(key.clone());
+                            buffer.new = None;
+                        }
+                        // no need to verify the value has been actually edited right.
+                        buffer.edit = None;
+                        *item = InputItem::Tag(TagItem::new((*buffer).clone()));
                     }
                 }
             });
@@ -608,10 +606,10 @@ where
             Message::InputRadio(id, input_data) => {
                 if let Some(buffer_option) = self.radio_buffer.get(&id) {
                     let empty = if let Ok(buffer_option) = buffer_option.try_borrow() {
-                        if let Ok(mut item) = input_data.try_borrow_mut() {
-                            if let InputItem::Radio(data) = &mut *item {
-                                data.set_selected(buffer_option.clone());
-                            }
+                        if let Ok(mut item) = input_data.try_borrow_mut()
+                            && let InputItem::Radio(data) = &mut *item
+                        {
+                            data.set_selected(buffer_option.clone());
                         }
                         buffer_option.is_empty()
                     } else {
@@ -678,20 +676,15 @@ where
                 if let (Some(buffer), Ok(mut input_data)) = (
                     self.vec_select_buffer.get(&(data_id)),
                     input_data.try_borrow_mut(),
-                ) {
-                    if let (Some(buffer), InputItem::VecSelect(input_data)) =
-                        (buffer.get(col_id), &mut *input_data)
-                    {
-                        if let (Ok(buffer), Some(input_data)) =
-                            (buffer.try_borrow(), input_data.get_mut(col_id))
-                        {
-                            if let Some(buffer) = &*buffer {
-                                input_data.clone_from(buffer);
-                                if !buffer.is_empty() {
-                                    self.required_msg.remove(&data_id);
-                                }
-                            }
-                        }
+                ) && let (Some(buffer), InputItem::VecSelect(input_data)) =
+                    (buffer.get(col_id), &mut *input_data)
+                    && let (Ok(buffer), Some(input_data)) =
+                        (buffer.try_borrow(), input_data.get_mut(col_id))
+                    && let Some(buffer) = &*buffer
+                {
+                    input_data.clone_from(buffer);
+                    if !buffer.is_empty() {
+                        self.required_msg.remove(&data_id);
                     }
                 }
             }
@@ -717,55 +710,56 @@ where
                     (None, None, None)
                 };
 
-                if let Some(new) = new {
-                    if !new.is_empty() {
-                        if let Some(data_tag) = ctx.props().input_data_tag.as_ref() {
-                            if let Ok(mut data_tag) = data_tag.try_borrow_mut() {
-                                data_tag.new = Some(new);
-                            }
-                        }
-                        let msg = ctx
-                            .props()
-                            .extra_messages
-                            .as_ref()
-                            .and_then(|m| m.get(&MessageType::AddTag).cloned());
-                        if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
-                            parent.clone().downcast::<T>().send_message(msg);
-                        }
+                if let Some(new) = new
+                    && !new.is_empty()
+                {
+                    if let Some(data_tag) = ctx.props().input_data_tag.as_ref()
+                        && let Ok(mut data_tag) = data_tag.try_borrow_mut()
+                    {
+                        data_tag.new = Some(new);
+                    }
+                    let msg = ctx
+                        .props()
+                        .extra_messages
+                        .as_ref()
+                        .and_then(|m| m.get(&MessageType::AddTag).cloned());
+                    if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
+                        parent.clone().downcast::<T>().send_message(msg);
                     }
                 }
-                if let Some(edit) = edit {
-                    if !edit.0.is_empty() && !edit.1.is_empty() {
-                        if let Some(data_tag) = ctx.props().input_data_tag.as_ref() {
-                            if let Ok(mut data_tag) = data_tag.try_borrow_mut() {
-                                data_tag.edit = Some(edit);
-                            }
-                        }
-                        let msg = ctx
-                            .props()
-                            .extra_messages
-                            .as_ref()
-                            .and_then(|m| m.get(&MessageType::EditTag).cloned());
-                        if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
-                            parent.clone().downcast::<T>().send_message(msg);
-                        }
+                if let Some(edit) = edit
+                    && !edit.0.is_empty()
+                    && !edit.1.is_empty()
+                {
+                    if let Some(data_tag) = ctx.props().input_data_tag.as_ref()
+                        && let Ok(mut data_tag) = data_tag.try_borrow_mut()
+                    {
+                        data_tag.edit = Some(edit);
+                    }
+                    let msg = ctx
+                        .props()
+                        .extra_messages
+                        .as_ref()
+                        .and_then(|m| m.get(&MessageType::EditTag).cloned());
+                    if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
+                        parent.clone().downcast::<T>().send_message(msg);
                     }
                 }
-                if let Some(delete) = delete {
-                    if !delete.is_empty() {
-                        if let Some(data_tag) = ctx.props().input_data_tag.as_ref() {
-                            if let Ok(mut data_tag) = data_tag.try_borrow_mut() {
-                                data_tag.delete = Some(delete);
-                            }
-                        }
-                        let msg = ctx
-                            .props()
-                            .extra_messages
-                            .as_ref()
-                            .and_then(|m| m.get(&MessageType::DeleteTag).cloned());
-                        if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
-                            parent.clone().downcast::<T>().send_message(msg);
-                        }
+                if let Some(delete) = delete
+                    && !delete.is_empty()
+                {
+                    if let Some(data_tag) = ctx.props().input_data_tag.as_ref()
+                        && let Ok(mut data_tag) = data_tag.try_borrow_mut()
+                    {
+                        data_tag.delete = Some(delete);
+                    }
+                    let msg = ctx
+                        .props()
+                        .extra_messages
+                        .as_ref()
+                        .and_then(|m| m.get(&MessageType::DeleteTag).cloned());
+                    if let (Some(parent), Some(msg)) = (ctx.link().get_parent(), msg) {
+                        parent.clone().downcast::<T>().send_message(msg);
                     }
                 }
 
@@ -776,71 +770,68 @@ where
                 self.propagate_checkbox(ctx, &item);
             }
             Message::InputNicName(data_id, nic_id, name, input_data) => {
-                if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                    if let InputItem::Nic(data) = &mut *input_data {
-                        if let Some(nic) = data.get_mut(nic_id) {
-                            nic.name.clone_from(&name);
-                        }
-                    }
+                if let Ok(mut input_data) = input_data.try_borrow_mut()
+                    && let InputItem::Nic(data) = &mut *input_data
+                    && let Some(nic) = data.get_mut(nic_id)
+                {
+                    nic.name.clone_from(&name);
                 }
                 self.remove_required_msg(&data_id, name.is_empty());
                 self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicInterface(data_id, nic_id, interface, input_data) => {
-                if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                    if let InputItem::Nic(data) = &mut *input_data {
-                        if let Some(nic) = data.get_mut(nic_id) {
-                            nic.interface.clone_from(&interface);
-                        }
-                    }
+                if let Ok(mut input_data) = input_data.try_borrow_mut()
+                    && let InputItem::Nic(data) = &mut *input_data
+                    && let Some(nic) = data.get_mut(nic_id)
+                {
+                    nic.interface.clone_from(&interface);
                 }
                 self.remove_required_msg(&data_id, interface.is_empty());
                 self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicGateway(data_id, nic_id, gateway, input_data) => {
-                if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                    if let InputItem::Nic(data) = &mut *input_data {
-                        if let Some(nic) = data.get_mut(nic_id) {
-                            nic.gateway.clone_from(&gateway);
-                        }
-                    }
+                if let Ok(mut input_data) = input_data.try_borrow_mut()
+                    && let InputItem::Nic(data) = &mut *input_data
+                    && let Some(nic) = data.get_mut(nic_id)
+                {
+                    nic.gateway.clone_from(&gateway);
                 }
                 self.remove_required_msg(&data_id, gateway.is_empty());
                 self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
             Message::InputNicAdd(data_id, nic_id, input_data) => {
-                if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                    if let InputItem::Nic(data) = &mut *input_data {
+                if let Ok(mut input_data) = input_data.try_borrow_mut()
+                    && let InputItem::Nic(data) = &mut *input_data
+                {
+                    data.push(InputNic::default());
+                }
+                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
+            }
+            Message::InputNicDelete(data_id, nic_id, input_data) => {
+                if let Ok(mut input_data) = input_data.try_borrow_mut()
+                    && let InputItem::Nic(data) = &mut *input_data
+                {
+                    data.remove(nic_id);
+                    if data.is_empty() {
                         data.push(InputNic::default());
                     }
                 }
                 self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
             }
-            Message::InputNicDelete(data_id, nic_id, input_data) => {
-                if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                    if let InputItem::Nic(data) = &mut *input_data {
-                        data.remove(nic_id);
-                        if data.is_empty() {
-                            data.push(InputNic::default());
-                        }
-                    }
-                }
-                self.remove_verification_nic(cal_index(Some(&data_id), nic_id));
-            }
             Message::InputGroupAdd(base_index, input_data, items_conf) => {
-                if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                    if let InputItem::Group(data) = &mut *input_data {
-                        if data.len() == 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER) {
-                            // TODO: issue #188
-                            return false;
-                        }
-                        let new_row = group_item_list_preset(&items_conf);
-                        data.push(new_row);
+                if let Ok(mut input_data) = input_data.try_borrow_mut()
+                    && let InputItem::Group(data) = &mut *input_data
+                {
+                    if data.len() == 2_usize.pow(super::POWER_OF_MAX_NUM_OF_LAYER) {
+                        // TODO: issue #188
+                        return false;
+                    }
+                    let new_row = group_item_list_preset(&items_conf);
+                    data.push(new_row);
 
-                        if let Some(d) = data.last() {
-                            let row_rep_index = cal_index(Some(&base_index), data.len() - 1);
-                            self.group_row_to_buffer(&row_rep_index, d, &items_conf);
-                        }
+                    if let Some(d) = data.last() {
+                        let row_rep_index = cal_index(Some(&base_index), data.len() - 1);
+                        self.group_row_to_buffer(&row_rep_index, d, &items_conf);
                     }
                 }
             }
@@ -963,11 +954,11 @@ where
                 }
             }
             Message::FileLoaded(file_name, file) => {
-                if let Some(input_data) = self.file_input_data.as_ref() {
-                    if let Ok(mut item) = input_data.try_borrow_mut() {
-                        let content = BASE64.encode(&file);
-                        *item = InputItem::File(FileItem::new(file_name, content));
-                    }
+                if let Some(input_data) = self.file_input_data.as_ref()
+                    && let Ok(mut item) = input_data.try_borrow_mut()
+                {
+                    let content = BASE64.encode(&file);
+                    *item = InputItem::File(FileItem::new(file_name, content));
                 }
                 self.file_reader = None;
             }
@@ -1119,12 +1110,11 @@ where
 
     fn prepare_nic(ctx: &Context<Self>) {
         for input_data in &ctx.props().input_data {
-            if let Ok(mut input_data) = input_data.try_borrow_mut() {
-                if let InputItem::Nic(input_data) = &mut *input_data {
-                    if input_data.is_empty() {
-                        input_data.push(InputNic::default());
-                    }
-                }
+            if let Ok(mut input_data) = input_data.try_borrow_mut()
+                && let InputItem::Nic(input_data) = &mut *input_data
+                && input_data.is_empty()
+            {
+                input_data.push(InputNic::default());
             }
         }
     }
@@ -1171,34 +1161,27 @@ where
         );
 
         for (index, t) in ctx.props().input_conf.iter().enumerate() {
-            if let InputConfig::Text(conf) = &(**t) {
-                if let Some(data) = ctx.props().input_data.get(index) {
-                    if let Ok(input) = data.try_borrow() {
-                        if conf.unique {
-                            let mut different = true;
-                            for (key, item) in &*ctx.props().data {
-                                if id.as_ref().is_none_or(|id| id != key) {
-                                    if let Some(other) = item.columns.get(index) {
-                                        if let (Column::Text(other_value), InputItem::Text(value)) =
-                                            (other, &(*input))
-                                        {
-                                            if let ViewString::Raw(other_value) = &other_value.text
-                                            {
-                                                if value == other_value {
-                                                    different = false;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if !different {
-                                self.unique_msg.insert(BigUint::from(index));
-                                unique.push(true);
-                            }
-                        }
+            if let InputConfig::Text(conf) = &(**t)
+                && let Some(data) = ctx.props().input_data.get(index)
+                && let Ok(input) = data.try_borrow()
+                && conf.unique
+            {
+                let mut different = true;
+                for (key, item) in &*ctx.props().data {
+                    if id.as_ref().is_none_or(|id| id != key)
+                        && let Some(other) = item.columns.get(index)
+                        && let (Column::Text(other_value), InputItem::Text(value)) =
+                            (other, &(*input))
+                        && let ViewString::Raw(other_value) = &other_value.text
+                        && value == other_value
+                    {
+                        different = false;
+                        break;
                     }
+                }
+                if !different {
+                    self.unique_msg.insert(BigUint::from(index));
+                    unique.push(true);
                 }
             }
         }
@@ -1206,18 +1189,18 @@ where
     }
 
     fn radio_buffer_after_checkbox(&mut self, data_id: &BigUint, item: &Rc<RefCell<InputItem>>) {
-        if let Ok(item) = item.try_borrow() {
-            if let InputItem::Checkbox(cb) = &*item {
-                for (sub_index, child) in cb.children().iter().enumerate() {
-                    if let Ok(child) = child.try_borrow() {
-                        if let InputItem::Radio(data) = &*child {
-                            let id = cal_index(Some(data_id), sub_index);
-                            if let Some(buffer_option) = self.radio_buffer.get(&id) {
-                                if let Ok(mut buffer_option) = buffer_option.try_borrow_mut() {
-                                    (*buffer_option).clone_from(&data.selected().to_string());
-                                }
-                            }
-                        }
+        if let Ok(item) = item.try_borrow()
+            && let InputItem::Checkbox(cb) = &*item
+        {
+            for (sub_index, child) in cb.children().iter().enumerate() {
+                if let Ok(child) = child.try_borrow()
+                    && let InputItem::Radio(data) = &*child
+                {
+                    let id = cal_index(Some(data_id), sub_index);
+                    if let Some(buffer_option) = self.radio_buffer.get(&id)
+                        && let Ok(mut buffer_option) = buffer_option.try_borrow_mut()
+                    {
+                        (*buffer_option).clone_from(&data.selected().to_string());
                     }
                 }
             }

@@ -149,47 +149,45 @@ where
                 }
                 if Self::max_num(ctx) {
                     self.message = Some(MAX_NUM_MSG);
-                } else if self.verify(ctx).unwrap_or(false) {
-                    if let (Some(parent), Some(msg)) =
+                } else if self.verify(ctx).unwrap_or(false)
+                    && let (Some(parent), Some(msg)) =
                         (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-                    {
-                        parent.clone().downcast::<T>().send_message(msg.clone());
-                    }
+                {
+                    parent.clone().downcast::<T>().send_message(msg.clone());
                 }
             }
             Message::TabBackspace(key) => match key.as_str() {
                 "Backspace" => {
-                    if self.input.is_empty() {
-                        if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
-                            let last = self.view_order.pop();
-                            let send_msg = match last {
-                                Some(ItemType::Host(index)) => {
-                                    if index < data.hosts.len() {
-                                        data.hosts.remove(index);
-                                    }
-                                    true
+                    if self.input.is_empty()
+                        && let Ok(mut data) = ctx.props().input_data.try_borrow_mut()
+                    {
+                        let last = self.view_order.pop();
+                        let send_msg = match last {
+                            Some(ItemType::Host(index)) => {
+                                if index < data.hosts.len() {
+                                    data.hosts.remove(index);
                                 }
-                                Some(ItemType::Network(index)) => {
-                                    if index < data.networks.len() {
-                                        data.networks.remove(index);
-                                    }
-                                    true
-                                }
-                                Some(ItemType::Range(index)) => {
-                                    if index < data.ranges.len() {
-                                        data.ranges.remove(index);
-                                    }
-                                    true
-                                }
-                                None => false,
-                            };
-                            if send_msg {
-                                if let (Some(parent), Some(msg)) =
-                                    (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-                                {
-                                    parent.clone().downcast::<T>().send_message(msg.clone());
-                                }
+                                true
                             }
+                            Some(ItemType::Network(index)) => {
+                                if index < data.networks.len() {
+                                    data.networks.remove(index);
+                                }
+                                true
+                            }
+                            Some(ItemType::Range(index)) => {
+                                if index < data.ranges.len() {
+                                    data.ranges.remove(index);
+                                }
+                                true
+                            }
+                            None => false,
+                        };
+                        if send_msg
+                            && let (Some(parent), Some(msg)) =
+                                (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
+                        {
+                            parent.clone().downcast::<T>().send_message(msg.clone());
                         }
                     }
                 }
@@ -210,10 +208,10 @@ where
                                 self.view_order
                                     .retain(|item| *item != ItemType::Host(index));
                                 for v in &mut self.view_order {
-                                    if let ItemType::Host(i) = *v {
-                                        if i > index {
-                                            *v = ItemType::Host(i - 1);
-                                        }
+                                    if let ItemType::Host(i) = *v
+                                        && i > index
+                                    {
+                                        *v = ItemType::Host(i - 1);
                                     }
                                 }
                             }
@@ -224,10 +222,10 @@ where
                                 self.view_order
                                     .retain(|item| *item != ItemType::Network(index));
                                 for v in &mut self.view_order {
-                                    if let ItemType::Network(i) = *v {
-                                        if i > index {
-                                            *v = ItemType::Network(i - 1);
-                                        }
+                                    if let ItemType::Network(i) = *v
+                                        && i > index
+                                    {
+                                        *v = ItemType::Network(i - 1);
                                     }
                                 }
                             }
@@ -238,10 +236,10 @@ where
                                 self.view_order
                                     .retain(|item| *item != ItemType::Range(index));
                                 for v in &mut self.view_order {
-                                    if let ItemType::Range(i) = *v {
-                                        if i > index {
-                                            *v = ItemType::Range(i - 1);
-                                        }
+                                    if let ItemType::Range(i) = *v
+                                        && i > index
+                                    {
+                                        *v = ItemType::Range(i - 1);
                                     }
                                 }
                             }

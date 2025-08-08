@@ -88,18 +88,18 @@ const PASSWD_CMP: [&str; 7] = [
 pub(crate) fn is_adjacent(password: &str) -> bool {
     for c in PASSWD_CMP {
         for i in 0..=c.len() - PASSWORD_MIN_FORBID_ADJACENT_LEN {
-            if let Some(slice) = c.get(i..i + PASSWORD_MIN_FORBID_ADJACENT_LEN) {
-                if password.contains(slice) {
-                    return true;
-                }
+            if let Some(slice) = c.get(i..i + PASSWORD_MIN_FORBID_ADJACENT_LEN)
+                && password.contains(slice)
+            {
+                return true;
             }
         }
         let c_rev: String = c.chars().rev().collect();
         for i in 0..=c_rev.len() - PASSWORD_MIN_FORBID_ADJACENT_LEN {
-            if let Some(slice) = c_rev.get(i..i + PASSWORD_MIN_FORBID_ADJACENT_LEN) {
-                if password.contains(slice) {
-                    return true;
-                }
+            if let Some(slice) = c_rev.get(i..i + PASSWORD_MIN_FORBID_ADJACENT_LEN)
+                && password.contains(slice)
+            {
+                return true;
             }
         }
     }

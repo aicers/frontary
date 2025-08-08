@@ -157,13 +157,13 @@ pub fn parse_host_network(input: &str) -> Option<HostNetwork> {
     }
     if let Some((start, end)) = input.split_once('-') {
         let (start, end) = (start.trim(), end.trim());
-        if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(start), Ipv4Addr::from_str(end)) {
-            if start < end {
-                return Some(HostNetwork::Range(IpRange {
-                    start: start.to_string(),
-                    end: end.to_string(),
-                }));
-            }
+        if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(start), Ipv4Addr::from_str(end))
+            && start < end
+        {
+            return Some(HostNetwork::Range(IpRange {
+                start: start.to_string(),
+                end: end.to_string(),
+            }));
         }
     }
 
@@ -197,10 +197,10 @@ pub fn validate_host_network(input: &str) -> (bool, Option<String>) {
 fn validate_ip_range(txt: &str, del: char) -> Option<String> {
     if let Some((ip_start, ip_end)) = txt.split_once(del) {
         let (ip_start, ip_end) = (ip_start.trim(), ip_end.trim());
-        if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(ip_start), Ipv4Addr::from_str(ip_end)) {
-            if start < end {
-                return Some(format!("{ip_start} - {ip_end}"));
-            }
+        if let (Ok(start), Ok(end)) = (Ipv4Addr::from_str(ip_start), Ipv4Addr::from_str(ip_end))
+            && start < end
+        {
+            return Some(format!("{ip_start} - {ip_end}"));
         }
     }
     None
@@ -235,13 +235,13 @@ pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> Stri
         let mut sized_item = item_org.to_string();
         let item = item_org.as_bytes();
         for i in 4..item.len() {
-            if let Ok(split) = std::str::from_utf8(&item[0..=i]) {
-                if let Ok(w) = text_width(split, font) {
-                    if width > (60 + margin) && w > width - (60 + margin) {
-                        sized_item = format!("{split}...");
-                        break;
-                    }
-                }
+            if let Ok(split) = std::str::from_utf8(&item[0..=i])
+                && let Ok(w) = text_width(split, font)
+                && width > (60 + margin)
+                && w > width - (60 + margin)
+            {
+                sized_item = format!("{split}...");
+                break;
             }
         }
         sized_item
@@ -365,10 +365,9 @@ impl IpRange {
         if let (Ok(start), Ok(end)) = (
             Ipv4Addr::from_str(&self.start),
             Ipv4Addr::from_str(&self.end),
-        ) {
-            if start < end {
-                return true;
-            }
+        ) && start < end
+        {
+            return true;
         }
         false
     }
@@ -420,7 +419,7 @@ pub fn sort_hosts(hosts: &mut Vec<String>) {
         if let Ok(addr) = Ipv4Addr::from_str(h) {
             addr
         } else {
-            Ipv4Addr::new(0, 0, 0, 0)
+            Ipv4Addr::UNSPECIFIED
         }
     });
     hosts.dedup();

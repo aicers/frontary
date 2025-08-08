@@ -117,10 +117,10 @@ fn is_valid_domain_name(domain: &str) -> bool {
     }
 
     // Top-level domain should contain at least one letter (not all numbers)
-    if let Some(tld) = labels.last() {
-        if tld.chars().all(|c| c.is_ascii_digit()) {
-            return false;
-        }
+    if let Some(tld) = labels.last()
+        && tld.chars().all(|c| c.is_ascii_digit())
+    {
+        return false;
     }
 
     true
