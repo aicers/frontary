@@ -785,7 +785,7 @@ div.mini-select-top-direction-icon {
     height: 16px;
     float: right;
     margin-left: 4px;
-    background-image: url('/staic/frontary/traffic-direction.png');
+    background-image: url('/frontary/traffic-direction.png');
     background-position: center;
     background-size: 16px 16px;
     background-repeat: no-repeat;
@@ -803,7 +803,7 @@ div.mini-select-top-direction-icon-deactive {
 }
 
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
-    background-image: url('/staic/frontary/traffic-direction.png');
+    background-image: url('/frontary/traffic-direction.png');
     background-position: center;
     background-size: 16px 16px;
     background-repeat: no-repeat;
