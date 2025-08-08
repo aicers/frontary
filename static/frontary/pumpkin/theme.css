@@ -965,6 +965,7 @@ div.mini-select-list-sort-recently-text {
 
 div.mini-select-list-sort-recently-text::before {
     content: '';
+    display: inline-block;
     width: 24px;
     height: 24px;
     background-image: url('/frontary/pumpkin/list-sort-recently.svg');
@@ -1915,11 +1916,6 @@ div.input-radio-title {
 div.input-radio-radio {
     font-size: 13px;
     line-height: 16px;
-    margin-right: 24px;
-}
-
-div.input-radio-radio:last-child {
-    margin-right: 0;
 }
 
 div.input-radio-notice {
