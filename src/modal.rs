@@ -3,7 +3,7 @@ use std::{marker::PhantomData, rc::Rc, str::FromStr};
 use json_gettext::get_text;
 use yew::{AttrValue, Component, Context, Html, Properties, classes, html};
 
-use crate::{Texts, define_u32_consts, language::Language, text};
+use crate::{Texts, Theme, define_u32_consts, language::Language, text};
 
 const MAX_HEIGHT: u32 = 700;
 const DEFAULT_MIN_HEIGHT: u32 = 306;
@@ -72,6 +72,8 @@ where
     pub option_messages: Rc<Vec<String>>,
     pub parent_messages: Vec<T::Message>,
     pub parent_cancel_message: T::Message,
+    #[prop_or(None)]
+    pub theme: Option<Theme>,
 }
 
 pub struct Model<T> {
@@ -163,6 +165,9 @@ where
         };
         let onclick_close = ctx.link().callback(|_| Message::Close);
         let txt = ctx.props().txt.txt.clone();
+        let theme = ctx.props().theme;
+        let close_img = Theme::path(&theme, "modal-close.svg");
+        let divider_img = Theme::path(&theme, "modal-divider.svg");
         let title_header = if let Some(title_header) = ctx.props().title_header {
             html! {
                 <div class="modal-title-header">
@@ -176,18 +181,18 @@ where
             <div class="modal-close">
                 <img
                     src={ if cfg!(feature = "pumpkin") {
-                        "/frontary/pumpkin/modal-close.svg"
+                        {close_img}
                     } else {
-                        "/frontary/modal-close.png"
+                        "/frontary/modal-close.png".to_string()
                     } }
                     class="modal-close"
                     onclick={onclick_close}
                 />
             </div>
         };
-        let divider = if cfg!(feature = "pumpkin") && ctx.props().height.is_none() {
+        let divider_html = if cfg!(feature = "pumpkin") && ctx.props().height.is_none() {
             html! {
-                <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                <img src={ divider_img.clone() } class="modal-divider" />
             }
         } else {
             html! {}
@@ -217,7 +222,7 @@ where
                             { title_header }
                             { modal_close }
                         </div>
-                        { divider }
+                        { divider_html }
                     } else {
                         if matches!(ctx.props().kind, MsgType::TextOnly) {
                             <div class="modal-icon-close">
@@ -264,7 +269,7 @@ where
                     </div>
                     if cfg!(feature="pumpkin") {
                         if ctx.props().height.is_none() {
-                            <img src="/frontary/pumpkin/modal-divider.svg" class="modal-divider" />
+                            <img src={ divider_img } class="modal-divider" />
                         }
                     }
                     <div class={align_class}>

@@ -12,7 +12,7 @@ use super::{
 };
 use crate::{
     CheckStatus, Checkbox, InputConfig, MoreAction, NBSP, Pages, SelectMini, SelectMiniKind, Sort,
-    SortStatus, ViewString, WholeList,
+    SortStatus, Theme, ViewString, WholeList,
     list::{ColWidths, Column, DataType, Kind, ListItem, ModalDisplay},
     text,
 };
@@ -29,6 +29,7 @@ where
         let check_status = self.check_status(ctx);
         let mut colspan = 0;
         let rowspan = ctx.props().display_info.widths.len().to_string();
+        let theme = ctx.props().theme;
 
         html! {
             <>
@@ -37,6 +38,7 @@ where
                         <div onclick={onclick_all}>
                             <Checkbox
                                 status={check_status}
+                                {theme}
                             />
                         </div>
                     </td>
@@ -50,6 +52,7 @@ where
                                     <div onclick={onclick_all_second}>
                                         <Checkbox
                                             status={check_status_second}
+                                            {theme}
                                         />
                                     </div>
                                 </td>
@@ -191,6 +194,7 @@ where
     #[allow(clippy::too_many_lines)]
     pub(super) fn view_list(&self, ctx: &Context<Self>) -> Html {
         let (start, end) = self.item_range(ctx);
+        let theme = ctx.props().theme;
 
         html! {
             for (start..=end).map(|index| {
@@ -218,17 +222,18 @@ where
                                     Kind::LayeredFirst => {
                                         if ctx.props().data_type == Some(DataType::Customer) {
                                             let cols = ctx.props().display_info.titles.len().to_string();
-                                            let (prefix, extension) = if cfg!(feature = "pumpkin") {
-                                                ("pumpkin/", "svg")
+                                            let file_name = if self.expand_list.contains(key) {
+                                                "collapse-list"
                                             } else {
-                                                ("", "png")
+                                                "expand-list"
                                             };
-                                            let expand_collapse_img = if self.expand_list.contains(key) {
-                                                format!("collapse-list.{extension}")
+                                            let ext = if cfg!(feature = "pumpkin") {
+                                                "svg"
                                             } else {
-                                                format!("expand-list.{extension}")
+                                                "png"
                                             };
-                                            let style = format!("background-image: url('/frontary/{prefix}{expand_collapse_img}');");
+                                            let expand_collapse_img = Theme::path(&theme, &format!("{file_name}.{ext}"));
+                                            let style = format!("background-image: url('{expand_collapse_img}');");
                                             let onclick_expandible = |key: String| ctx.link().callback(move |_| Message::ClickExpandible(key.clone()));
                                             let list_top = if cfg!(feature = "pumpkin") {
                                                 34
@@ -241,6 +246,7 @@ where
                                                         <div onclick={onclick_item(key.clone())}>
                                                             <Checkbox
                                                                 status={check_status}
+                                                                {theme}
                                                             />
                                                         </div>
                                                     </td>
@@ -270,6 +276,7 @@ where
                                                                 align_left={false}
                                                                 list_top={list_top}
                                                                 kind={SelectMiniKind::MoreAction}
+                                                                {theme}
                                                             />
                                                         </div>
                                                     </td>
@@ -310,6 +317,7 @@ where
                                                         <div onclick={onclick_item(key.clone())}>
                                                             <Checkbox
                                                                 status={check_status}
+                                                                {theme}
                                                             />
                                                         </div>
                                                     </td>
@@ -341,6 +349,7 @@ where
                                                                 align_left={false}
                                                                 {list_top}
                                                                 kind={SelectMiniKind::MoreAction}
+                                                                {theme}
                                                             />
                                                         </div>
                                                     </td>
@@ -452,6 +461,7 @@ where
                                                     input_conf={input_conf.clone()}
                                                     input_second_data={Some(second_data.clone())}
                                                     messages={ctx.props().messages.clone()}
+                                                    {theme}
                                                 />
                                             }
                                         } else {
@@ -874,6 +884,19 @@ where
     }
 
     pub(super) fn view_delete_checked(&self, ctx: &Context<Self>, msg: String) -> Html {
+        let theme = ctx.props().theme;
+        let ext = if cfg!(feature = "pumpkin") {
+            "svg"
+        } else {
+            "png"
+        };
+        let delete_img_file = if cfg!(feature = "pumpkin") {
+            "delete-trash.svg"
+        } else {
+            "delete-trash-white.png"
+        };
+        let delete_img = Theme::path(&theme, delete_img_file);
+        let close_img = Theme::path(&theme, &format!("close-white.{ext}"));
         if self.check_status(ctx) == CheckStatus::Unchecked {
             html! {}
         } else {
@@ -889,12 +912,12 @@ where
                         <tr>
                             <td class="list-whole-delete-checked-trash">
                                 <div class="list-whole-delete-checked-trash" onclick={onclick_delete}>
-                                    <img src={if cfg!(feature = "pumpkin") { "/frontary/pumpkin/delete-trash.svg" } else { "/frontary/delete-trash-white.png" }} class="list-whole-delete-trash-white" />
+                                    <img src={delete_img} class="list-whole-delete-trash-white" />
                                 </div>
                             </td>
                             <td class="list-whole-delete-checked-close">
                                 <div class="list-whole-delete-checked-close" onclick={onclick_cancel}>
-                                    <img src={if cfg! (feature = "pumpkin") {"/frontary/pumpkin/close-white.svg"} else {"/frontary/close-white.png"} } class="list-whole-close-white" />
+                                    <img src={close_img} class="list-whole-close-white" />
                                 </div>
                             </td>
                         </tr>
