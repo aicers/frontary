@@ -22,6 +22,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   classes for different layout variations. The hardcoded padding values in
   `line_class` and `delete_cell_class` now support both one-row and multi-row
   group layouts more flexibly.
+- Fixed incorrect `background-image` URL in `mini-select-top-direction-icon` CSS
+  by removing the `/staic` prefix so the icon loads correctly.
 
 ## [0.12.0] - 2025-07-15
 
