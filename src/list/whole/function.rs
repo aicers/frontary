@@ -224,10 +224,11 @@ where
         self.checked.clear();
         let (start, end) = self.item_range(ctx);
         for index in start..=end {
-            if let Some(key) = self.sorted_keys.get(index - 1) {
-                if prev.contains(key) && !added.contains(key) {
-                    self.checked.insert(key.clone());
-                }
+            if let Some(key) = self.sorted_keys.get(index - 1)
+                && prev.contains(key)
+                && !added.contains(key)
+            {
+                self.checked.insert(key.clone());
             }
         }
     }
@@ -287,32 +288,32 @@ where
     }
 
     pub(super) fn set_sort_list_kind(&mut self, ctx: &Context<Self>) {
-        if ctx.props().kind != Kind::LayeredSecond {
-            if let Ok(mut kind) = self.sort_list_kind.try_borrow_mut() {
-                let desired_kind = if let Some(sort) = self.sort {
-                    if sort.index == 0 {
-                        match sort.status {
-                            SortStatus::Ascending => Some(SortListKind::Ascending),
-                            SortStatus::Descending => Some(SortListKind::Descending),
-                            SortStatus::Unsorted => None, // unreachable
-                        }
-                    } else {
-                        None
+        if ctx.props().kind != Kind::LayeredSecond
+            && let Ok(mut kind) = self.sort_list_kind.try_borrow_mut()
+        {
+            let desired_kind = if let Some(sort) = self.sort {
+                if sort.index == 0 {
+                    match sort.status {
+                        SortStatus::Ascending => Some(SortListKind::Ascending),
+                        SortStatus::Descending => Some(SortListKind::Descending),
+                        SortStatus::Unsorted => None, // unreachable
                     }
                 } else {
-                    Some(SortListKind::LatestFirst)
-                };
-
-                if let Some(desired) = desired_kind {
-                    if ctx.props().visible_sort_options.contains(&desired) {
-                        *kind = Some(desired);
-                    } else {
-                        // Fall back to the first available option
-                        *kind = ctx.props().visible_sort_options.first().copied();
-                    }
-                } else {
-                    *kind = None;
+                    None
                 }
+            } else {
+                Some(SortListKind::LatestFirst)
+            };
+
+            if let Some(desired) = desired_kind {
+                if ctx.props().visible_sort_options.contains(&desired) {
+                    *kind = Some(desired);
+                } else {
+                    // Fall back to the first available option
+                    *kind = ctx.props().visible_sort_options.first().copied();
+                }
+            } else {
+                *kind = None;
             }
         }
     }
@@ -323,12 +324,11 @@ where
             *id = Vec::new();
         }
         for index in start..=end {
-            if let Some(key) = self.sorted_keys.get(index - 1) {
-                if self.expand_list.contains(key) {
-                    if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
-                        *id = vec![key.clone()];
-                    }
-                }
+            if let Some(key) = self.sorted_keys.get(index - 1)
+                && self.expand_list.contains(key)
+                && let Ok(mut id) = ctx.props().input_ids.try_borrow_mut()
+            {
+                *id = vec![key.clone()];
             }
         }
     }

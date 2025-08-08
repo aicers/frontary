@@ -99,13 +99,13 @@ where
 
     fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         let num_pages = ctx.props().num_pages;
-        if let Ok(mut info) = ctx.props().pages_info.try_borrow_mut() {
-            if info.end + 1 - info.start < num_pages {
-                if info.start + num_pages - 1 < info.total {
-                    info.end = info.start + num_pages - 1;
-                } else if info.end > num_pages && info.end + 1 - num_pages > 0 {
-                    info.start = info.end + 1 - num_pages;
-                }
+        if let Ok(mut info) = ctx.props().pages_info.try_borrow_mut()
+            && info.end + 1 - info.start < num_pages
+        {
+            if info.start + num_pages - 1 < info.total {
+                info.end = info.start + num_pages - 1;
+            } else if info.end > num_pages && info.end + 1 - num_pages > 0 {
+                info.start = info.end + 1 - num_pages;
             }
         }
         true
