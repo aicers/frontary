@@ -306,11 +306,11 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 let icon = if key == "On" {
-                                                    "/frontary/on.png"
+                                                    Theme::path(&theme, "on.png")
                                                 } else if key == "Off" {
-                                                    "/frontary/off.png"
+                                                    Theme::path(&theme, "off.png")
                                                 } else {
-                                                    ""
+                                                    String::new()
                                                 };
                                                 html! {
                                                     <td class={classes!("mini-select-list-down-item", class_list_align)} onclick={onclick_item(index)} style={style_width.clone()}>
