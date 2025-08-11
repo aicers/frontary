@@ -97,18 +97,18 @@ where
     }
 
     fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
-        if ctx.props().kind == Kind::Multi {
-            if let (Ok(mut sel), Ok(list)) = (
+        if ctx.props().kind == Kind::Multi
+            && let (Ok(mut sel), Ok(list)) = (
                 ctx.props().selected.try_borrow_mut(),
                 ctx.props().list.try_borrow(),
-            ) {
-                // if threre is any deleted item that belongs to the list of the selected
-                if let Some(selected) = sel.as_mut() {
-                    let list_tmp = list.iter().map(Item::id).collect::<HashSet<&String>>();
-                    selected.retain(|k| list_tmp.contains(k));
-                    if !list.is_empty() && selected.len() == list.len() {
-                        *sel = None;
-                    }
+            )
+        {
+            // if threre is any deleted item that belongs to the list of the selected
+            if let Some(selected) = sel.as_mut() {
+                let list_tmp = list.iter().map(Item::id).collect::<HashSet<&String>>();
+                selected.retain(|k| list_tmp.contains(k));
+                if !list.is_empty() && selected.len() == list.len() {
+                    *sel = None;
                 }
             }
         }
@@ -257,12 +257,11 @@ where
             }
         };
 
-        if send_msg {
-            if let (Some(parent), Some(msg)) =
+        if send_msg
+            && let (Some(parent), Some(msg)) =
                 (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
-            {
-                parent.clone().downcast::<T>().send_message(msg.clone());
-            }
+        {
+            parent.clone().downcast::<T>().send_message(msg.clone());
         }
         true
     }

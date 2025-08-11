@@ -294,10 +294,10 @@ where
                             if *status == CheckStatus::Checked {
                                 let (start, end) = self.item_range(ctx);
                                 for index in start..=end {
-                                    if let Some(key) = self.sorted_keys.get(index - 1) {
-                                        if !self.checked.contains(key) {
-                                            self.checked.insert(key.clone());
-                                        }
+                                    if let Some(key) = self.sorted_keys.get(index - 1)
+                                        && !self.checked.contains(key)
+                                    {
+                                        self.checked.insert(key.clone());
                                     }
                                 }
                             } else if *status == CheckStatus::Unchecked {
@@ -553,13 +553,13 @@ where
             },
             Message::ClearChecked => {
                 self.checked.clear();
-                if ctx.props().kind == Kind::LayeredSecond {
-                    if let Some(parent) = ctx.link().get_parent() {
-                        parent
-                            .clone()
-                            .downcast::<Self>()
-                            .send_message(Message::ResetCheckSecond);
-                    }
+                if ctx.props().kind == Kind::LayeredSecond
+                    && let Some(parent) = ctx.link().get_parent()
+                {
+                    parent
+                        .clone()
+                        .downcast::<Self>()
+                        .send_message(Message::ResetCheckSecond);
                 }
             }
             Message::ResetCheckSecond => {
@@ -623,10 +623,9 @@ where
                 if let (Some(parent), Some(msg)) = (
                     ctx.link().get_parent(),
                     ctx.props().messages.get(&MessageType::AddSecond),
-                ) {
-                    if let Some(parent) = parent.clone().downcast::<Self>().get_parent() {
-                        parent.clone().downcast::<T>().send_message(msg.clone());
-                    }
+                ) && let Some(parent) = parent.clone().downcast::<Self>().get_parent()
+                {
+                    parent.clone().downcast::<T>().send_message(msg.clone());
                 }
                 return false;
             }
@@ -635,10 +634,9 @@ where
                 if let (Some(parent), Some(msg)) = (
                     ctx.link().get_parent(),
                     ctx.props().messages.get(&MessageType::EditSecond),
-                ) {
-                    if let Some(parent) = parent.clone().downcast::<Self>().get_parent() {
-                        parent.clone().downcast::<T>().send_message(msg.clone());
-                    }
+                ) && let Some(parent) = parent.clone().downcast::<Self>().get_parent()
+                {
+                    parent.clone().downcast::<T>().send_message(msg.clone());
                 }
                 return false;
             }
@@ -646,10 +644,9 @@ where
                 if let (Some(parent), Some(msg)) = (
                     ctx.link().get_parent(),
                     ctx.props().messages.get(&MessageType::DeleteSecond),
-                ) {
-                    if let Some(parent) = parent.clone().downcast::<Self>().get_parent() {
-                        parent.clone().downcast::<T>().send_message(msg.clone());
-                    }
+                ) && let Some(parent) = parent.clone().downcast::<Self>().get_parent()
+                {
+                    parent.clone().downcast::<T>().send_message(msg.clone());
                 }
                 return false;
             }
@@ -746,13 +743,13 @@ where
                     } else {
                         false
                     };
-                    if send_msg {
-                        if let (Some(parent), Some(msg)) = (
+                    if send_msg
+                        && let (Some(parent), Some(msg)) = (
                             ctx.link().get_parent(),
                             ctx.props().messages.get(&MessageType::Delete),
-                        ) {
-                            parent.clone().downcast::<T>().send_message(msg.clone());
-                        }
+                        )
+                    {
+                        parent.clone().downcast::<T>().send_message(msg.clone());
                     }
                     return false;
                 }
