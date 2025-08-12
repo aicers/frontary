@@ -350,11 +350,17 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             traffic_direction_hover_light,
         ));
 
-        let off = include_bytes!("../static/frontary/off.png");
+        let off = include_bytes!("../static/frontary/pumpkin/off.png");
         rtn.push(("off.png", off));
 
-        let on = include_bytes!("../static/frontary/on.png");
+        let off_light = include_bytes!("../static/frontary/pumpkin/light/off.png");
+        rtn.push(("light/off.png", off_light));
+
+        let on = include_bytes!("../static/frontary/pumpkin/on.png");
         rtn.push(("on.png", on));
+
+        let on_light = include_bytes!("../static/frontary/pumpkin/light/on.png");
+        rtn.push(("light/on.png", on_light));
 
         let plus_for_add = include_bytes!("../static/frontary/pumpkin/plus-for-add.svg");
         rtn.push(("plus-for-add.svg", plus_for_add));
