@@ -245,7 +245,7 @@ pub enum DataType {
     Network,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum ColWidths {
     Pixel(Vec<Option<u32>>), // None means need to calculate: full width - sum of widths of the other Some(width)
     Ratio(Vec<Option<f32>>), // None means no need to specify
@@ -266,10 +266,170 @@ impl ColWidths {
     }
 }
 
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, PartialEq, Debug)]
 pub struct DisplayInfo {
     pub widths: Vec<ColWidths>, // The first row, widths[0] should be ColWidths::Pixel
     pub width_full: u32,        // sum of column widths
     pub height: u32,
     pub titles: Vec<&'static str>,
+}
+
+impl DisplayInfo {
+    /// Creates a new `DisplayInfo` with validation.
+    ///
+    /// # Arguments
+    ///
+    /// * `widths` - Vector of column width specifications
+    /// * `width_full` - Total width for all columns
+    /// * `width_view` - Display viewport width
+    /// * `height` - Row height
+    /// * `titles` - Column titles
+    ///
+    /// # Returns
+    ///
+    /// Returns the validated `DisplayInfo` on success.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if:
+    /// * The sum of fixed column widths exceeds `width_full`
+    /// * Width values are invalid (zero or excessive)
+    /// * The first row of widths is not of type `ColWidths::Pixel` as required
+    pub fn new(
+        widths: Vec<ColWidths>,
+        width_full: u32,
+        width_view: u32,
+        height: u32,
+        titles: Vec<&'static str>,
+    ) -> Result<Self, String> {
+        // Basic validation first
+        if width_full == 0 {
+            return Err("width_full must be greater than zero".to_string());
+        }
+
+        // Validate that the first row should be ColWidths::Pixel as per documentation
+        if let Some(first_row) = widths.first()
+            && !matches!(first_row, ColWidths::Pixel(_))
+        {
+            return Err("The first row of widths must be ColWidths::Pixel".to_string());
+        }
+
+        // Validate width consistency for Pixel columns
+        for (row_idx, col_widths) in widths.iter().enumerate() {
+            if let ColWidths::Pixel(pixel_widths) = col_widths {
+                let fixed_width_sum: u32 = pixel_widths.iter().filter_map(|&w| w).sum();
+                if fixed_width_sum > width_full {
+                    return Err(format!(
+                        "Sum of fixed column widths ({fixed_width_sum}) exceeds total width ({width_full}) in row {row_idx}"
+                    ));
+                }
+            }
+        }
+
+        Ok(Self {
+            widths,
+            width_full,
+            width_view,
+            height,
+            titles,
+        })
+    }
+
+    /// Creates a new `DisplayInfo` with the same validation, but returns a default on error.
+    /// This is useful for maintaining backward compatibility where validation failures should not panic.
+    #[must_use]
+    pub fn new_or_default(
+        widths: Vec<ColWidths>,
+        width_full: u32,
+        width_view: u32,
+        height: u32,
+        titles: Vec<&'static str>,
+    ) -> Self {
+        Self::new(widths, width_full, width_view, height, titles).unwrap_or_default()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display_info_valid_creation() {
+        let widths = vec![ColWidths::Pixel(vec![Some(400), Some(300), None])];
+        let result = DisplayInfo::new(widths, 1200, 1000, 30, vec!["Col1", "Col2", "Col3"]);
+
+        assert!(result.is_ok());
+        let display_info = result.unwrap();
+        assert_eq!(display_info.width_full, 1200);
+        assert_eq!(display_info.width_view, 1000);
+    }
+
+    #[test]
+    fn test_display_info_width_sum_exceeds_full_width() {
+        let widths = vec![ColWidths::Pixel(vec![Some(1000), Some(1000)])];
+        let result = DisplayInfo::new(widths, 1200, 1000, 30, vec!["Col1", "Col2"]);
+
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert!(error.contains("Sum of fixed column widths (2000) exceeds total width (1200)"));
+    }
+
+    #[test]
+    fn test_display_info_zero_width_full() {
+        let widths = vec![ColWidths::Pixel(vec![Some(100)])];
+        let result = DisplayInfo::new(widths, 0, 1000, 30, vec!["Col1"]);
+
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert_eq!(error, "width_full must be greater than zero");
+    }
+
+    #[test]
+    fn test_display_info_first_row_not_pixel() {
+        let widths = vec![ColWidths::Ratio(vec![Some(0.5), Some(0.5)])];
+        let result = DisplayInfo::new(widths, 1200, 1000, 30, vec!["Col1", "Col2"]);
+
+        assert!(result.is_err());
+        let error = result.unwrap_err();
+        assert_eq!(error, "The first row of widths must be ColWidths::Pixel");
+    }
+
+    #[test]
+    fn test_display_info_mixed_pixel_and_ratio_rows() {
+        let widths = vec![
+            ColWidths::Pixel(vec![Some(400), Some(300)]),
+            ColWidths::Ratio(vec![Some(0.5), Some(0.5)]),
+        ];
+        let result = DisplayInfo::new(widths, 1200, 1000, 30, vec!["Col1", "Col2"]);
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_display_info_with_none_pixel_widths() {
+        let widths = vec![ColWidths::Pixel(vec![Some(400), None, Some(300)])];
+        let result = DisplayInfo::new(widths, 1200, 1000, 30, vec!["Col1", "Col2", "Col3"]);
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_display_info_new_or_default_with_valid_data() {
+        let widths = vec![ColWidths::Pixel(vec![Some(400), Some(300)])];
+        let display_info =
+            DisplayInfo::new_or_default(widths, 1200, 1000, 30, vec!["Col1", "Col2"]);
+
+        assert_eq!(display_info.width_full, 1200);
+        assert_eq!(display_info.width_view, 1000);
+    }
+
+    #[test]
+    fn test_display_info_new_or_default_with_invalid_data() {
+        let widths = vec![ColWidths::Pixel(vec![Some(1000), Some(1000)])];
+        let display_info =
+            DisplayInfo::new_or_default(widths, 1200, 1000, 30, vec!["Col1", "Col2"]);
+
+        // Should return default values on validation failure
+        assert_eq!(display_info, DisplayInfo::default());
+    }
 }

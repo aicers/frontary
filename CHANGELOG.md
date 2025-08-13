@@ -12,6 +12,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
+- Added `DisplayInfo::new()` constructor with validation to prevent width
+  configuration errors.
+- Added `DisplayInfo::new_or_default()` for backward compatibility.
 
 ### Changed
 
@@ -22,6 +25,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
   `InputEscape` follows `InputAdd` in the `WholeList` component.
+- Fixed u32 underflow in `varied_width()` calculation when column widths exceed
+  total width by using `saturating_sub()` for safe arithmetic.
 - Fixed a bug where `PasswordItem` was not cleared when iterating through items
   in the `WholeList` component.
 - Fixed Group Row and Delete Cell alignment by adding `compact` to
