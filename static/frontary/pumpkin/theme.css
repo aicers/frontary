@@ -1065,6 +1065,7 @@ div.list-sort-recently {
 }
 
 div.list-table {
+    width: 100%;
     overflow-x: auto;
     padding-bottom: 50px;
     border-radius: 10px;
