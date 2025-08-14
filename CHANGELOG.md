@@ -12,9 +12,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
-- Added `DisplayInfo::new()` constructor with validation to prevent width
-  configuration errors.
-- Added `DisplayInfo::new_or_default()` for backward compatibility.
 
 ### Changed
 
