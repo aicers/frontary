@@ -209,7 +209,7 @@ input[type=text].searchable-select-input-empty-alert {
     border-radius: 8px;
     background-image: url(/frontary/pumpkin/select-down-alert.svg);
     background-size: 32px 32px;
-    background-position: right 8px top 3px;
+    background-position: right 8px top 4px;
     background-color: var(--Transparent-Mid-Grey);
     background-repeat: no-repeat;
     border: none;
