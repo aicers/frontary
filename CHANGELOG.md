@@ -15,9 +15,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added "Close All" button for notifications to allow users to dismiss all
   notifications at once when there are multiple notifications present.
 - Added custom validation for `TextConfig`.
-- Added `DisplayInfo::new()` constructor with validation to prevent width
-  configuration errors.
-- Added `DisplayInfo::new_or_default()` for backward compatibility.
 
 ### Changed
 
