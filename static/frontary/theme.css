@@ -2859,6 +2859,7 @@ div.modal-message-item {
     align-items: center;
     justify-content: center;
     color: #000000;
+    height: 100%;
 }
 
 div.modal-buttons-row {
