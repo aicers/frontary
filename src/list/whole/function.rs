@@ -182,14 +182,24 @@ where
             })
             .collect();
 
-        // First step: the latest item first whether a sort column is designated or not
-        keys.sort_unstable_by(|a, b| {
-            if let (Some(a_time), Some(b_time)) = (a.2, b.2) {
-                b_time.cmp(&a_time)
-            } else {
-                b.0.cmp(&a.0)
-            }
-        });
+        // Only apply "Latest First" sorting if no specific column is sorted AND LatestFirst is available
+        let should_apply_latest_first = index.is_none()
+            && ctx
+                .props()
+                .visible_sort_options
+                .contains(&SortListKind::LatestFirst);
+
+        if should_apply_latest_first {
+            // First step: the latest item first
+            keys.sort_unstable_by(|a, b| {
+                if let (Some(a_time), Some(b_time)) = (a.2, b.2) {
+                    b_time.cmp(&a_time)
+                } else {
+                    b.0.cmp(&a.0)
+                }
+            });
+        }
+
         // Second step: if a sort column is designated, sort items by the column
         if index.is_some() {
             if asc {
@@ -302,15 +312,24 @@ where
                     None
                 }
             } else {
-                Some(SortListKind::LatestFirst)
+                // Only default to LatestFirst if it's available in visible_sort_options
+                if ctx
+                    .props()
+                    .visible_sort_options
+                    .contains(&SortListKind::LatestFirst)
+                {
+                    Some(SortListKind::LatestFirst)
+                } else {
+                    None
+                }
             };
 
             if let Some(desired) = desired_kind {
                 if ctx.props().visible_sort_options.contains(&desired) {
                     *kind = Some(desired);
                 } else {
-                    // Fall back to the first available option
-                    *kind = ctx.props().visible_sort_options.first().copied();
+                    // Don't fall back to first available option to prevent unintended sorting
+                    *kind = None;
                 }
             } else {
                 *kind = None;
