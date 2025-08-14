@@ -28,6 +28,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `line_class` and `delete_cell_class` now support both one-row and multi-row
   group layouts more flexibly.
 - Fixed on/off icon paths to work with theme-based asset directories.
+- Fixed `WholeList` sorting behavior to respect `visible_sort_options` prop,
+  preventing unintended "Latest First" sorting when not explicitly available
+  and avoiding automatic re-sorting on dropdown interaction.
 
 ## [0.12.0] - 2025-07-15
 
