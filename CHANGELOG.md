@@ -28,6 +28,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `line_class` and `delete_cell_class` now support both one-row and multi-row
   group layouts more flexibly.
 - Fixed on/off icon paths to work with theme-based asset directories.
+- Fixed a bug where the index for `InputItem::SelectMultiple` would be included
+  in `required_messages` even though `all` and `required` is enabled in
+  `InputConfig::SelectMultiple`. If `all` is enabled, the `None` value should be
+  evaluated to the "All" option when `required` is also enabled.
 
 ## [0.12.0] - 2025-07-15
 
