@@ -2852,13 +2852,13 @@ img.modal-alert {
 }
 
 div.modal-message-item {
-    height: 24px;
     font-weight: normal;
     font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000000;
+    height: 100%;
 }
 
 div.modal-buttons-row {
