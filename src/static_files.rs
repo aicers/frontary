@@ -225,11 +225,11 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             include_bytes!("../static/frontary/pumpkin/light/notification-error.svg");
         rtn.push(("light/notification-error.svg", notification_error_light));
 
-        let select_down_alert = include_bytes!("../static/frontary/pumpkin/select-down-alert.svg");
+        let select_down_alert = include_bytes!("../static/frontary/pumpkin/select-down.svg");
         rtn.push(("select-down-alert.svg", select_down_alert));
 
         let select_down_alert_light =
-            include_bytes!("../static/frontary/pumpkin/light/select-down-alert.svg");
+            include_bytes!("../static/frontary/pumpkin/light/select-down.svg");
         rtn.push(("light/select-down-alert.svg", select_down_alert_light));
 
         let checkbox_link_up_line =

@@ -199,12 +199,12 @@ html.light input[type=text].searchable-select-input-empty-disabled {
 }
 
 input[type=text].searchable-select-input-empty-alert {
-    background-image: url('/frontary/pumpkin/select-down-alert.svg');
+    background-image: url('/frontary/pumpkin/select-down.svg');
     color: var(--Dark-30);
 }
 
 html.light input[type=text].searchable-select-input-empty-alert {
-    background-image: url('/frontary/pumpkin/light/select-down-alert.svg');
+    background-image: url('/frontary/pumpkin/light/select-down.svg');
 }
 
 div.searchable-select-list-down {
