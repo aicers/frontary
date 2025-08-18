@@ -221,8 +221,13 @@ where
                 .contains(&SortListKind::LatestFirst)
             {
                 self.sort = None; // This will trigger LatestFirst in sort_keys
+            } else {
+                // When LatestFirst is hidden, default to deterministic column 0 Ascending
+                self.sort = Some(SortColumn {
+                    index: 0,
+                    status: SortStatus::Ascending,
+                });
             }
-            // Otherwise, preserve the current sort state
             self.set_sort_list_kind(ctx);
         }
 

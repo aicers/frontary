@@ -203,9 +203,17 @@ where
         // Second step: if a sort column is designated, sort items by the column
         if index.is_some() {
             if asc {
-                keys.sort_by(|a, b| a.1.cmp(&b.1));
+                keys.sort_by(|a, b| {
+                    a.1.cmp(&b.1)
+                        .then_with(|| a.2.cmp(&b.2).reverse()) // Tiebreaker: newer creation time first
+                        .then_with(|| a.0.cmp(&b.0)) // Final tiebreaker: key order
+                });
             } else {
-                keys.sort_unstable_by(|a, b| b.1.cmp(&a.1));
+                keys.sort_by(|a, b| {
+                    b.1.cmp(&a.1)
+                        .then_with(|| a.2.cmp(&b.2).reverse()) // Tiebreaker: newer creation time first
+                        .then_with(|| a.0.cmp(&b.0)) // Final tiebreaker: key order
+                });
             }
         }
 
@@ -320,7 +328,8 @@ where
                 {
                     Some(SortListKind::LatestFirst)
                 } else {
-                    None
+                    // When LatestFirst is hidden, default to Ascending to match the default sort
+                    Some(SortListKind::Ascending)
                 }
             };
 
