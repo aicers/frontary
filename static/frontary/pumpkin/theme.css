@@ -3015,7 +3015,6 @@ div.modal-messages {
 }
 
 div.modal-message-item {
-    height: 24px;
     font-weight: normal;
     font-size: 13px;
     display: flex;
@@ -3025,6 +3024,7 @@ div.modal-message-item {
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
+    height: 100%;
 }
 
 div.modal-buttons-row {
