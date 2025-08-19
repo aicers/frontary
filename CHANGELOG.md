@@ -13,11 +13,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
 
-### Changed
-
-- Centralized image path handling with `Theme::path`, supporting light/dark themes
-  via assets in `pumpkin/` and `pumpkin/light/` across components.
-
 ### Fixed
 
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
