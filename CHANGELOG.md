@@ -16,11 +16,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   notifications at once when there are multiple notifications present.
 - Added custom validation for `TextConfig`.
 
-### Changed
-
-- Centralized image path handling with `Theme::path`, supporting light/dark themes
-  via assets in `pumpkin/` and `pumpkin/light/` across components.
-
 ### Fixed
 
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
