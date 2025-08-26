@@ -11,12 +11,14 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Centralized image path handling with `Theme::path`, supporting light/dark themes
   via assets in `pumpkin/` and `pumpkin/light/` across components.
+- Changed functions and icons related with Network/IP filter to latest Figma design.
 
 ### Added
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
+- Added `SelectionState` enum to clarify Network/IP filter states.
 
 ### Fixed
 
