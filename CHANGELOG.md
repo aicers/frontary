@@ -18,6 +18,14 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
 
+### Changed
+
+- **BREAKING**: Made the `data` field in `input::component::Props` optional
+  to support standalone usage of the `Input` component. When the `Input`
+  component is used independently without requiring uniqueness checks against
+  other list items, the `data` prop can now be set to `None`. Existing code
+  must wrap the `data` prop with `Some()`.
+
 ### Fixed
 
 - Fixed a bug where `PasswordItem` was not cleared when iterating through items
