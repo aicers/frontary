@@ -3027,6 +3027,16 @@ div.modal-message-item {
     height: 100%;
 }
 
+div.modal-text-multi-line {
+    max-height: 48px;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+div.modal-message-item:has(div.modal-text-multi-line) {
+    height: auto;
+}
+
 div.modal-buttons-row {
     display: flex;
     flex-direction: row;
