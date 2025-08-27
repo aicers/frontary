@@ -7,20 +7,16 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Removed
-
-- Removed `width_view` field from `DisplayInfo` struct.
-
-### Changed
-
-- Centralized image path handling with `Theme::path`, supporting light/dark themes
-  via assets in `pumpkin/` and `pumpkin/light/` across components.
-
 ### Added
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
+
+### Changed
+
+- Centralized image path handling with `Theme::path`, supporting light/dark themes
+  via assets in `pumpkin/` and `pumpkin/light/` across components.
 
 ### Fixed
 
@@ -36,6 +32,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   in `required_messages` even though `all` and `required` is enabled in
   `InputConfig::SelectMultiple`. If `all` is enabled, the `None` value should be
   evaluated to the "All" option when `required` is also enabled.
+
+### Removed
+
+- Removed `width_view` field from `DisplayInfo` struct.
 
 ## [0.12.0] - 2025-07-15
 
