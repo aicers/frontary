@@ -7,20 +7,16 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Removed
-
-- Removed `width_view` field from `DisplayInfo` struct.
-
-### Changed
-
-- Centralized image path handling with `Theme::path`, supporting light/dark themes
-  via assets in `pumpkin/` and `pumpkin/light/` across components.
-
 ### Added
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
   `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
+
+### Changed
+
+- Centralized image path handling with `Theme::path`, supporting light/dark themes
+  via assets in `pumpkin/` and `pumpkin/light/` across components.
 
 ### Fixed
 
@@ -31,6 +27,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   classes for different layout variations. The hardcoded padding values in
   `line_class` and `delete_cell_class` now support both one-row and multi-row
   group layouts more flexibly.
+
+### Removed
+
+- Removed `width_view` field from `DisplayInfo` struct.
 
 ## [0.12.0] - 2025-07-15
 
