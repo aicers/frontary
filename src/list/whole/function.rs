@@ -273,10 +273,6 @@ where
             Kind::LayeredFirst | Kind::Flat => {
                 let default_items = gen_default_items_from_confs(&ctx.props().input_conf);
                 copy_items(&default_items, &ctx.props().input_data);
-
-                if let Ok(mut input_ids) = ctx.props().input_ids.try_borrow_mut() {
-                    input_ids.clear();
-                }
             }
             Kind::LayeredSecond => {
                 if let Some(data) = ctx.props().input_second_data.as_ref() {
