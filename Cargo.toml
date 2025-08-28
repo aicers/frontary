@@ -45,3 +45,4 @@ yew = "0.21"
 
 [lints.clippy]
 pedantic = "warn"
+unwrap_used = "warn"
