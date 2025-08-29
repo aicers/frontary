@@ -211,9 +211,21 @@ where
 
         let sort_changed = self.sort != ctx.props().sort;
         if self.data_cache.len() < ctx.props().data.len() {
-            // if an item is added, sort items by latest to display the added one at the top.
+            // if an item is added, only sort by latest if LatestFirst is available
             self.initiate_pages_info(ctx); // go to the first page
-            self.sort = None;
+            if ctx
+                .props()
+                .visible_sort_options
+                .contains(&SortListKind::LatestFirst)
+            {
+                self.sort = None; // This will trigger LatestFirst in sort_keys
+            } else {
+                // When LatestFirst is hidden, default to deterministic column 0 Ascending
+                self.sort = Some(SortColumn {
+                    index: 0,
+                    status: SortStatus::Ascending,
+                });
+            }
             self.set_sort_list_kind(ctx);
         }
 
