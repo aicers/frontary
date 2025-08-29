@@ -26,7 +26,9 @@ pub enum ChildrenPosition {
     Right,
 }
 
-#[derive(Clone, PartialEq)]
+type ValidationFn = fn(&str) -> Result<(), String>;
+
+#[derive(Clone)]
 pub struct TextConfig {
     pub ess: Essential,
     pub length: Option<usize>,
@@ -34,6 +36,18 @@ pub struct TextConfig {
     pub preset: Option<String>,
     pub unique: bool,
     pub immutable: bool,
+    pub validation: Option<ValidationFn>,
+}
+
+impl PartialEq for TextConfig {
+    fn eq(&self, other: &Self) -> bool {
+        self.ess == other.ess
+            && self.length == other.length
+            && self.width == other.width
+            && self.preset == other.preset
+            && self.unique == other.unique
+            && self.immutable == other.immutable
+    }
 }
 
 #[derive(Clone, PartialEq)]

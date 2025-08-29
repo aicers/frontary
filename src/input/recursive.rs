@@ -673,6 +673,27 @@ where
                     // HIGHTLIGHT: All kinds are not necessarily to be verified.
                     // HIGHTLIGHT: Since HostNetworkGroup items were verified, they don't need to be verified here.
                     match (&*input_data, &**input_conf) {
+                        (InputItem::Text(value), InputConfig::Text(config)) => {
+                            if parent_checked
+                                && !value.is_empty()
+                                && let Some(validator) = config.validation
+                            {
+                                match validator(value) {
+                                    Ok(()) => {
+                                        self.verification.insert(item_index, Verification::Valid);
+                                    }
+                                    Err(msg) => {
+                                        self.verification.insert(
+                                            item_index,
+                                            Verification::Invalid(InvalidMessage::InvalidCustom(
+                                                msg,
+                                            )),
+                                        );
+                                        rtn = false;
+                                    }
+                                }
+                            }
+                        }
                         (InputItem::Unsigned32(value), InputConfig::Unsigned32(config)) => {
                             if let Some(value) = value.as_ref()
                                 && parent_checked

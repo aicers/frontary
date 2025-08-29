@@ -24,11 +24,12 @@ use crate::{
     sort_hosts, sort_networks, text,
 };
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub(super) enum InvalidMessage {
     InvalidInput,
     InvalidDomain,
     InvalidPassword(InvalidPasswordKind),
+    InvalidCustom(String),
     InterfaceNameRequired,
     InterfaceRequired,
     GatewayRequired,
@@ -36,7 +37,7 @@ pub(super) enum InvalidMessage {
     WrongGateway,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub(super) enum Verification {
     Valid,
     Invalid(InvalidMessage),
