@@ -20,6 +20,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Enhanced `SelectMultiple` to properly distinguish between "All" selection and no
+  selection when both `all` and `required` options are enabled. Added internal
+  state tracking to support proper validation in all configuration combinations.
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
   `InputEscape` follows `InputAdd` in the `WholeList` component.
 - Fixed a bug where `PasswordItem` was not cleared when iterating through items
