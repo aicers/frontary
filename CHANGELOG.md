@@ -34,6 +34,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   in `required_messages` even though `all` and `required` is enabled in
   `InputConfig::SelectMultiple`. If `all` is enabled, the `None` value should be
   evaluated to the "All" option when `required` is also enabled.
+- Fixed overflow in `searchable-select-list-down` CSS to remove horizontal scrollbar.
 
 ### Removed
 
