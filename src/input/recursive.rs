@@ -349,7 +349,15 @@ where
             && let Ok(mut buffer) = buffer.try_borrow_mut()
             && !preset.is_empty()
         {
-            *buffer = Some(preset.iter().cloned().collect::<HashSet<String>>());
+            let preset_set = preset.iter().cloned().collect::<HashSet<String>>();
+            *buffer = Some(preset_set.clone());
+
+            // Also update the state buffer
+            if let Some(state_buffer) = self.select_multiple_state_buffer.get(id)
+                && let Ok(mut state_buffer) = state_buffer.try_borrow_mut()
+            {
+                *state_buffer = super::component::SelectMultipleState::Some(preset_set);
+            }
         }
     }
 
@@ -434,7 +442,31 @@ where
                             input_conf.required() && item.is_empty()
                         }
                         (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(conf)) => {
-                            input_conf.required() && item.is_empty() && !conf.all
+                            if input_conf.required() {
+                                if conf.all && conf.ess.required {
+                                    // When both all=true and required=true, check the state buffer
+                                    if let Some(state_buffer) =
+                                        self.select_multiple_state_buffer.get(&this_index)
+                                    {
+                                        if let Ok(state) = state_buffer.try_borrow() {
+                                            matches!(
+                                                *state,
+                                                super::component::SelectMultipleState::None
+                                            )
+                                        } else {
+                                            false
+                                        }
+                                    } else {
+                                        // Fallback: if no state buffer, consider empty only if item is actually empty
+                                        item.is_empty()
+                                    }
+                                } else {
+                                    // Original logic: required and empty, but not when all=true (unless both all and required)
+                                    item.is_empty() && !conf.all
+                                }
+                            } else {
+                                false
+                            }
                         }
                         (InputItem::Password(pw), InputConfig::Password(_)) => {
                             // HIGHLIGHT: In case of Edit, empty means no change of passwords
@@ -1385,14 +1417,63 @@ where
         data: &SelectMultipleItem,
         config: &SelectMultipleConfig,
     ) {
+        use super::component::SelectMultipleState;
+
         if config.all {
+            // When all=true, start with "All" state and keep the old buffer logic for compatibility
             self.select_searchable_buffer
                 .insert(index.clone(), Rc::new(RefCell::new(None)));
+            self.select_multiple_state_buffer.insert(
+                index.clone(),
+                Rc::new(RefCell::new(SelectMultipleState::All)),
+            );
         } else {
+            // When all=false, use specific selections
+            let selection_set = data.into_inner();
             self.select_searchable_buffer.insert(
                 index.clone(),
-                Rc::new(RefCell::new(Some(data.into_inner()))),
+                Rc::new(RefCell::new(Some(selection_set.clone()))),
             );
+            self.select_multiple_state_buffer.insert(
+                index.clone(),
+                Rc::new(RefCell::new(SelectMultipleState::Some(selection_set))),
+            );
+        }
+    }
+
+    /// Update the `SelectMultiple` state to distinguish between "All", "None", and specific selections
+    /// This is used when the UI needs to signal a state change (e.g., user deselects everything)
+    #[allow(dead_code)] // This method will be used by UI components in the future
+    pub(super) fn update_select_multiple_state(
+        &mut self,
+        index: &BigUint,
+        state: &super::component::SelectMultipleState,
+        _all_items: Option<&HashSet<String>>,
+    ) {
+        use super::component::SelectMultipleState;
+
+        // Update the state buffer
+        if let Some(state_buffer) = self.select_multiple_state_buffer.get(index)
+            && let Ok(mut state_buffer) = state_buffer.try_borrow_mut()
+        {
+            *state_buffer = state.clone();
+        }
+
+        // Update the searchable buffer to match the state
+        if let Some(search_buffer) = self.select_searchable_buffer.get(index)
+            && let Ok(mut search_buffer) = search_buffer.try_borrow_mut()
+        {
+            match state {
+                SelectMultipleState::All => {
+                    *search_buffer = None;
+                }
+                SelectMultipleState::None => {
+                    *search_buffer = Some(HashSet::new());
+                }
+                SelectMultipleState::Some(selections) => {
+                    *search_buffer = Some(selections.clone());
+                }
+            }
         }
     }
 

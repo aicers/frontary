@@ -58,10 +58,25 @@ type CompValueBuf = HashMap<
 
 type VecSelectBuf = HashMap<BigUint, Vec<Rc<RefCell<Option<HashSet<String>>>>>>;
 
+/// `SelectMultiple` state to distinguish between "All" and no selection when all=true and required=true
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub(super) enum SelectMultipleState {
+    /// All items are selected (when all=true)
+    All,
+    /// No items selected (when user deselects everything)
+    #[allow(dead_code)] // This variant will be used when UI components signal "no selection"
+    None,
+    /// Specific items selected
+    Some(HashSet<String>),
+}
+
+type SelectMultipleStateBuffer = HashMap<BigUint, Rc<RefCell<SelectMultipleState>>>;
+
 pub struct Model<T> {
     pub(super) radio_buffer: HashMap<BigUint, Rc<RefCell<String>>>,
     pub(super) host_network_buffer: HashMap<BigUint, Rc<RefCell<InputHostNetworkGroup>>>,
     pub(super) select_searchable_buffer: HashMap<BigUint, Rc<RefCell<Option<HashSet<String>>>>>,
+    pub(super) select_multiple_state_buffer: SelectMultipleStateBuffer,
     pub(super) vec_select_buffer: VecSelectBuf,
     pub(super) tag_buffer: HashMap<BigUint, Rc<RefCell<InputTagGroup>>>,
     pub(super) comparison_value_kind_buffer: HashMap<BigUint, Rc<RefCell<Option<HashSet<String>>>>>,
@@ -97,6 +112,7 @@ where
         self.radio_buffer == other.radio_buffer
             && self.host_network_buffer == other.host_network_buffer
             && self.select_searchable_buffer == other.select_searchable_buffer
+            && self.select_multiple_state_buffer == other.select_multiple_state_buffer
             && self.vec_select_buffer == other.vec_select_buffer
             && self.tag_buffer == other.tag_buffer
             && self.comparison_value_kind_buffer == other.comparison_value_kind_buffer
@@ -123,6 +139,7 @@ impl<T> Clone for Model<T> {
             radio_buffer: self.radio_buffer.clone(),
             host_network_buffer: self.host_network_buffer.clone(),
             select_searchable_buffer: self.select_searchable_buffer.clone(),
+            select_multiple_state_buffer: self.select_multiple_state_buffer.clone(),
             vec_select_buffer: self.vec_select_buffer.clone(),
             tag_buffer: self.tag_buffer.clone(),
             comparison_value_kind_buffer: self.comparison_value_kind_buffer.clone(),
@@ -408,6 +425,7 @@ where
             radio_buffer: HashMap::new(),
             host_network_buffer: HashMap::new(),
             select_searchable_buffer: HashMap::new(),
+            select_multiple_state_buffer: HashMap::new(),
             vec_select_buffer: HashMap::new(),
             tag_buffer: HashMap::new(),
             comparison_value_kind_buffer: HashMap::new(),
@@ -635,15 +653,58 @@ where
                                 ));
                             }
                             buffer.is_empty()
-                        } else if let Ok(mut item) = input_data.try_borrow_mut() {
-                            let list = list
-                                .iter()
-                                .map(|item| item.0.clone())
-                                .collect::<HashSet<String>>();
-                            *item = InputItem::SelectMultiple(SelectMultipleItem::new(list));
-                            false
                         } else {
-                            false
+                            // Handle None case - check if we have state buffer to distinguish All vs None
+                            if let Some(state_buffer) = self.select_multiple_state_buffer.get(&id) {
+                                if let Ok(state) = state_buffer.try_borrow() {
+                                    match &*state {
+                                        SelectMultipleState::All => {
+                                            // "All" is selected - set to all items in list
+                                            if let Ok(mut item) = input_data.try_borrow_mut() {
+                                                let list = list
+                                                    .iter()
+                                                    .map(|item| item.0.clone())
+                                                    .collect::<HashSet<String>>();
+                                                *item = InputItem::SelectMultiple(
+                                                    SelectMultipleItem::new(list),
+                                                );
+                                            }
+                                            false // All is not empty
+                                        }
+                                        SelectMultipleState::None => {
+                                            // No selection - set to empty
+                                            if let Ok(mut item) = input_data.try_borrow_mut() {
+                                                *item = InputItem::SelectMultiple(
+                                                    SelectMultipleItem::new(HashSet::new()),
+                                                );
+                                            }
+                                            true // No selection is empty
+                                        }
+                                        SelectMultipleState::Some(selections) => {
+                                            // Specific selections
+                                            if let Ok(mut item) = input_data.try_borrow_mut() {
+                                                *item = InputItem::SelectMultiple(
+                                                    SelectMultipleItem::new(selections.clone()),
+                                                );
+                                            }
+                                            selections.is_empty()
+                                        }
+                                    }
+                                } else {
+                                    false
+                                }
+                            } else {
+                                // Fallback to old behavior if state buffer not found
+                                if let Ok(mut item) = input_data.try_borrow_mut() {
+                                    let list = list
+                                        .iter()
+                                        .map(|item| item.0.clone())
+                                        .collect::<HashSet<String>>();
+                                    *item =
+                                        InputItem::SelectMultiple(SelectMultipleItem::new(list));
+                                }
+                                false
+                            }
                         }
                     } else {
                         false
@@ -846,6 +907,14 @@ where
                                         | InputItem::SelectMultiple(_) => {
                                             rearrange_buffer(
                                                 &mut self.select_searchable_buffer,
+                                                &base_index,
+                                                row_index,
+                                                col,
+                                                data.len(),
+                                            );
+                                            // Also rearrange the SelectMultiple state buffer
+                                            rearrange_buffer(
+                                                &mut self.select_multiple_state_buffer,
                                                 &base_index,
                                                 row_index,
                                                 col,
