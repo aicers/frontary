@@ -33,6 +33,7 @@ const FAIL_COLOR: &str = "#B5131A";
 pub enum Message {
     Timeout(usize),
     Close(usize),
+    CloseAll,
 }
 
 #[allow(clippy::module_name_repetitions)]
@@ -91,6 +92,12 @@ impl Component for Model {
                     list.retain(|l| l.0 != serial);
                 }
             }
+            Message::CloseAll => {
+                self.timeouts.clear();
+                if let Ok(mut list) = ctx.props().list.try_borrow_mut() {
+                    list.clear();
+                }
+            }
         }
         true
     }
@@ -112,7 +119,8 @@ impl Component for Model {
         html! {
             <>
                 <div id="notification" class="notification" style={style}>
-                { for list.iter().rev().map(|l| Self::view_item(ctx, l.0, &l.1, theme)) }
+                    { if list.len() > 1 { Self::view_close_all_button(ctx) } else { html! {} } }
+                    { for list.iter().rev().map(|l| Self::view_item(ctx, l.0, &l.1, theme)) }
                 </div>
             </>
         }
@@ -149,6 +157,19 @@ impl Model {
             self.timeouts.insert(serial, handle);
         }
         true
+    }
+
+    fn view_close_all_button(ctx: &Context<Self>) -> Html {
+        let onclick_close_all = ctx.link().callback(|_| Message::CloseAll);
+        let txt = ctx.props().txt.txt.clone();
+
+        html! {
+            <div class="notification-close-all">
+                <div class="notification-close-all-button" onclick={onclick_close_all}>
+                    { text!(txt, ctx.props().language, "Close All") }
+                </div>
+            </div>
+        }
     }
 
     #[allow(clippy::too_many_lines)]

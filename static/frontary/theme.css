@@ -2658,9 +2658,7 @@ div.notification {
     overflow: hidden;
     flex-direction: column-reverse;
     z-index: 90;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-right: 10px;
+    padding: 5px 0 5px 10px;
 }
 
 table.notification {
@@ -2675,6 +2673,7 @@ td.notification-contents {
     padding-left: 16px;
     padding-right: 8px;
     background-color: #FFFFFF;
+    border-radius: 4px 0px 0px 4px;
 }
 
 table.notification-contents-text-table {
@@ -2733,6 +2732,25 @@ div.notification-contents-done-button {
 
 div.notification-contents-done-button:hover {
     cursor: pointer;
+}
+
+div.notification-close-all {
+    width: 100%;
+    padding: 5px 0px;
+    display: flex;
+}
+
+div.notification-close-all-button {
+    padding: 5px 10px;
+    background-color: #FFFFFF;
+    border: 1px solid #CECECE;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+div.notification-close-all-button:hover {
+    cursor: pointer;
+    background-color: #F0F0F0;
 }
 
 div.modal-outer {

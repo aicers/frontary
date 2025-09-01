@@ -2923,6 +2923,27 @@ div.notification-contents-done-button:hover {
     color: var(--Blue-80);
 }
 
+div.notification-close-all {
+    width: 100%;
+    padding: 8px 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+div.notification-close-all-button {
+    padding: 8px 16px;
+    background-color: var(--White);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--Dark-70);
+}
+
+div.notification-close-all-button:hover {
+    cursor: pointer;
+    color: var(--Blue-80);
+}
+
 div.modal-outer {
     position: fixed;
     display: flex;
