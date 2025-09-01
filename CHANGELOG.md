@@ -24,6 +24,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
   `InputEscape` follows `InputAdd` in the `WholeList` component.
+- Fixed host network duplicate check logic where `binary_search` would fail to
+  detect duplicates after using `push()` instead of `insert()`, which broke the
+  sorted order requirement for proper duplicate detection.
 - Fixed a bug where `PasswordItem` was not cleared when iterating through items
   in the `WholeList` component.
 - Fixed Group Row and Delete Cell alignment by adding `compact` to

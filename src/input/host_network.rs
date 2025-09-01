@@ -480,6 +480,7 @@ where
     }
 
     // None means empty
+    #[allow(clippy::too_many_lines)]
     fn verify(&mut self, ctx: &Context<Self>) -> Option<bool> {
         if let Some((l, _)) = self.input.split_once(',') {
             self.input = l.to_string();
@@ -491,39 +492,44 @@ where
         } else if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
             match ctx.props().kind {
                 Kind::All => match parse_host_network(&self.input) {
-                    Some(HostNetwork::Host(host)) => {
-                        if data.hosts.binary_search(&host).is_ok() {
+                    Some(HostNetwork::Host(host)) => match data.hosts.binary_search(&host) {
+                        Ok(_) => {
                             self.message = Some(EXIST_MSG);
                             Some(false)
-                        } else {
+                        }
+                        Err(pos) => {
                             self.view_order.push(ItemType::Host(data.hosts.len()));
-                            data.hosts.push(host);
+                            data.hosts.insert(pos, host);
                             self.input = String::new();
                             Some(true)
                         }
-                    }
+                    },
                     Some(HostNetwork::Network(network)) => {
-                        if data.networks.binary_search(&network).is_ok() {
-                            self.message = Some(EXIST_MSG);
-                            Some(false)
-                        } else {
-                            self.view_order.push(ItemType::Network(data.networks.len()));
-                            data.networks.push(network);
-                            self.input = String::new();
-                            Some(true)
+                        match data.networks.binary_search(&network) {
+                            Ok(_) => {
+                                self.message = Some(EXIST_MSG);
+                                Some(false)
+                            }
+                            Err(pos) => {
+                                self.view_order.push(ItemType::Network(data.networks.len()));
+                                data.networks.insert(pos, network);
+                                self.input = String::new();
+                                Some(true)
+                            }
                         }
                     }
-                    Some(HostNetwork::Range(range)) => {
-                        if data.ranges.binary_search(&range).is_ok() {
+                    Some(HostNetwork::Range(range)) => match data.ranges.binary_search(&range) {
+                        Ok(_) => {
                             self.message = Some(EXIST_MSG);
                             Some(false)
-                        } else {
+                        }
+                        Err(pos) => {
                             self.view_order.push(ItemType::Range(data.ranges.len()));
-                            data.ranges.push(range);
+                            data.ranges.insert(pos, range);
                             self.input = String::new();
                             Some(true)
                         }
-                    }
+                    },
                     None => {
                         self.message = Some(INVALID_INPUT_MSG);
                         Some(false)
@@ -531,14 +537,17 @@ where
                 },
                 Kind::HostOnly => {
                     if let Some(HostNetwork::Host(host)) = parse_host_network(&self.input) {
-                        if data.hosts.binary_search(&host).is_ok() {
-                            self.message = Some(EXIST_MSG);
-                            Some(false)
-                        } else {
-                            self.view_order.push(ItemType::Host(data.hosts.len()));
-                            data.hosts.push(host);
-                            self.input = String::new();
-                            Some(true)
+                        match data.hosts.binary_search(&host) {
+                            Ok(_) => {
+                                self.message = Some(EXIST_MSG);
+                                Some(false)
+                            }
+                            Err(pos) => {
+                                self.view_order.push(ItemType::Host(data.hosts.len()));
+                                data.hosts.insert(pos, host);
+                                self.input = String::new();
+                                Some(true)
+                            }
                         }
                     } else {
                         self.message = Some(INVALID_INPUT_MSG_HOST);
@@ -547,14 +556,17 @@ where
                 }
                 Kind::NetworkOnly => {
                     if let Some(HostNetwork::Network(network)) = parse_host_network(&self.input) {
-                        if data.networks.binary_search(&network).is_ok() {
-                            self.message = Some(EXIST_MSG);
-                            Some(false)
-                        } else {
-                            self.view_order.push(ItemType::Network(data.networks.len()));
-                            data.networks.push(network);
-                            self.input = String::new();
-                            Some(true)
+                        match data.networks.binary_search(&network) {
+                            Ok(_) => {
+                                self.message = Some(EXIST_MSG);
+                                Some(false)
+                            }
+                            Err(pos) => {
+                                self.view_order.push(ItemType::Network(data.networks.len()));
+                                data.networks.insert(pos, network);
+                                self.input = String::new();
+                                Some(true)
+                            }
                         }
                     } else {
                         self.message = Some(INVALID_INPUT_MSG);
@@ -563,14 +575,17 @@ where
                 }
                 Kind::RangeOnly => {
                     if let Some(HostNetwork::Range(range)) = parse_host_network(&self.input) {
-                        if data.ranges.binary_search(&range).is_ok() {
-                            self.message = Some(EXIST_MSG);
-                            Some(false)
-                        } else {
-                            self.view_order.push(ItemType::Range(data.ranges.len()));
-                            data.ranges.push(range);
-                            self.input = String::new();
-                            Some(true)
+                        match data.ranges.binary_search(&range) {
+                            Ok(_) => {
+                                self.message = Some(EXIST_MSG);
+                                Some(false)
+                            }
+                            Err(pos) => {
+                                self.view_order.push(ItemType::Range(data.ranges.len()));
+                                data.ranges.insert(pos, range);
+                                self.input = String::new();
+                                Some(true)
+                            }
                         }
                     } else {
                         self.message = Some(INVALID_INPUT_MSG_RANGE);
