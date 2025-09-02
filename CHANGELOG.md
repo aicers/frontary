@@ -7,11 +7,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Changed
-
-- Centralized image path handling with `Theme::path`, supporting light/dark themes
-  via assets in `pumpkin/` and `pumpkin/light/` across components.
-
 ### Added
 
 - Added visible sort options for dropdowns via `visible_sort_options` in
@@ -20,6 +15,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added "Close All" button for notifications to allow users to dismiss all
   notifications at once when there are multiple notifications present.
 - Added custom validation for `TextConfig`.
+
+### Changed
+
+- Centralized image path handling with `Theme::path`, supporting light/dark themes
+  via assets in `pumpkin/` and `pumpkin/light/` across components.
 
 ### Fixed
 
