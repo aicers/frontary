@@ -254,7 +254,9 @@ where
                                                 { m }
                                             },
                                             TextStyle::RawBold => html! {
-                                                <b> { m } </b>
+                                                <div class="modal-text-multi-line">
+                                                    <b> { m } </b>
+                                                </div>
                                             },
                                             TextStyle::RawHtml => html! {
                                                 { v_node }
