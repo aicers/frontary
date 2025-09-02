@@ -14,6 +14,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Prevent multiple pagination requests before previous one completes.
 - Added "Close All" button for notifications to allow users to dismiss all
   notifications at once when there are multiple notifications present.
+- Added custom validation for `TextConfig`.
 
 ### Changed
 

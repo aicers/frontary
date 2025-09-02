@@ -88,8 +88,12 @@ where
             String::new()
         };
 
-        let class = if self.required_msg.contains(&my_index) || self.unique_msg.contains(&my_index)
-        {
+        let class = if self.required_msg.contains(&my_index)
+            || self.unique_msg.contains(&my_index)
+            || matches!(
+                self.verification.get(&my_index),
+                Some(Verification::Invalid(InvalidMessage::InvalidCustom(_)))
+            ) {
             "frontary-input-text-alert"
         } else {
             "frontary-input-text"
@@ -170,6 +174,16 @@ where
                         }
                     } else {
                         html! {}
+                    }
+                }
+                {
+                    match self.verification.get(&my_index) {
+                        Some(Verification::Invalid(InvalidMessage::InvalidCustom(msg))) => html! {
+                            <div class="input-contents-item-alert-message">
+                               { text!(txt, ctx.props().language, msg) }
+                            </div>
+                        },
+                        _ => html! {}
                     }
                 }
             </div>
