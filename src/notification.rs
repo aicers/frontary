@@ -44,13 +44,13 @@ pub enum Message {
     CloseAll,
 }
 
-/// A single notification item with message content and metadata.
+/// A single notification item with message content and context.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, PartialEq, Eq)]
 pub struct NotificationItem {
     /// Primary notification message
     pub message: String,
-    /// Optional secondary message with additional details
+    /// Secondary message with additional details
     pub sub_message: String,
     /// HTTP status code if this notification is related to a network request
     pub status_code: Option<u16>,

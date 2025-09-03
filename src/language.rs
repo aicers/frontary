@@ -78,10 +78,6 @@ impl Language {
 ///
 /// Falls back to English if no preference is stored or if the stored
 /// value is invalid.
-///
-/// # Returns
-///
-/// The user's preferred language or the default (English)
 #[must_use]
 pub fn get() -> Language {
     const DEFAULT_LANGUAGE: Language = Language::English;
