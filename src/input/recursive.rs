@@ -424,6 +424,7 @@ where
                         (InputItem::Text(_), InputConfig::Text(_))
                         | (InputItem::DomainName(_), InputConfig::DomainName(_))
                         | (InputItem::SelectSingle(_), InputConfig::SelectSingle(_))
+                        | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_))
                         | (InputItem::Tag(_), InputConfig::Tag(_))
                         | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
@@ -432,9 +433,6 @@ where
                         | (InputItem::File(_), InputConfig::File(_))
                         | (InputItem::Comparison(_), InputConfig::Comparison(_)) => {
                             input_conf.required() && item.is_empty()
-                        }
-                        (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(conf)) => {
-                            input_conf.required() && item.is_empty() && !conf.all
                         }
                         (InputItem::Password(pw), InputConfig::Password(_)) => {
                             // HIGHLIGHT: In case of Edit, empty means no change of passwords
