@@ -33,13 +33,10 @@ impl Theme {
     ///
     /// # Examples
     ///
-    /// ```rust,no_run
+    /// ```
     /// use frontary::Theme;
     ///
-    /// match Theme::load_from_browser() {
-    ///     Some(theme) => println!("Loaded theme: {}", theme),
-    ///     None => println!("No theme saved, using default"),
-    /// }
+    /// Theme::load_from_browser();
     /// ```
     #[must_use]
     pub fn load_from_browser() -> Option<Theme> {
@@ -58,7 +55,7 @@ impl Theme {
     ///
     /// # Examples
     ///
-    /// ```rust,no_run
+    /// ```
     /// use frontary::Theme;
     ///
     /// Theme::save_to_browser(Theme::Dark);
