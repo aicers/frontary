@@ -28,6 +28,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed host network duplicate check logic where `binary_search` would fail to
   detect duplicates after using `push()` instead of `insert()`, which broke the
   sorted order requirement for proper duplicate detection.
+- Fixed u32 underflow in `varied_width()` calculation when column widths exceed
+  total width by using `saturating_sub()` for safe arithmetic.
 - Fixed a bug where `PasswordItem` was not cleared when iterating through items
   in the `WholeList` component.
 - Fixed Group Row and Delete Cell alignment by adding `compact` to
