@@ -989,6 +989,7 @@ where
         base_index: Option<&BigUint>,
         layer_index: usize,
         theme: Option<Theme>,
+        length: Option<usize>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
@@ -1005,6 +1006,7 @@ where
                         {kind}
                         {num}
                         {width}
+                        {length}
                         input_data={Rc::clone(buffer)}
                         input_notice={Some(ess.notice)}
                         parent_message={Some(Message::InputHostNetworkGroup(my_index.clone(), input_data.clone()))}
