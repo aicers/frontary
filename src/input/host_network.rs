@@ -1,11 +1,12 @@
 use std::rc::Rc;
-use std::{cell::RefCell, marker::PhantomData};
+use std::{borrow::Cow, cell::RefCell, marker::PhantomData};
 
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, KeyboardEvent};
 use yew::{Component, Context, Html, Properties, TargetCast, events::InputEvent, html};
 
+use crate::input::config::ValidationFn;
 use crate::{
     HostNetwork, InputHostNetworkGroup, Texts, Theme, language::Language, parse_host_network, text,
 };
@@ -28,7 +29,7 @@ enum ItemType {
 #[derive(PartialEq)]
 pub struct Model<T> {
     input: String,
-    message: Option<&'static str>,
+    message: Option<Cow<'static, str>>,
     view_order: Vec<ItemType>,
     phantom: PhantomData<T>,
 }
@@ -63,7 +64,7 @@ const INPUT_HOST_NOTICE: &str = "Multiple IP addresses possible";
 const INPUT_RANGE_NOTICE: &str = "(Input Example: 192.168.1.100 - 192.168.1.200)";
 const INPUT_NETWORK_NOTICE: &str = "(Input Example: 192.168.10.0/24)";
 
-#[derive(Clone, PartialEq, Properties)]
+#[derive(Clone, Properties)]
 pub struct Props<T>
 where
     T: Clone + Component + PartialEq,
@@ -76,6 +77,8 @@ where
     pub kind: Kind,
     #[prop_or(None)]
     pub num: Option<usize>,
+    #[prop_or(None)]
+    pub length: Option<usize>,
     #[prop_or(None)]
     pub parent_message: Option<T::Message>,
     #[prop_or(None)]
@@ -97,6 +100,34 @@ where
     pub is_required: bool,
     #[prop_or(None)]
     pub theme: Option<Theme>,
+    #[prop_or(None)]
+    pub validation: Option<ValidationFn>,
+}
+
+impl<T> PartialEq for Props<T>
+where
+    T: Clone + Component + PartialEq,
+    <T as Component>::Message: Clone + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.txt == other.txt
+            && self.language == other.language
+            && self.rerender_serial == other.rerender_serial
+            && self.kind == other.kind
+            && self.num == other.num
+            && self.length == other.length
+            && self.parent_message == other.parent_message
+            && self.parent_message_save == other.parent_message_save
+            && self.parent_message_no_save == other.parent_message_no_save
+            && self.parent_message_user_input == other.parent_message_user_input
+            && Rc::ptr_eq(&self.input_data, &other.input_data)
+            && self.input_notice == other.input_notice
+            && self.width == other.width
+            && self.max_height == other.max_height
+            && self.verify_to_save == other.verify_to_save
+            && self.is_required == other.is_required
+            && self.theme == other.theme
+    }
 }
 
 impl<T> Component for Model<T>
@@ -148,7 +179,7 @@ where
                     _ => (),
                 }
                 if Self::max_num(ctx) {
-                    self.message = Some(MAX_NUM_MSG);
+                    self.message = Some(Cow::Borrowed(MAX_NUM_MSG));
                 } else if self.verify(ctx).unwrap_or(false)
                     && let (Some(parent), Some(msg)) =
                         (ctx.link().get_parent(), ctx.props().parent_message.as_ref())
@@ -255,7 +286,7 @@ where
             }
             Message::VerifyToSave => {
                 if Self::max_num(ctx) {
-                    self.message = Some(MAX_NUM_MSG);
+                    self.message = Some(Cow::Borrowed(MAX_NUM_MSG));
                 } else {
                     let verify = self.verify(ctx);
                     if let (Some(parent), Some(msg_save), Some(msg_no_save)) = (
@@ -413,6 +444,7 @@ where
                     class="host-network-group-input-input-input"
                     value={self.input.clone()}
                     placeholder={placeholder}
+                    maxlength={ctx.props().length.map(|l| l.to_string())}
                     oninput={oninput}
                     onkeyup={onkeyup}
                     onkeydown={onkeydown}
@@ -448,7 +480,7 @@ where
                 }
             }
         };
-        if let Some(msg) = self.message {
+        if let Some(msg) = self.message.as_deref() {
             html! {
                 <div class="host-network-group-input-input-message">
                     { text!(txt, ctx.props().language, msg) }
@@ -490,11 +522,17 @@ where
         if self.input.is_empty() {
             None
         } else if let Ok(mut data) = ctx.props().input_data.try_borrow_mut() {
+            if let Some(validation) = ctx.props().validation
+                && let Err(msg) = validation(&self.input)
+            {
+                self.message = Some(Cow::Owned(msg));
+                return Some(false);
+            }
             match ctx.props().kind {
                 Kind::All => match parse_host_network(&self.input) {
                     Some(HostNetwork::Host(host)) => match data.hosts.binary_search(&host) {
                         Ok(_) => {
-                            self.message = Some(EXIST_MSG);
+                            self.message = Some(Cow::Borrowed(EXIST_MSG));
                             Some(false)
                         }
                         Err(pos) => {
@@ -507,7 +545,7 @@ where
                     Some(HostNetwork::Network(network)) => {
                         match data.networks.binary_search(&network) {
                             Ok(_) => {
-                                self.message = Some(EXIST_MSG);
+                                self.message = Some(Cow::Borrowed(EXIST_MSG));
                                 Some(false)
                             }
                             Err(pos) => {
@@ -520,7 +558,7 @@ where
                     }
                     Some(HostNetwork::Range(range)) => match data.ranges.binary_search(&range) {
                         Ok(_) => {
-                            self.message = Some(EXIST_MSG);
+                            self.message = Some(Cow::Borrowed(EXIST_MSG));
                             Some(false)
                         }
                         Err(pos) => {
@@ -531,7 +569,7 @@ where
                         }
                     },
                     None => {
-                        self.message = Some(INVALID_INPUT_MSG);
+                        self.message = Some(Cow::Borrowed(INVALID_INPUT_MSG));
                         Some(false)
                     }
                 },
@@ -539,7 +577,7 @@ where
                     if let Some(HostNetwork::Host(host)) = parse_host_network(&self.input) {
                         match data.hosts.binary_search(&host) {
                             Ok(_) => {
-                                self.message = Some(EXIST_MSG);
+                                self.message = Some(Cow::Borrowed(EXIST_MSG));
                                 Some(false)
                             }
                             Err(pos) => {
@@ -550,7 +588,7 @@ where
                             }
                         }
                     } else {
-                        self.message = Some(INVALID_INPUT_MSG_HOST);
+                        self.message = Some(Cow::Borrowed(INVALID_INPUT_MSG_HOST));
                         Some(false)
                     }
                 }
@@ -558,7 +596,7 @@ where
                     if let Some(HostNetwork::Network(network)) = parse_host_network(&self.input) {
                         match data.networks.binary_search(&network) {
                             Ok(_) => {
-                                self.message = Some(EXIST_MSG);
+                                self.message = Some(Cow::Borrowed(EXIST_MSG));
                                 Some(false)
                             }
                             Err(pos) => {
@@ -569,7 +607,7 @@ where
                             }
                         }
                     } else {
-                        self.message = Some(INVALID_INPUT_MSG);
+                        self.message = Some(Cow::Borrowed(INVALID_INPUT_MSG));
                         Some(false)
                     }
                 }
@@ -577,7 +615,7 @@ where
                     if let Some(HostNetwork::Range(range)) = parse_host_network(&self.input) {
                         match data.ranges.binary_search(&range) {
                             Ok(_) => {
-                                self.message = Some(EXIST_MSG);
+                                self.message = Some(Cow::Borrowed(EXIST_MSG));
                                 Some(false)
                             }
                             Err(pos) => {
@@ -588,7 +626,7 @@ where
                             }
                         }
                     } else {
-                        self.message = Some(INVALID_INPUT_MSG_RANGE);
+                        self.message = Some(Cow::Borrowed(INVALID_INPUT_MSG_RANGE));
                         Some(false)
                     }
                 }

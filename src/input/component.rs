@@ -1042,7 +1042,7 @@ where
                     }
                     InputConfig::HostNetworkGroup(config) => {
                         self.view_host_network_group(ctx, &config.ess, config.kind, config.num,
-                            config.width, input_data, None, index, config.theme)
+                            config.width, input_data, None, index, config.theme, config.length, config.validation)
                     }
                     InputConfig::SelectSingle(config) => {
                         self.view_select_searchable(ctx, false, &config.ess, config.width,

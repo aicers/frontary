@@ -15,7 +15,8 @@ use super::{
 };
 use crate::{
     HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag, Theme,
-    input::component::Verification, text,
+    input::{component::Verification, config::ValidationFn},
+    text,
 };
 
 const CHANGE_PASSWORD_NOTICE: &str = "If you want to change your password, input a new one.";
@@ -992,6 +993,8 @@ where
         base_index: Option<&BigUint>,
         layer_index: usize,
         theme: Option<Theme>,
+        length: Option<usize>,
+        validation: Option<ValidationFn>,
     ) -> Html {
         let my_index = cal_index(base_index, layer_index);
         let txt = ctx.props().txt.txt.clone();
@@ -1008,6 +1011,7 @@ where
                         {kind}
                         {num}
                         {width}
+                        {length}
                         input_data={Rc::clone(buffer)}
                         input_notice={Some(ess.notice)}
                         parent_message={Some(Message::InputHostNetworkGroup(my_index.clone(), input_data.clone()))}
@@ -1017,6 +1021,7 @@ where
                         verify_to_save={self.verify_host_network_group}
                         is_required={self.required_msg.contains(&my_index)}
                         {theme}
+                        {validation}
                     />
                     { self.view_required_msg(ctx, &my_index) }
                 </div>

@@ -317,7 +317,7 @@ where
                     <div class={class_child}>
                         <div class={class_line}>
                         </div>
-                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, Some(base_index), layer_index, config.theme) }
+                        { self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, child_data, Some(base_index), layer_index, config.theme, config.length, config.validation) }
                     </div>
                 }
             }
@@ -623,7 +623,7 @@ where
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_host_network_group(ctx, &config.ess, config.kind, config.num, config.width, each_item,
-                                                                                Some(&row_rep_index), col_index, config.theme)
+                                                                                Some(&row_rep_index), col_index, config.theme, config.length, config.validation)
                                                                         }
                                                                         InputConfig::SelectSingle(config) => {
                                                                             let mut ess = config.ess.clone();
