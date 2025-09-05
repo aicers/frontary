@@ -77,6 +77,8 @@ where
     #[prop_or(None)]
     pub num: Option<usize>,
     #[prop_or(None)]
+    pub length: Option<usize>,
+    #[prop_or(None)]
     pub parent_message: Option<T::Message>,
     #[prop_or(None)]
     pub parent_message_save: Option<T::Message>,
@@ -413,6 +415,7 @@ where
                     class="host-network-group-input-input-input"
                     value={self.input.clone()}
                     placeholder={placeholder}
+                    maxlength={ctx.props().length.map(|l| l.to_string())}
                     oninput={oninput}
                     onkeyup={onkeyup}
                     onkeydown={onkeydown}

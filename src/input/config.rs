@@ -71,6 +71,7 @@ pub struct HostNetworkGroupConfig {
     pub num: Option<usize>,
     pub width: Option<u32>,
     pub theme: Option<Theme>,
+    pub length: Option<usize>,
 }
 
 #[derive(Clone, PartialEq)]
