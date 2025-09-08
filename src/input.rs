@@ -32,7 +32,7 @@ pub use item::{
 };
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
-pub use recursive::invalid_password;
+pub use recursive::{invalid_password, invalid_password_with_min_length};
 use strum_macros::{Display, EnumIter, EnumString};
 pub use tag::Model as Tag;
 

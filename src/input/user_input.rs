@@ -289,6 +289,7 @@ where
         &self,
         ctx: &Context<Self>,
         ess: &InputEssential,
+        length: Option<usize>,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
@@ -360,12 +361,28 @@ where
                     }
                 </div>
                 <div class="input-contents-item-input-password">
-                    <input type="password" class={class} style={style.clone()}
-                        placeholder={placeholder.clone()}
-                        autofocus={autofocus}
-                        autocomplete="new-password"
-                        oninput={oninput}
-                    />
+                    {
+                        if let Some(length) = length {
+                            html! {
+                                <input type="password" class={class} style={style.clone()}
+                                    placeholder={placeholder.clone()}
+                                    autofocus={autofocus}
+                                    autocomplete="new-password"
+                                    oninput={oninput}
+                                    maxlength={length.to_string()}
+                                />
+                            }
+                        } else {
+                            html! {
+                                <input type="password" class={class} style={style.clone()}
+                                    placeholder={placeholder.clone()}
+                                    autofocus={autofocus}
+                                    autocomplete="new-password"
+                                    oninput={oninput}
+                                />
+                            }
+                        }
+                    }
                 </div>
                 <div class="input-password-notice">
                     { text!(txt, ctx.props().language, PASSWD_REQUIREMENT)}
@@ -373,11 +390,26 @@ where
                 <div class="input-reenter-password-title">
                     { text!(txt, ctx.props().language, "Re-enter password") }
                 </div>
-                <input type="password" class={class} style={style}
-                    placeholder={placeholder}
-                    autocomplete="new-password"
-                    oninput={oninput_confirm(my_index.clone())}
-                />
+                {
+                    if let Some(length) = length {
+                        html! {
+                            <input type="password" class={class} style={style}
+                                placeholder={placeholder}
+                                autocomplete="new-password"
+                                oninput={oninput_confirm(my_index.clone())}
+                                maxlength={length.to_string()}
+                            />
+                        }
+                    } else {
+                        html! {
+                            <input type="password" class={class} style={style}
+                                placeholder={placeholder}
+                                autocomplete="new-password"
+                                oninput={oninput_confirm(my_index.clone())}
+                            />
+                        }
+                    }
+                }
                 <div class="input-text-message">
                     { self.view_required_msg(ctx, &my_index) }
                 </div>

@@ -752,12 +752,15 @@ where
                                 }
                             }
                         }
-                        (InputItem::Password(pwd), InputConfig::Password(_)) => {
+                        (InputItem::Password(pwd), InputConfig::Password(config)) => {
                             if parent_checked
                                 && let Some(cnf_pwd) = self.confirm_password.get(&(item_index))
                             {
                                 if pwd == cnf_pwd {
-                                    if let Some(v) = invalid_password(pwd) {
+                                    let min_length = config.length.unwrap_or(PASSWORD_MIN_LEN);
+                                    if let Some(v) =
+                                        invalid_password_with_min_length(pwd, min_length)
+                                    {
                                         self.verification.insert(
                                             item_index,
                                             Verification::Invalid(InvalidMessage::InvalidPassword(
@@ -1508,6 +1511,11 @@ where
 
 #[must_use]
 pub fn invalid_password(password: &str) -> Option<Kind> {
+    invalid_password_with_min_length(password, PASSWORD_MIN_LEN)
+}
+
+#[must_use]
+pub fn invalid_password_with_min_length(password: &str, min_length: usize) -> Option<Kind> {
     let analyzed = analyzer::analyze(password);
     let filtered = analyzed.password();
 
@@ -1517,7 +1525,7 @@ pub fn invalid_password(password: &str) -> Option<Kind> {
             Some(Kind::HasControlCharacter)
         } else if analyzed.spaces_count() > 0 {
             Some(Kind::HasSpace)
-        } else if analyzed.length() < PASSWORD_MIN_LEN {
+        } else if analyzed.length() < min_length {
             Some(Kind::TooShort)
         } else if analyzed.lowercase_letters_count() == 0 {
             Some(Kind::NoLowercaseLetter)
@@ -1539,7 +1547,7 @@ pub fn invalid_password(password: &str) -> Option<Kind> {
             Some(Kind::HasControlCharacter)
         } else if analyzed.spaces_count() > 0 {
             Some(Kind::HasSpace)
-        } else if analyzed.length() < PASSWORD_MIN_LEN {
+        } else if analyzed.length() < min_length {
             Some(Kind::TooShort)
         } else if analyzed.lowercase_letters_count() == 0 {
             Some(Kind::NoLowercaseLetter)
@@ -1552,5 +1560,25 @@ pub fn invalid_password(password: &str) -> Option<Kind> {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_invalid_password_with_min_length() {
+        // Test with default minimum length
+        assert!(invalid_password("short").is_some());
+        assert!(invalid_password("ValidPassword123!").is_none());
+
+        // Test with custom minimum length
+        assert!(invalid_password_with_min_length("abc", 5).is_some());
+        assert!(invalid_password_with_min_length("Valid123!", 5).is_none());
+
+        // Test that custom length overrides default
+        assert!(invalid_password_with_min_length("ValidPass123!", 20).is_some());
+        assert!(invalid_password_with_min_length("VeryLongValidPassword123!", 20).is_none());
     }
 }
