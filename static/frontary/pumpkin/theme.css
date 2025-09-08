@@ -743,7 +743,7 @@ td.mini-select-list-down-item {
     padding: 10px 12px;
     vertical-align: middle;
     white-space: nowrap;
-    color: var(--Dark-20);
+    color: var(--Text-Secondary);
     font-weight: 400;
     font-size: 16px;
     line-height: 20px;
@@ -1116,7 +1116,7 @@ td.list-whole-head-check {
 td.list-whole-head-title {
     height: 30px;
     font-size: 14px;
-    color: var(--Dark-10);
+    color: var(--Text-Secondary);
     text-align: center;
     vertical-align: middle;
     font-weight: 500;
@@ -1715,7 +1715,7 @@ div.input-password-notice {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: var(--Dark-10);
+    color: var(--Text-Secondary);
     margin-bottom: 20px;
     padding-top: 4px;
 }
@@ -1945,7 +1945,7 @@ div.input-radio-notice {
     line-height: 16px;
     display: flex;
     align-items: center;
-    color: var(--Dark-10);
+    color: var(--Text-Secondary);
 }
 
 div.input-radio-message {
@@ -2082,7 +2082,7 @@ div.host-network-group-input-input-notice {
     font-size: 11px;
     display: flex;
     align-items: center;
-    color: var(--Dark-10);
+    color: var(--Text-Secondary);
     padding-top: 4px;
 }
 
@@ -3182,7 +3182,7 @@ td.tab-menu-unselected {
     vertical-align: middle;
     font-weight: 500;
     font-size: 16px;
-    color: var(--Dark-10);
+    color: var(--Text-Secondary);
     padding: 8px 16px;
 }
 
