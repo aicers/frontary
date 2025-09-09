@@ -20,6 +20,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Centralized image path handling with `Theme::path`, supporting light/dark themes
   via assets in `pumpkin/` and `pumpkin/light/` across components.
+- Changed functions and icons related with Network/IP filter to latest Figma design.
 
 ### Fixed
 
