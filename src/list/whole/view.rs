@@ -3,6 +3,7 @@ use std::rc::Rc;
 use std::str::FromStr;
 
 use htmlescape::decode_html;
+use itertools::Itertools;
 use json_gettext::get_text;
 use yew::{Component, Context, Html, classes, html, virtual_dom::AttrValue};
 
@@ -727,16 +728,16 @@ where
                 }
             }
             Column::SelectMultiple(list) => {
-                let mut list = list
+                let list = list
                     .selected
                     .values()
                     .map(|v| v.to_string_txt(&txt, ctx.props().language))
+                    .sorted()
                     .collect::<Vec<String>>();
-                list.sort_unstable();
                 view_list_sep_dot(&list, false)
             }
             Column::Tag(tags) => {
-                let mut list = tags
+                let list = tags
                     .tags
                     .iter()
                     .filter_map(|t| {
@@ -748,8 +749,8 @@ where
                             }
                         })
                     })
+                    .sorted()
                     .collect::<Vec<String>>();
-                list.sort_unstable();
                 html! {
                     <div class="list-whole-tag">
                     {
@@ -786,7 +787,6 @@ where
                     .map(|s| {
                         s.values()
                             .map(|v| v.to_string_txt(&txt, ctx.props().language))
-                            .collect::<Vec<_>>()
                             .join(",")
                     })
                     .collect::<Vec<_>>();

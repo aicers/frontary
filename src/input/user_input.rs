@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use gloo_file::File;
+use itertools::Itertools;
 use json_gettext::get_text;
 use num_bigint::BigUint;
 use wasm_bindgen::JsCast;
@@ -1087,7 +1088,7 @@ where
             }
             Message::ChooseFile(my_index_clone.clone(), result, input_data_clone.clone())
         });
-        let extensions = validate_extensions(extensions).join(",");
+        let extensions = validate_extensions(extensions).iter().join(",");
         let txt = ctx.props().txt.txt.clone();
         let file_name = if let Ok(input_data) = input_data.try_borrow() {
             if let InputItem::File(file) = &(*input_data) {

@@ -6,6 +6,7 @@ use std::{
     fmt::{self, Write},
 };
 
+use itertools::Itertools;
 use jiff::Timestamp;
 pub use whole::{MessageType, Model as WholeList, SortColumn, SortListKind};
 
@@ -154,21 +155,11 @@ impl std::fmt::Display for Column {
             }
             Self::SelectMultiple(d) => {
                 // Since the language is not known here, keys are used.
-                let values = d
-                    .selected
-                    .values()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>()
-                    .join(",");
+                let values = d.selected.values().map(ToString::to_string).join(",");
                 write!(formatter, "{values}")
             }
             Self::Tag(d) => {
-                let values = d
-                    .tags
-                    .iter()
-                    .map(String::as_str)
-                    .collect::<Vec<_>>()
-                    .join(",");
+                let values = d.tags.iter().map(String::as_str).join(",");
                 write!(formatter, "{values}")
             }
             Self::Unsigned32(d) => {
@@ -217,13 +208,7 @@ impl std::fmt::Display for Column {
                 let values = d
                     .selected
                     .iter()
-                    .map(|s| {
-                        s.values()
-                            .map(ToString::to_string)
-                            .collect::<Vec<_>>()
-                            .join(",")
-                    })
-                    .collect::<Vec<_>>()
+                    .map(|s| s.values().map(ToString::to_string).join(","))
                     .join(" | ");
                 write!(formatter, "{values}")
             }
