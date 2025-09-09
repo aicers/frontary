@@ -361,28 +361,13 @@ where
                     }
                 </div>
                 <div class="input-contents-item-input-password">
-                    {
-                        if let Some(length) = length {
-                            html! {
-                                <input type="password" class={class} style={style.clone()}
-                                    placeholder={placeholder.clone()}
-                                    autofocus={autofocus}
-                                    autocomplete="new-password"
-                                    oninput={oninput}
-                                    maxlength={length.to_string()}
-                                />
-                            }
-                        } else {
-                            html! {
-                                <input type="password" class={class} style={style.clone()}
-                                    placeholder={placeholder.clone()}
-                                    autofocus={autofocus}
-                                    autocomplete="new-password"
-                                    oninput={oninput}
-                                />
-                            }
-                        }
-                    }
+                    <input type="password" class={class} style={style.clone()}
+                        placeholder={placeholder.clone()}
+                        autofocus={autofocus}
+                        autocomplete="new-password"
+                        oninput={oninput}
+                        maxlength={length.map(|l| l.to_string())}
+                    />
                 </div>
                 <div class="input-password-notice">
                     { text!(txt, ctx.props().language, PASSWD_REQUIREMENT)}
@@ -390,26 +375,12 @@ where
                 <div class="input-reenter-password-title">
                     { text!(txt, ctx.props().language, "Re-enter password") }
                 </div>
-                {
-                    if let Some(length) = length {
-                        html! {
-                            <input type="password" class={class} style={style}
-                                placeholder={placeholder}
-                                autocomplete="new-password"
-                                oninput={oninput_confirm(my_index.clone())}
-                                maxlength={length.to_string()}
-                            />
-                        }
-                    } else {
-                        html! {
-                            <input type="password" class={class} style={style}
-                                placeholder={placeholder}
-                                autocomplete="new-password"
-                                oninput={oninput_confirm(my_index.clone())}
-                            />
-                        }
-                    }
-                }
+                <input type="password" class={class} style={style}
+                    placeholder={placeholder}
+                    autocomplete="new-password"
+                    oninput={oninput_confirm(my_index.clone())}
+                    maxlength={length.map(|l| l.to_string())}
+                />
                 <div class="input-text-message">
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
