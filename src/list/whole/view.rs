@@ -728,16 +728,16 @@ where
                 }
             }
             Column::SelectMultiple(list) => {
-                let list = list
+                let mut list = list
                     .selected
                     .values()
                     .map(|v| v.to_string_txt(&txt, ctx.props().language))
-                    .sorted()
                     .collect::<Vec<String>>();
+                list.sort_unstable();
                 view_list_sep_dot(&list, false)
             }
             Column::Tag(tags) => {
-                let list = tags
+                let mut list = tags
                     .tags
                     .iter()
                     .filter_map(|t| {
@@ -749,8 +749,8 @@ where
                             }
                         })
                     })
-                    .sorted()
                     .collect::<Vec<String>>();
+                list.sort_unstable();
                 html! {
                     <div class="list-whole-tag">
                     {
