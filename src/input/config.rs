@@ -60,6 +60,7 @@ pub struct DomainNameConfig {
 #[derive(Clone, PartialEq)]
 pub struct PasswordConfig {
     pub ess: Essential,
+    pub length: Option<usize>,
     pub width: Option<u32>,
 }
 

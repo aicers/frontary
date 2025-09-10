@@ -1037,7 +1037,7 @@ where
                             None, index, index == 0)
                     }
                     InputConfig::Password(config) => {
-                        self.view_password(ctx, &config.ess, config.width, input_data, None, index,
+                        self.view_password(ctx, &config.ess, config.length, config.width, input_data, None, index,
                             index == 0)
                     }
                     InputConfig::HostNetworkGroup(config) => {

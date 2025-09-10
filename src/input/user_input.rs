@@ -289,6 +289,7 @@ where
         &self,
         ctx: &Context<Self>,
         ess: &InputEssential,
+        length: Option<usize>,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
@@ -365,6 +366,7 @@ where
                         autofocus={autofocus}
                         autocomplete="new-password"
                         oninput={oninput}
+                        maxlength={length.map(|l| l.to_string())}
                     />
                 </div>
                 <div class="input-password-notice">
@@ -377,6 +379,7 @@ where
                     placeholder={placeholder}
                     autocomplete="new-password"
                     oninput={oninput_confirm(my_index.clone())}
+                    maxlength={length.map(|l| l.to_string())}
                 />
                 <div class="input-text-message">
                     { self.view_required_msg(ctx, &my_index) }
