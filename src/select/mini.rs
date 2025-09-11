@@ -378,17 +378,35 @@ where
             .top_height
             .map_or_else(String::new, |h| format!("height: {h}px;"));
         let style = if ctx.props().kind == Kind::Round {
-            format!(
-                "{} {} background-color: {}; color: {};",
-                style_width,
-                style_height,
-                &ctx.props().top_bg_color,
-                &ctx.props().value_text_color,
-            )
+            // format!(
+            //     "{} {} background-color: {}; color: {};",
+            //     style_width,
+            //     style_height,
+            //     &ctx.props().top_bg_color,
+            //     &ctx.props().value_text_color,
+            // )
+            if cfg!(feature = "pumpkin") {
+                // pumpkin ignores top_bg_color
+                format!(
+                    "{} {} color: {};",
+                    style_width,
+                    style_height,
+                    &ctx.props().value_text_color,
+                )
+            } else {
+                // normal case uses top_bg_color
+                format!(
+                    "{} {} background-color: {}; color: {};",
+                    style_width,
+                    style_height,
+                    &ctx.props().top_bg_color,
+                    &ctx.props().value_text_color,
+                )
+            }
         } else {
             // `Kind::Soft` only
             if cfg!(feature = "pumpkin") {
-                format!("{style_width} {style_height} background-color: rgba(97, 105, 116, 0.24);",)
+                format!("{style_width} {style_height}")
             } else {
                 format!("{style_width} {style_height} background-color: #FFFFFF;",)
             }
@@ -478,11 +496,25 @@ where
             .props()
             .top_width
             .map_or_else(String::new, |w| format!("width: {w}px;"));
-        let style = format!(
-            "{} background-color: {};",
-            style_width,
-            &ctx.props().top_bg_color
-        );
+        // let style = if cfg!(feature = "pumpkin") {
+        //     // format!("{style_width} background-color: rgba(97, 105, 116, 0.24);")
+        // } else {
+        //     format!(
+        //         "{} background-color: {};",
+        //         style_width,
+        //         &ctx.props().top_bg_color
+        //     )
+        // };
+        let style = if cfg!(feature = "pumpkin") {
+            style_width.to_string()
+        } else {
+            format!(
+                "{} background-color: {};",
+                style_width,
+                &ctx.props().top_bg_color
+            )
+        };
+
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
         html! {

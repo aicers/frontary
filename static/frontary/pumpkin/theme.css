@@ -165,7 +165,7 @@ input[type=text].searchable-select-input-empty-alert {
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     background-size: 32px 32px;
     background-position: right 8px top 4px;
     background-repeat: no-repeat;
@@ -176,7 +176,7 @@ input[type=text].searchable-select-input {
 }
 
 input[type=text].searchable-select-input-empty {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=text].searchable-select-input,
@@ -191,7 +191,7 @@ html.light input[type=text].searchable-select-input-empty {
 
 input[type=text].searchable-select-input-empty-disabled {
     background-image: url('/frontary/pumpkin/select-down-disabled.svg');
-    color: var(--Dark-50);
+    color: var(--Surface-Neutral-Text-Disabled);
 }
 
 html.light input[type=text].searchable-select-input-empty-disabled {
@@ -200,7 +200,7 @@ html.light input[type=text].searchable-select-input-empty-disabled {
 
 input[type=text].searchable-select-input-empty-alert {
     background-image: url('/frontary/pumpkin/select-down-alert.svg');
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 html.light input[type=text].searchable-select-input-empty-alert {
@@ -239,14 +239,14 @@ input[type=text].searchable-select-search {
     outline: none;
     border: none;
     border-radius: 8px;
-    background: var(--Transparent-Mid-Grey);
+    background: var(--Surface-Neutral);
     padding-left: 48px;
     color: var(--Text-Primary);
 }
 
 input[type=text].searchable-select-search::placeholder {
     font-size: 16px;
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 div.searchable-select-list-search-all {
@@ -273,17 +273,17 @@ tr.searchable-select-list-item-single {
 }
 
 tr.searchable-select-list-item-single:hover {
-    background-color: var(--Dark-60);
+    background-color: var(--Dropdown-Item-Hover-Bg);
 }
 
 td.searchable-select-list-item-single-selected {
     width: 100%;
     height: 48px;
     font-size: 16px;
-    color: var(--Dark-20);
+    color: var(--Text-Primary);
     font-weight: 400;
     line-height: 24px;
-    background: var(--Dark-60);
+    background: var(--Dropdown-Item-Selected-Bg);
     padding: 8px 12px;
 }
 
@@ -292,7 +292,7 @@ td.searchable-select-list-item-single {
     padding: 8px 12px;
     height: 48px;
     font-size: 16px;
-    color: var(--Dark-20);
+    color: var(--Text-Primary);
     font-weight: 400;
     line-height: 24px;
     height: 48px;
@@ -303,7 +303,7 @@ div.scrollable-table-wrapper {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
-    scrollbar-color: var(--Dark-50) transparent;
+    scrollbar-color: var(--Scrollbar-Thumb) transparent;
 }
 
 div.scrollable-table-wrapper::-webkit-scrollbar {
@@ -315,7 +315,7 @@ div.scrollable-table-wrapper::-webkit-scrollbar-track {
 }
 
 div.scrollable-table-wrapper::-webkit-scrollbar-thumb {
-    background-color: var(--Dark-50);
+    background-color: var(--Scrollbar-Thumb);
     border-radius: 10px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -349,7 +349,7 @@ input[type=text].complex-select-input {
     line-height: 24px;
     color: var(--Text-Primary);
     border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     background-image: url('/frontary/pumpkin/complex-select-pop.svg');
     background-size: 32px 32px;
     background-position: right 8px top 3px;
@@ -383,7 +383,7 @@ html.light input[type=text].complex-select-input-empty {
 }
 
 input[type=text].complex-select-input-empty-alert {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
     border: 2px solid var(--Red-60);
     background-image: url('/frontary/pumpkin/complex-select-pop-alert.svg');
 }
@@ -399,8 +399,8 @@ div.complex-select-pop {
     height: 100%;
     right: 0px;
     top: 0px;
-    background-color: var(--Dark-80);
-    box-shadow: -10px 0px 50px 0px rgba(0, 0, 0, 0.25);
+    background-color: var(--Drawer-Bg);
+    box-shadow: var(--Drawer-Shadow);
 }
 
 div.complex-select-pop-head {
@@ -412,7 +412,7 @@ td.complex-select-pop-head-text {
     height: 70px;
     padding-left: 24px;
     padding-right: 20px;
-    background-color: var(--Dark-80);
+    /* background-color: var(--Dark-80); */
     vertical-align: middle;
     font-size: 16px;
     color: var(--Text-Primary);
@@ -427,7 +427,7 @@ td.complex-select-pop-head-close {
     width: 34px;
     padding-top: 10px;
     padding-right: 10px;
-    background-color: var(--Dark-80);
+    /* background-color: var(--Dark-80); */
     vertical-align: top;
     font-size: 16px;
 }
@@ -526,7 +526,7 @@ div.complex-select-pop-list-list-all {
 table.complex-select-pop-list-list-all {
     height: 42px;
     width: 100%;
-    border-bottom: 1px solid var(--Dark-70);
+    border-bottom: 1px solid var(--Section-Divider);
 }
 
 div.complex-select-pop-list-list-items {
@@ -580,7 +580,7 @@ input[type=text].complex-select-search {
     height: 40px;
     margin-left: 24px;
     padding: 4px 12px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     border: none;
     border-radius: 8px;
     background-image: url('/frontary/pumpkin/magnifier.svg');
@@ -596,7 +596,7 @@ html.light input[type=text].complex-select-search {
 
 input[type=text].complex-select-search::placeholder {
     font-size: 16px;
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=text].complex-select-search:focus {
@@ -649,7 +649,7 @@ input[type=text].complex-select-pop-input {
     font-weight: 400;
     line-height: 24px;
     padding: 8px 12px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     border: none;
     border-radius: 8px;
     color: var(--Text-Primary);
@@ -659,7 +659,7 @@ input[type=text].complex-select-pop-input::placeholder {
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=text].complex-select-pop-input:focus {
@@ -675,7 +675,7 @@ div.complex-select-pop-input-list {
 }
 
 td.complex-select-pop-input-list-networks {
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     border-radius: 8px;
     color: var(--Text-Primary);
 }
@@ -715,7 +715,7 @@ div.mini-select-list-down {
     right: 0px;
     top: 32px;
     z-index: 99;
-    background-color: var(--Dark-70);
+    background-color: var(--Dropdown-Background);
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     border-radius: 8px;
     padding: 7px 0px;
@@ -733,7 +733,7 @@ table.mini-select-list-down-table {
     width: 100%;
     vertical-align: middle;
     white-space: nowrap;
-    background-color: var(--Dark-70);
+    /* background-color: var(--Dark-70); */
     border-radius: 8px;
 }
 
@@ -755,7 +755,7 @@ td.mini-select-list-down-item-selected {
     padding: 10px 12px;
     vertical-align: middle;
     white-space: nowrap;
-    background-color: var(--Dark-60);
+    background-color: var(--Dropdown-Item-Selected-Bg);
     color: var(--Text-Primary);
     font-size: 16px;
     font-weight: 400;
@@ -771,7 +771,7 @@ td.mini-select-list-down-item-left {
 }
 
 td.mini-select-list-down-item:hover {
-    background-color: var(--Dark-60);
+    background-color: var(--Dropdown-Item-Hover-Bg);
     color: var(--Text-Primary);
     cursor: pointer;
 }
@@ -892,7 +892,7 @@ div.mini-select-basic:hover {
 
 div.mini-select-basic-basic {
     border-radius: 8px;
-    background: var(--Transparent-Mid-Grey);
+    background: var(--Surface-Neutral);
     display: inline-flex;
     padding: 8px 12px;
     justify-content: center;
@@ -904,6 +904,7 @@ div.mini-select-basic-basic {
 div.mini-select-basic-square {
     border-radius: 8px;
     padding: 8px 12px;
+    background-color: var(--Surface-Neutral);
 }
 
 div.mini-select-basic-value {
@@ -941,6 +942,7 @@ div.mini-select-item-direction {
     padding: 4px 12px;
     border-radius: 8px;
     white-space: nowrap;
+    background-color: var(--Surface-Neutral);
 }
 
 div.mini-select-item-direction:hover {
@@ -984,7 +986,7 @@ html.light div.mini-select-list-sort-recently-icon {
 
 div.mini-select-list-sort-recently-text {
     height: 40px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     display: flex;
     flex-direction: row;
     border-radius: 8px;
@@ -1069,7 +1071,7 @@ div.list-table {
     overflow-x: auto;
     padding-bottom: 50px;
     border-radius: 10px;
-    background: var(--Transparent-Light-Grey);
+    background: var(--Table-Cell-Bg);
 }
 
 table.list-table {
@@ -1085,7 +1087,7 @@ div.list-add {
     height: 40px;
     font-size: 16px;
     font-weight: 500;
-    color: var(--Text-Primary);
+    color: var(--Btn-Primary-Text);
     background-color: var(--Blue-70);
     border-radius: 8px;
     padding: 8px 24px;
@@ -1284,15 +1286,14 @@ div.list-whole-list-second-add {
     font-weight: 500;
     font-size: 16px;
     border-radius: 8px;
-    border: 2px solid var(--Transparent-Dark-Grey);
-    color: var(--Blue-40);
+    border: 2px solid var(--Btn-Secondary-Border);
+    color: var(--Btn-Secondary-Text);
     padding: 8px 24px;
 }
 
 div.list-whole-list-second-add:hover {
-    border: 2px solid var(--Blue-40);
+    border: 2px solid var(--Btn-Secondary-Hover-Border);
     border-radius: 8px;
-    color: var(--Blue-40);
     font-weight: 500;
     font-size: 16px;
     padding: 8px 24px;
@@ -1312,7 +1313,7 @@ div.list-whole-delete-checked {
     height: 52px;
     padding-left: 60px;
     padding-right: 60px;
-    background-color: var(--Dark-60);
+    background-color: var(--Selection-Toolbar-Bg);
     border-radius: 26px;
     display: flex;
     flex-direction: row;
@@ -1324,7 +1325,7 @@ div.list-whole-delete-checked-text {
     margin-right: 24px;
     font-weight: normal;
     font-size: 14px;
-    color: var(--Text-Primary);
+    color: var(--Selection-Toolbar-Text);
 }
 
 div.list-whole-delete-checked-trash {
@@ -1467,10 +1468,10 @@ table.list-whole-group {
 
 th.list-whole-group-heading {
     height: 30px;
-    background-color: rgba(95, 104, 118, 0.24);
+    background-color: var(--Surface-Neutral);
     font-weight: normal;
     font-size: 11px;
-    color: var(--Dark-10);
+    color: var(--Text-Primary);
     font-weight: 400;
 }
 
@@ -1550,13 +1551,13 @@ div.input-outer {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--Modal-Background);
+    background-color: var(--Overlay-Background);
     z-index: 99;
 }
 
 div.input-inner {
     padding: 24px;
-    background-color: var(--Dark-80);
+    background-color: var(--Modal-Bg);
     border-radius: 8px;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     max-height: 600px;
@@ -1651,7 +1652,7 @@ input[type=text].frontary-input-text {
     outline: none;
     border: none;
     border-radius: 8px;
-    background: var(--Transparent-Mid-Grey);
+    background: var(--Surface-Neutral);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -1664,7 +1665,7 @@ input[type=text].frontary-input-text:disabled {
 }
 
 input[type=text].frontary-input-text::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=text].frontary-input-text-alert {
@@ -1677,12 +1678,12 @@ input[type=text].frontary-input-text-alert {
     font-weight: 400;
     line-height: 24px;
     border-radius: 8px;
-    border: 2px solid var(--Red-60);
-    background-color: var(--Transparent-Mid-Grey);
+    border: 2px solid var(--Input-Error-Border);
+    background-color: var(--Input-Error-Bg);
 }
 
 input[type=text].frontary-input-text-alert::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 div.input-text-message {
@@ -1694,7 +1695,7 @@ div.input-required-message {
     font-size: 14px;
     line-height: 20px;
     font-weight: 500;
-    color: var(--Red-60);
+    color: var(--Input-Error-Text);
 }
 
 img.input-error-icon {
@@ -1755,7 +1756,7 @@ input[type=password].input-password {
     outline: none;
     border: none;
     border-radius: 8px;
-    background: var(--Transparent-Mid-Grey);
+    background: var(--Surface-Neutral);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -1763,7 +1764,7 @@ input[type=password].input-password {
 }
 
 input[type=password].input-password::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=password].input-password-alert {
@@ -1781,7 +1782,7 @@ input[type=password].input-password-alert {
 }
 
 input[type=password].input-password-alert::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=number].input-number {
@@ -1791,7 +1792,7 @@ input[type=number].input-number {
     outline: none;
     border: none;
     border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -1799,7 +1800,7 @@ input[type=number].input-number {
 }
 
 input[type=number].input-number::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=number].input-number-alert {
@@ -1817,7 +1818,7 @@ input[type=number].input-number-alert {
 }
 
 input[type=number].input-number-alert::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=number].input-number-comparison {
@@ -1837,7 +1838,7 @@ input[type=number].input-number-comparison {
 }
 
 input[type=number].input-number-comparison::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 input[type=number].input-number-comparison-alert {
@@ -1874,15 +1875,15 @@ div.input-cancel {
     font-weight: 500;
     font-size: 16px;
     border-radius: 8px;
-    border: 2px solid var(--Transparent-Dark-Grey);
+    border: 2px solid var(--Btn-Secondary-Border);
     line-height: 24px;
-    color: var(--Blue-40);
+    color: var(--Btn-Secondary-Text);
 }
 
 div.input-cancel:hover {
     border-radius: 8px;
-    border: 2px solid var(--Blue-40);
-    background: var(--Dark-80);
+    border: 2px solid var(--Btn-Secondary-Hover-Border);
+    background: var(--Btn-Secondary-Hover-Bg);
     cursor: pointer;
 }
 
@@ -1898,7 +1899,7 @@ div.input-save {
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
-    color: var(--Text-Primary);
+    color: var(--Btn-Primary-Text);
 }
 
 div.input-save:hover {
@@ -2011,7 +2012,7 @@ div.host-network-group-input {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     border: none;
     border-radius: 8px;
     padding: 2px 12px;
@@ -2025,7 +2026,7 @@ div.host-network-group-input-item {
     padding: 4px 8px;
     flex-direction: row;
     align-items: center;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Tag-Bg);
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
@@ -2062,7 +2063,7 @@ input[type=text].host-network-group-input-input-input {
 }
 
 input[type=text].host-network-group-input-input-input::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 div.host-network-group-input-input-message {
@@ -2114,7 +2115,7 @@ div.tag-group-input {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     border: none;
     border-radius: 8px;
     padding: 2px 12px;
@@ -2149,7 +2150,7 @@ div.tag-group-input-item {
     if border-radius is greater than max(width, height),
     it makes half size of min(width, height) */
     border-radius: 8px;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Tag-Bg);
     color: var(--Text-Primary);
     text-align: left;
     font-size: 14px;
@@ -2182,7 +2183,7 @@ input[type=text].tag-group-input-input-input {
 }
 
 input[type=text].tag-group-input-input-input::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
     background-color: transparent;
     font-size: 16px;
 }
@@ -2339,7 +2340,7 @@ input[type=text].tag-select-edit-tag {
 }
 
 input[type=text].tag-select-edit-tag::placeholder {
-    color: var(--Dark-30);
+    color: var(--Input-Placeholder-Text);
 }
 
 img.tag-select-edit-done {
@@ -2463,8 +2464,8 @@ div.input-add-item {
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    border: 2px solid var(--Transparent-Dark-Grey);
-    color: var(--Blue-40);
+    border: 2px solid var(--Btn-Secondary-Border);
+    color: var(--Btn-Secondary-Text);
     text-align: center;
     font-size: 16px;
     font-weight: 500;
@@ -2475,8 +2476,8 @@ div.input-add-item {
 
 div.input-add-item:hover {
     cursor: pointer;
-    border: 2px solid var(--Blue-40);
-    background-color: var(--Dark-80);
+    border: 2px solid var(--Btn-Secondary-Hover-Border);
+    background-color: var(--Btn-Secondary-Hover-Bg);
 }
 
 div.input-file {
@@ -2606,7 +2607,7 @@ div.input-trash-can-delete {
     background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: var(--Transparent-Mid-Grey);
+    background-color: var(--Surface-Neutral);
     border-radius: 8px;
 }
 
@@ -2615,10 +2616,10 @@ html.light div.input-trash-can-delete {
 }
 
 div.input-trash-can-delete:hover {
-    background-color: var(--Transparent-Mid-Grey);
-    box-shadow: 0px 0px 6px 0px rgba(255, 255, 255, 0.2);
+    background-color: var(--Btn-Icon-Hover-Bg);
+    box-shadow: var(--Btn-Icon-Hover-Shadow), inset 0 0 0 2px var(--Btn-Icon-Hover-Inner-Border);
     cursor: pointer;
-    border: 2px solid rgba(71, 76, 85, 1)
+    border: 2px solid var(--Btn-Icon-Hover-Shadow);
 }
 
 td.group-list-link-line-bottom {
@@ -2831,13 +2832,14 @@ table.notification {
     margin-top: 5px;
     margin-bottom: 5px;
     background-clip: padding-box;
-    border-radius: 0px 4px 4px 0px;
+    /* border-radius: 0px 4px 4px 0px; */
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
 }
 
 td.notification-contents {
     padding: 16px 15px 16px 24px;
-    background-color: var(--Dark-5);
+    background-color: var(--Toast-Bg);
     border-radius: 8px;
     gap: 10px;
     display: grid;
@@ -2854,6 +2856,7 @@ div.clumit-notification {
 div.clumit-notification-error {
     align-items: center;
     display: flex;
+    color: var(--Text-Primary);
 }
 
 img.clumit-notification-error {
@@ -2864,7 +2867,7 @@ img.clumit-notification-error {
 
 table.notification-contents-text-table {
     width: 100%;
-    color: var(--Dark-60);
+    color: var(--Toast-Text);
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
@@ -2932,16 +2935,15 @@ div.notification-close-all {
 
 div.notification-close-all-button {
     padding: 8px 16px;
-    background-color: var(--White);
+    background-color: var(--Toast-Bg);
     border-radius: 8px;
     font-size: 14px;
     font-weight: 400;
-    color: var(--Dark-70);
+    color: var(--Toast-Text);
 }
 
 div.notification-close-all-button:hover {
     cursor: pointer;
-    color: var(--Blue-80);
 }
 
 div.modal-outer {
@@ -2963,15 +2965,15 @@ div.modal-outer::before {
     left: 0;
     right: 0;
     bottom: 0;
-    opacity: 0.09;
-    background-color: var(--Modal-Background);
+    /* opacity: 0.09; */
+    background-color: var(--Overlay-Background);
     z-index: -1;
 }
 
 div.modal-contents {
     overflow: auto;
     padding: 24px;
-    background-color: var(--Dark-80);
+    background-color: var(--Modal-Bg);
     border-radius: 8px;
     display: inline-flex;
     padding: 24px;
@@ -3082,8 +3084,8 @@ div.modal-button-item-recommendation {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--Blue-40);
-    border: 2px solid var(--Transparent-Dark-Grey);
+    color: var(--Btn-Secondary-Text);
+    border: 2px solid var(--Btn-Secondary-Border);
     border-radius: 8px;
     text-align: center;
     font-size: 16px;
@@ -3097,15 +3099,15 @@ div.modal-button-item-recommendation {
 div.modal-button-item-recommendation:hover {
     cursor: pointer;
     border-radius: 8px;
-    border: 2px solid var(--Blue-40);
-    background: var(--Dark-80);
+    border: 2px solid var(--Btn-Secondary-Hover-Border);
+    background: var(--Btn-Secondary-Hover-Bg);
 }
 
 div.modal-button-item-option {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--Text-Primary);
+    color: var(--Btn-Primary-Text);
     background-color: var(--Blue-70);
     border-radius: 8px;
     text-align: center;
@@ -3214,7 +3216,7 @@ div.cell-modal-container::before {
     right: 0;
     bottom: 0;
     opacity: 0.09;
-    background-color: var(--Modal-Background);
+    background-color: var(--Overlay-Background);
     z-index: -1;
 }
 
@@ -3225,7 +3227,7 @@ div.cell-modal-wrapper {
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
-    background-color: var(--Dark-80);
+    background-color: var(--Modal-Bg);
     border-radius: 8px;
     max-height: 600px;
 }
