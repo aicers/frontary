@@ -547,6 +547,50 @@ impl Unsigned32Item {
 }
 
 #[derive(Clone, PartialEq, Default)]
+pub struct Unsigned16Item {
+    value: Option<u16>,
+}
+
+impl Deref for Unsigned16Item {
+    type Target = Option<u16>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+impl DerefMut for Unsigned16Item {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.value
+    }
+}
+
+impl Unsigned16Item {
+    #[must_use]
+    pub fn new(value: Option<u16>) -> Self {
+        Self { value }
+    }
+
+    pub fn set(&mut self, value: u16) {
+        self.value = Some(value);
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.value.is_none()
+    }
+
+    #[must_use]
+    pub fn into_inner(&self) -> Option<u16> {
+        self.value
+    }
+
+    pub fn clear(&mut self) {
+        *self = Self::new(None);
+    }
+}
+
+#[derive(Clone, PartialEq, Default)]
 pub struct Unsigned8Item {
     value: Option<u8>,
 }
@@ -1028,6 +1072,7 @@ pub enum InputItem {
     SelectMultiple(SelectMultipleItem),
     Tag(TagItem),
     Unsigned32(Unsigned32Item),
+    Unsigned16(Unsigned16Item),
     Unsigned8(Unsigned8Item),
     Float64(Float64Item),
     Percentage(PercentageItem),
@@ -1051,6 +1096,7 @@ impl InputItem {
             InputItem::SelectMultiple(selected_list) => selected_list.clear(),
             InputItem::Tag(tag) => tag.clear(),
             InputItem::Unsigned32(value) => value.clear(),
+            InputItem::Unsigned16(value) => value.clear(),
             InputItem::Unsigned8(value) => value.clear(),
             InputItem::Float64(value) => value.clear(),
             InputItem::Percentage(value) => value.clear(),
@@ -1075,6 +1121,7 @@ impl InputItem {
             InputItem::SelectMultiple(selected_list) => selected_list.is_empty(),
             InputItem::Tag(tag) => tag.is_empty(),
             InputItem::Unsigned32(value) => value.is_empty(),
+            InputItem::Unsigned16(value) => value.is_empty(),
             InputItem::Unsigned8(value) => value.is_empty(),
             InputItem::Float64(value) => value.is_empty(),
             InputItem::Percentage(value) => value.is_empty(),
@@ -1100,6 +1147,7 @@ impl InputItem {
             InputConfig::SelectMultiple(_) => Self::SelectMultiple(SelectMultipleItem::default()),
             InputConfig::Tag(_) => Self::Tag(TagItem::default()),
             InputConfig::Unsigned32(_) => Self::Unsigned32(Unsigned32Item::default()),
+            InputConfig::Unsigned16(_) => Self::Unsigned16(Unsigned16Item::default()),
             InputConfig::Unsigned8(_) => Self::Unsigned8(Unsigned8Item::default()),
             InputConfig::Float64(_) => Self::Float64(Float64Item::default()),
             InputConfig::Percentage(_) => Self::Percentage(PercentageItem::default()),
@@ -1161,6 +1209,7 @@ impl From<&Column> for InputItem {
                 delete: None,
             })),
             Column::Unsigned32(value) => Self::Unsigned32(Unsigned32Item::new(value.value)),
+            Column::Unsigned16(value) => Self::Unsigned16(Unsigned16Item::new(value.value)),
             Column::Unsigned8(value) => Self::Unsigned8(Unsigned8Item::new(value.value)),
             Column::Float64(value) => Self::Float64(Float64Item::new(value.value)),
             Column::Percentage(value) => Self::Percentage(PercentageItem::new(value.value)),
@@ -1197,6 +1246,7 @@ impl From<&Column> for InputItem {
                             | Column::SelectSingle(..)
                             | Column::SelectMultiple(..)
                             | Column::Unsigned32(..)
+                            | Column::Unsigned16(..)
                             | Column::Unsigned8(..)
                             | Column::Float64(..)
                             | Column::Percentage(..)

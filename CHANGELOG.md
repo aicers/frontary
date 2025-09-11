@@ -18,6 +18,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
 - Added `Column::DomainName` variant to `WholeList`.
+- Added `Unsigned16` to `Column`, `InputConfig`, and `InputItem` to support
+  16-bit unsigned integer types, reducing unnecessary conversions for values
+  like TCP/UDP port numbers.
 
 ### Changed
 
