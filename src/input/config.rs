@@ -26,7 +26,7 @@ pub enum ChildrenPosition {
     Right,
 }
 
-type ValidationFn = fn(&str) -> Result<(), String>;
+pub(super) type ValidationFn = fn(&str) -> Result<(), String>;
 
 #[derive(Clone)]
 pub struct TextConfig {
@@ -64,7 +64,7 @@ pub struct PasswordConfig {
     pub width: Option<u32>,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct HostNetworkGroupConfig {
     pub ess: Essential,
     pub kind: HostNetworkKind,
@@ -72,6 +72,19 @@ pub struct HostNetworkGroupConfig {
     pub num: Option<usize>,
     pub width: Option<u32>,
     pub theme: Option<Theme>,
+    pub length: Option<usize>,
+    pub validation: Option<ValidationFn>,
+}
+
+impl PartialEq for HostNetworkGroupConfig {
+    fn eq(&self, other: &Self) -> bool {
+        self.ess == other.ess
+            && self.kind == other.kind
+            && self.num == other.num
+            && self.width == other.width
+            && self.theme == other.theme
+            && self.length == other.length
+    }
 }
 
 #[derive(Clone, PartialEq)]
