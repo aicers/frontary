@@ -28,6 +28,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   only actions to also apply to custom selected items.
 - Added `unique` flag to `DomainNameConfig` to enable client-side duplicate
   domain name detection.
+- Added `Unsigned16` to `Column`, `InputConfig`, and `InputItem` to support
+  16-bit unsigned integer types, reducing unnecessary conversions for values
+  like TCP/UDP port numbers.
 
 ### Changed
 

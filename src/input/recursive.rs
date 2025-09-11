@@ -117,6 +117,10 @@ where
                                                 InputItem::Unsigned8(_),
                                                 InputConfig::Unsigned8(_),
                                             )
+                                            | (
+                                                InputItem::Unsigned16(_),
+                                                InputConfig::Unsigned16(_),
+                                            )
                                             | (InputItem::Float64(_), InputConfig::Float64(_))
                                             | (
                                                 InputItem::Percentage(_),
@@ -170,6 +174,7 @@ where
                         | (InputItem::Password(_), InputConfig::Password(_))
                         | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
+                        | (InputItem::Unsigned16(_), InputConfig::Unsigned16(_))
                         | (InputItem::Float64(_), InputConfig::Float64(_))
                         | (InputItem::Percentage(_), InputConfig::Percentage(_))
                         | (InputItem::Nic(_), InputConfig::Nic(_))
@@ -240,6 +245,13 @@ where
                             }
                         }
                         (InputItem::Unsigned8(item), InputConfig::Unsigned8(config)) => {
+                            if let Some(preset) = &config.preset
+                                && parent_checked
+                            {
+                                item.set(*preset);
+                            }
+                        }
+                        (InputItem::Unsigned16(item), InputConfig::Unsigned16(config)) => {
                             if let Some(preset) = &config.preset
                                 && parent_checked
                             {
@@ -428,6 +440,7 @@ where
                         | (InputItem::Tag(_), InputConfig::Tag(_))
                         | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
+                        | (InputItem::Unsigned16(_), InputConfig::Unsigned16(_))
                         | (InputItem::Float64(_), InputConfig::Float64(_))
                         | (InputItem::Percentage(_), InputConfig::Percentage(_))
                         | (InputItem::File(_), InputConfig::File(_))
@@ -534,100 +547,115 @@ where
         !required.is_empty() || !self.required_msg.is_empty()
     }
 
+    fn extract_required_flags(config: &GroupConfig) -> Vec<bool> {
+        config
+            .items
+            .iter()
+            .map(|t| match &(**t) {
+                InputConfig::Text(_)
+                | InputConfig::DomainName(_)
+                | InputConfig::HostNetworkGroup(_)
+                | InputConfig::SelectSingle(_)
+                | InputConfig::SelectMultiple(_)
+                | InputConfig::Unsigned32(_)
+                | InputConfig::Unsigned8(_)
+                | InputConfig::Unsigned16(_)
+                | InputConfig::Float64(_)
+                | InputConfig::Percentage(_)
+                | InputConfig::Comparison(_)
+                | InputConfig::VecSelect(_) => t.required(),
+                InputConfig::Password(_)
+                | InputConfig::Tag(_)
+                | InputConfig::Nic(_)
+                | InputConfig::File(_)
+                | InputConfig::Group(_)
+                | InputConfig::Checkbox(_)
+                | InputConfig::Radio(_) => {
+                    panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+                }
+            })
+            .collect::<Vec<bool>>()
+    }
+
+    fn analyze_group_empty_states(
+        &self,
+        group: &GroupItem,
+        base_index: &BigUint,
+    ) -> Vec<Vec<Option<bool>>> {
+        // in the case of VecSelect or Comparison
+        // Some(true) means all of sub elements empty
+        // Some(false) means all of sub elements not empty
+        // None means not all of any of sub elements empty but at least one empty
+        group
+            .iter()
+            .enumerate()
+            .map(|(row_index, row)| {
+                row.iter()
+                    .enumerate()
+                    .filter_map(|(col_index, col)| {
+                        if let Ok(col) = col.try_borrow() {
+                            match &*col {
+                                InputItem::Text(_)
+                                | InputItem::DomainName(_)
+                                | InputItem::HostNetworkGroup(_)
+                                | InputItem::SelectSingle(_)
+                                | InputItem::SelectMultiple(_)
+                                | InputItem::Unsigned32(_)
+                                | InputItem::Unsigned8(_)
+                                | InputItem::Unsigned16(_)
+                                | InputItem::Float64(_)
+                                | InputItem::Percentage(_) => Some(Some(col.is_empty())),
+                                InputItem::Comparison(v) => {
+                                    if v.is_some() {
+                                        Some(Some(false))
+                                    } else if self
+                                        .comparison_kind(
+                                            &cal_index(Some(&cal_index(Some(base_index), row_index)), col_index)
+                                        )
+                                        .is_some()
+                                    {
+                                        Some(None)
+                                    } else {
+                                        Some(Some(true))
+                                    }
+                                }
+                                InputItem::VecSelect(v) => {
+                                    if v.iter().all(HashSet::is_empty) {
+                                        Some(Some(true))
+                                    } else if v.iter().all(|d| !d.is_empty()) {
+                                        Some(Some(false))
+                                    } else {
+                                        Some(None)
+                                    }
+                                }
+                                InputItem::Password(_)
+                                | InputItem::Tag(_)
+                                | InputItem::Nic(_)
+                                | InputItem::File(_)
+                                | InputItem::Group(_)
+                                | InputItem::Checkbox(_)
+                                | InputItem::Radio(_) => {
+                                    panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
+                                },
+                            }
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<Option<bool>>>()
+            })
+            .collect::<Vec<Vec<Option<bool>>>>()
+    }
+
     fn group_required_all_recursive(
         &mut self,
         group: &GroupItem,
         config: &GroupConfig,
         base_index: &BigUint,
     ) {
-        let required = config
-        .items
-        .iter()
-        .map(|t| match &(**t) {
-            InputConfig::Text(_)
-            | InputConfig::DomainName(_)
-            | InputConfig::HostNetworkGroup(_)
-            | InputConfig::SelectSingle(_)
-            | InputConfig::SelectMultiple(_)
-            | InputConfig::Unsigned32(_)
-            | InputConfig::Unsigned8(_)
-            | InputConfig::Float64(_)
-            | InputConfig::Percentage(_)
-            | InputConfig::Comparison(_)
-            | InputConfig::VecSelect(_) => t.required(),
-            InputConfig::Password(_)
-            | InputConfig::Tag(_)
-            | InputConfig::Nic(_)
-            | InputConfig::File(_)
-            | InputConfig::Group(_)
-            | InputConfig::Checkbox(_)
-            | InputConfig::Radio(_) => {
-                panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
-            }
-        })
-        .collect::<Vec<bool>>();
-        // in the case of VecSelect or Comparison
-        // Some(true) means all of sub elements empty
-        // Some(false) means all of sub elements not empty
-        // None means not all of any of sub elements empty but at least one empty
-        let empty = group
-        .iter()
-        .enumerate()
-        .map(|(row_index, row)| {
-            row.iter()
-                .enumerate()
-                .filter_map(|(col_index, col)| {
-                    if let Ok(col) = col.try_borrow() {
-                        match &*col {
-                            InputItem::Text(_)
-                            | InputItem::DomainName(_)
-                            | InputItem::HostNetworkGroup(_)
-                            | InputItem::SelectSingle(_)
-                            | InputItem::SelectMultiple(_)
-                            | InputItem::Unsigned32(_)
-                            | InputItem::Unsigned8(_)
-                            | InputItem::Float64(_)
-                            | InputItem::Percentage(_) => Some(Some(col.is_empty())),
-                            InputItem::Comparison(v) => {
-                                if v.is_some() {
-                                    Some(Some(false))
-                                } else if self
-                                    .comparison_kind(
-                                        &cal_index(Some(&cal_index(Some(base_index), row_index)), col_index)
-                                    )
-                                    .is_some()
-                                {
-                                    Some(None)
-                                } else {
-                                    Some(Some(true))
-                                }
-                            }
-                            InputItem::VecSelect(v) => {
-                                if v.iter().all(HashSet::is_empty) {
-                                    Some(Some(true))
-                                } else if v.iter().all(|d| !d.is_empty()) {
-                                    Some(Some(false))
-                                } else {
-                                    Some(None)
-                                }
-                            }
-                            InputItem::Password(_)
-                            | InputItem::Tag(_)
-                            | InputItem::Nic(_)
-                            | InputItem::File(_)
-                            | InputItem::Group(_)
-                            | InputItem::Checkbox(_)
-                            | InputItem::Radio(_) => {
-                                panic!("Input Group does not support some items such as Password, Tag, Nic, File, Group, Checkbox, and Radio.")
-                            },
-                        }
-                    } else {
-                        None
-                    }
-                })
-                .collect::<Vec<Option<bool>>>()
-        })
-        .collect::<Vec<Vec<Option<bool>>>>();
+        let required = Self::extract_required_flags(config);
+        let empty = self.analyze_group_empty_states(group, base_index);
+
         for (row_index, row) in empty.iter().enumerate() {
             let all_empty = row.iter().all(|&x| x == Some(true));
             if !all_empty || config.ess.required && row_index == 0 {
@@ -708,6 +736,21 @@ where
                             }
                         }
                         (InputItem::Unsigned8(value), InputConfig::Unsigned8(config)) => {
+                            if let Some(value) = value.as_ref()
+                                && parent_checked
+                            {
+                                if *value >= config.min && *value <= config.max {
+                                    self.verification.insert(item_index, Verification::Valid);
+                                } else {
+                                    self.verification.insert(
+                                        item_index,
+                                        Verification::Invalid(InvalidMessage::InvalidInput),
+                                    );
+                                    rtn = false;
+                                }
+                            }
+                        }
+                        (InputItem::Unsigned16(value), InputConfig::Unsigned16(config)) => {
                             if let Some(value) = value.as_ref()
                                 && parent_checked
                             {
@@ -1134,6 +1177,13 @@ where
                                 }
                             }
                             (InputItem::Unsigned8(user), InputConfig::Unsigned8(config)) => {
+                                if (user.is_none() || this_checked == Some(CheckStatus::Unchecked))
+                                    && let Some(preset) = &config.preset
+                                {
+                                    user.set(*preset);
+                                }
+                            }
+                            (InputItem::Unsigned16(user), InputConfig::Unsigned16(config)) => {
                                 if (user.is_none() || this_checked == Some(CheckStatus::Unchecked))
                                     && let Some(preset) = &config.preset
                                 {

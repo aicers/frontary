@@ -133,6 +133,15 @@ pub struct Unsigned32Config {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct Unsigned16Config {
+    pub ess: Essential,
+    pub min: u16,
+    pub max: u16,
+    pub width: Option<u16>,
+    pub preset: Option<u16>,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct Unsigned8Config {
     pub ess: Essential,
     pub min: u8,
@@ -268,6 +277,7 @@ pub enum InputConfig {
     SelectMultiple(SelectMultipleConfig),
     Tag(TagConfig),
     Unsigned32(Unsigned32Config),
+    Unsigned16(Unsigned16Config),
     Unsigned8(Unsigned8Config),
     Float64(Float64Config),
     Percentage(PercentageConfig),
@@ -292,6 +302,7 @@ impl InputConfig {
             Self::SelectMultiple(config) => config.ess.required,
             Self::Tag(config) => config.ess.required,
             Self::Unsigned32(config) => config.ess.required,
+            Self::Unsigned16(config) => config.ess.required,
             Self::Unsigned8(config) => config.ess.required,
             Self::Float64(config) => config.ess.required,
             Self::Percentage(config) => config.ess.required,
@@ -316,6 +327,7 @@ impl InputConfig {
             Self::SelectMultiple(config) => config.ess.title(),
             Self::Tag(config) => config.ess.title(),
             Self::Unsigned32(config) => config.ess.title(),
+            Self::Unsigned16(config) => config.ess.title(),
             Self::Unsigned8(config) => config.ess.title(),
             Self::Float64(config) => config.ess.title(),
             Self::Percentage(config) => config.ess.title(),
