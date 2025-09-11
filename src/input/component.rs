@@ -14,8 +14,8 @@ use yew::{Component, Context, Html, Properties, html, virtual_dom::AttrValue};
 use super::{
     DomainNameItem, FileItem, Float64Item, HostNetworkGroupItem, InputConfig,
     InputHostNetworkGroup, InputItem, InputTag, InputTagGroup, PasswordItem, PercentageItem,
-    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned32Item,
-    Value as ComparisonValue, cal_index, group_item_list_preset,
+    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned16Item,
+    Unsigned32Item, Value as ComparisonValue, cal_index, group_item_list_preset,
 };
 use crate::{
     InputNic, InvalidPasswordKind, MessageType, Rerender, Texts, Theme, ViewString,
@@ -167,9 +167,11 @@ pub enum Message {
     InputConfirmPassword(BigUint, String),
     InputUnsigned32(BigUint, Option<u32>, Rc<RefCell<InputItem>>),
     InputUnsigned8(BigUint, Option<u8>, Rc<RefCell<InputItem>>),
+    InputUnsigned16(BigUint, Option<u16>, Rc<RefCell<InputItem>>),
     InputFloat64(BigUint, Option<f64>, Rc<RefCell<InputItem>>),
     InvalidInputUnsigned32,
     InvalidInputUnsigned8,
+    InvalidInputUnsigned16,
     InvalidInputFloat64,
     InputPercentage(BigUint, Option<f32>, Rc<RefCell<InputItem>>),
     InvalidInputPercentage,
@@ -232,9 +234,11 @@ impl Clone for Message {
             Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(a.clone(), b.clone()),
             Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(a.clone(), *b, c.clone()),
             Self::InputUnsigned8(a, b, c) => Self::InputUnsigned8(a.clone(), *b, c.clone()),
+            Self::InputUnsigned16(a, b, c) => Self::InputUnsigned16(a.clone(), *b, c.clone()),
             Self::InputFloat64(a, b, c) => Self::InputFloat64(a.clone(), *b, c.clone()),
             Self::InvalidInputUnsigned32 => Self::InvalidInputUnsigned32,
             Self::InvalidInputUnsigned8 => Self::InvalidInputUnsigned8,
+            Self::InvalidInputUnsigned16 => Self::InvalidInputUnsigned16,
             Self::InvalidInputFloat64 => Self::InvalidInputFloat64,
             Self::InputPercentage(a, b, c) => Self::InputPercentage(a.clone(), *b, c.clone()),
             Self::InvalidInputPercentage => Self::InvalidInputPercentage,
@@ -293,6 +297,7 @@ impl PartialEq for Message {
             | (Self::TrySave, Self::TrySave)
             | (Self::InvalidInputUnsigned32, Self::InvalidInputUnsigned32)
             | (Self::InvalidInputUnsigned8, Self::InvalidInputUnsigned8)
+            | (Self::InvalidInputUnsigned16, Self::InvalidInputUnsigned16)
             | (Self::InvalidInputFloat64, Self::InvalidInputFloat64)
             | (Self::InvalidInputComparisonValue, Self::InvalidInputComparisonValue)
             | (Self::FailLoadFile, Self::FailLoadFile)
@@ -311,6 +316,9 @@ impl PartialEq for Message {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
             (Self::InputUnsigned8(s1, s2, s3), Self::InputUnsigned8(o1, o2, o3)) => {
+                s1 == o1 && s2 == o2 && s3 == o3
+            }
+            (Self::InputUnsigned16(s1, s2, s3), Self::InputUnsigned16(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
             (Self::InputFloat64(s1, s2, s3), Self::InputFloat64(o1, o2, o3)) => {
@@ -586,6 +594,14 @@ where
                 self.remove_group_required(ctx);
                 self.unique_msg.remove(&id);
             }
+            Message::InputUnsigned16(id, value, input_data) => {
+                if let Ok(mut item) = input_data.try_borrow_mut() {
+                    *item = InputItem::Unsigned16(Unsigned16Item::new(value));
+                }
+                self.remove_required_msg(&id, false);
+                self.remove_group_required(ctx);
+                self.unique_msg.remove(&id);
+            }
             Message::InputFloat64(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Float64(Float64Item::new(value));
@@ -595,6 +611,7 @@ where
             }
             Message::InvalidInputUnsigned32
             | Message::InvalidInputUnsigned8
+            | Message::InvalidInputUnsigned16
             | Message::InvalidInputFloat64
             | Message::InvalidInputPercentage
             | Message::InvalidInputComparisonValue => return false,
@@ -1063,6 +1080,10 @@ where
                     }
                     InputConfig::Unsigned8(config) => {
                         self.view_unsigned_8(ctx, &config.ess, config.min, config.max,
+                            config.width, input_data, None, index, index == 0, false)
+                    }
+                    InputConfig::Unsigned16(config) => {
+                        self.view_unsigned_16(ctx, &config.ess, config.min, config.max,
                             config.width, input_data, None, index, index == 0, false)
                     }
                     InputConfig::Float64(config) => {
