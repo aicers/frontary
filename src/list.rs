@@ -155,11 +155,11 @@ impl std::fmt::Display for Column {
             }
             Self::SelectMultiple(d) => {
                 // Since the language is not known here, keys are used.
-                let values = d.selected.values().map(ToString::to_string).join(",");
+                let values = d.selected.values().join(",");
                 write!(formatter, "{values}")
             }
             Self::Tag(d) => {
-                let values = d.tags.iter().map(String::as_str).join(",");
+                let values = d.tags.iter().join(",");
                 write!(formatter, "{values}")
             }
             Self::Unsigned32(d) => {
@@ -205,11 +205,7 @@ impl std::fmt::Display for Column {
             }
             Self::VecSelect(d) => {
                 // Since the language is not known here, keys are used.
-                let values = d
-                    .selected
-                    .iter()
-                    .map(|s| s.values().map(ToString::to_string).join(","))
-                    .join(" | ");
+                let values = d.selected.iter().map(|s| s.values().join(",")).join(" | ");
                 write!(formatter, "{values}")
             }
             Self::Group(_) | Self::Checkbox(_) | Self::Radio(_) => Ok(()),
