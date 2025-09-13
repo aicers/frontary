@@ -371,7 +371,7 @@ where
     pub txt: Texts,
     pub language: Language,
 
-    pub data: Rc<HashMap<String, ListItem>>,
+    pub data: Option<Rc<HashMap<String, ListItem>>>,
     #[prop_or(None)]
     pub input_id: Option<AttrValue>, // Some: Edit, None: Add
     #[prop_or(None)]
@@ -1168,16 +1168,18 @@ where
                 && conf.unique
             {
                 let mut different = true;
-                for (key, item) in &*ctx.props().data {
-                    if id.as_ref().is_none_or(|id| id != key)
-                        && let Some(other) = item.columns.get(index)
-                        && let (Column::Text(other_value), InputItem::Text(value)) =
-                            (other, &(*input))
-                        && let ViewString::Raw(other_value) = &other_value.text
-                        && value == other_value
-                    {
-                        different = false;
-                        break;
+                if let Some(data) = ctx.props().data.as_ref() {
+                    for (key, item) in data.iter() {
+                        if id.as_ref().is_none_or(|id| id != key)
+                            && let Some(other) = item.columns.get(index)
+                            && let (Column::Text(other_value), InputItem::Text(value)) =
+                                (other, &(*input))
+                            && let ViewString::Raw(other_value) = &other_value.text
+                            && value == other_value
+                        {
+                            different = false;
+                            break;
+                        }
                     }
                 }
                 if !different {

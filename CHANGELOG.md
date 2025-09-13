@@ -22,6 +22,11 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Centralized image path handling with `Theme::path`, supporting light/dark themes
   via assets in `pumpkin/` and `pumpkin/light/` across components.
+- Made the `data` field in `input::component::Props` optional to support
+  standalone usage of the `Input` component. When the `Input` component is used
+  independently without requiring uniqueness checks against other list items,
+  the `data` prop can now be set to `None`. Existing code must wrap the `data`
+  prop with `Some()`.
 
 ### Fixed
 
