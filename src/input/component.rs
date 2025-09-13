@@ -1169,7 +1169,7 @@ where
             {
                 let mut different = true;
                 if let Some(data) = ctx.props().data.as_ref() {
-                    for (key, item) in &**data {
+                    for (key, item) in data.iter() {
                         if id.as_ref().is_none_or(|id| id != key)
                             && let Some(other) = item.columns.get(index)
                             && let (Column::Text(other_value), InputItem::Text(value)) =
