@@ -3,6 +3,7 @@ use std::rc::Rc;
 use std::str::FromStr;
 
 use htmlescape::decode_html;
+use itertools::Itertools;
 use json_gettext::get_text;
 use yew::{Component, Context, Html, classes, html, virtual_dom::AttrValue};
 
@@ -786,7 +787,6 @@ where
                     .map(|s| {
                         s.values()
                             .map(|v| v.to_string_txt(&txt, ctx.props().language))
-                            .collect::<Vec<_>>()
                             .join(",")
                     })
                     .collect::<Vec<_>>();
