@@ -9,9 +9,9 @@ use web_sys::HtmlInputElement;
 use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, Properties, classes, events::InputEvent, html};
 
+use crate::click_outside::toggle_visibility;
 use crate::{
     CheckStatus, Checkbox, Item, Texts, Theme, language::Language, shorten_text, text, text_width,
-    toggle_visibility,
 };
 
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
@@ -121,7 +121,7 @@ where
         let txt = ctx.props().txt.txt.clone();
         let send_msg = match msg {
             Message::Click => {
-                toggle_visibility(&ctx.props().id);
+                let _ = toggle_visibility(&ctx.props().id);
                 false
             }
             Message::InputSearch(input) => {
