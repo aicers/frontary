@@ -116,9 +116,8 @@ img.radio-separate-img {
     display: inline-block;
 }
 
-div.radio-space {
-    width: 24px;
-    display: inline-block;
+div.radio-item-with-space {
+    margin-right: 24px;
 }
 
 div.searchable-select-vector {
