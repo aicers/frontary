@@ -37,9 +37,9 @@ const PASSWD_CONSECUTIVE_MSG: &str =
 const PASSWD_ADJACENT_MSG: &str =
     "Your password must not contain more than 3 adjacent keyboard characters.";
 const PASSWD_REQUIREMENT: &str = if cfg!(feature = "cc-password") {
-    "Use 9–64 characters with a mix of uppercase and lowercase letters, numbers, and symbols. Spaces aren't allowed. Avoid repeated characters or simple sequences (e.g. 1234, qwer)."
+    "no spaces, between 9 and 64 characters, at least one number/uppercase/lowercase/special characters, no consecutive repetition, and less than 4 adjacent keyboard characters"
 } else {
-    "Use 8–64 characters with a mix of uppercase and lowercase letters, numbers, and symbols. Spaces aren't allowed."
+    "no spaces, between 8 and 64 characters, at least one number/uppercase/lowercase/special characters"
 };
 const FLOAT64_STEP_DEFAULT: f64 = 0.1;
 
