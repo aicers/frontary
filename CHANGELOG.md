@@ -27,6 +27,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   independently without requiring uniqueness checks against other list items,
   the `data` prop can now be set to `None`. Existing code must wrap the `data`
   prop with `Some()`.
+- `DomainNameItem` now enforces case-insensitive domain names by automatically
+  converting input to lowercase in both `new` and `set` methods.
 
 ### Fixed
 

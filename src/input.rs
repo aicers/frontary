@@ -614,7 +614,7 @@ fn item_preset(conf: &Rc<InputConfig>) -> InputItem {
             conf.preset.as_deref().unwrap_or_default().to_string(),
         )),
         InputConfig::DomainName(conf) => InputItem::DomainName(DomainNameItem::new(
-            conf.preset.as_deref().unwrap_or_default().to_string(),
+            conf.preset.as_deref().unwrap_or_default(),
         )),
         InputConfig::HostNetworkGroup(_) => {
             InputItem::HostNetworkGroup(HostNetworkGroupItem::new(InputHostNetworkGroup::default()))
