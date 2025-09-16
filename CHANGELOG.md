@@ -26,6 +26,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   values for consistent theming across light and dark modes.
 - Bump bincode crate to 2.0 and modified the related code.
 
+### Removed
+
+- Removed the `wasm_bindgen` bindings for `toggle_visibility`, `toggle_visibility_complex`,
+  and `visible_tag_select`; these helpers are now exposed directly from the Rust
+  API in `frontary::click_outside`.
+
 ## [0.13.0] - 2025-10-01
 
 ### Added
@@ -42,6 +48,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   registered only actions to also apply to custom selected items.
 - Added `unique` flag to `DomainNameConfig` to enable client-side duplicate
   domain name detection.
+- Added `listen_click_outside` API to enable click-outside detection for custom
+  areas, allowing users to close UI components when clicking outside of them.
 
 ### Changed
 

@@ -518,9 +518,6 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
         let complex_select_pop = include_bytes!("../static/frontary/complex-select-pop.png");
         rtn.push(("complex-select-pop.png", complex_select_pop));
 
-        let custom_select = include_bytes!("../static/frontary/custom-select.js");
-        rtn.push(("custom_select.js", custom_select));
-
         let delete_trash_white = include_bytes!("../static/frontary/delete-trash-white.png");
         rtn.push(("delete-trash-white.png", delete_trash_white));
 
