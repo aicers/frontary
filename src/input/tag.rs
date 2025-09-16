@@ -136,7 +136,9 @@ where
     #[allow(clippy::too_many_lines)]
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Message::Focus => visible_tag_select(&self.id),
+            Message::Focus => {
+                let _ = visible_tag_select(&self.id);
+            }
             Message::Input(input) => {
                 self.input = input;
                 self.reset_search_list(ctx);
@@ -224,7 +226,7 @@ where
                         data.old.insert(key.clone());
                         self.view_order.push(key);
                         self.input = String::new();
-                        toggle_visibility(&self.id);
+                        let _ = toggle_visibility(&self.id);
                         true
                     }
                 } else {

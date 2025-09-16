@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
 - Added `Column::DomainName` variant to `WholeList`.
+- Added `listen_click_outside` API to enable click-outside detection for custom
+  areas, allowing users to close UI components when clicking outside of them.
 
 ### Changed
 
@@ -32,6 +34,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   converting input to lowercase in both `new` and `set` methods.
 - Changed `width` field type in `Unsigned8Config` from `Option<u8>` to
   `Option<u32>` to unify width types across input configurations.
+- Rewrote JavaScript-based `custom-select.js` functionality in Rust using WASM
+  bindings for better consistency and maintainability. The click-outside
+  detection feature is now available as a fully developed Rust API through the
+  `listen_click_outside` function.
 
 ### Fixed
 
