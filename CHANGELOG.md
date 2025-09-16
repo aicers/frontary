@@ -20,6 +20,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `Column::DomainName` variant to `WholeList`.
 - Added `ItemKind` enum to distinguish selected items, allowing previously registered
   only actions to also apply to custom selected items.
+- Added `listen_click_outside` API to enable click-outside detection for custom
+  areas, allowing users to close UI components when clicking outside of them.
 
 ### Changed
 
@@ -38,6 +40,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Switched the modal to incremental loading and optimized the CSS (`modal-messages`,
   `modal-message-item`) to resolve slowdowns and layout issues when displaying
   long content.
+- Rewrote JavaScript-based `custom-select.js` functionality in Rust using WASM
+  bindings for better consistency and maintainability. The click-outside
+  detection feature is now available as a fully developed Rust API through the
+  `listen_click_outside` function.
 
 ### Fixed
 
