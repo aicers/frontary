@@ -129,7 +129,7 @@ impl Component for Model {
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Message::Click | Message::Close => {
-                toggle_visibility_complex(&ctx.props().id);
+                let _ = toggle_visibility_complex(&ctx.props().id);
             }
             Message::ToggleList => {
                 self.view_list = !self.view_list;
