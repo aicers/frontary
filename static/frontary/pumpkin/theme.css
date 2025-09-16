@@ -1728,15 +1728,6 @@ div.input-reenter-password-title {
     margin-bottom: 4px;
 }
 
-div.input-comparison-empty {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--Text-Primary);
-}
 
 div.input-comparison-value-indicator-padded {
     padding: 0 8px;
