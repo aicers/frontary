@@ -32,6 +32,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
   `InputEscape` follows `InputAdd` in the `WholeList` component.
+- Fixed mini select component styling for `pumpkin` feature to use CSS tokens
+  instead of hardcoded inline colors, enabling proper dark/light mode integration.
 - Fixed host network duplicate check logic where `binary_search` would fail to
   detect duplicates after using `push()` instead of `insert()`, which broke the
   sorted order requirement for proper duplicate detection.

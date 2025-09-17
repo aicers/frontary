@@ -35,11 +35,11 @@ pub enum Message {
 }
 
 #[cfg(feature = "pumpkin")]
-const DEFAULT_BG_COLOR: &str = "rgba(97, 105, 116, 0.24);";
+const DEFAULT_BG_COLOR: &str = "";
 #[cfg(not(feature = "pumpkin"))]
 const DEFAULT_BG_COLOR: &str = "#EAEAEA";
 #[cfg(feature = "pumpkin")]
-const DEFAULT_VALUE_TEXT_COLOR: &str = "#FFFFFF";
+const DEFAULT_VALUE_TEXT_COLOR: &str = "";
 #[cfg(not(feature = "pumpkin"))]
 const DEFAULT_VALUE_TEXT_COLOR: &str = "#363636";
 const DEFAULT_LIST_TEXT_COLOR: &str = "#363636";
@@ -238,11 +238,15 @@ where
             ctx.props().list_top
         };
         let style = format!(
-            "{}: 0px; top: {}px; {}; color: {};",
+            "{}: 0px; top: {}px; {};{}",
             align,
             list_top,
             &style_width,
-            ctx.props().list_text_color,
+            if ctx.props().list_text_color.is_empty() {
+                String::new()
+            } else {
+                format!(" color: {};", ctx.props().list_text_color)
+            }
         );
         let class = if ctx.props().kind == Kind::MoreActionNoImage {
             "mini-select-list-down-visible"
@@ -379,18 +383,26 @@ where
             .map_or_else(String::new, |h| format!("height: {h}px;"));
         let style = if ctx.props().kind == Kind::Round {
             format!(
-                "{} {} background-color: {}; color: {};",
+                "{} {};{}{}",
                 style_width,
                 style_height,
-                &ctx.props().top_bg_color,
-                &ctx.props().value_text_color,
+                if ctx.props().top_bg_color.is_empty() {
+                    String::new()
+                } else {
+                    format!(" background-color: {};", ctx.props().top_bg_color)
+                },
+                if ctx.props().value_text_color.is_empty() {
+                    String::new()
+                } else {
+                    format!(" color: {};", ctx.props().value_text_color)
+                }
             )
         } else {
             // `Kind::Soft` only
             if cfg!(feature = "pumpkin") {
-                format!("{style_width} {style_height} background-color: rgba(97, 105, 116, 0.24);",)
+                format!("{style_width} {style_height}")
             } else {
-                format!("{style_width} {style_height} background-color: #FFFFFF;",)
+                format!("{style_width} {style_height} background-color: #FFFFFF;")
             }
         };
         let (outer_sub_class, icon_sub_class) = if ctx.props().kind == Kind::Round {
@@ -479,9 +491,13 @@ where
             .top_width
             .map_or_else(String::new, |w| format!("width: {w}px;"));
         let style = format!(
-            "{} background-color: {};",
+            "{}{}",
             style_width,
-            &ctx.props().top_bg_color
+            if ctx.props().top_bg_color.is_empty() {
+                String::new()
+            } else {
+                format!(" background-color: {};", ctx.props().top_bg_color)
+            }
         );
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
