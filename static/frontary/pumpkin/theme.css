@@ -280,7 +280,7 @@ td.searchable-select-list-item-single-selected {
     width: 100%;
     height: 48px;
     font-size: 16px;
-    color: var(--Dark-20);
+    color: var(--Text-Primary);
     font-weight: 400;
     line-height: 24px;
     background: var(--Dark-60);
@@ -292,7 +292,7 @@ td.searchable-select-list-item-single {
     padding: 8px 12px;
     height: 48px;
     font-size: 16px;
-    color: var(--Dark-20);
+    color: var(--Text-Primary);
     font-weight: 400;
     line-height: 24px;
     height: 48px;
@@ -1470,7 +1470,7 @@ th.list-whole-group-heading {
     background-color: rgba(95, 104, 118, 0.24);
     font-weight: normal;
     font-size: 11px;
-    color: var(--Dark-10);
+    color: var(--Text-Primary);
     font-weight: 400;
 }
 
