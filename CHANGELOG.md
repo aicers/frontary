@@ -46,6 +46,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   group layouts more flexibly.
 - Fixed on/off icon paths to work with theme-based asset directories.
 - Fixed overflow in `searchable-select-list-down` CSS to remove horizontal scrollbar.
+- Fixed mini select styling for `pumpkin` feature by moving some inline colors
+  to CSS, enabling proper dark/light mode integration.
 
 ### Removed
 

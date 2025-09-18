@@ -904,6 +904,7 @@ div.mini-select-basic-basic {
 div.mini-select-basic-square {
     border-radius: 8px;
     padding: 8px 12px;
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.mini-select-basic-value {
@@ -941,6 +942,7 @@ div.mini-select-item-direction {
     padding: 4px 12px;
     border-radius: 8px;
     white-space: nowrap;
+    background-color: var(--Transparent-Mid-Grey);
 }
 
 div.mini-select-item-direction:hover {
