@@ -176,6 +176,12 @@ impl DerefMut for DomainNameItem {
 }
 
 impl DomainNameItem {
+    /// Creates a domain item and normalizes it to lowercase at input time.
+    ///
+    /// Rationale:
+    /// - Domain names are case-insensitive (RFC 4343 §2, RFC 3986 §3.2.2).
+    ///   Lowercasing here ensures consistent storage and comparison semantics.
+    /// - Validation is separate; see `is_valid_domain_name()`.
     #[must_use]
     pub fn new(domain: &str) -> Self {
         Self {
@@ -183,6 +189,11 @@ impl DomainNameItem {
         }
     }
 
+    /// Updates the domain and normalizes it to lowercase at input time.
+    ///
+    /// See also:
+    /// - Case-insensitivity rationale in `new()`
+    /// - `is_valid_domain_name()` for validation rules
     pub fn set(&mut self, domain: &str) {
         self.domain = domain.to_lowercase();
     }
