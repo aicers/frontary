@@ -17,6 +17,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added custom validation for `TextConfig`.
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
+- Added `NetworkKind` enum to distinguish registered and custom items, allowing
+  previously registered-only actions to also apply to custom items.
 
 ### Changed
 
@@ -27,6 +29,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   independently without requiring uniqueness checks against other list items,
   the `data` prop can now be set to `None`. Existing code must wrap the `data`
   prop with `Some()`.
+- Changed functions and icons related with Network/IP filter to latest design.
 
 ### Fixed
 
