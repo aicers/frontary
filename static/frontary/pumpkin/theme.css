@@ -412,7 +412,6 @@ td.complex-select-pop-head-text {
     height: 70px;
     padding-left: 24px;
     padding-right: 20px;
-    background-color: var(--Dark-80);
     vertical-align: middle;
     font-size: 16px;
     color: var(--Text-Primary);
@@ -427,7 +426,6 @@ td.complex-select-pop-head-close {
     width: 34px;
     padding-top: 10px;
     padding-right: 10px;
-    background-color: var(--Dark-80);
     vertical-align: top;
     font-size: 16px;
 }
@@ -733,7 +731,6 @@ table.mini-select-list-down-table {
     width: 100%;
     vertical-align: middle;
     white-space: nowrap;
-    background-color: var(--Dark-70);
     border-radius: 8px;
 }
 
@@ -1292,7 +1289,6 @@ div.list-whole-list-second-add {
 div.list-whole-list-second-add:hover {
     border: 2px solid var(--Blue-40);
     border-radius: 8px;
-    color: var(--Blue-40);
     font-weight: 500;
     font-size: 16px;
     padding: 8px 24px;
@@ -1806,7 +1802,6 @@ input[type=number].input-number-alert {
     height: 40px;
     width: 100%;
     padding: 8px 12px;
-    color: var(--Dark-20);
     outline: none;
     font-size: 16px;
     font-weight: 400;
@@ -2207,7 +2202,6 @@ div.tag-group-input-select {
 
 div.tag-group-input-select-item-outer-edit {
     width: 100%;
-    background-color: var(--Dark-70);
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 11px;
@@ -2218,17 +2212,13 @@ div.tag-group-input-select-item-outer-edit {
 div.tag-group-input-select-item-outer {
     width: 100%;
     height: auto;
-    background-color: var(--Dark-70);
     padding: 4px 12px;
-    border-radius: 8px;
 }
 
 div.tag-group-input-select-item-outer-cursor {
     width: 100%;
-    background-color: var(--Dark-70);
     padding: 4px 12px;
     height: auto;
-    border-radius: 8px;
 }
 
 div.tag-group-input-select-item-outer:hover {
@@ -2963,7 +2953,6 @@ div.modal-outer::before {
     left: 0;
     right: 0;
     bottom: 0;
-    opacity: 0.09;
     background-color: var(--Modal-Background);
     z-index: -1;
 }
