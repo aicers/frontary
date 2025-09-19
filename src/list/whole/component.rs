@@ -867,6 +867,12 @@ where
                                     ViewInputStatus::Edit => (Message::Edit, ctx.props().input_edit_title),
                                     ViewInputStatus::None => unreachable!(),
                                 };
+                                // Do not pass a selected `input_id` when adding; otherwise inputs treat it as edit.
+                                let input_id_prop: Option<AttrValue> = match self.view_input_status {
+                                    ViewInputStatus::Add => None,
+                                    ViewInputStatus::Edit => input_id.clone().map(Into::into),
+                                    ViewInputStatus::None => unreachable!(),
+                                };
                                 let messages = if ctx.props().data_type == Some(DataType::Network) {
                                     let mut messages: HashMap<MessageType, Message> = HashMap::new();
                                     messages.insert(MessageType::AddTag, Message::ExtraMessage(MessageType::AddTag));
@@ -886,7 +892,7 @@ where
                                         width={ctx.props().input_width}
                                         height={ctx.props().input_height}
                                         input_conf={ctx.props().input_conf.clone()}
-                                        input_id={input_id}
+                                        input_id={input_id_prop}
                                         input_data={ctx.props().input_data.clone()}
                                         input_data_tag={tag}
                                         action_message={msg}
@@ -921,6 +927,11 @@ where
                                 ),
                                 ViewInputStatus::None => unreachable!(),
                             };
+                            let input_id_prop: Option<AttrValue> = match self.view_input_status {
+                                ViewInputStatus::Add => None,
+                                ViewInputStatus::Edit => input_id.clone().map(Into::into),
+                                ViewInputStatus::None => unreachable!(),
+                            };
                             if let Some(data) = ctx.props().input_second_data.as_ref() {
                                 let tag = ctx.props().input_data_tag.clone();
                                 html! {
@@ -932,7 +943,7 @@ where
                                         width={ctx.props().input_width}
                                         height={ctx.props().input_height}
                                         input_conf={ctx.props().input_conf.clone()}
-                                        input_id={input_id}
+                                        input_id={input_id_prop}
                                         input_second_id={second_id}
 
                                         input_data={data.clone()}
