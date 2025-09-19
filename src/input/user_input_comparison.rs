@@ -161,16 +161,7 @@ where
         let (Some(value_kind), Some(cmp_kind)) =
             (self.comparison_kind(data_id), self.comparison_cmp(data_id))
         else {
-            return html! {
-                if cfg!(feature = "pumpkin") {
-                    <div class="input-comparison-empty">
-                    </div>
-                }
-                else {
-                    <div class="input-comparison-value">
-                    </div>
-                }
-            };
+            return html! {};
         };
 
         let last_elem_style = if cmp_statement_tail(cmp_kind).is_empty() {
