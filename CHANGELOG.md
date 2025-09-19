@@ -50,6 +50,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed overflow in `searchable-select-list-down` CSS to remove horizontal scrollbar.
 - Fixed mini select styling for `pumpkin` feature by moving some inline colors
   to CSS, enabling proper dark/light mode integration.
+- Fixed an issue where `Add` mode was incorrectly detected as `Edit` mode if
+  `input_id` remained set after `Edit`/`Delete` actions.
 
 ### Removed
 
