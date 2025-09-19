@@ -176,13 +176,26 @@ impl DerefMut for DomainNameItem {
 }
 
 impl DomainNameItem {
+    /// Creates a domain item and normalizes it to lowercase at input time.
+    ///
+    /// Rationale:
+    /// - Domain names are case-insensitive (RFC 4343 §2, RFC 3986 §3.2.2).
+    ///   Lowercasing here ensures consistent storage and comparison semantics.
+    /// - Validation is separate; see `is_valid_domain_name`.
     #[must_use]
-    pub fn new(domain: String) -> Self {
-        Self { domain }
+    pub fn new(domain: &str) -> Self {
+        Self {
+            domain: domain.to_lowercase(),
+        }
     }
 
+    /// Updates the domain and normalizes it to lowercase at input time.
+    ///
+    /// See also:
+    /// - Case-insensitivity rationale in `DomainNameItem::new`
+    /// - `is_valid_domain_name` for validation rules
     pub fn set(&mut self, domain: &str) {
-        self.domain = domain.to_string();
+        self.domain = domain.to_lowercase();
     }
 
     #[must_use]
@@ -229,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_domain_name_item() {
-        let mut item = DomainNameItem::new("example.com".to_string());
+        let mut item = DomainNameItem::new("example.com");
         assert!(item.is_valid());
         assert_eq!(item.as_str(), "example.com");
 
@@ -238,6 +251,35 @@ mod tests {
 
         item.set("valid-domain.org");
         assert!(item.is_valid());
+    }
+
+    #[test]
+    fn test_domain_name_item_case_insensitive() {
+        // Test new() with uppercase
+        let item = DomainNameItem::new("EXAMPLE.COM");
+        assert_eq!(item.as_str(), "example.com");
+        assert!(item.is_valid());
+
+        // Test new() with mixed case
+        let item = DomainNameItem::new("ExAmPlE.CoM");
+        assert_eq!(item.as_str(), "example.com");
+        assert!(item.is_valid());
+
+        // Test set() with uppercase
+        let mut item = DomainNameItem::new("example.com");
+        item.set("TEST-DOMAIN.ORG");
+        assert_eq!(item.as_str(), "test-domain.org");
+        assert!(item.is_valid());
+
+        // Test set() with mixed case
+        item.set("MiXeD-CaSe.ExAmPlE.nEt");
+        assert_eq!(item.as_str(), "mixed-case.example.net");
+        assert!(item.is_valid());
+
+        // Test that validation still works with lowercased domains
+        item.set("INVALID..DOMAIN");
+        assert!(!item.is_valid());
+        assert_eq!(item.as_str(), "invalid..domain");
     }
 }
 
