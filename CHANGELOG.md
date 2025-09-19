@@ -17,6 +17,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added custom validation for `TextConfig`.
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
+- Added `listen_click_outside` API to enable click-outside detection for custom
+  areas, allowing users to close UI components when clicking outside of them.
 
 ### Changed
 
@@ -29,6 +31,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   prop with `Some()`.
 - `DomainNameItem` now enforces case-insensitive domain names by automatically
   converting input to lowercase in both `new` and `set` methods.
+- Rewrote JavaScript-based `custom-select.js` functionality in Rust using WASM
+  bindings for better consistency and maintainability. The click-outside
+  detection feature is now available as a fully developed Rust API through the
+  `listen_click_outside` function.
 
 ### Fixed
 
