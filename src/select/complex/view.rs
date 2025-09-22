@@ -9,29 +9,18 @@ use yew::{Context, Html, events::InputEvent, html};
 use super::{MIN_POP_HEIGHT, Message, Model};
 use crate::{
     CheckStatus, Checkbox, EndpointKind, NBSP, NetworkItem, SelectComplexKind, SelectMini,
-    SelectMiniKind, SelectionExtraInfo, Theme, ViewString, text, window_inner_height,
+    SelectMiniKind, SelectionExtraInfo, Theme, ViewString, select::complex::ItemKind, text,
+    window_inner_height,
 };
 
 impl Model {
     #[allow(clippy::too_many_lines)]
     pub(super) fn view_pop(&self, ctx: &Context<Self>) -> Html {
         let txt = ctx.props().txt.txt.clone();
+        let (predefined_selected_opt, custom_selected_count) = ctx.props().selected.len();
+        let predefined_selected_count = predefined_selected_opt.unwrap_or_default();
         let postfix = if cfg!(feature = "pumpkin") {
-            let list_unselected = if let Ok(predef) = ctx.props().selected.predefined.try_borrow() {
-                match predef.as_ref() {
-                    Some(map) => {
-                        map.is_empty()
-                            || map
-                                .values()
-                                .all(|rc| rc.try_borrow().ok().and_then(|v| *v).is_none())
-                    }
-                    None => false,
-                }
-            } else {
-                false
-            };
-            let custom_len = ctx.props().selected.custom.borrow().len();
-            if list_unselected && custom_len == 0 {
+            if predefined_selected_count == 0 && custom_selected_count == 0 {
                 "unchecked"
             } else {
                 "checked"
@@ -155,6 +144,7 @@ impl Model {
                                         <div class="complex-select-pop-list-head" onclick={onclick_list}>
                                             <div class="complex-select-pop-head-1st">
                                                 { text!(txt, ctx.props().language, "Saved Network/IPs") }
+                                                { format!(" ({})", predefined_selected_count) }
                                             </div>
                                             <div class="complex-select-pop-head-2nd">
                                                 <div class="complex-select-pop-head-2nd-text">
@@ -182,6 +172,7 @@ impl Model {
                                             <div class={class_input_head} onclick={onclick_input}>
                                                 <div class="complex-select-pop-head-1st">
                                                     { text!(txt, ctx.props().language, "Custom Network/IPs") }
+                                                    { format!(" ({})", custom_selected_count) }
                                                 </div>
                                                 <div class="complex-select-pop-head-2nd">
                                                     <div class="complex-select-pop-head-2nd-text">
@@ -400,7 +391,9 @@ impl Model {
                             {
                                 match ctx.props().kind {
                                     SelectComplexKind::NetworkIp => {
-                                        let onclick_all = ctx.link().callback(move |_| Message::ClickAllBelow);
+                                        let onclick_all = ctx
+                                            .link()
+                                            .callback(|_| Message::ClickAllBelow(ItemKind::Registered));
                                         html! {
                                             <>
                                                 <div class="complex-select-pop-list-select-all-group">
@@ -412,7 +405,7 @@ impl Model {
                                                             { text!(txt, ctx.props().language, "Select below") }
                                                         </div>
                                                     </div>
-                                                    { self.view_direction(ctx) }
+                                                    { self.view_direction(ctx, ItemKind::Registered) }
                                                 </div>
                                                 <div class="complex-select-pop-list-divider">
                                                 </div>
@@ -433,7 +426,9 @@ impl Model {
                                 {
                                     match ctx.props().kind {
                                         SelectComplexKind::NetworkIp => {
-                                            let onclick_all = ctx.link().callback(move |_| Message::ClickAllBelow);
+                                            let onclick_all = ctx
+                                                .link()
+                                                .callback(|_| Message::ClickAllBelow(ItemKind::Registered));
                                             html! {
                                                 <div class="complex-select-pop-list-list-all">
                                                     <table class="complex-select-pop-list-list-all">
@@ -448,7 +443,7 @@ impl Model {
                                                                 { text!(txt, ctx.props().language, "Select All") }
                                                             </td>
                                                             <td>
-                                                                { self.view_direction(ctx) }
+                                                                { self.view_direction(ctx, ItemKind::Registered) }
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -495,7 +490,33 @@ impl Model {
         }
     }
 
-    fn view_direction(&self, ctx: &Context<Self>) -> Html {
+    fn view_direction(&self, ctx: &Context<Self>, origin: ItemKind) -> Html {
+        let (parent_message, id, active) = match origin {
+            ItemKind::Registered => {
+                let check_status = if self.search_result.is_some() {
+                    self.check_status(ctx, true)
+                } else {
+                    self.check_status(ctx, false)
+                };
+                let active = matches!(
+                    check_status,
+                    CheckStatus::Checked | CheckStatus::Indeterminate
+                );
+                (Message::SetDirection, "assign-direction", active)
+            }
+            ItemKind::Custom => {
+                let check_status = Self::check_custom_status(ctx);
+                let active = matches!(
+                    check_status,
+                    CheckStatus::Checked | CheckStatus::Indeterminate
+                );
+                (
+                    Message::SetDirectionItem(ItemKind::Custom),
+                    "assign-direction-custom",
+                    active,
+                )
+            }
+        };
         let direction_list = Rc::new(vec![
             ViewString::Key("Set the selected to both".to_string()),
             ViewString::Key("Set the selected to sources".to_string()),
@@ -506,24 +527,15 @@ impl Model {
             EndpointKind::Source,
             EndpointKind::Destination,
         ]);
-        let check_status = if self.search_result.is_some() {
-            self.check_status(ctx, true)
-        } else {
-            self.check_status(ctx, false)
-        };
-        let active = match check_status {
-            CheckStatus::Checked | CheckStatus::Indeterminate => true,
-            CheckStatus::Unchecked => false,
-        };
         let theme = ctx.props().theme;
         html! {
             <SelectMini::<EndpointKind, Self>
                 txt={ctx.props().txt.clone()}
                 language={ctx.props().language}
-                parent_message={Message::SetDirection}
+                parent_message={parent_message}
                 active={active}
                 deactive_class_suffix={Some("-deactive".to_string())}
-                id="assign-direction"
+                id={id.to_string()}
                 list={direction_list}
                 candidate_values={value_candidates}
                 selected_value={self.direction.clone()}
@@ -562,7 +574,7 @@ impl Model {
         };
         let onclick_item = |key: String| {
             ctx.link()
-                .callback(move |_| Message::ClickItem(key.clone()))
+                .callback(move |_| Message::ClickItem(key.clone(), ItemKind::Registered))
         };
         let style_item_width = match (ctx.props().kind, cfg!(feature = "pumpkin")) {
             (SelectComplexKind::NetworkIp, true) => "",
@@ -703,22 +715,22 @@ impl Model {
             let theme = ctx.props().theme;
             if let Some(selected) = self.direction_items.get(id) {
                 html! {
-                    <SelectMini::<SelectionExtraInfo, Self>
-                        txt={ctx.props().txt.clone()}
-                        language={ctx.props().language}
-                        parent_message={Message::SetDirectionItem}
-                        id={format!("assign-item-direction-{}", id.clone())}
-                        list={Rc::clone(&src_dst_list)}
-                        candidate_values={Rc::clone(&value_candidates)}
-                        selected_value={Rc::clone(selected)}
-                        selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
-                        align_left={false}
-                        list_top={28}
-                        {top_width}
-                        list_min_width={Some(70)}
-                        kind={SelectMiniKind::DirectionItem}
-                        {theme}
-                    />
+                <SelectMini::<SelectionExtraInfo, Self>
+                    txt={ctx.props().txt.clone()}
+                    language={ctx.props().language}
+                    parent_message={Message::SetDirectionItem(ItemKind::Registered)}
+                    id={format!("assign-item-direction-{}", id.clone())}
+                    list={Rc::clone(&src_dst_list)}
+                    candidate_values={Rc::clone(&value_candidates)}
+                    selected_value={Rc::clone(selected)}
+                    selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
+                    align_left={false}
+                    list_top={28}
+                    {top_width}
+                    list_min_width={Some(70)}
+                    kind={SelectMiniKind::DirectionItem}
+                    {theme}
+                />
                 }
             } else {
                 html! {}
@@ -759,6 +771,34 @@ impl Model {
 
             html! {
                 <>
+                    {
+                        if custom_is_empty {
+                            html! {}
+                        } else {
+                            let check_status = Self::check_custom_status(ctx);
+                            let onclick_all_custom = ctx
+                                .link()
+                                .callback(|_| Message::ClickAllBelow(ItemKind::Custom));
+                            let theme = ctx.props().theme;
+                            html! {
+                                <>
+                                    <div class="complex-select-pop-list-select-all-group">
+                                        <div class="complex-select-pop-list-select-all-checkbox">
+                                            <div onclick={onclick_all_custom}>
+                                                <Checkbox status={check_status} {theme} />
+                                            </div>
+                                            <div class="complex-select-pop-list-select-all-text">
+                                                { text!(txt, ctx.props().language, "Select below") }
+                                            </div>
+                                        </div>
+                                        { self.view_direction(ctx, ItemKind::Custom) }
+                                    </div>
+                                    <div class="complex-select-pop-list-divider"></div>
+                                </>
+                            }
+                        }
+                    }
+
                     if custom_is_empty {
                         <div class="complex-select-pop-input-empty">
                             { text!(txt, ctx.props().language, "No custom network/IPs added.") }
@@ -824,7 +864,7 @@ impl Model {
                                     match ctx.props().kind {
                                         SelectComplexKind::NetworkIp => {
                                             let style_ip = if cfg!(feature = "pumpkin") {
-                                                "float: left; width: 100%".to_string()
+                                                String::new()
                                             } else {
                                                 format!("float: left; width: {}px;", ctx.props().pop_width - 150)
                                             };
@@ -846,33 +886,67 @@ impl Model {
                                             };
                                             let theme = ctx.props().theme;
                                             if cfg!(feature = "pumpkin") {
+                                                let theme = ctx.props().theme;
+                                                let checked = if let Ok(v) = value.try_borrow() {
+                                                    match *v {
+                                                        Some(SelectionExtraInfo::Network(EndpointKind::Both)) => CheckStatus::Checked,
+                                                        Some(
+                                                            SelectionExtraInfo::Network(_)
+                                                                | SelectionExtraInfo::Basic,
+                                                        ) => CheckStatus::Indeterminate,
+                                                        None => CheckStatus::Unchecked,
+                                                    }
+                                                } else { CheckStatus::Unchecked };
+                                                let onclick_custom = |k: String| {
+                                                    ctx.link().callback(move |_| {
+                                                        Message::ClickItem(
+                                                            k.clone(),
+                                                            ItemKind::Custom,
+                                                        )
+                                                    })
+                                                };
                                                 html! {
                                                     <div class="complex-select-pop-input-list-items">
-                                                        <div class="complex-select-pop-input-list-networks">
-                                                            <div style={style_ip} class="complex-select-pop-input-list-text">
+                                                        <div class="complex-select-pop-input-list-component">
+                                                            <div class="complex-select-pop-list-checkbox-icon">
+                                                                <div onclick={onclick_custom(key.clone())}>
+                                                                    <Checkbox status={checked} {theme} />
+                                                                </div>
+                                                            </div>
+                                                            <div class="complex-select-pop-input-list-text">
                                                                 { key }
                                                             </div>
                                                             <div class="complex-select-pop-input-list-delete" onclick={onclick_del(key.clone())}>
                                                             </div>
                                                         </div>
                                                         <div class="complex-select-pop-input-list-direction">
-                                                            <SelectMini::<SelectionExtraInfo, Self>
-                                                                txt={ctx.props().txt.clone()}
-                                                                language={ctx.props().language}
-                                                                parent_message={Message::Render}
-                                                                id={format!("assign-input-direction-{}", key.clone())}
-                                                                list={src_dst_list}
-                                                                candidate_values={value_candidates}
-                                                                default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
-                                                                selected_value={value.clone()}
-                                                                selected_value_cache={value.try_borrow().ok().and_then(|x| *x)}
-                                                                align_left={false}
-                                                                {list_top}
-                                                                top_width={Some(top_width)}
-                                                                list_min_width={Some(70)}
-                                                                kind={SelectMiniKind::DirectionItem}
-                                                                {top_bg_color}
-                                                            />
+                                                            {
+                                                                if let Ok(v) = value.try_borrow()
+                                                                    && v.is_some()
+                                                                {
+                                                                    html! {
+                                                                        <SelectMini::<SelectionExtraInfo, Self>
+                                                                            txt={ctx.props().txt.clone()}
+                                                                            language={ctx.props().language}
+                                                                            parent_message={Message::Render}
+                                                                            id={format!("assign-input-direction-{}", key.clone())}
+                                                                        list={src_dst_list}
+                                                                        candidate_values={value_candidates}
+                                                                        default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
+                                                                        selected_value={value.clone()}
+                                                                        selected_value_cache={value.try_borrow().ok().and_then(|x| *x)}
+                                                                        align_left={false}
+                                                                        {list_top}
+                                                                        top_width={Some(top_width)}
+                                                                        list_min_width={Some(70)}
+                                                                        kind={SelectMiniKind::DirectionItem}
+                                                                        {top_bg_color}
+                                                                    />
+                                                                }
+                                                            } else {
+                                                                html! {}
+                                                            }
+                                                        }
                                                         </div>
                                                     </div>
                                                 }

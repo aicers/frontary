@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
 - Added `Column::DomainName` variant to `WholeList`.
+- Added `ItemKind` enum to distinguish selected items, allowing previously registered
+  only actions to also apply to custom selected items.
 
 ### Changed
 

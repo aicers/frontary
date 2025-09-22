@@ -1,7 +1,7 @@
 mod component;
 mod view;
 
-pub use component::{Kind, Message, Model};
+pub use component::{ItemKind, Kind, Message, Model};
 
 #[cfg(feature = "pumpkin")]
 pub(super) const DEFAULT_POP_WIDTH: u32 = 450;

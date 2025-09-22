@@ -811,24 +811,26 @@ div.complex-select-pop-input-list {
 
 div.complex-select-pop-input-list-items {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     align-self: stretch;
 }
 
-div.complex-select-pop-input-list-networks {
+div.complex-select-pop-input-list-component {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 4px;
-    flex: 1;
-    background-color: var(--Transparent-Mid-Grey);
-    border-radius: 8px;
-    color: var(--Text-Primary);
-    padding: 8px 12px;
+    flex: 1 0 0;
 }
+
 
 div.complex-select-pop-input-list-text {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1 0 0;
+    color: var(--Text-Primary);
     font-size: 16px;
     line-height: 24px;
 }
@@ -841,10 +843,18 @@ div.complex-select-pop-input-list-delete {
     align-items: center;
     background-image: url('/frontary/pumpkin/delete-x.svg');
     background-repeat: no-repeat;
+    flex-direction: column;
+    flex-shrink: 0;
 }
 
 html.light div.complex-select-pop-input-list-delete {
     background-image: url('/frontary/pumpkin/light/delete-x.svg');
+}
+
+div.complex-select-pop-input-list-direction {
+    display: flex;
+    align-items: center;
+    min-width: 94px;
 }
 
 div.mini-select {

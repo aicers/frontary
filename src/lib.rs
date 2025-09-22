@@ -489,10 +489,18 @@ impl ComplexSelection {
         if let (Ok(predefined), Ok(custom)) =
             (self.predefined.try_borrow(), self.custom.try_borrow())
         {
-            predefined.as_ref().map_or_else(
-                || (None, custom.len()),
-                |predefined| (Some(predefined.len()), custom.len()),
-            )
+            let is_selected = |value: &RefSelectionExtraInfo| {
+                value
+                    .try_borrow()
+                    .map(|selection| selection.is_some())
+                    .unwrap_or(false)
+            };
+            let custom_selected = custom.values().filter(|value| is_selected(value)).count();
+            let predefined_selected = (*predefined)
+                .as_ref()
+                .map(|map| map.values().filter(|value| is_selected(value)).count());
+
+            (predefined_selected, custom_selected)
         } else {
             (Some(usize::MAX), usize::MAX)
         }
