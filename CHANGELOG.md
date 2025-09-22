@@ -29,6 +29,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   prop with `Some()`.
 - `DomainNameItem` now enforces case-insensitive domain names by automatically
   converting input to lowercase in both `new` and `set` methods.
+- Changed functions and icons related with Network/IP filter to latest Figma design.
 
 ### Fixed
 
