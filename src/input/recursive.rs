@@ -557,9 +557,9 @@ where
                 | InputConfig::HostNetworkGroup(_)
                 | InputConfig::SelectSingle(_)
                 | InputConfig::SelectMultiple(_)
-                | InputConfig::Unsigned32(_)
                 | InputConfig::Unsigned8(_)
                 | InputConfig::Unsigned16(_)
+                | InputConfig::Unsigned32(_)
                 | InputConfig::Float64(_)
                 | InputConfig::Percentage(_)
                 | InputConfig::Comparison(_)
@@ -600,9 +600,9 @@ where
                                 | InputItem::HostNetworkGroup(_)
                                 | InputItem::SelectSingle(_)
                                 | InputItem::SelectMultiple(_)
-                                | InputItem::Unsigned32(_)
                                 | InputItem::Unsigned8(_)
                                 | InputItem::Unsigned16(_)
+                                | InputItem::Unsigned32(_)
                                 | InputItem::Float64(_)
                                 | InputItem::Percentage(_) => Some(Some(col.is_empty())),
                                 InputItem::Comparison(v) => {
