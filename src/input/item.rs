@@ -281,6 +281,27 @@ mod tests {
         assert!(!item.is_valid());
         assert_eq!(item.as_str(), "invalid..domain");
     }
+
+    #[test]
+    fn test_input_item_from_domain_column() {
+        use crate::ViewString;
+        use crate::list::{Column, DomainNameColumn};
+
+        let domain_col = DomainNameColumn {
+            domain: ViewString::Raw("Example.COM".to_string()),
+            display: None,
+        };
+        let column = Column::DomainName(domain_col);
+        let input_item = InputItem::from(&column);
+
+        match input_item {
+            InputItem::DomainName(domain_item) => {
+                assert_eq!(domain_item.as_str(), "example.com"); // Should be lowercased
+                assert!(domain_item.is_valid());
+            }
+            _ => panic!("Expected InputItem::DomainName"),
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Default)]
@@ -1127,6 +1148,9 @@ impl From<&Column> for InputItem {
     fn from(col: &Column) -> Self {
         match col {
             Column::Text(txt) => Self::Text(TextItem::new(txt.text.to_string())),
+            Column::DomainName(domain) => {
+                Self::DomainName(DomainNameItem::new(&domain.domain.to_string()))
+            }
             Column::HostNetworkGroup(items) => {
                 let mut input = InputHostNetworkGroup::default();
                 for item in &items.host_network_group {
@@ -1191,6 +1215,7 @@ impl From<&Column> for InputItem {
                     for c in g {
                         match c {
                             Column::Text(..)
+                            | Column::DomainName(..)
                             | Column::HostNetworkGroup(..)
                             | Column::SelectSingle(..)
                             | Column::SelectMultiple(..)

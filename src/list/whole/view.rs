@@ -404,10 +404,10 @@ where
                                     if let Some(pages_info) = self.pages_info_second.get(key) {
                                         let data = Rc::new(item.sub_items.iter().enumerate().map(|(index, item)| {
                                             // HIGHLIGHT: use the first item as the key
-                                            let key = if let Some(Column::Text(txt)) = item.first() {
-                                                txt.text.to_string()
-                                            } else {
-                                                index.to_string()
+                                            let key = match item.first() {
+                                                Some(Column::Text(txt)) => txt.text.to_string(),
+                                                Some(Column::DomainName(domain)) => domain.domain.to_string(),
+                                                _ => index.to_string(),
                                             };
                                             (
                                                 key,
@@ -699,6 +699,22 @@ where
                     }
                 }
             }
+            Column::DomainName(elem) => {
+                if let Some(display) = &elem.display {
+                    let v_node = Html::from_html_unchecked(
+                        AttrValue::from_str(display).expect("AttrValue never returns Err."),
+                    );
+                    html! {
+                        <div>
+                            { v_node }
+                        </div>
+                    }
+                } else {
+                    html! {
+                        elem.domain.to_string_txt(&txt, ctx.props().language)
+                    }
+                }
+            }
             Column::HostNetworkGroup(elem) => {
                 html! {
                     for elem.host_network_group.iter().map(|elem| html! {
@@ -819,6 +835,7 @@ where
                                         for g.iter().map(|c|
                                             match c {
                                                 Column::Text(..)
+                                                | Column::DomainName(..)
                                                 | Column::HostNetworkGroup(..)
                                                 | Column::SelectSingle(..)
                                                 | Column::SelectMultiple(..)

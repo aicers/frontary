@@ -32,6 +32,12 @@ pub struct TextColumn {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct DomainNameColumn {
+    pub domain: ViewString,
+    pub display: Option<String>,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct HostNetworkGroupColumn {
     pub host_network_group: Vec<String>,
 }
@@ -124,6 +130,7 @@ pub struct ModalDisplay {
 #[derive(Clone, PartialEq)]
 pub enum Column {
     Text(TextColumn),
+    DomainName(DomainNameColumn),
     HostNetworkGroup(HostNetworkGroupColumn),
     SelectSingle(SelectSingleColumn),
     SelectMultiple(SelectMultipleColumn),
@@ -145,6 +152,7 @@ impl std::fmt::Display for Column {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Text(d) => write!(formatter, "{}", &d.text),
+            Self::DomainName(d) => write!(formatter, "{}", &d.domain),
             Self::HostNetworkGroup(d) => write!(formatter, "{}", d.host_network_group.join(",")),
             Self::SelectSingle(d) => {
                 if let Some((_, value)) = d.selected.as_ref() {
@@ -253,4 +261,32 @@ pub struct DisplayInfo {
     pub width_full: u32,        // sum of column widths
     pub height: u32,
     pub titles: Vec<&'static str>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_domain_name_column_display() {
+        let domain_col = DomainNameColumn {
+            domain: ViewString::Raw("example.com".to_string()),
+            display: None,
+        };
+        let column = Column::DomainName(domain_col);
+
+        assert_eq!(column.to_string(), "example.com");
+    }
+
+    #[test]
+    fn test_domain_name_column_with_display() {
+        let domain_col = DomainNameColumn {
+            domain: ViewString::Raw("example.com".to_string()),
+            display: Some("<b>example.com</b>".to_string()),
+        };
+        let column = Column::DomainName(domain_col);
+
+        // Display should be ignored in string representation, only domain is used
+        assert_eq!(column.to_string(), "example.com");
+    }
 }
