@@ -35,6 +35,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Changed `width` field type in `Unsigned8Config` from `Option<u8>` to
   `Option<u32>` to unify width types across input configurations.
 - Changed functions and icons related with Network/IP filter to latest Figma design.
+- Switched the modal to incremental loading and optimized the CSS (`modal-messages`,
+  `modal-message-item`) to resolve slowdowns and layout issues when displaying
+  long content.
 
 ### Fixed
 

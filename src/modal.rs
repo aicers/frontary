@@ -6,7 +6,9 @@
 use std::{marker::PhantomData, rc::Rc, str::FromStr};
 
 use json_gettext::get_text;
-use yew::{AttrValue, Component, Context, Html, Properties, classes, html};
+use wasm_bindgen::JsCast;
+use web_sys::{Event, HtmlElement};
+use yew::{AttrValue, Callback, Component, Context, Html, Properties, classes, html};
 
 use crate::{Texts, Theme, define_u32_consts, language::Language, text};
 
@@ -14,6 +16,13 @@ const MAX_HEIGHT: u32 = 700;
 const DEFAULT_MIN_HEIGHT: u32 = 306;
 const DEFAULT_MIN_OPTION_WIDTH: u32 = 220;
 const DEFAULT_MAX_OPTION_WIDTH: u32 = 440;
+const INITIAL_BATCH_SIZE: usize = 50;
+const LOAD_BATCH_SIZE: usize = 50;
+const SCROLL_LOAD_THRESHOLD: i32 = 40;
+
+fn initial_visible_count(total: usize) -> usize {
+    total.min(INITIAL_BATCH_SIZE)
+}
 
 #[cfg(feature = "pumpkin")]
 define_u32_consts! {
@@ -61,6 +70,7 @@ pub enum TextStyle {
 pub enum Message {
     Close,
     ClickButton(usize),
+    LoadMore,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -95,6 +105,7 @@ where
 
 pub struct Model<T> {
     phantom: PhantomData<T>,
+    visible_count: usize,
 }
 
 impl<T> Component for Model<T>
@@ -105,9 +116,11 @@ where
     type Message = Message;
     type Properties = Props<T>;
 
-    fn create(_ctx: &Context<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
+        let total = ctx.props().title_messages.len();
         Self {
             phantom: PhantomData,
+            visible_count: initial_visible_count(total),
         }
     }
 
@@ -130,6 +143,19 @@ where
                     parent.clone().downcast::<T>().send_message(message.clone());
                 }
                 false
+            }
+            Message::LoadMore => {
+                let total = ctx.props().title_messages.len();
+                if self.visible_count >= total {
+                    return false;
+                }
+                let new_count = (self.visible_count + LOAD_BATCH_SIZE).min(total);
+                if new_count == self.visible_count {
+                    false
+                } else {
+                    self.visible_count = new_count;
+                    true
+                }
             }
         }
     }
@@ -220,7 +246,7 @@ where
             } else {
                 "modal-contents"
             };
-        let class = classes!(
+        let messages_class = classes!(
             "modal-messages",
             (!cfg!(feature = "pumpkin")
                 && ctx
@@ -231,6 +257,24 @@ where
                     .any(|(_, t)| { matches!(t, TextStyle::RawNormal | TextStyle::RawHtml) }))
             .then_some("modal-messages-raw")
         );
+        let total_items = ctx.props().title_messages.len();
+        let onscroll = if self.visible_count < total_items {
+            let link = ctx.link().clone();
+            Callback::from(move |event: Event| {
+                if let Some(target) = event
+                    .target()
+                    .and_then(|t| t.dyn_into::<HtmlElement>().ok())
+                {
+                    let remaining =
+                        target.scroll_height() - target.scroll_top() - target.client_height();
+                    if remaining <= SCROLL_LOAD_THRESHOLD {
+                        link.send_message(Message::LoadMore);
+                    }
+                }
+            })
+        } else {
+            Callback::default()
+        };
         html! {
             <div class="modal-outer">
                 <div class={modal_contents} style={style}>
@@ -253,37 +297,43 @@ where
                             </div>
                         }
                     }
-                    <div {class}>
+                    <div class={messages_class} onscroll={onscroll}>
                     {
-                        for ctx.props().title_messages.iter().map(|ms| {
-                            html! {
-                                <div class="modal-message-item">
-                                {
-                                    for ms.iter().map(|(m, t)| {
-                                        let v_node = Html::from_html_unchecked(
-                                            AttrValue::from_str(m).expect("AttrValue never returns Err.")
-                                        );
-                                        match t {
-                                            TextStyle::Key => html! {
-                                                { text!(txt, ctx.props().language, m) }
-                                            },
-                                            TextStyle::RawNormal => html! {
-                                                { m }
-                                            },
-                                            TextStyle::RawBold => html! {
-                                                <div class="modal-text-multi-line">
-                                                    <b> { m } </b>
-                                                </div>
-                                            },
-                                            TextStyle::RawHtml => html! {
-                                                { v_node }
+                        for ctx
+                            .props()
+                            .title_messages
+                            .iter()
+                            .enumerate()
+                            .take(self.visible_count)
+                            .map(|(index, ms)| {
+                                html! {
+                                    <div key={index} class="modal-message-item">
+                                    {
+                                        for ms.iter().map(|(m, t)| {
+                                            let v_node = Html::from_html_unchecked(
+                                                AttrValue::from_str(m).expect("AttrValue never returns Err.")
+                                            );
+                                            match t {
+                                                TextStyle::Key => html! {
+                                                    { text!(txt, ctx.props().language, m) }
+                                                },
+                                                TextStyle::RawNormal => html! {
+                                                    { m }
+                                                },
+                                                TextStyle::RawBold => html! {
+                                                    <div class="modal-text-multi-line">
+                                                        <b> { m } </b>
+                                                    </div>
+                                                },
+                                                TextStyle::RawHtml => html! {
+                                                    { v_node }
+                                                }
                                             }
-                                        }
-                                    })
+                                        })
+                                    }
+                                    </div>
                                 }
-                                </div>
-                            }
-                        })
+                            })
                     }
                     </div>
                     if cfg!(feature="pumpkin") {
