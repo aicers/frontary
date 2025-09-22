@@ -165,13 +165,13 @@ pub enum Message {
     InputDomainName(BigUint, String, Rc<RefCell<InputItem>>),
     InputPassword(BigUint, String, Rc<RefCell<InputItem>>),
     InputConfirmPassword(BigUint, String),
-    InputUnsigned32(BigUint, Option<u32>, Rc<RefCell<InputItem>>),
     InputUnsigned8(BigUint, Option<u8>, Rc<RefCell<InputItem>>),
     InputUnsigned16(BigUint, Option<u16>, Rc<RefCell<InputItem>>),
+    InputUnsigned32(BigUint, Option<u32>, Rc<RefCell<InputItem>>),
     InputFloat64(BigUint, Option<f64>, Rc<RefCell<InputItem>>),
-    InvalidInputUnsigned32,
     InvalidInputUnsigned8,
     InvalidInputUnsigned16,
+    InvalidInputUnsigned32,
     InvalidInputFloat64,
     InputPercentage(BigUint, Option<f32>, Rc<RefCell<InputItem>>),
     InvalidInputPercentage,
@@ -232,13 +232,13 @@ impl Clone for Message {
             }
             Self::InputPassword(a, b, c) => Self::InputPassword(a.clone(), b.clone(), c.clone()),
             Self::InputConfirmPassword(a, b) => Self::InputConfirmPassword(a.clone(), b.clone()),
-            Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(a.clone(), *b, c.clone()),
             Self::InputUnsigned8(a, b, c) => Self::InputUnsigned8(a.clone(), *b, c.clone()),
             Self::InputUnsigned16(a, b, c) => Self::InputUnsigned16(a.clone(), *b, c.clone()),
+            Self::InputUnsigned32(a, b, c) => Self::InputUnsigned32(a.clone(), *b, c.clone()),
             Self::InputFloat64(a, b, c) => Self::InputFloat64(a.clone(), *b, c.clone()),
-            Self::InvalidInputUnsigned32 => Self::InvalidInputUnsigned32,
             Self::InvalidInputUnsigned8 => Self::InvalidInputUnsigned8,
             Self::InvalidInputUnsigned16 => Self::InvalidInputUnsigned16,
+            Self::InvalidInputUnsigned32 => Self::InvalidInputUnsigned32,
             Self::InvalidInputFloat64 => Self::InvalidInputFloat64,
             Self::InputPercentage(a, b, c) => Self::InputPercentage(a.clone(), *b, c.clone()),
             Self::InvalidInputPercentage => Self::InvalidInputPercentage,
@@ -578,14 +578,6 @@ where
                 self.confirm_password.insert(id.clone(), txt.clone());
                 self.remove_required_msg(&id, txt.is_empty());
             }
-            Message::InputUnsigned32(id, value, input_data) => {
-                if let Ok(mut item) = input_data.try_borrow_mut() {
-                    *item = InputItem::Unsigned32(Unsigned32Item::new(value));
-                }
-                self.remove_required_msg(&id, false);
-                self.remove_group_required(ctx);
-                self.unique_msg.remove(&id);
-            }
             Message::InputUnsigned8(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Unsigned8(Unsigned8Item::new(value));
@@ -597,6 +589,14 @@ where
             Message::InputUnsigned16(id, value, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
                     *item = InputItem::Unsigned16(Unsigned16Item::new(value));
+                }
+                self.remove_required_msg(&id, false);
+                self.remove_group_required(ctx);
+                self.unique_msg.remove(&id);
+            }
+            Message::InputUnsigned32(id, value, input_data) => {
+                if let Ok(mut item) = input_data.try_borrow_mut() {
+                    *item = InputItem::Unsigned32(Unsigned32Item::new(value));
                 }
                 self.remove_required_msg(&id, false);
                 self.remove_group_required(ctx);
