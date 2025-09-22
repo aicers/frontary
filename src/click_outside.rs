@@ -3,12 +3,43 @@ use std::rc::Rc;
 
 use gloo_events::EventListener;
 use wasm_bindgen::prelude::*;
-use web_sys::{Document, Element, HtmlElement, MouseEvent};
+use web_sys::{Document, Element, HtmlElement, MouseEvent, Window};
 
 thread_local! {
     static CLICK_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
     static CLICK_COMPLEX_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
     static MOUSEDOWN_COMPLEX_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
+}
+
+/// Helper function to get window and document
+fn get_window_and_document() -> Result<(Window, Document), JsValue> {
+    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window found"))?;
+    let document = window
+        .document()
+        .ok_or_else(|| JsValue::from_str("No document found"))?;
+    Ok((window, document))
+}
+
+/// Helper function to get an HTML element by ID with proper error handling
+fn get_html_element_by_id(document: &Document, id: &str) -> Result<HtmlElement, JsValue> {
+    let element = document
+        .get_element_by_id(id)
+        .ok_or_else(|| JsValue::from_str(&format!("Element with id '{id}' not found")))?;
+
+    element
+        .dyn_into::<HtmlElement>()
+        .map_err(|_| JsValue::from_str("Element is not an HtmlElement"))
+}
+
+/// Helper function to check if an element is hidden (display: none)
+fn is_element_hidden(window: &Window, element: &HtmlElement) -> Result<bool, JsValue> {
+    let computed_style = window.get_computed_style(element)?;
+    let display = computed_style
+        .ok_or_else(|| JsValue::from_str("Could not get computed style"))?
+        .get_property_value("display")
+        .map_err(|_| JsValue::from_str("Could not get display property"))?;
+
+    Ok(display == "none")
 }
 
 /// Toggle the visibility of an element by ID.
@@ -20,25 +51,10 @@ thread_local! {
 /// * The element with the given ID cannot be found
 #[wasm_bindgen]
 pub fn toggle_visibility(id: &str) -> Result<(), JsValue> {
-    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window found"))?;
-    let document = window
-        .document()
-        .ok_or_else(|| JsValue::from_str("No document found"))?;
-    let element = document
-        .get_element_by_id(id)
-        .ok_or_else(|| JsValue::from_str(&format!("Element with id '{id}' not found")))?;
+    let (window, document) = get_window_and_document()?;
+    let element = get_html_element_by_id(&document, id)?;
 
-    let element = element
-        .dyn_into::<HtmlElement>()
-        .map_err(|_| JsValue::from_str("Element is not an HtmlElement"))?;
-
-    let computed_style = window.get_computed_style(&element)?;
-    let display = computed_style
-        .ok_or_else(|| JsValue::from_str("Could not get computed style"))?
-        .get_property_value("display")
-        .map_err(|_| JsValue::from_str("Could not get display property"))?;
-
-    if display == "none" {
+    if is_element_hidden(&window, &element)? {
         // Close other selects
         close_all_selects(&document);
 
@@ -69,25 +85,10 @@ pub fn toggle_visibility(id: &str) -> Result<(), JsValue> {
 /// * The element with the given ID cannot be found
 #[wasm_bindgen]
 pub fn toggle_visibility_complex(id: &str) -> Result<(), JsValue> {
-    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window found"))?;
-    let document = window
-        .document()
-        .ok_or_else(|| JsValue::from_str("No document found"))?;
-    let element = document
-        .get_element_by_id(id)
-        .ok_or_else(|| JsValue::from_str(&format!("Element with id '{id}' not found")))?;
+    let (window, document) = get_window_and_document()?;
+    let element = get_html_element_by_id(&document, id)?;
 
-    let element = element
-        .dyn_into::<HtmlElement>()
-        .map_err(|_| JsValue::from_str("Element is not an HtmlElement"))?;
-
-    let computed_style = window.get_computed_style(&element)?;
-    let display = computed_style
-        .ok_or_else(|| JsValue::from_str("Could not get computed style"))?
-        .get_property_value("display")
-        .map_err(|_| JsValue::from_str("Could not get display property"))?;
-
-    if display == "none" {
+    if is_element_hidden(&window, &element)? {
         element
             .style()
             .set_property("display", "block")
@@ -117,17 +118,8 @@ pub fn toggle_visibility_complex(id: &str) -> Result<(), JsValue> {
 /// * The element with the given ID cannot be found
 #[wasm_bindgen]
 pub fn visible_tag_select(id: &str) -> Result<(), JsValue> {
-    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window found"))?;
-    let document = window
-        .document()
-        .ok_or_else(|| JsValue::from_str("No document found"))?;
-    let element = document
-        .get_element_by_id(id)
-        .ok_or_else(|| JsValue::from_str(&format!("Element with id '{id}' not found")))?;
-
-    let element = element
-        .dyn_into::<HtmlElement>()
-        .map_err(|_| JsValue::from_str("Element is not an HtmlElement"))?;
+    let (_window, document) = get_window_and_document()?;
+    let element = get_html_element_by_id(&document, id)?;
 
     element
         .style()
@@ -176,10 +168,7 @@ pub fn listen_click_outside(
     element_id: &str,
     callback: &js_sys::Function,
 ) -> Result<ClickOutsideHandle, JsValue> {
-    let window = web_sys::window().ok_or_else(|| JsValue::from_str("No window found"))?;
-    let document = window
-        .document()
-        .ok_or_else(|| JsValue::from_str("No document found"))?;
+    let (_window, document) = get_window_and_document()?;
 
     let target_element = document
         .get_element_by_id(element_id)
@@ -194,7 +183,7 @@ pub fn listen_click_outside(
             && let Some(click_element) = click_target.dyn_ref::<Element>()
         {
             // Check if the click was outside the target element
-            if !is_descendant_of(click_element, &target_element) {
+            if !target_element.contains(Some(click_element)) {
                 let this = JsValue::NULL;
                 let _ = callback.call1(&this, &JsValue::from(mouse_event));
             }
@@ -321,7 +310,7 @@ fn close_custom_select(event: &MouseEvent, document: &Document) {
             let elements = document.get_elements_by_class_name(class);
             for i in 0..elements.length() {
                 if let Some(select_elem) = elements.item(i)
-                    && is_descendant_of(element, &select_elem)
+                    && select_elem.contains(Some(element))
                 {
                     return;
                 }
@@ -363,7 +352,7 @@ fn close_custom_select_complex(event: &MouseEvent, document: &Document) {
         let elements = document.get_elements_by_class_name("complex-select");
         for i in 0..elements.length() {
             if let Some(select_elem) = elements.item(i)
-                && is_descendant_of(element, &select_elem)
+                && select_elem.contains(Some(element))
             {
                 return;
             }
@@ -382,17 +371,4 @@ fn close_custom_select_complex(event: &MouseEvent, document: &Document) {
         remove_listen_click_complex();
         remove_listen_mousedown_complex();
     }
-}
-
-fn is_descendant_of(element: &Element, ancestor: &Element) -> bool {
-    let mut current = Some(element.clone());
-
-    while let Some(elem) = current {
-        if elem == *ancestor {
-            return true;
-        }
-        current = elem.parent_element();
-    }
-
-    false
 }
