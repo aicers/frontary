@@ -450,10 +450,10 @@ where
 
         html! {
             <div onclick={onclick} class={class}>
+                <div class={class_icon}>
+                </div>
                 <div class={class_text}>
                     {  text!(txt, ctx.props().language, "Set directions") }
-                </div>
-                <div class={class_icon}>
                 </div>
             </div>
         }

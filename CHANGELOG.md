@@ -32,6 +32,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   converting input to lowercase in both `new` and `set` methods.
 - Changed `width` field type in `Unsigned8Config` from `Option<u8>` to
   `Option<u32>` to unify width types across input configurations.
+- Changed functions and icons related with Network/IP filter to latest Figma design.
 
 ### Fixed
 

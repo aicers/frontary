@@ -94,6 +94,11 @@ impl Component for Model {
             direction: Rc::new(RefCell::new(None)),
             direction_items: HashMap::new(),
         };
+        if cfg!(feature = "pumpkin")
+            && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+        {
+            *predefined = Some(HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new());
+        }
         s.buffer_direction_items(ctx);
 
         s
@@ -110,7 +115,7 @@ impl Component for Model {
                 .map(NetworkItem::id)
                 .collect::<HashSet<&String>>();
             predefined.retain(|k, _| list_tmp.contains(k));
-            if self.check_status(ctx, false) == CheckStatus::Checked {
+            if !cfg!(feature = "pumpkin") && self.check_status(ctx, false) == CheckStatus::Checked {
                 *sel = None;
             }
         }
@@ -249,7 +254,29 @@ impl Component for Model {
                         }
                     }
                     CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                        if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+                        if cfg!(feature = "pumpkin") {
+                            if let (Ok(list), Ok(mut predefined)) = (
+                                ctx.props().list.try_borrow(),
+                                ctx.props().selected.predefined.try_borrow_mut(),
+                            ) {
+                                let full_select: HashMap<
+                                    String,
+                                    Rc<RefCell<Option<SelectionExtraInfo>>>,
+                                > = list
+                                    .iter()
+                                    .map(|item| {
+                                        (
+                                            item.id().clone(),
+                                            Rc::new(RefCell::new(Some(
+                                                SelectionExtraInfo::Network(EndpointKind::Both),
+                                            ))),
+                                        )
+                                    })
+                                    .collect();
+                                *predefined = Some(full_select);
+                            }
+                        } else if let Ok(mut predefined) =
+                            ctx.props().selected.predefined.try_borrow_mut()
                         {
                             *predefined = None;
                         }
@@ -303,7 +330,8 @@ impl Component for Model {
                             *sel = Some(s);
                         }
                     }
-                    if check_status != CheckStatus::Checked
+                    if !cfg!(feature = "pumpkin")
+                        && check_status != CheckStatus::Checked
                         && self.check_status(ctx, false) == CheckStatus::Checked
                         && let Ok(mut sel) = ctx.props().selected.predefined.try_borrow_mut()
                     {
@@ -316,6 +344,14 @@ impl Component for Model {
                 }
             }
             Message::ClickAddInput => {
+                if cfg!(feature = "pumpkin") {
+                    if !self.view_input {
+                        self.view_input = true;
+                    }
+                    if self.view_list {
+                        self.view_list = false;
+                    }
+                }
                 if self.validate_user_input(ctx) {
                     if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                         match custom.entry(self.input_text.clone()) {
@@ -327,6 +363,8 @@ impl Component for Model {
                                     Kind::Basic => None,
                                 };
                                 entry.insert(Rc::new(RefCell::new(extra)));
+                                self.input_text.clear();
+                                self.input_wrong_msg = None;
                             }
                             Occupied(_) => {
                                 self.input_wrong_msg = Some("The input already exists.");
@@ -340,10 +378,13 @@ impl Component for Model {
                 }
             }
             Message::DeleteInputItem(key) => {
-                if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
-                    && let Occupied(entry) = custom.entry(key)
-                {
-                    entry.remove_entry();
+                if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
+                    if let Occupied(entry) = custom.entry(key) {
+                        entry.remove_entry();
+                    }
+                    if custom.is_empty() {
+                        self.view_input = false;
+                    }
                 }
             }
             Message::SetDirection => {
@@ -357,7 +398,11 @@ impl Component for Model {
                 let check_status = self.check_status(ctx, false);
                 if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut() {
                     match check_status {
-                        CheckStatus::Checked => *predefined = None,
+                        CheckStatus::Checked => {
+                            if !cfg!(feature = "pumpkin") {
+                                *predefined = None;
+                            }
+                        }
                         CheckStatus::Unchecked | CheckStatus::Indeterminate => (),
                     }
                 }
@@ -375,7 +420,42 @@ impl Component for Model {
         let mut class_input = "complex-select-input";
         let txt = ctx.props().txt.txt.clone();
         let check_status = self.check_status(ctx, false);
-        let value = if let Ok(list) = ctx.props().list.try_borrow() {
+        let value = if cfg!(feature = "pumpkin") {
+            if let Ok(list) = ctx.props().list.try_borrow() {
+                if list.is_empty() {
+                    class_input = "complex-select-input";
+                    text!(txt, ctx.props().language, "All").to_string()
+                } else {
+                    let list_unselected =
+                        if let Ok(predef) = ctx.props().selected.predefined.try_borrow() {
+                            match predef.as_ref() {
+                                Some(map) => {
+                                    map.is_empty()
+                                        || map.values().all(|rc| {
+                                            rc.try_borrow().ok().and_then(|v| *v).is_none()
+                                        })
+                                }
+                                None => false,
+                            }
+                        } else {
+                            false
+                        };
+                    let custom_len = ctx.props().selected.custom.borrow().len();
+                    if list_unselected && custom_len == 0 {
+                        text!(txt, ctx.props().language, "All").to_string()
+                    } else {
+                        let selected_len = Self::selected_len(ctx);
+                        format!(
+                            "({}) {}",
+                            selected_len,
+                            text!(txt, ctx.props().language, "Selected Filters"),
+                        )
+                    }
+                }
+            } else {
+                "complex-select-input-empty".to_string()
+            }
+        } else if let Ok(list) = ctx.props().list.try_borrow() {
             if list.is_empty() {
                 class_input = "complex-select-input-empty";
                 text!(txt, ctx.props().language, "None").to_string()
@@ -573,16 +653,15 @@ impl Model {
                 .direction_items
                 .iter()
                 .filter_map(|(k, v)| {
-                    if let Ok(v) = v.try_borrow() {
-                        Some((k.clone(), Rc::new(RefCell::new(*v))))
-                    } else {
-                        None
-                    }
+                    v.try_borrow()
+                        .ok()
+                        .and_then(|v| (*v).map(|val| (k.clone(), Rc::new(RefCell::new(Some(val))))))
                 })
                 .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>();
             *predefined = Some(s);
         }
-        if self.check_status(ctx, false) == CheckStatus::Checked
+        if !cfg!(feature = "pumpkin")
+            && self.check_status(ctx, false) == CheckStatus::Checked
             && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
         {
             *predefined = None;
