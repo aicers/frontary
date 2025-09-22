@@ -625,9 +625,21 @@ div.complex-select-pop-input-input-plus {
     width: 40px;
     height: 40px;
     background-image: url('/frontary/pumpkin/plus-for-add.svg');
-    background-size: 40px 40px;
+    background-size: 24px 24px;
     background-position: center;
     background-repeat: no-repeat;
+    padding: 8px;
+    background-color: var(--Transparent-Mid-Grey);
+    border-radius: 8px;
+}
+
+div.complex-select-pop-input-input-plus:hover {
+    cursor: pointer;
+    box-shadow:
+        inset 0 0 0 2px var(--Dark-60),
+        0 0 0 2px var(--Dark-70),
+        0 0 6px 0 rgba(255, 255, 255, 0.20);
+    border-radius: 8px;
 }
 
 html.light div.complex-select-pop-input-input-plus {
@@ -1020,8 +1032,10 @@ div.mini-select-list-sort-recently-text-text {
 
 div.mini-select-list-sort-recently-text:hover {
     cursor: pointer;
-    border-radius: 8px;
-    box-shadow: 0px 0px 6px 0px rgba(255, 255, 255, 0.20);
+    box-shadow:
+        inset 0 0 0 2px rgba(71, 76, 85, 0.4),
+        0 0 0 2px var(--Dark-70),
+        0 0 6px 0 rgba(255, 255, 255, 0.15);
     align-items: center;
 }
 
@@ -1095,6 +1109,7 @@ div.list-add {
 
 div.list-add:hover {
     box-shadow: 0px 2px 8px 0px rgba(35, 125, 245, 0.40);
+    outline: 2px solid rgba(96, 103, 113, 0.20);
     cursor: pointer;
 }
 
@@ -1904,9 +1919,9 @@ div.input-save {
 }
 
 div.input-save:hover {
-    background-color: var(--Blue-70);
-    box-shadow: 0px 2px 8px 0px rgba(35, 125, 245, 0.40);
-    border-radius: 8px;
+    cursor: pointer;
+    outline: 2px solid rgba(96, 103, 113, 0.20);
+    box-shadow: 0 2px 8px 0 rgba(35, 125, 245, 0.40);
     cursor: pointer;
 }
 
@@ -2233,9 +2248,9 @@ div.tag-group-input-select-item-outer-cursor {
     border-radius: 8px;
 }
 
+div.tag-group-input-select-item-outer-cursor:hover,
 div.tag-group-input-select-item-outer:hover {
     background-color: var(--Transparent-Mid-Grey);
-    border-radius: 0px;
 }
 
 div.tag-group-input-select-item {
@@ -2617,10 +2632,11 @@ html.light div.input-trash-can-delete {
 }
 
 div.input-trash-can-delete:hover {
-    background-color: var(--Transparent-Mid-Grey);
-    box-shadow: 0px 0px 6px 0px rgba(255, 255, 255, 0.2);
     cursor: pointer;
-    border: 2px solid rgba(71, 76, 85, 1)
+    box-shadow:
+        inset 0 0 0 2px var(--Dark-60),
+        0 0 0 2px var(--Dark-70),
+        0 0 6px 0 rgba(255, 255, 255, 0.20)
 }
 
 td.group-list-link-line-bottom {
