@@ -2,13 +2,17 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use gloo_events::EventListener;
-use wasm_bindgen::prelude::*;
-use web_sys::{Document, Element, HtmlElement, MouseEvent, Window};
+use wasm_bindgen::closure::Closure;
+use wasm_bindgen::{JsCast, prelude::*};
+use web_sys::{AddEventListenerOptions, Document, Element, HtmlElement, MouseEvent, Window};
+
+type MousedownHandler = Closure<dyn FnMut(MouseEvent)>;
 
 thread_local! {
     static CLICK_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
     static CLICK_COMPLEX_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
-    static MOUSEDOWN_COMPLEX_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
+    static MOUSEDOWN_COMPLEX_HANDLER: RefCell<Option<MousedownHandler>> =
+        const { RefCell::new(None) };
 }
 
 /// Helper function to get window and document
@@ -257,31 +261,47 @@ fn remove_listen_click_complex() {
         *l.borrow_mut() = None;
     });
 }
-
 fn add_listen_mousedown_complex(document: &Document) {
     remove_listen_mousedown_complex();
 
-    let listener = EventListener::new(document, "mousedown", |event| {
-        if let Some(mouse_event) = event.dyn_ref::<MouseEvent>()
-            && let Some(target) = mouse_event.target()
-            && let Some(element) = target.dyn_ref::<Element>()
-        {
-            let is_input = element.tag_name() == "INPUT";
-            if !is_input {
-                mouse_event.stop_propagation();
-                mouse_event.prevent_default();
-            }
-        }
-    });
+    let options = {
+        let opts = AddEventListenerOptions::new();
+        opts.set_passive(false);
+        opts
+    };
 
-    MOUSEDOWN_COMPLEX_LISTENER.with(|l| {
-        *l.borrow_mut() = Some(listener);
-    });
+    let handler = Closure::wrap(Box::new(move |event: MouseEvent| {
+        if let Some(element) = event.target().and_then(|t| t.dyn_into::<Element>().ok())
+            && element.tag_name() != "INPUT"
+        {
+            event.stop_propagation();
+            event.prevent_default();
+        }
+    }) as Box<dyn FnMut(MouseEvent)>);
+
+    document
+        .add_event_listener_with_callback_and_add_event_listener_options(
+            "mousedown",
+            handler.as_ref().unchecked_ref(),
+            &options,
+        )
+        .expect("register mousedown listener");
+
+    // keep handler and options alive for removal
+    MOUSEDOWN_COMPLEX_HANDLER.with(|slot| *slot.borrow_mut() = Some(handler));
 }
 
 fn remove_listen_mousedown_complex() {
-    MOUSEDOWN_COMPLEX_LISTENER.with(|l| {
-        *l.borrow_mut() = None;
+    MOUSEDOWN_COMPLEX_HANDLER.with(|slot| {
+        if let Some(handler) = slot.borrow_mut().take()
+            && let Some(document) = web_sys::window().and_then(|w| w.document())
+        {
+            let _ = document.remove_event_listener_with_callback_and_bool(
+                "mousedown",
+                handler.as_ref().unchecked_ref(),
+                false,
+            );
+        }
     });
 }
 
