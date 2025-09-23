@@ -404,10 +404,10 @@ where
                                     if let Some(pages_info) = self.pages_info_second.get(key) {
                                         let data = Rc::new(item.sub_items.iter().enumerate().map(|(index, item)| {
                                             // HIGHLIGHT: use the first item as the key
-                                            let key = if let Some(Column::Text(txt)) = item.first() {
-                                                txt.text.to_string()
-                                            } else {
-                                                index.to_string()
+                                            let key = match item.first() {
+                                                Some(Column::Text(txt)) => txt.text.to_string(),
+                                                Some(Column::DomainName(domain)) => domain.domain.clone(),
+                                                _ => index.to_string(),
                                             };
                                             (
                                                 key,
@@ -699,6 +699,7 @@ where
                     }
                 }
             }
+            Column::DomainName(elem) => html! { elem.domain.clone() },
             Column::HostNetworkGroup(elem) => {
                 html! {
                     for elem.host_network_group.iter().map(|elem| html! {
@@ -819,6 +820,7 @@ where
                                         for g.iter().map(|c|
                                             match c {
                                                 Column::Text(..)
+                                                | Column::DomainName(..)
                                                 | Column::HostNetworkGroup(..)
                                                 | Column::SelectSingle(..)
                                                 | Column::SelectMultiple(..)

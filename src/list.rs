@@ -32,6 +32,11 @@ pub struct TextColumn {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct DomainNameColumn {
+    pub domain: String,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct HostNetworkGroupColumn {
     pub host_network_group: Vec<String>,
 }
@@ -124,6 +129,7 @@ pub struct ModalDisplay {
 #[derive(Clone, PartialEq)]
 pub enum Column {
     Text(TextColumn),
+    DomainName(DomainNameColumn),
     HostNetworkGroup(HostNetworkGroupColumn),
     SelectSingle(SelectSingleColumn),
     SelectMultiple(SelectMultipleColumn),
@@ -145,6 +151,7 @@ impl std::fmt::Display for Column {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Text(d) => write!(formatter, "{}", &d.text),
+            Self::DomainName(d) => write!(formatter, "{}", &d.domain),
             Self::HostNetworkGroup(d) => write!(formatter, "{}", d.host_network_group.join(",")),
             Self::SelectSingle(d) => {
                 if let Some((_, value)) = d.selected.as_ref() {

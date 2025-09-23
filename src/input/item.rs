@@ -1127,6 +1127,7 @@ impl From<&Column> for InputItem {
     fn from(col: &Column) -> Self {
         match col {
             Column::Text(txt) => Self::Text(TextItem::new(txt.text.to_string())),
+            Column::DomainName(domain) => Self::DomainName(DomainNameItem::new(&domain.domain)),
             Column::HostNetworkGroup(items) => {
                 let mut input = InputHostNetworkGroup::default();
                 for item in &items.host_network_group {
@@ -1191,6 +1192,7 @@ impl From<&Column> for InputItem {
                     for c in g {
                         match c {
                             Column::Text(..)
+                            | Column::DomainName(..)
                             | Column::HostNetworkGroup(..)
                             | Column::SelectSingle(..)
                             | Column::SelectMultiple(..)
