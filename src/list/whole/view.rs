@@ -3,7 +3,6 @@ use std::rc::Rc;
 use std::str::FromStr;
 
 use htmlescape::decode_html;
-use itertools::Itertools;
 use json_gettext::get_text;
 use yew::{Component, Context, Html, classes, html, virtual_dom::AttrValue};
 
@@ -763,8 +762,9 @@ where
                     </div>
                 }
             }
-            Column::Unsigned32(_)
-            | Column::Unsigned8(_)
+            Column::Unsigned8(_)
+            | Column::Unsigned16(_)
+            | Column::Unsigned32(_)
             | Column::Float64(_)
             | Column::Percentage(_)
             | Column::Comparison(_) => html! { col.to_string() },
@@ -787,6 +787,7 @@ where
                     .map(|s| {
                         s.values()
                             .map(|v| v.to_string_txt(&txt, ctx.props().language))
+                            .collect::<Vec<_>>()
                             .join(",")
                     })
                     .collect::<Vec<_>>();
@@ -822,8 +823,9 @@ where
                                                 | Column::HostNetworkGroup(..)
                                                 | Column::SelectSingle(..)
                                                 | Column::SelectMultiple(..)
-                                                | Column::Unsigned32(..)
                                                 | Column::Unsigned8(..)
+                                                | Column::Unsigned16(..)
+                                                | Column::Unsigned32(..)
                                                 | Column::Float64(..)
                                                 | Column::Percentage(..)
                                                 | Column::Comparison(..)

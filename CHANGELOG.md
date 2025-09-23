@@ -17,18 +17,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added custom validation for `TextConfig`.
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
+- Added `Unsigned16` to `Column`, `InputConfig`, and `InputItem`.
 
 ### Changed
 
 - Centralized image path handling with `Theme::path`, supporting light/dark themes
   via assets in `pumpkin/` and `pumpkin/light/` across components.
-- Made the `data` field in `input::component::Props` optional to support
-  standalone usage of the `Input` component. When the `Input` component is used
-  independently without requiring uniqueness checks against other list items,
-  the `data` prop can now be set to `None`. Existing code must wrap the `data`
-  prop with `Some()`.
-- `DomainNameItem` now enforces case-insensitive domain names by automatically
-  converting input to lowercase in both `new` and `set` methods.
 
 ### Fixed
 
@@ -48,8 +42,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   group layouts more flexibly.
 - Fixed on/off icon paths to work with theme-based asset directories.
 - Fixed overflow in `searchable-select-list-down` CSS to remove horizontal scrollbar.
-- Fixed mini select styling for `pumpkin` feature by moving some inline colors
-  to CSS, enabling proper dark/light mode integration.
 
 ### Removed
 
