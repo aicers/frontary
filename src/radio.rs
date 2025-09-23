@@ -101,28 +101,22 @@ where
                     let onclick = |index: usize| ctx.link().callback(move |_| Message::ClickItem(index));
                     let style = ctx.props().width_item.map_or_else(String::new, |w| format!("width: {w}px;"));
 
+                    let class = if index < ctx.props().list.len() - 1 {
+                        "radio-item radio-item-with-space"
+                    } else {
+                        "radio-item"
+                    };
+
                     html! {
-                        <>
-                            <div class="radio-item" role="radio" onclick={onclick(index)} style={style}>
-                                <img src={radio_img} class="radio-img" />
-                                {
-                                    match item {
-                                        ViewString::Key(key) => html! { text!(txt, ctx.props().language, key) },
-                                        ViewString::Raw(txt) => html! { txt },
-                                    }
-                                }
-                            </div>
+                        <div class={class} role="radio" onclick={onclick(index)} style={style}>
+                            <img src={radio_img} class="radio-img" />
                             {
-                                if index < ctx.props().list.len() - 1 {
-                                    html! {
-                                        <div class="radio-space">
-                                        </div>
-                                    }
-                                } else {
-                                    html! {}
+                                match item {
+                                    ViewString::Key(key) => html! { text!(txt, ctx.props().language, key) },
+                                    ViewString::Raw(txt) => html! { txt },
                                 }
                             }
-                        </>
+                        </div>
                     }
                 })
             }
