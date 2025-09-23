@@ -58,6 +58,3 @@ yew = "0.21"
 [lints.clippy]
 pedantic = "warn"
 unwrap_used = "warn"
-
-[dev-dependencies]
-wasm-bindgen-test = "0.3.51"
