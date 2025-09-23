@@ -261,6 +261,7 @@ fn remove_listen_click_complex() {
         *l.borrow_mut() = None;
     });
 }
+
 fn add_listen_mousedown_complex(document: &Document) {
     remove_listen_mousedown_complex();
 
