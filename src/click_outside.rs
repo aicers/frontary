@@ -184,18 +184,13 @@ pub fn listen_click_outside(
 
     let callback = callback.clone();
     let element_id = element_id.to_string();
+    let document_for_closure = document.clone();
     let listener = EventListener::new(&document, "click", move |event| {
         let Some(mouse_event) = event.dyn_ref::<MouseEvent>() else {
             return;
         };
 
-        let Some(window) = web_sys::window() else {
-            return;
-        };
-        let Some(document) = window.document() else {
-            return;
-        };
-        let Some(target_root) = document.get_element_by_id(&element_id) else {
+        let Some(target_root) = document_for_closure.get_element_by_id(&element_id) else {
             return;
         };
 
