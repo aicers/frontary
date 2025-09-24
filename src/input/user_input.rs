@@ -552,8 +552,6 @@ where
                         html! {}
                     }
                 }
-                <div class="input-contents-item-space">
-                </div>
             </div>
         }
     }
@@ -694,8 +692,6 @@ where
                         html! {}
                     }
                 }
-                <div class="input-contents-item-space">
-                </div>
             </div>
         }
     }
@@ -835,8 +831,6 @@ where
                         html! {}
                     }
                 }
-                <div class="input-contents-item-space">
-                </div>
             </div>
         }
     }
@@ -975,8 +969,6 @@ where
                         html! {}
                     }
                 }
-                <div class="input-contents-item-space">
-                </div>
             </div>
         }
     }
