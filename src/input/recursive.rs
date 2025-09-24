@@ -110,16 +110,16 @@ where
                                             | (InputItem::Password(_), InputConfig::Password(_))
                                             | (InputItem::Tag(_), InputConfig::Tag(_))
                                             | (
-                                                InputItem::Unsigned32(_),
-                                                InputConfig::Unsigned32(_),
-                                            )
-                                            | (
                                                 InputItem::Unsigned8(_),
                                                 InputConfig::Unsigned8(_),
                                             )
                                             | (
                                                 InputItem::Unsigned16(_),
                                                 InputConfig::Unsigned16(_),
+                                            )
+                                            | (
+                                                InputItem::Unsigned32(_),
+                                                InputConfig::Unsigned32(_),
                                             )
                                             | (InputItem::Float64(_), InputConfig::Float64(_))
                                             | (
@@ -172,9 +172,9 @@ where
                         (InputItem::Text(_), InputConfig::Text(_))
                         | (InputItem::DomainName(_), InputConfig::DomainName(_))
                         | (InputItem::Password(_), InputConfig::Password(_))
-                        | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
                         | (InputItem::Unsigned16(_), InputConfig::Unsigned16(_))
+                        | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Float64(_), InputConfig::Float64(_))
                         | (InputItem::Percentage(_), InputConfig::Percentage(_))
                         | (InputItem::Nic(_), InputConfig::Nic(_))
@@ -438,9 +438,9 @@ where
                         | (InputItem::SelectSingle(_), InputConfig::SelectSingle(_))
                         | (InputItem::SelectMultiple(_), InputConfig::SelectMultiple(_))
                         | (InputItem::Tag(_), InputConfig::Tag(_))
-                        | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Unsigned8(_), InputConfig::Unsigned8(_))
                         | (InputItem::Unsigned16(_), InputConfig::Unsigned16(_))
+                        | (InputItem::Unsigned32(_), InputConfig::Unsigned32(_))
                         | (InputItem::Float64(_), InputConfig::Float64(_))
                         | (InputItem::Percentage(_), InputConfig::Percentage(_))
                         | (InputItem::File(_), InputConfig::File(_))
@@ -1169,13 +1169,6 @@ where
                                     self.select_multiple_to_buffer(&item_index, user, config);
                                 }
                             }
-                            (InputItem::Unsigned32(user), InputConfig::Unsigned32(config)) => {
-                                if (user.is_none() || this_checked == Some(CheckStatus::Unchecked))
-                                    && let Some(preset) = &config.preset
-                                {
-                                    user.set(*preset);
-                                }
-                            }
                             (InputItem::Unsigned8(user), InputConfig::Unsigned8(config)) => {
                                 if (user.is_none() || this_checked == Some(CheckStatus::Unchecked))
                                     && let Some(preset) = &config.preset
@@ -1184,6 +1177,13 @@ where
                                 }
                             }
                             (InputItem::Unsigned16(user), InputConfig::Unsigned16(config)) => {
+                                if (user.is_none() || this_checked == Some(CheckStatus::Unchecked))
+                                    && let Some(preset) = &config.preset
+                                {
+                                    user.set(*preset);
+                                }
+                            }
+                            (InputItem::Unsigned32(user), InputConfig::Unsigned32(config)) => {
                                 if (user.is_none() || this_checked == Some(CheckStatus::Unchecked))
                                     && let Some(preset) = &config.preset
                                 {

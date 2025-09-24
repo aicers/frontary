@@ -339,15 +339,6 @@ where
                     </div>
                 }
             }
-            InputConfig::Unsigned32(config) => {
-                html! {
-                    <div class={class_child}>
-                        <div class={class_line}>
-                        </div>
-                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, Some(base_index), layer_index, false, false) }
-                    </div>
-                }
-            }
             InputConfig::Unsigned8(config) => {
                 html! {
                     <div class={class_child}>
@@ -363,6 +354,15 @@ where
                         <div class={class_line}>
                         </div>
                         { self.view_unsigned_16(ctx, &config.ess, config.min, config.max, config.width, child_data, Some(base_index), layer_index, false, false) }
+                    </div>
+                }
+            }
+            InputConfig::Unsigned32(config) => {
+                html! {
+                    <div class={class_child}>
+                        <div class={class_line}>
+                        </div>
+                        { self.view_unsigned_32(ctx, &config.ess, config.min, config.max, config.width, child_data, Some(base_index), layer_index, false, false) }
                     </div>
                 }
             }
@@ -646,16 +646,22 @@ where
                                                                             self.view_select_nic_or(ctx, config.options.as_ref(), config.nic_index, &ess, each_item,
                                                                                 Some(&row_rep_index), col_index, 1, config.theme)
                                                                             }
-                                                                        InputConfig::Unsigned32(config) => {
+                                                                        InputConfig::Unsigned8(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
-                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, each_item,
+                                                                            self.view_unsigned_8(ctx, &ess, config.min, config.max, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Unsigned16(config) => {
                                                                             let mut ess = config.ess.clone();
                                                                             ess.required = false;
                                                                             self.view_unsigned_16(ctx, &ess, config.min, config.max, config.width, each_item,
+                                                                                Some(&row_rep_index), col_index, false, true)
+                                                                        }
+                                                                        InputConfig::Unsigned32(config) => {
+                                                                            let mut ess = config.ess.clone();
+                                                                            ess.required = false;
+                                                                            self.view_unsigned_32(ctx, &ess, config.min, config.max, config.width, each_item,
                                                                                 Some(&row_rep_index), col_index, false, true)
                                                                         }
                                                                         InputConfig::Float64(config) => {
