@@ -1,5 +1,4 @@
 use std::cell::RefCell;
-use std::rc::Rc;
 
 use gloo_events::EventListener;
 use wasm_bindgen::closure::Closure;
@@ -152,6 +151,9 @@ impl ClickOutsideHandle {
 
 /// API to enable click-outside detection for custom areas.
 /// When a user clicks outside the specified element, the callback will be invoked.
+/// The listener fetches the target element on every event so it remains accurate
+/// even if the DOM node is replaced by the renderer (for example, after a Yew
+/// re-render or a component toggle).
 ///
 /// # Arguments
 ///
@@ -174,23 +176,35 @@ pub fn listen_click_outside(
 ) -> Result<ClickOutsideHandle, JsValue> {
     let (_window, document) = get_window_and_document()?;
 
-    let target_element = document
-        .get_element_by_id(element_id)
-        .ok_or_else(|| JsValue::from_str(&format!("Element with id '{element_id}' not found")))?;
+    if document.get_element_by_id(element_id).is_none() {
+        return Err(JsValue::from_str(&format!(
+            "Element with id '{element_id}' not found"
+        )));
+    }
 
     let callback = callback.clone();
-    let target_element = Rc::new(target_element);
-
+    let element_id = element_id.to_string();
     let listener = EventListener::new(&document, "click", move |event| {
-        if let Some(mouse_event) = event.dyn_ref::<MouseEvent>()
-            && let Some(click_target) = mouse_event.target()
+        let Some(mouse_event) = event.dyn_ref::<MouseEvent>() else {
+            return;
+        };
+
+        let Some(window) = web_sys::window() else {
+            return;
+        };
+        let Some(document) = window.document() else {
+            return;
+        };
+        let Some(target_root) = document.get_element_by_id(&element_id) else {
+            return;
+        };
+
+        if let Some(click_target) = mouse_event.target()
             && let Some(click_element) = click_target.dyn_ref::<Element>()
+            && !target_root.contains(Some(click_element))
         {
-            // Check if the click was outside the target element
-            if !target_element.contains(Some(click_element)) {
-                let this = JsValue::NULL;
-                let _ = callback.call1(&this, &JsValue::from(mouse_event));
-            }
+            let this = JsValue::NULL;
+            let _ = callback.call1(&this, &JsValue::from(mouse_event));
         }
     });
 
