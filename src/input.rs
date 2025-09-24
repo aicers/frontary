@@ -27,8 +27,8 @@ pub use host_network::Model as HostNetworkHtml;
 pub use item::{
     CheckboxItem, ComparisonItem, DomainNameItem, FileItem, Float64Item, GroupItem,
     HostNetworkGroupItem, InputItem, NicItem, PasswordItem, PercentageItem, RadioItem,
-    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned32Item,
-    VecSelectItem,
+    SelectMultipleItem, SelectSingleItem, TagItem, TextItem, Unsigned8Item, Unsigned16Item,
+    Unsigned32Item, VecSelectItem,
 };
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -548,8 +548,9 @@ fn default_items(confs: &[Rc<InputConfig>], level: usize) -> Vec<Rc<RefCell<Inpu
                     InputItem::SelectMultiple(SelectMultipleItem::default())
                 }
                 InputConfig::Tag(_) => InputItem::Tag(TagItem::default()),
-                InputConfig::Unsigned32(_) => InputItem::Unsigned32(Unsigned32Item::default()),
                 InputConfig::Unsigned8(_) => InputItem::Unsigned8(Unsigned8Item::default()),
+                InputConfig::Unsigned16(_) => InputItem::Unsigned16(Unsigned16Item::default()),
+                InputConfig::Unsigned32(_) => InputItem::Unsigned32(Unsigned32Item::default()),
                 InputConfig::Float64(_) => InputItem::Float64(Float64Item::default()),
                 InputConfig::Percentage(_) => InputItem::Percentage(PercentageItem::default()),
                 InputConfig::Nic(_) => InputItem::Nic(NicItem::default()),
@@ -627,8 +628,9 @@ fn item_preset(conf: &Rc<InputConfig>) -> InputItem {
                 p.iter().cloned().collect::<HashSet<String>>()
             }),
         )),
-        InputConfig::Unsigned32(conf) => InputItem::Unsigned32(Unsigned32Item::new(conf.preset)),
         InputConfig::Unsigned8(conf) => InputItem::Unsigned8(Unsigned8Item::new(conf.preset)),
+        InputConfig::Unsigned16(conf) => InputItem::Unsigned16(Unsigned16Item::new(conf.preset)),
+        InputConfig::Unsigned32(conf) => InputItem::Unsigned32(Unsigned32Item::new(conf.preset)),
         InputConfig::Float64(conf) => InputItem::Float64(Float64Item::new(conf.preset)),
         InputConfig::Percentage(conf) => InputItem::Percentage(PercentageItem::new(conf.preset)),
         InputConfig::Comparison(_) => InputItem::Comparison(ComparisonItem::new(None)),

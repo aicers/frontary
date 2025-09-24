@@ -63,6 +63,11 @@ pub struct Unsigned8Column {
 }
 
 #[derive(Clone, PartialEq)]
+pub struct Unsigned16Column {
+    pub value: Option<u16>,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct Float64Column {
     pub value: Option<f64>,
 }
@@ -128,8 +133,9 @@ pub enum Column {
     SelectSingle(SelectSingleColumn),
     SelectMultiple(SelectMultipleColumn),
     Tag(TagColumn),
-    Unsigned32(Unsigned32Column),
     Unsigned8(Unsigned8Column),
+    Unsigned16(Unsigned16Column),
+    Unsigned32(Unsigned32Column),
     Float64(Float64Column),
     Percentage(PercentageColumn),
     Nic(NicColumn),
@@ -162,11 +168,15 @@ impl std::fmt::Display for Column {
                 let values = d.tags.iter().join(",");
                 write!(formatter, "{values}")
             }
-            Self::Unsigned32(d) => {
+            Self::Unsigned8(d) => {
                 let value = d.value.map_or_else(String::new, |d| d.to_string());
                 write!(formatter, "{value}")
             }
-            Self::Unsigned8(d) => {
+            Self::Unsigned16(d) => {
+                let value = d.value.map_or_else(String::new, |d| d.to_string());
+                write!(formatter, "{value}")
+            }
+            Self::Unsigned32(d) => {
                 let value = d.value.map_or_else(String::new, |d| d.to_string());
                 write!(formatter, "{value}")
             }

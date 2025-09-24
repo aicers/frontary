@@ -591,6 +591,51 @@ impl Unsigned8Item {
 }
 
 #[derive(Clone, PartialEq, Default)]
+pub struct Unsigned16Item {
+    value: Option<u16>,
+}
+
+impl Deref for Unsigned16Item {
+    type Target = Option<u16>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+impl DerefMut for Unsigned16Item {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.value
+    }
+}
+
+impl Unsigned16Item {
+    #[must_use]
+    pub fn new(value: Option<u16>) -> Self {
+        Self { value }
+    }
+
+    pub fn set(&mut self, value: u16) {
+        self.value = Some(value);
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.value.is_none()
+    }
+
+    #[must_use]
+    #[allow(clippy::wrong_self_convention)]
+    pub fn into_inner(&self) -> Option<u16> {
+        self.value
+    }
+
+    pub fn clear(&mut self) {
+        *self = Self::new(None);
+    }
+}
+
+#[derive(Clone, PartialEq, Default)]
 pub struct Float64Item {
     value: Option<f64>,
 }
@@ -1027,8 +1072,9 @@ pub enum InputItem {
     SelectSingle(SelectSingleItem),
     SelectMultiple(SelectMultipleItem),
     Tag(TagItem),
-    Unsigned32(Unsigned32Item),
     Unsigned8(Unsigned8Item),
+    Unsigned16(Unsigned16Item),
+    Unsigned32(Unsigned32Item),
     Float64(Float64Item),
     Percentage(PercentageItem),
     Nic(NicItem),
@@ -1050,8 +1096,9 @@ impl InputItem {
             InputItem::SelectSingle(selected) => selected.clear(),
             InputItem::SelectMultiple(selected_list) => selected_list.clear(),
             InputItem::Tag(tag) => tag.clear(),
-            InputItem::Unsigned32(value) => value.clear(),
             InputItem::Unsigned8(value) => value.clear(),
+            InputItem::Unsigned16(value) => value.clear(),
+            InputItem::Unsigned32(value) => value.clear(),
             InputItem::Float64(value) => value.clear(),
             InputItem::Percentage(value) => value.clear(),
             InputItem::Nic(nics) => nics.clear(),
@@ -1074,8 +1121,9 @@ impl InputItem {
             InputItem::SelectSingle(selected) => selected.is_empty(),
             InputItem::SelectMultiple(selected_list) => selected_list.is_empty(),
             InputItem::Tag(tag) => tag.is_empty(),
-            InputItem::Unsigned32(value) => value.is_empty(),
             InputItem::Unsigned8(value) => value.is_empty(),
+            InputItem::Unsigned16(value) => value.is_empty(),
+            InputItem::Unsigned32(value) => value.is_empty(),
             InputItem::Float64(value) => value.is_empty(),
             InputItem::Percentage(value) => value.is_empty(),
             InputItem::Nic(nics) => nics.is_empty(),
@@ -1099,8 +1147,9 @@ impl InputItem {
             InputConfig::SelectSingle(_) => Self::SelectSingle(SelectSingleItem::default()),
             InputConfig::SelectMultiple(_) => Self::SelectMultiple(SelectMultipleItem::default()),
             InputConfig::Tag(_) => Self::Tag(TagItem::default()),
-            InputConfig::Unsigned32(_) => Self::Unsigned32(Unsigned32Item::default()),
             InputConfig::Unsigned8(_) => Self::Unsigned8(Unsigned8Item::default()),
+            InputConfig::Unsigned16(_) => Self::Unsigned16(Unsigned16Item::default()),
+            InputConfig::Unsigned32(_) => Self::Unsigned32(Unsigned32Item::default()),
             InputConfig::Float64(_) => Self::Float64(Float64Item::default()),
             InputConfig::Percentage(_) => Self::Percentage(PercentageItem::default()),
             InputConfig::Nic(_) => Self::Nic(NicItem::default()),
@@ -1159,8 +1208,9 @@ impl From<&Column> for InputItem {
                 edit: None,
                 delete: None,
             })),
-            Column::Unsigned32(value) => Self::Unsigned32(Unsigned32Item::new(value.value)),
             Column::Unsigned8(value) => Self::Unsigned8(Unsigned8Item::new(value.value)),
+            Column::Unsigned16(value) => Self::Unsigned16(Unsigned16Item::new(value.value)),
+            Column::Unsigned32(value) => Self::Unsigned32(Unsigned32Item::new(value.value)),
             Column::Float64(value) => Self::Float64(Float64Item::new(value.value)),
             Column::Percentage(value) => Self::Percentage(PercentageItem::new(value.value)),
             Column::Nic(nics) => Self::Nic(NicItem::new(nics.nics.clone())),
@@ -1194,8 +1244,9 @@ impl From<&Column> for InputItem {
                             | Column::HostNetworkGroup(..)
                             | Column::SelectSingle(..)
                             | Column::SelectMultiple(..)
-                            | Column::Unsigned32(..)
                             | Column::Unsigned8(..)
+                            | Column::Unsigned16(..)
+                            | Column::Unsigned32(..)
                             | Column::Float64(..)
                             | Column::Percentage(..)
                             | Column::Comparison(..)
