@@ -1586,6 +1586,8 @@ div.input-inner {
 table.input-head {
     width: 100%;
     margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #EBEBEB;
 }
 
 td.input-title {
@@ -1607,11 +1609,6 @@ td.input-close-x {
 
 td.input-close-x:hover {
     cursor: pointer;
-}
-
-td.input-head-space {
-    height: 20px;
-    border-bottom: 1px solid #EBEBEB;
 }
 
 div.input-contents {
