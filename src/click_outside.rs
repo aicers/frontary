@@ -7,6 +7,14 @@ use web_sys::{AddEventListenerOptions, Document, Element, HtmlElement, MouseEven
 
 type MousedownHandler = Closure<dyn FnMut(MouseEvent)>;
 
+// thread_local! is used here because:
+// 1. WASM runs in a single-threaded environment where thread-local storage provides
+//    a way to store global state that persists across function calls
+// 2. These event listeners need to be globally accessible for cleanup when elements
+//    are hidden or when new listeners replace old ones
+// 3. RefCell provides interior mutability needed to replace/remove listeners
+// 4. There's no alternative in WASM that provides the same level of control over
+//    global event listener lifecycle management
 thread_local! {
     static CLICK_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
     static CLICK_COMPLEX_LISTENER: RefCell<Option<EventListener>> = const { RefCell::new(None) };
@@ -46,6 +54,8 @@ fn is_element_hidden(window: &Window, element: &HtmlElement) -> Result<bool, JsV
 }
 
 /// Toggle the visibility of an element by ID.
+/// This function is exposed to JavaScript via `#[wasm_bindgen]` to allow web components
+/// to programmatically show/hide elements and manage their click-outside behavior.
 ///
 /// # Errors
 ///
@@ -80,6 +90,8 @@ pub fn toggle_visibility(id: &str) -> Result<(), JsValue> {
 }
 
 /// Toggle the visibility of a complex select element by ID.
+/// This function is exposed to JavaScript via `#[wasm_bindgen]` for complex dropdown
+/// components that require advanced event management (non-passive mousedown events).
 ///
 /// # Errors
 ///
@@ -113,6 +125,8 @@ pub fn toggle_visibility_complex(id: &str) -> Result<(), JsValue> {
 }
 
 /// Make a tag select element visible by ID.
+/// This function is exposed to JavaScript via `#[wasm_bindgen]` specifically for
+/// tag input components that need to show their dropdown selection interface.
 ///
 /// # Errors
 ///
@@ -135,7 +149,9 @@ pub fn visible_tag_select(id: &str) -> Result<(), JsValue> {
 }
 
 /// Handle for managing click-outside event listeners.
-/// Call `stop()` to remove the listener when no longer needed.
+/// This struct provides lifetime management for click-outside event listeners,
+/// allowing proper cleanup when the listener is no longer needed.
+/// The `#[wasm_bindgen]` attribute exposes this to JavaScript for manual cleanup.
 #[wasm_bindgen]
 pub struct ClickOutsideHandle {
     listener: Option<EventListener>,
@@ -144,6 +160,8 @@ pub struct ClickOutsideHandle {
 #[wasm_bindgen]
 impl ClickOutsideHandle {
     /// Stop listening for clicks outside the element.
+    /// This method is exposed to JavaScript via `#[wasm_bindgen]` to allow
+    /// manual cleanup of event listeners from JavaScript code.
     pub fn stop(&mut self) {
         self.listener = None;
     }
@@ -154,6 +172,10 @@ impl ClickOutsideHandle {
 /// The listener fetches the target element on every event so it remains accurate
 /// even if the DOM node is replaced by the renderer (for example, after a Yew
 /// re-render or a component toggle).
+///
+/// This function is exposed to JavaScript via `#[wasm_bindgen]` to provide a complete
+/// click-outside detection API that can be used by any web component or JavaScript code.
+/// The returned `ClickOutsideHandle` allows proper cleanup of event listeners.
 ///
 /// # Arguments
 ///
