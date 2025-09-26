@@ -17,6 +17,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added custom validation for `TextConfig`.
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
+- Added `Column::DomainName` variant to `WholeList`.
 
 ### Changed
 
