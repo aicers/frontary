@@ -11,7 +11,7 @@ use yew::{Component, Context, Html, events::InputEvent, html, html::TargetCast};
 
 use super::{
     InputItem, cal_index,
-    component::{InvalidMessage, Message, Model},
+    component::{InputSecondId, InvalidMessage, Message, Model},
 };
 use crate::{
     HostNetworkHtml, HostNetworkKind, InputEssential, InvalidPasswordKind as Kind, Tag, Theme,
@@ -108,8 +108,11 @@ where
             "width: {};",
             width.map_or("100%".to_string(), |w| format!("{w}px"))
         );
-
-        let is_edit_mode = ctx.props().input_id.is_some();
+        let is_edit_mode = match ctx.props().input_second_id.as_ref() {
+            Some(InputSecondId::Add) => false,
+            Some(InputSecondId::Edit(_)) => true,
+            None => ctx.props().input_id.is_some(),
+        };
         html! {
             <div class={class_item}>
                 {

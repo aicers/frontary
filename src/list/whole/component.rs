@@ -778,11 +778,13 @@ where
     fn view(&self, ctx: &Context<Self>) -> Html {
         let txt = ctx.props().txt.txt.clone();
         let onclick_add = ctx.link().callback(|_| Message::InputAdd);
-        let input_id = ctx
-            .props()
-            .input_ids
-            .try_borrow()
-            .map_or(None, |ids| ids.first().cloned());
+        let input_id = if matches!(self.view_input_status, ViewInputStatus::Edit)
+            && let Ok(ids) = ctx.props().input_ids.try_borrow()
+        {
+            ids.first().cloned()
+        } else {
+            None
+        };
         let sort_column = ctx
             .props()
             .display_info
