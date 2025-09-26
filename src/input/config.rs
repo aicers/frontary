@@ -137,7 +137,7 @@ pub struct Unsigned16Config {
     pub ess: Essential,
     pub min: u16,
     pub max: u16,
-    pub width: Option<u16>,
+    pub width: Option<u32>,
     pub preset: Option<u16>,
 }
 
