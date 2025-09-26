@@ -997,10 +997,6 @@ where
                             <td class="input-close-x" onclick={onclick_escape.clone()}>
                             </td>
                         </tr>
-                        <tr>
-                            <td colspan="2" class="input-head-space"> // height: 20
-                            </td>
-                        </tr>
                     </table>
                     <div class="input-contents">
                         { self.view_input(ctx) }
