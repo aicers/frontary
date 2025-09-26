@@ -3037,9 +3037,8 @@ div.modal-messages {
 }
 
 div.modal-message-item {
-    font-weight: normal;
-    font-size: 14px;
     font-weight: 400;
+    font-size: 14px;
     line-height: 20px;
     display: flex;
     align-items: center;
