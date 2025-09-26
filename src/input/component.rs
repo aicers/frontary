@@ -1183,6 +1183,30 @@ where
                     unique.push(true);
                 }
             }
+            if let InputConfig::DomainName(conf) = &(**t)
+                && let Some(data) = ctx.props().input_data.get(index)
+                && let Ok(input) = data.try_borrow()
+                && conf.unique
+            {
+                let mut different = true;
+                if let Some(data) = ctx.props().data.as_ref() {
+                    for (key, item) in data.iter() {
+                        if id.as_ref().is_none_or(|id| id != key)
+                            && let Some(other) = item.columns.get(index)
+                            && let (Column::DomainName(other_value), InputItem::DomainName(value)) =
+                                (other, &(*input))
+                            && value == &other_value.domain
+                        {
+                            different = false;
+                            break;
+                        }
+                    }
+                }
+                if !different {
+                    self.unique_msg.insert(BigUint::from(index));
+                    unique.push(true);
+                }
+            }
         }
         !unique.is_empty()
     }

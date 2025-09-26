@@ -55,6 +55,7 @@ pub struct DomainNameConfig {
     pub ess: Essential,
     pub width: Option<u32>,
     pub preset: Option<String>,
+    pub unique: bool,
 }
 
 #[derive(Clone, PartialEq)]
