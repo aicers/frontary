@@ -38,9 +38,19 @@ wasm-bindgen = { version = "0.2.82", features = [
 ] } # rustwasm/wasm-bindgen#2963
 web-sys = { version = "0.3", features = [
     "CanvasRenderingContext2d",
+    "CssStyleDeclaration",
+    "Document",
+    "Element",
+    "Event",
+    "EventTarget",
     "HtmlCanvasElement",
+    "HtmlCollection",
+    "HtmlElement",
+    "MouseEvent",
     "Navigator",
+    "Node",
     "TextMetrics",
+    "Window",
 ] }
 yew = "0.21"
 

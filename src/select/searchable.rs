@@ -121,7 +121,7 @@ where
         let txt = ctx.props().txt.txt.clone();
         let send_msg = match msg {
             Message::Click => {
-                toggle_visibility(&ctx.props().id);
+                let _ = toggle_visibility(&ctx.props().id);
                 false
             }
             Message::InputSearch(input) => {
