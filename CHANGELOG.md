@@ -20,6 +20,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `Column::DomainName` variant to `WholeList`.
 - Added `ItemKind` enum to distinguish selected items, allowing previously registered
   only actions to also apply to custom selected items.
+- Added `unique` flag to `DomainNameConfig` to enable client-side duplicate
+  domain name detection.
 
 ### Changed
 
