@@ -44,7 +44,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `DomainNameItem` now enforces case-insensitive domain names by automatically
   converting input to lowercase in both `new` and `set` methods.
 - Changed `width` field type in `Unsigned8Config` from `Option<u8>` to
-  `Option<u32>` to unify width types across input configurations.
+  `Option<u32>` and in `Unsigned16Config` from `Option<u16>` to `Option<u32>`
+  to unify width types across input configurations.
 - Changed functions and icons related with Network/IP filter to latest Figma design.
 - Switched the modal to incremental loading and optimized the CSS (`modal-messages`,
   `modal-message-item`) to resolve slowdowns and layout issues when displaying
