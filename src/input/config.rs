@@ -136,7 +136,7 @@ pub struct Unsigned8Config {
     pub ess: Essential,
     pub min: u8,
     pub max: u8,
-    pub width: Option<u8>,
+    pub width: Option<u32>,
     pub preset: Option<u8>,
 }
 

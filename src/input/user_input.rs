@@ -567,7 +567,7 @@ where
         ess: &InputEssential,
         min: u8,
         max: u8,
-        width: Option<u8>,
+        width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
         layer_index: usize,
