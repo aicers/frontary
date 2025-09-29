@@ -20,8 +20,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `Column::DomainName` variant to `WholeList`.
 - Added `ItemKind` enum to distinguish selected items, allowing previously registered
   only actions to also apply to custom selected items.
-- Added `listen_click_outside` API to enable click-outside detection for custom
-  areas, allowing users to close UI components when clicking outside of them.
 
 ### Changed
 

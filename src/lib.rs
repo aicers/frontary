@@ -76,10 +76,6 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::JsCast;
 use yew::Properties;
 
-pub use self::click_outside::{
-    ClickOutsideHandle, listen_click_outside, toggle_visibility, toggle_visibility_complex,
-    visible_tag_select,
-};
 pub use crate::checkbox::{CheckStatus, Model as Checkbox};
 pub use crate::input::{
     CheckboxChildrenConfig, CheckboxConfig, CheckboxItem, ChildrenPosition, Comparison,

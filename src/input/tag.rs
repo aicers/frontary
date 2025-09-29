@@ -11,9 +11,8 @@ use yew::{
     virtual_dom::AttrValue,
 };
 
-use crate::{
-    InputTagGroup, Texts, Theme, language::Language, text, toggle_visibility, visible_tag_select,
-};
+use crate::click_outside::{toggle_visibility, visible_tag_select};
+use crate::{InputTagGroup, Texts, Theme, language::Language, text};
 
 pub struct Model<T> {
     id: String,

@@ -7,7 +7,8 @@ use web_sys::{Event, HtmlElement};
 use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, NodeRef, Properties, classes, html};
 
-use crate::{Texts, Theme, ViewString, language::Language, text, toggle_visibility};
+use crate::click_outside::toggle_visibility;
+use crate::{Texts, Theme, ViewString, language::Language, text};
 
 pub struct Model<T, U> {
     click_listener: Option<EventListener>,
