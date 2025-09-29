@@ -10,9 +10,10 @@ use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, Properties, classes, html};
 
 use super::DEFAULT_POP_WIDTH;
+use crate::click_outside::toggle_visibility_complex;
 use crate::{
     CheckStatus, ComplexSelection, EndpointKind, NetworkGroup, NetworkItem, SelectionExtraInfo,
-    Texts, Theme, language::Language, text, toggle_visibility_complex, validate_host_network,
+    Texts, Theme, language::Language, text, validate_host_network,
 };
 
 #[derive(Clone, Copy, Eq, PartialEq)]
