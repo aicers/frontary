@@ -42,8 +42,11 @@ export function toggle_visibility_complex(id) {
         var elemDisplay = window
             .getComputedStyle(elem)
             .getPropertyValue("display");
+        var needFlex =
+            window.getComputedStyle(elem).getPropertyValue("flex-direction") ===
+            "column";
         if (elemDisplay == "none") {
-            elem.style.display = "block";
+            elem.style.display = needFlex ? "flex" : "block";
             add_listen_click_complex();
             add_listen_mousedown_complex();
         } else {
@@ -174,7 +177,7 @@ function remove_listen_click_complex() {
 }
 
 function mousedown_handler(e) {
-    const isInput = e.target.tagName === 'INPUT';
+    const isInput = e.target.tagName === "INPUT";
     if (!isInput) {
         e.stopPropagation();
         e.preventDefault();

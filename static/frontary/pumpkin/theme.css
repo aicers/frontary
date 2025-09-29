@@ -70,10 +70,9 @@ input[type=password] {
 }
 
 div.basic-checkbox {
-    width: 48px;
-    height: 48px;
-    border: 0;
-    background-size: 48px 48px;
+    width: 40px;
+    height: 40px;
+    background-size: 40px 40px;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -394,40 +393,39 @@ html.light input[type=text].complex-select-input-empty-alert {
 
 div.complex-select-pop {
     display: none;
+    flex-direction: column;
     position: fixed;
+    overflow: hidden;
     z-index: 20;
     height: 100%;
     right: 0px;
     top: 0px;
     background-color: var(--Dark-80);
-    box-shadow: -10px 0px 50px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: -10px 0px 50px 0px rgba(0, 0, 0, 0.3);
 }
 
 div.complex-select-pop-head {
-    height: 70px;
+    padding: 16px 24px;
+    gap: 12px;
+    display: flex;
+    align-self: stretch;
+}
+
+div.complex-select-pop-head-text {
+    display: flex;
+    align-items: center;
     width: 100%;
-}
-
-td.complex-select-pop-head-text {
-    height: 70px;
-    padding-left: 24px;
-    padding-right: 20px;
+    background-color: var(--Dark-80);
     vertical-align: middle;
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 24px;
     color: var(--Text-Primary);
 }
 
-span.complex-select-pop-head-color {
-    color: var(--Text-Primary);
-}
-
-td.complex-select-pop-head-close {
-    height: 70px;
-    width: 34px;
-    padding-top: 10px;
-    padding-right: 10px;
-    vertical-align: top;
-    font-size: 16px;
+div.complex-select-pop-head-close {
+    height: 40px;
+    width: 40px;
+    background-color: var(--Dark-80);
 }
 
 div.complex-select-pop-head-close-icon {
@@ -442,52 +440,120 @@ html.light div.complex-select-pop-head-close-icon {
     background-image: url('/frontary/pumpkin/light/modal-close.svg');
 }
 
-div.complex-select-pop-all {
-    height: 48px;
-    margin-top: 6px;
-    padding-left: 24px;
-    padding-right: 24px;
+div.complex-select-pop-container {
+    padding: 0 24px 30px 24px;
+    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1;
+    align-items: flex-start;
+    align-self: stretch;
+    min-height: 0;
+    height: 100%;
 }
 
-div.complex-select-pop-all-text {
-    float: left;
-    height: 42px;
-    padding-top: 12px;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 20px;
-    color: var(--Text-Primary);
+div.complex-select-pop-list-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    width: 100%;
+    min-height: 48px;
+    overflow: hidden;
+    gap: 16px;
 }
 
-div.complex-select-pop-all-button {
-    float: right;
-    width: 48px;
-    height: 48px;
-    background-size: 48px 48px;
-    background-repeat: no-repeat;
+div.complex-select-pop-list-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 div.complex-select-pop-list-head {
-    height: 48px;
     width: 100%;
     font-size: 16px;
     font-weight: 500;
     color: var(--Text-Primary);
     line-height: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+}
+
+div.complex-select-pop-head-1st {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--Text-Primary);
+    line-height: 24px;
+    flex: 1 0 0;
+}
+
+div.complex-select-pop-head-2nd {
+    color: var(--Blue-40);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+div.complex-select-pop-head-2nd-text {
+    color: var(--Blue-40);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+div.complex-select-pop-head-2nd-icon {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    justify-content: center;
+    align-items: center;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.complex-select-pop-subtext {
+    color: var(--Text-Secondary);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+div.complex-select-pop-divider {
+    width: 100%;
+    height: 1px;
+    min-height: 1px;
+    background: var(--Dark-70);
+}
+
+div.complex-select-pop-input-group {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+div.complex-select-pop-input-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
 }
 
 div.complex-select-pop-input-head {
-    height: 48px;
-    width: 100%;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--Text-Primary);
-    line-height: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
 }
 
 div.complex-select-pop-input-head-bottom {
-    height: 48px;
-    width: 100%;
     position: fixed;
     bottom: 0px;
     font-size: 14px;
@@ -496,75 +562,94 @@ div.complex-select-pop-input-head-bottom {
     color: var(--Text-Primary);
 }
 
-td.complex-select-pop-head-1st {
-    width: 125px;
-    height: 42px;
-    padding-left: 24px;
-    vertical-align: middle;
+div.complex-select-pop-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-self: stretch;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
-td.complex-select-pop-head-2nd {
-    height: 42px;
-    width: 22px;
-    background-size: 22px 22px;
-    background-position: 0px 10px;
-    background-repeat: no-repeat;
+div.complex-select-pop-list-empty {
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--Dark-30);
 }
 
 div.complex-select-pop-list-search {
-    height: 42px;
-}
-
-div.complex-select-pop-list-list-all {
-    padding-left: 26px;
-    padding-right: 26px;
-    height: 42px;
-}
-
-table.complex-select-pop-list-list-all {
-    height: 42px;
+    height: 40px;
     width: 100%;
-    border-bottom: 1px solid var(--Dark-70);
 }
 
-div.complex-select-pop-list-list-items {
-    overflow: auto;
-    padding-left: 26px;
-    padding-right: 26px;
-    padding-bottom: 20px;
+div.complex-select-pop-list-select-all-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
 }
 
-td.complex-select-pop-list-list-all-checkbox {
-    width: 19px;
+div.complex-select-pop-list-select-all-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-td.complex-select-pop-list-list-all-item {
-    padding-top: 2px;
+div.complex-select-pop-list-select-all-checkbox-icon {
+    width: 40px;
+    height: 40px;
+}
+
+div.complex-select-pop-list-select-all-text {
+    font-size: 16px;
+    line-height: 24px;
     color: var(--Text-Primary);
+}
+
+div.complex-select-pop-list-divider {
+    background-color: var(--Dark-70);
+    height: 1px;
+    width: 100%;
+}
+
+div.complex-select-pop-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+    align-self: stretch;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+div.complex-select-pop-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+}
+
+div.complex-select-pop-list-item-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+div.complex-select-pop-list-item-checkbox-icon {
+    width: 40px;
+    height: 40px;
+}
+
+div.complex-select-pop-list-item-checkbox-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
-}
-
-td.complex-select-pop-list-list-items-checkbox {
-    width: 19px;
-    vertical-align: top;
-    padding-top: 13px;
-}
-
-td.complex-select-pop-list-list-items-item {
-    padding-top: 20px;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 20px;
     color: var(--Text-Primary);
-    vertical-align: top;
-}
-
-td.complex-select-pop-list-list-items-direction {
-    width: 70px;
-    vertical-align: top;
-    padding-top: 20px;
 }
 
 div.complex-select-pop-list-networks {
@@ -575,15 +660,15 @@ div.complex-select-pop-list-networks {
 }
 
 input[type=text].complex-select-search {
+    width: 100%;
     height: 40px;
-    margin-left: 24px;
-    padding: 4px 12px;
+    padding: 8px 12px;
     background-color: var(--Transparent-Mid-Grey);
     border: none;
     border-radius: 8px;
     background-image: url('/frontary/pumpkin/magnifier.svg');
     background-size: 32px 32px;
-    background-position: right 12px top 5px;
+    background-position: right 8px top 4px;
     background-repeat: no-repeat;
     color: var(--Text-Primary);
 }
@@ -593,6 +678,7 @@ html.light input[type=text].complex-select-search {
 }
 
 input[type=text].complex-select-search::placeholder {
+    line-height: 24px;
     font-size: 16px;
     color: var(--Dark-30);
 }
@@ -601,21 +687,30 @@ input[type=text].complex-select-search:focus {
     outline: none;
 }
 
-div.complex-select-pop-input {
-    margin-top: 9px;
+div.complex-select-pop-input-input {
+    display: flex;
+    gap: 8px;
+    width: 100%;
 }
 
-div.complex-select-pop-input-input {
-    height: 30px;
-    margin-bottom: 8px;
-    padding-left: 24px;
-    padding-right: 24px;
+div.complex-select-pop-input-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+div.complex-select-pop-input-group-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
 div.complex-select-pop-input-input-text {
-    height: 30px;
-    padding-right: 8px;
-    float: left;
+    width: 100%;
+    flex: 1;
 }
 
 div.complex-select-pop-input-input-plus {
@@ -645,15 +740,28 @@ html.light div.complex-select-pop-input-input-plus {
 }
 
 div.complex-select-pop-input-input-message {
-    font-size: 12px;
-    padding-left: 26px;
-    padding-right: 26px;
-    padding-top: 15px;
-    height: 30px;
+    font-size: 14px;
+    padding-top: 4px;
     color: var(--Red-60);
+    line-height: 20px;
+}
+
+div.complex-select-pop-input-empty {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    color: var(--Dark-30);
+}
+
+div.complex-select-pop-input-input-head {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+    color: var(--Text-Primary);
 }
 
 input[type=text].complex-select-pop-input {
+    width: 100%;
     height: 40px;
     font-size: 16px;
     font-weight: 400;
@@ -663,6 +771,7 @@ input[type=text].complex-select-pop-input {
     border: none;
     border-radius: 8px;
     color: var(--Text-Primary);
+    box-sizing: border-box;
 }
 
 input[type=text].complex-select-pop-input::placeholder {
@@ -676,44 +785,76 @@ input[type=text].complex-select-pop-input:focus {
     outline: none;
 }
 
-div.complex-select-pop-input-list {
-    overflow: auto;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 20px;
-    font-size: 13px;
+div.complex-select-pop-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-y: auto;
+    gap: 8px;
+    align-self: stretch;
+    min-height: 0;
+    width: 100%;
+    flex: 1 1 auto;
 }
 
-td.complex-select-pop-input-list-networks {
-    background-color: var(--Transparent-Mid-Grey);
-    border-radius: 8px;
-    color: var(--Text-Primary);
+div.complex-select-pop-input-list {
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+    align-self: stretch;
+    min-height: 0;
+    height: 100%;
 }
+
+div.complex-select-pop-input-list-items {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+}
+
+div.complex-select-pop-input-list-component {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1 0 0;
+}
+
 
 div.complex-select-pop-input-list-text {
-    padding-top: 6px;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 6px;
-}
-
-td.complex-select-pop-input-list-direction {
-    width: 74px;
-    padding-left: 8px;
-    vertical-align: top;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1 0 0;
+    color: var(--Text-Primary);
+    font-size: 16px;
+    line-height: 24px;
 }
 
 div.complex-select-pop-input-list-delete {
+    display: flex;
     width: 24px;
     height: 24px;
-    float: right;
+    justify-content: center;
+    align-items: center;
     background-image: url('/frontary/pumpkin/delete-x.svg');
-    background-position: 2px 2px;
     background-repeat: no-repeat;
+    flex-direction: column;
+    flex-shrink: 0;
 }
 
 html.light div.complex-select-pop-input-list-delete {
     background-image: url('/frontary/pumpkin/light/delete-x.svg');
+}
+
+div.complex-select-pop-input-list-direction {
+    display: flex;
+    align-items: center;
+    min-width: 94px;
 }
 
 div.mini-select {
@@ -813,50 +954,44 @@ img.mini-select-list-down-item-more-action {
 }
 
 div.mini-select-top-direction {
-    float: right;
-    height: 24px;
-    top: -2px;
-    padding-top: 2px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 24px;
-    color: var(--Text-Primary);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
 }
 
 div.mini-select-top-direction-deactive {
-    float: right;
-    height: 20px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 24px;
-    color: var(--Dark-50);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
 }
 
-div.mini-select-top-direction:hover {
+div.mini-select-top-direction:hover div.mini-select-top-direction-text {
     color: var(--Blue-40);
     cursor: pointer;
 }
 
 div.mini-select-top-direction-text {
-    float: right;
-    margin-left: 4px;
-    margin-right: 4px;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--Text-Primary);
 }
 
 div.mini-select-top-direction-text-deactive {
-    float: right;
-    margin-left: 4px;
-    margin-right: 4px;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--Dark-50);
 }
 
 div.mini-select-top-direction-icon,
 div.mini-select-top-direction-icon-deactive {
+    display: flex;
     width: 24px;
     height: 24px;
-    float: right;
-    margin-left: 4px;
-    background-position: center;
-    background-repeat: no-repeat;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 div.mini-select-top-direction-icon {
@@ -877,10 +1012,16 @@ html.light div.mini-select-top-direction-icon-deactive {
 
 div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
     background-image: url('/frontary/pumpkin/traffic-direction-hover.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 
 html.light div.mini-select-top-direction:hover div.mini-select-top-direction-icon {
     background-image: url('/frontary/pumpkin/light/traffic-direction-hover.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
 
 div.mini-select-basic {
@@ -947,8 +1088,7 @@ html.light td.mini-select-item-direction-icon {
 }
 
 div.mini-select-item-direction {
-    float: right;
-    padding: 4px 12px;
+    padding: 8px 12px;
     border-radius: 8px;
     white-space: nowrap;
     background-color: var(--Transparent-Mid-Grey);
@@ -959,14 +1099,16 @@ div.mini-select-item-direction:hover {
 }
 
 td.mini-select-item-direction {
-    height: 32px;
+    width: 42px;
+    height: 24px;
     vertical-align: middle;
-    text-align: center;
-    font-size: 14px;
+    text-align: left;
+    font-size: 16px;
     line-height: 24px;
     color: var(--Text-Primary);
     font-weight: 400;
-    padding-right: 5px;
+    padding-right: 4px;
+    white-space: nowrap;
 }
 
 td.mini-select-item-direction-icon {

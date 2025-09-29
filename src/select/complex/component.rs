@@ -21,6 +21,12 @@ pub enum Kind {
     NetworkIp,
 }
 
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub enum ItemKind {
+    Registered,
+    Custom,
+}
+
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, PartialEq, Eq)]
 pub struct Model {
@@ -43,14 +49,14 @@ pub enum Message {
     InputInput(String),
     ToggleList,
     ToggleInput,
-    ClickItem(String),
+    ClickItem(String, ItemKind),
     ClickAll,
-    ClickAllBelow,
+    ClickAllBelow(ItemKind),
     ClickAddInput,
     DeleteInputItem(String),
     Render,
     SetDirection,
-    SetDirectionItem,
+    SetDirectionItem(ItemKind),
     InputError,
 }
 
@@ -110,7 +116,7 @@ impl Component for Model {
                 .map(NetworkItem::id)
                 .collect::<HashSet<&String>>();
             predefined.retain(|k, _| list_tmp.contains(k));
-            if self.check_status(ctx, false) == CheckStatus::Checked {
+            if !cfg!(feature = "pumpkin") && self.check_status(ctx, false) == CheckStatus::Checked {
                 *sel = None;
             }
         }
@@ -172,71 +178,91 @@ impl Component for Model {
                     Kind::Basic => self.input_text = text,
                 }
             }
-            Message::ClickItem(key) => {
-                if let (Ok(mut sel), Ok(list)) = (
-                    ctx.props().selected.predefined.try_borrow_mut(),
-                    ctx.props().list.try_borrow(),
-                ) {
-                    if let Some(predefined) = sel.as_mut() {
-                        match predefined.entry(key) {
-                            Vacant(entry) => {
-                                let extra = match ctx.props().kind {
-                                    Kind::NetworkIp => {
-                                        Some(SelectionExtraInfo::Network(EndpointKind::Both))
-                                    }
-                                    Kind::Basic => None,
-                                };
-                                entry.insert(Rc::new(RefCell::new(extra)));
-                            }
-                            Occupied(entry) => match ctx.props().kind {
-                                Kind::NetworkIp => {
-                                    let remove = if let Ok(mut extra) = entry.get().try_borrow_mut()
-                                    {
-                                        if *extra
-                                            == Some(SelectionExtraInfo::Network(EndpointKind::Both))
-                                        {
-                                            true
-                                        } else {
-                                            *extra = Some(SelectionExtraInfo::Network(
-                                                EndpointKind::Both,
-                                            ));
-                                            false
+            Message::ClickItem(key, network_kind) => match network_kind {
+                ItemKind::Registered => {
+                    if let (Ok(mut sel), Ok(list)) = (
+                        ctx.props().selected.predefined.try_borrow_mut(),
+                        ctx.props().list.try_borrow(),
+                    ) {
+                        if let Some(predefined) = sel.as_mut() {
+                            match predefined.entry(key) {
+                                Vacant(entry) => {
+                                    let extra = match ctx.props().kind {
+                                        Kind::NetworkIp => {
+                                            Some(SelectionExtraInfo::Network(EndpointKind::Both))
                                         }
-                                    } else {
-                                        false
+                                        Kind::Basic => None,
                                     };
-                                    if remove {
+                                    entry.insert(Rc::new(RefCell::new(extra)));
+                                }
+                                Occupied(entry) => match ctx.props().kind {
+                                    Kind::NetworkIp => {
+                                        let remove =
+                                            if let Ok(mut extra) = entry.get().try_borrow_mut() {
+                                                if *extra
+                                                    == Some(SelectionExtraInfo::Network(
+                                                        EndpointKind::Both,
+                                                    ))
+                                                {
+                                                    true
+                                                } else {
+                                                    *extra = Some(SelectionExtraInfo::Network(
+                                                        EndpointKind::Both,
+                                                    ));
+                                                    false
+                                                }
+                                            } else {
+                                                false
+                                            };
+                                        if remove {
+                                            entry.remove_entry();
+                                        }
+                                    }
+                                    Kind::Basic => {
                                         entry.remove_entry();
                                     }
-                                }
-                                Kind::Basic => {
-                                    entry.remove_entry();
-                                }
-                            },
-                        }
-                    } else {
-                        let mut s =
-                            HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new();
-                        let extra = match ctx.props().kind {
-                            Kind::NetworkIp => {
-                                Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                                },
                             }
-                            Kind::Basic => None,
-                        };
-                        for list in list.iter() {
-                            s.insert(list.id().clone(), Rc::new(RefCell::new(extra)));
+                        } else {
+                            let mut s =
+                                HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new();
+                            let extra = match ctx.props().kind {
+                                Kind::NetworkIp => {
+                                    Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                                }
+                                Kind::Basic => None,
+                            };
+                            for list in list.iter() {
+                                s.insert(list.id().clone(), Rc::new(RefCell::new(extra)));
+                            }
+                            s.remove(&key);
+                            *sel = Some(s);
                         }
-                        s.remove(&key);
-                        *sel = Some(s);
+                    }
+                    if self.check_status(ctx, false) == CheckStatus::Checked
+                        && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+                    {
+                        *predefined = None;
+                    }
+                    self.buffer_direction_items(ctx);
+                }
+                ItemKind::Custom => {
+                    if ctx.props().kind == Kind::NetworkIp
+                        && let Ok(custom) = ctx.props().selected.custom.try_borrow()
+                        && let Some(value) = custom.get(&key)
+                        && let Ok(mut value) = value.try_borrow_mut()
+                    {
+                        match *value {
+                            Some(SelectionExtraInfo::Network(EndpointKind::Both)) => {
+                                *value = None;
+                            }
+                            _ => {
+                                *value = Some(SelectionExtraInfo::Network(EndpointKind::Both));
+                            }
+                        }
                     }
                 }
-                if self.check_status(ctx, false) == CheckStatus::Checked
-                    && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
-                {
-                    *predefined = None;
-                }
-                self.buffer_direction_items(ctx);
-            }
+            },
             Message::ClickAll => {
                 match self.check_status(ctx, false) {
                     CheckStatus::Checked => {
@@ -249,7 +275,29 @@ impl Component for Model {
                         }
                     }
                     CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                        if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
+                        if cfg!(feature = "pumpkin") {
+                            if let (Ok(list), Ok(mut predefined)) = (
+                                ctx.props().list.try_borrow(),
+                                ctx.props().selected.predefined.try_borrow_mut(),
+                            ) {
+                                let full_select: HashMap<
+                                    String,
+                                    Rc<RefCell<Option<SelectionExtraInfo>>>,
+                                > = list
+                                    .iter()
+                                    .map(|item| {
+                                        (
+                                            item.id().clone(),
+                                            Rc::new(RefCell::new(Some(
+                                                SelectionExtraInfo::Network(EndpointKind::Both),
+                                            ))),
+                                        )
+                                    })
+                                    .collect();
+                                *predefined = Some(full_select);
+                            }
+                        } else if let Ok(mut predefined) =
+                            ctx.props().selected.predefined.try_borrow_mut()
                         {
                             *predefined = None;
                         }
@@ -257,65 +305,103 @@ impl Component for Model {
                 }
                 self.buffer_direction_items(ctx);
             }
-            Message::ClickAllBelow => {
-                if let Some(search) = self.search_result.as_ref() {
-                    let check_status = self.check_status(ctx, true);
-                    if let (Ok(mut sel), Ok(list)) = (
-                        ctx.props().selected.predefined.try_borrow_mut(),
-                        ctx.props().list.try_borrow(),
-                    ) {
-                        if let Some(predefined) = sel.as_mut() {
-                            match check_status {
+            Message::ClickAllBelow(network_kind) => match network_kind {
+                ItemKind::Registered => {
+                    if let Some(search) = self.search_result.as_ref() {
+                        let check_status = self.check_status(ctx, true);
+                        if let (Ok(mut sel), Ok(list)) = (
+                            ctx.props().selected.predefined.try_borrow_mut(),
+                            ctx.props().list.try_borrow(),
+                        ) {
+                            if let Some(predefined) = sel.as_mut() {
+                                match check_status {
+                                    CheckStatus::Checked => {
+                                        for &index in search {
+                                            if let Some(item) = list.get(index)
+                                                && item.networks().is_some()
+                                            {
+                                                predefined.remove(item.id());
+                                            }
+                                        }
+                                    }
+                                    CheckStatus::Unchecked | CheckStatus::Indeterminate => {
+                                        for &index in search {
+                                            if let Some(item) = list.get(index)
+                                                && item.networks().is_some()
+                                            {
+                                                check_item_as_both(item.id(), predefined);
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                let mut s = HashMap::<
+                                    String,
+                                    Rc<RefCell<Option<SelectionExtraInfo>>>,
+                                >::new();
+                                for item in list.iter() {
+                                    if let Some(dir) = self.direction_items.get(item.id())
+                                        && let Ok(dir) = dir.try_borrow()
+                                    {
+                                        s.insert(item.id().clone(), Rc::new(RefCell::new(*dir)));
+                                    }
+                                }
+                                for &index in search {
+                                    if let Some(item) = list.get(index) {
+                                        s.remove(item.id());
+                                    }
+                                }
+                                *sel = Some(s);
+                            }
+                        }
+                        if !cfg!(feature = "pumpkin")
+                            && check_status != CheckStatus::Checked
+                            && self.check_status(ctx, false) == CheckStatus::Checked
+                            && let Ok(mut sel) = ctx.props().selected.predefined.try_borrow_mut()
+                        {
+                            *sel = None;
+                        }
+                        self.buffer_direction_items(ctx);
+                    } else {
+                        ctx.link().send_message(Message::ClickAll);
+                        return false;
+                    }
+                }
+                ItemKind::Custom => {
+                    if ctx.props().kind == Kind::NetworkIp {
+                        let status = Self::check_custom_status(ctx);
+                        if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
+                            match status {
                                 CheckStatus::Checked => {
-                                    for &index in search {
-                                        if let Some(item) = list.get(index)
-                                            && item.networks().is_some()
-                                        {
-                                            predefined.remove(item.id());
+                                    for v in custom.values_mut() {
+                                        if let Ok(mut vv) = v.try_borrow_mut() {
+                                            *vv = None;
                                         }
                                     }
                                 }
                                 CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                                    for &index in search {
-                                        if let Some(item) = list.get(index)
-                                            && item.networks().is_some()
-                                        {
-                                            check_item_as_both(item.id(), predefined);
+                                    for v in custom.values_mut() {
+                                        if let Ok(mut vv) = v.try_borrow_mut() {
+                                            *vv = Some(SelectionExtraInfo::Network(
+                                                EndpointKind::Both,
+                                            ));
                                         }
                                     }
                                 }
                             }
-                        } else {
-                            let mut s =
-                                HashMap::<String, Rc<RefCell<Option<SelectionExtraInfo>>>>::new();
-                            for item in list.iter() {
-                                if let Some(dir) = self.direction_items.get(item.id())
-                                    && let Ok(dir) = dir.try_borrow()
-                                {
-                                    s.insert(item.id().clone(), Rc::new(RefCell::new(*dir)));
-                                }
-                            }
-                            for &index in search {
-                                if let Some(item) = list.get(index) {
-                                    s.remove(item.id());
-                                }
-                            }
-                            *sel = Some(s);
                         }
                     }
-                    if check_status != CheckStatus::Checked
-                        && self.check_status(ctx, false) == CheckStatus::Checked
-                        && let Ok(mut sel) = ctx.props().selected.predefined.try_borrow_mut()
-                    {
-                        *sel = None;
-                    }
-                    self.buffer_direction_items(ctx);
-                } else {
-                    ctx.link().send_message(Message::ClickAll);
-                    return false;
                 }
-            }
+            },
             Message::ClickAddInput => {
+                if cfg!(feature = "pumpkin") {
+                    if !self.view_input {
+                        self.view_input = true;
+                    }
+                    if self.view_list {
+                        self.view_list = false;
+                    }
+                }
                 if self.validate_user_input(ctx) {
                     if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                         match custom.entry(self.input_text.clone()) {
@@ -327,6 +413,8 @@ impl Component for Model {
                                     Kind::Basic => None,
                                 };
                                 entry.insert(Rc::new(RefCell::new(extra)));
+                                self.input_text.clear();
+                                self.input_wrong_msg = None;
                             }
                             Occupied(_) => {
                                 self.input_wrong_msg = Some("The input already exists.");
@@ -340,24 +428,36 @@ impl Component for Model {
                 }
             }
             Message::DeleteInputItem(key) => {
-                if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
-                    && let Occupied(entry) = custom.entry(key)
-                {
-                    entry.remove_entry();
+                if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
+                    if let Occupied(entry) = custom.entry(key) {
+                        entry.remove_entry();
+                    }
+                    if custom.is_empty() {
+                        self.view_input = false;
+                    }
                 }
             }
             Message::SetDirection => {
                 self.set_direction(ctx);
                 self.load_direction_items(ctx);
             }
-            Message::SetDirectionItem => {
-                self.load_direction_items(ctx);
-            }
+            Message::SetDirectionItem(network_kind) => match network_kind {
+                ItemKind::Registered => {
+                    self.load_direction_items(ctx);
+                }
+                ItemKind::Custom => {
+                    self.set_direction_custom(ctx);
+                }
+            },
             Message::Render => {
                 let check_status = self.check_status(ctx, false);
                 if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut() {
                     match check_status {
-                        CheckStatus::Checked => *predefined = None,
+                        CheckStatus::Checked => {
+                            if !cfg!(feature = "pumpkin") {
+                                *predefined = None;
+                            }
+                        }
                         CheckStatus::Unchecked | CheckStatus::Indeterminate => (),
                     }
                 }
@@ -375,7 +475,32 @@ impl Component for Model {
         let mut class_input = "complex-select-input";
         let txt = ctx.props().txt.txt.clone();
         let check_status = self.check_status(ctx, false);
-        let value = if let Ok(list) = ctx.props().list.try_borrow() {
+        let value = if cfg!(feature = "pumpkin") {
+            if let Ok(list) = ctx.props().list.try_borrow() {
+                if list.is_empty() {
+                    class_input = "complex-select-input";
+                    text!(txt, ctx.props().language, "All").to_string()
+                } else {
+                    let (list_selected, custom_selected) = ctx.props().selected.len();
+                    if list_selected.unwrap_or_default() == 0 && custom_selected == 0 {
+                        text!(txt, ctx.props().language, "All").to_string()
+                    } else {
+                        let selected_len = Self::selected_len(ctx);
+                        if selected_len == 0 {
+                            text!(txt, ctx.props().language, "All").to_string()
+                        } else {
+                            format!(
+                                "({}) {}",
+                                selected_len,
+                                text!(txt, ctx.props().language, "Selected Filters"),
+                            )
+                        }
+                    }
+                }
+            } else {
+                "complex-select-input-empty".to_string()
+            }
+        } else if let Ok(list) = ctx.props().list.try_borrow() {
             if list.is_empty() {
                 class_input = "complex-select-input-empty";
                 text!(txt, ctx.props().language, "None").to_string()
@@ -528,6 +653,65 @@ impl Model {
         }
     }
 
+    #[inline]
+    pub(super) fn check_custom_status(ctx: &Context<Self>) -> CheckStatus {
+        if let Ok(custom) = ctx.props().selected.custom.try_borrow() {
+            if custom.is_empty() {
+                return CheckStatus::Unchecked;
+            }
+            let mut all_none = true;
+            let mut all_both = true;
+            for v in custom.values() {
+                if let Ok(v) = v.try_borrow() {
+                    match *v {
+                        None => {
+                            all_both = false;
+                        }
+                        Some(SelectionExtraInfo::Network(EndpointKind::Both)) => {
+                            all_none = false;
+                        }
+                        Some(SelectionExtraInfo::Network(_) | SelectionExtraInfo::Basic) => {
+                            all_none = false;
+                            all_both = false;
+                            break;
+                        }
+                    }
+                } else {
+                    all_none = false;
+                    all_both = false;
+                    break;
+                }
+            }
+            if all_none {
+                CheckStatus::Unchecked
+            } else if all_both {
+                CheckStatus::Checked
+            } else {
+                CheckStatus::Indeterminate
+            }
+        } else {
+            CheckStatus::Unchecked
+        }
+    }
+
+    fn set_direction_custom(&mut self, ctx: &Context<Self>) {
+        if ctx.props().kind != Kind::NetworkIp {
+            return;
+        }
+        if let Ok(direction) = self.direction.try_borrow()
+            && let Some(direction) = direction.as_ref()
+            && let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
+        {
+            for v in custom.values_mut() {
+                if let Ok(mut vv) = v.try_borrow_mut()
+                    && vv.is_some()
+                {
+                    *vv = Some(SelectionExtraInfo::Network(*direction));
+                }
+            }
+        }
+    }
+
     fn buffer_direction_items(&mut self, ctx: &Context<Self>) {
         self.direction_items = if let (Ok(predefined), Ok(list)) = (
             ctx.props().selected.predefined.try_borrow(),
@@ -573,16 +757,15 @@ impl Model {
                 .direction_items
                 .iter()
                 .filter_map(|(k, v)| {
-                    if let Ok(v) = v.try_borrow() {
-                        Some((k.clone(), Rc::new(RefCell::new(*v))))
-                    } else {
-                        None
-                    }
+                    v.try_borrow()
+                        .ok()
+                        .and_then(|v| (*v).map(|val| (k.clone(), Rc::new(RefCell::new(Some(val))))))
                 })
                 .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>();
             *predefined = Some(s);
         }
-        if self.check_status(ctx, false) == CheckStatus::Checked
+        if !cfg!(feature = "pumpkin")
+            && self.check_status(ctx, false) == CheckStatus::Checked
             && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
         {
             *predefined = None;

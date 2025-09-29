@@ -18,6 +18,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
 - Added `Column::DomainName` variant to `WholeList`.
+- Added `ItemKind` enum to distinguish selected items, allowing previously registered
+  only actions to also apply to custom selected items.
 
 ### Changed
 
@@ -32,6 +34,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
   converting input to lowercase in both `new` and `set` methods.
 - Changed `width` field type in `Unsigned8Config` from `Option<u8>` to
   `Option<u32>` to unify width types across input configurations.
+- Changed functions and icons related with Network/IP filter to latest Figma design.
 
 ### Fixed
 
