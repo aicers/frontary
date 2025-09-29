@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use htmlescape::decode_html;
 use itertools::Itertools;
 use json_gettext::get_text;
-use yew::{Component, Context, Html, classes, html, virtual_dom::AttrValue};
+use yew::classes;
+use yew::{Component, Context, Html, html, virtual_dom::AttrValue};
 
 use super::{
     DEFAULT_NUM_PAGES,
     component::{Message, Model},
 };
 use crate::{
-    CheckStatus, Checkbox, InputConfig, MoreAction, NBSP, Pages, SelectMini, SelectMiniKind, Sort,
+    CheckStatus, Checkbox, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
     SortStatus, Theme, ViewString, WholeList,
     list::{ColWidths, Column, DataType, Kind, ListItem, ModalDisplay},
     text,
@@ -26,7 +26,6 @@ where
     #[allow(clippy::too_many_lines)]
     pub(super) fn view_head(&self, ctx: &Context<Self>) -> Html {
         let onclick_all = ctx.link().callback(|_| Message::CheckAll);
-        let onclick_all_second = ctx.link().callback(|_| Message::CheckAllSecond);
         let check_status = self.check_status(ctx);
         let mut colspan = 0;
         let rowspan = ctx.props().display_info.widths.len().to_string();
@@ -35,31 +34,41 @@ where
         html! {
             <>
                 <tr class="list-whole-head">
-                    <td class="list-whole-head-check" rowspan={rowspan.clone()}>
-                        <div onclick={onclick_all}>
-                            <Checkbox
-                                status={check_status}
-                                {theme}
-                            />
-                        </div>
-                    </td>
                     {
-                        if ctx.props().kind == Kind::LayeredFirst {
-                            let check_status_second = self.check_status_second.try_borrow().map_or(CheckStatus::Unchecked, |s| *s);
-                            colspan += 1;
-
-                            html! {
-                                <td class="list-whole-head-check">
-                                    <div onclick={onclick_all_second}>
-                                        <Checkbox
-                                            status={check_status_second}
-                                            {theme}
-                                        />
-                                    </div>
-                                </td>
+                        match ctx.props().kind {
+                            Kind::LayeredFirst => {
+                                html! {
+                                    <>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}>
+                                            <div onclick={onclick_all.clone()}>
+                                                <Checkbox status={check_status} {theme} />
+                                            </div>
+                                        </td>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
+                                    </>
+                                }
                             }
-                        } else {
-                            html! {}
+                            Kind::LayeredSecond => {
+                                html! {
+                                    <>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}>
+                                            <div onclick={onclick_all.clone()}>
+                                                <Checkbox status={check_status} {theme} />
+                                            </div>
+                                        </td>
+                                    </>
+                                }
+                            }
+                            Kind::Flat => {
+                                html! {
+                                    <td class="list-whole-head-check" rowspan={rowspan.clone()}>
+                                        <div onclick={onclick_all}>
+                                            <Checkbox status={check_status} {theme} />
+                                        </div>
+                                    </td>
+                                }
+                            }
                         }
                     }
                     {
@@ -68,8 +77,25 @@ where
                                 colspan += ws.len();
                             }
 
+                            if ctx.props().kind == Kind::LayeredSecond {
+                                colspan = ctx.props().first_colspan.unwrap_or(colspan);
+                            }
+
+                            let style = if let ColWidths::Pixel(_) = widths {
+                                String::new()
+                            } else {
+                                "width: 100%;".to_string()
+                            };
                             html! {
-                                self.view_head_row(ctx, 0, widths)
+                                <td colspan={colspan.to_string()} class="list-whole-list-head">
+                                    <div class="list-whole-head-next-lines">
+                                        <table style={style}>
+                                            <tr class="list-whole-head-next-lines">
+                                                { self.view_head_row(ctx, 0, widths) }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
                             }
                         } else {
                             html! {}
@@ -131,7 +157,6 @@ where
         widths: &ColWidths,
     ) -> Html {
         let txt = ctx.props().txt.txt.clone();
-        let varied_width = Self::varied_width(ctx, widths);
         html! {
             for (0..widths.len()).map(|i| {
                 let index = start + i;
@@ -141,13 +166,18 @@ where
                     } else {
                         ""
                     };
-                    let style = if cfg!(feature = "pumpkin") {
-                        format!("width: {}px;", ctx.props().display_info.width_full)
-                    } else {
-                        Self::style_width_height(ctx, widths, i, varied_width)
-                    };
+                    // let style = if cfg!(feature = "pumpkin") {
+                        // format!("width: {}px;", ctx.props().display_info.width_full)
+                    // } else {
+                    let style =    Self::style_width_height(ctx, widths, i);
+                    // };
                     let style_inner = format!("width: 100%; height: {}px", ctx.props().display_info.height);
                     let onclick_sort = |index: usize| ctx.link().callback(move |_| Message::ClickSort(index));
+                    let sort_status = self.sort.map_or(SortStatus::Unsorted, |s| if s.index == index {
+                        s.status
+                    } else {
+                        SortStatus::Unsorted
+                    });
 
                     html! {
                         <td class={classes!("list-whole-head-title", class_border)} style={style} onclick={onclick_sort(index)}>
@@ -157,28 +187,12 @@ where
                                         { text!(txt, ctx.props().language, *title) }
                                     </td>
                                     {
-                                        if ctx.props().kind == Kind::LayeredFirst && !self.expand_list.is_empty()
-                                            || ctx.props().kind == Kind::Flat || ctx.props().kind == Kind::LayeredSecond {
-                                            let sort_status = if ctx.props().kind == Kind::LayeredFirst {
-                                                self.sort_second_layer
-                                            } else {
-                                                self.sort
-                                            };
-                                            let sort_status = sort_status.map_or(SortStatus::Unsorted, |s| if s.index == index {
-                                                s.status
-                                            } else {
-                                                SortStatus::Unsorted
-                                            });
-
-                                            html! {
-                                                <td class="list-whole-head-title-inner-sort">
-                                                    <div class="list-whole-head-title-sort">
-                                                        <Sort status={sort_status} />
-                                                    </div>
-                                                </td>
-                                            }
-                                        } else {
-                                            html! {}
+                                        html! {
+                                            <td class="list-whole-head-title-inner-sort">
+                                                <div class="list-whole-head-title-sort">
+                                                    <Sort status={sort_status} />
+                                                </div>
+                                            </td>
                                         }
                                     }
                                 </tr>
@@ -222,7 +236,8 @@ where
                                 match ctx.props().kind {
                                     Kind::LayeredFirst => {
                                         if ctx.props().data_type == Some(DataType::Customer) {
-                                            let cols = ctx.props().display_info.titles.len().to_string();
+                                            let cols = ctx.props().display_info.titles.len();
+
                                             let file_name = if self.expand_list.contains(key) {
                                                 "collapse-list"
                                             } else {
@@ -255,12 +270,8 @@ where
                                                         <div class="list-whole-list-first-expand" style={style} onclick={onclick_expandible(key.clone())}>
                                                         </div>
                                                     </td>
-                                                    <td colspan={cols} class="list-whole-list-first-layer">
-                                                        { item.columns.first().map_or_else(|| html! {}, |n| Self::view_column(ctx, index, n)) }
-                                                        { decode_html(NBSP.repeat(3).as_str()).expect("safely-selected character") }
-                                                        <span class="list-whole-list-first-layer-light">
-                                                            { item.columns.get(1).map_or_else(|| html! {}, |d| Self::view_column(ctx, index, d)) }
-                                                        </span>
+                                                    <td colspan={cols.to_string()} class="list-whole-list-flat">
+                                                        {self.view_column_row(ctx, item.columns.as_ref(), 0, &ctx.props().display_info.widths[0], ctx.props().display_info.widths.len() > 1)}
                                                     </td>
                                                     <td class="list-whole-list-first-layer-more-action">
                                                         <div class="list-whole-list-flat-more-action">
@@ -327,9 +338,16 @@ where
                                                             if let ColWidths::Pixel(ws) = widths {
                                                                 colspan += ws.len();
                                                             }
+                                                            if ctx.props().kind == Kind::LayeredSecond {
+                                                                colspan = ctx.props().first_colspan.unwrap_or(colspan);
+                                                            }
 
                                                             html! {
-                                                                self.view_column_row(ctx, item.columns.as_ref(), 0, widths, ctx.props().display_info.widths.len() > 1)
+                                                                <td colspan={colspan.to_string()} class="list-whole-list-colspan">
+                                                                    {
+                                                                        self.view_column_row(ctx, item.columns.as_ref(), 0, widths, ctx.props().display_info.widths.len() > 1)
+                                                                    }
+                                                                </td>
                                                             }
                                                         } else {
                                                             html! {}
@@ -446,12 +464,13 @@ where
                                                     kind={Kind::LayeredSecond}
                                                     data_type={ctx.props().data_type}
                                                     data={Rc::clone(&data)}
-                                                    display_info={Rc::clone(&ctx.props().display_info)}
-                                                    sort={self.sort_second_layer}
+                                                    display_info={Rc::clone(ctx.props().display_second_info.as_ref().unwrap_or(&ctx.props().display_info))}
+                                                    sort={self.sort}
                                                     pages_info={Rc::clone(pages_info)}
                                                     check_status_second={Rc::clone(&self.check_status_second)}
                                                     check_status_second_cache={Some(*check_status_second)}
 
+                                                    first_colspan={ctx.props().display_info.titles.len()}
                                                     input_ids={Rc::clone(&ctx.props().input_ids)}
                                                     input_second_keys={Rc::clone(&ctx.props().input_second_keys)}
                                                     input_data={ctx.props().input_data.clone()}
@@ -488,41 +507,47 @@ where
     }
 
     #[must_use]
-    fn varied_width(ctx: &Context<Self>, widths: &ColWidths) -> Option<u32> {
-        match widths {
-            ColWidths::Pixel(widths) => Some(
-                ctx.props()
-                    .display_info
-                    .width_full
-                    .saturating_sub(widths.iter().filter_map(|x| *x).sum::<u32>()),
-            ),
-            ColWidths::Ratio(_) => None,
-        }
-    }
-
-    #[must_use]
-    fn style_width_height(
-        ctx: &Context<Self>,
-        widths: &ColWidths,
-        index: usize,
-        varied_width: Option<u32>,
-    ) -> String {
+    fn style_width_height(ctx: &Context<Self>, widths: &ColWidths, index: usize) -> String {
         let width = match widths {
-            ColWidths::Pixel(ws) => ws.get(index).map_or_else(String::new, |w| {
-                w.map_or_else(
-                    || {
-                        varied_width
-                            .as_ref()
-                            .map_or_else(String::new, |v| format!("width: {v}px;"))
-                    },
-                    |w| format!("width: {w}px;"),
-                )
-            }),
-            ColWidths::Ratio(ws) => ws.get(index).map_or_else(String::new, |w| {
-                w.map_or_else(String::new, |w| {
-                    format!("width: {:.0}%;", (w * 100.0).trunc())
-                })
-            }),
+            ColWidths::Pixel(ws) => {
+                let width = ws.get(index).and_then(|w| *w);
+                if let Some(w) = width {
+                    format!("width: {w}px;")
+                } else {
+                    let specified_width: u32 = ws.iter().filter_map(|x| *x).sum();
+                    let num_unspecified = ws.iter().filter(|x| x.is_none()).count();
+
+                    if num_unspecified > 0 {
+                        let remaining_width = ctx
+                            .props()
+                            .display_info
+                            .width_full
+                            .saturating_sub(specified_width);
+                        format!("width: {}px;", remaining_width / num_unspecified as u32)
+                    } else {
+                        String::new()
+                    }
+                }
+            }
+            ColWidths::Ratio(ws) => {
+                let ratio = ws.get(index).and_then(|r| *r);
+                if let Some(r) = ratio {
+                    format!("width: {:.0}%;", (r * 100.0).trunc())
+                } else {
+                    let specified_ratio: f32 = ws.iter().filter_map(|x| *x).sum();
+                    let num_unspecified = ws.iter().filter(|x| x.is_none()).count();
+
+                    if num_unspecified > 0 {
+                        let remaining_ratio = 1.0 - specified_ratio;
+                        format!(
+                            "width: {:.0}%;",
+                            (remaining_ratio / num_unspecified as f32 * 100.0).trunc()
+                        )
+                    } else {
+                        String::new()
+                    }
+                }
+            }
         };
         let height = format!("height: {}px;", ctx.props().display_info.height);
         format!("{width} {height}")
@@ -534,27 +559,29 @@ where
         columns: &[Column],
         start: usize,
         widths: &ColWidths,
-        border: bool,
+        _border: bool,
     ) -> Html {
-        let varied_width = Self::varied_width(ctx, widths);
-
         html! {
             for (0..widths.len()).map(|i| {
                 let index = start + i;
                 if let Some(col) = columns.get(index) {
-                    let class_border = if start == 0 {
-                        "list-whole-column-next-lines-first"
-                    } else if i > 0 {
-                        "list-whole-column-next-lines"
-                    } else {
+                    let class = if ctx.props().kind == Kind::LayeredSecond || ctx.props().kind == Kind::Flat {
+                        if start == 0 {
+                            "list-whole-column-next-lines-first"
+                        } else if i > 0 {
+                            "list-whole-column-next-lines"
+                        } else {
+                            ""
+                        }
+                    }else{
                         ""
                     };
-                    let style = Self::style_width_height(ctx, widths, i, varied_width);
+                    let style = Self::style_width_height(ctx, widths, i);
                     let onclick_close = {
                         ctx.link().callback(move |_| Message::CloseModal)
                     };
                     html! {
-                        <td class={classes!("list-whole-list-flat", if border { class_border } else { "" })} style={style}>
+                        <td class={classes!("list-whole-list-flat",class)} style={style}>
                             { Self::view_column(ctx, index, col) }
                             {
                                 if let Some(modal) = &self.modal {

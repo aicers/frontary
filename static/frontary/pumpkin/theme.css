@@ -1130,7 +1130,7 @@ td.list-whole-head-title:hover {
 }
 
 td.list-whole-head-title-inner-text {
-    height: 30px;
+    height: 48px;
     word-break: keep-all;
     overflow-wrap: break-word;
 }
