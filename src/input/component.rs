@@ -551,6 +551,7 @@ where
                 }
                 self.remove_required_msg(&id, txt.is_empty());
                 self.unique_msg.remove(&id);
+                self.decide_unique_all(ctx);
             }
             Message::InputDomainName(id, domain, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
@@ -558,6 +559,7 @@ where
                 }
                 self.remove_required_msg(&id, domain.is_empty());
                 self.unique_msg.remove(&id);
+                self.decide_unique_all(ctx);
             }
             Message::InputPassword(id, txt, input_data) => {
                 if let Ok(mut item) = input_data.try_borrow_mut() {
