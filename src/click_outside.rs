@@ -88,11 +88,21 @@ pub fn toggle_visibility(id: &str) -> Result<(), JsValue> {
 pub fn toggle_visibility_complex(id: &str) -> Result<(), JsValue> {
     let (window, document) = get_window_and_document()?;
     let element = get_html_element_by_id(&document, id)?;
+    let display = {
+        #[cfg(feature = "pumpkin")]
+        {
+            "flex"
+        }
+        #[cfg(not(feature = "pumpkin"))]
+        {
+            "block"
+        }
+    };
 
     if is_element_hidden(&window, &element)? {
         element
             .style()
-            .set_property("display", "block")
+            .set_property("display", display)
             .map_err(|_| JsValue::from_str("Could not set display property"))?;
 
         add_listen_click_complex(&document);
