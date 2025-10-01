@@ -296,8 +296,8 @@ impl PartialEq for Message {
             | (Self::Save, Self::Save)
             | (Self::TrySave, Self::TrySave)
             | (Self::InvalidInputUnsigned32, Self::InvalidInputUnsigned32)
-            | (Self::InvalidInputUnsigned8, Self::InvalidInputUnsigned8)
             | (Self::InvalidInputUnsigned16, Self::InvalidInputUnsigned16)
+            | (Self::InvalidInputUnsigned8, Self::InvalidInputUnsigned8)
             | (Self::InvalidInputFloat64, Self::InvalidInputFloat64)
             | (Self::InvalidInputComparisonValue, Self::InvalidInputComparisonValue)
             | (Self::FailLoadFile, Self::FailLoadFile)
@@ -315,10 +315,10 @@ impl PartialEq for Message {
             (Self::InputUnsigned32(s1, s2, s3), Self::InputUnsigned32(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::InputUnsigned8(s1, s2, s3), Self::InputUnsigned8(o1, o2, o3)) => {
+            (Self::InputUnsigned16(s1, s2, s3), Self::InputUnsigned16(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
-            (Self::InputUnsigned16(s1, s2, s3), Self::InputUnsigned16(o1, o2, o3)) => {
+            (Self::InputUnsigned8(s1, s2, s3), Self::InputUnsigned8(o1, o2, o3)) => {
                 s1 == o1 && s2 == o2 && s3 == o3
             }
             (Self::InputFloat64(s1, s2, s3), Self::InputFloat64(o1, o2, o3)) => {
@@ -610,8 +610,8 @@ where
                 self.unique_msg.remove(&id);
             }
             Message::InvalidInputUnsigned32
-            | Message::InvalidInputUnsigned8
             | Message::InvalidInputUnsigned16
+            | Message::InvalidInputUnsigned8
             | Message::InvalidInputFloat64
             | Message::InvalidInputPercentage
             | Message::InvalidInputComparisonValue => return false,
@@ -1078,12 +1078,12 @@ where
                         self.view_unsigned_32(ctx, &config.ess, config.min, config.max,
                             config.width, input_data, None, index, index == 0, false)
                     }
-                    InputConfig::Unsigned8(config) => {
-                        self.view_unsigned_8(ctx, &config.ess, config.min, config.max,
-                            config.width, input_data, None, index, index == 0, false)
-                    }
                     InputConfig::Unsigned16(config) => {
                         self.view_unsigned_16(ctx, &config.ess, config.min, config.max,
+                            config.width, input_data, None, index, index == 0, false)
+                    }
+                    InputConfig::Unsigned8(config) => {
+                        self.view_unsigned_8(ctx, &config.ess, config.min, config.max,
                             config.width, input_data, None, index, index == 0, false)
                     }
                     InputConfig::Float64(config) => {
