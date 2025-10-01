@@ -576,12 +576,12 @@ where
 
     #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
-    pub(super) fn view_unsigned_8(
+    pub(super) fn view_unsigned_16(
         &self,
         ctx: &Context<Self>,
         ess: &InputEssential,
-        min: u8,
-        max: u8,
+        min: u16,
+        max: u16,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
@@ -599,25 +599,25 @@ where
                 .map_or(Message::InputError, |input| {
                     let value = input.value();
                     if value.is_empty() {
-                        Message::InputUnsigned8(
+                        Message::InputUnsigned16(
                             my_index_clone.clone(),
                             None,
                             input_data_clone.clone(),
                         )
-                    } else if let Ok(parsed) = value.parse::<u8>() {
-                        Message::InputUnsigned8(
+                    } else if let Ok(parsed) = value.parse::<u16>() {
+                        Message::InputUnsigned16(
                             my_index_clone.clone(),
                             Some(parsed),
                             input_data_clone.clone(),
                         )
                     } else {
-                        Message::InvalidInputUnsigned8
+                        Message::InvalidInputUnsigned16
                     }
                 })
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Unsigned8(value) = &*input_data {
+            if let InputItem::Unsigned16(value) = &*input_data {
                 value.into_inner()
             } else {
                 None
@@ -716,12 +716,12 @@ where
 
     #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
-    pub(super) fn view_unsigned_16(
+    pub(super) fn view_unsigned_8(
         &self,
         ctx: &Context<Self>,
         ess: &InputEssential,
-        min: u16,
-        max: u16,
+        min: u8,
+        max: u8,
         width: Option<u32>,
         input_data: &Rc<RefCell<InputItem>>,
         base_index: Option<&BigUint>,
@@ -739,25 +739,25 @@ where
                 .map_or(Message::InputError, |input| {
                     let value = input.value();
                     if value.is_empty() {
-                        Message::InputUnsigned16(
+                        Message::InputUnsigned8(
                             my_index_clone.clone(),
                             None,
                             input_data_clone.clone(),
                         )
-                    } else if let Ok(parsed) = value.parse::<u16>() {
-                        Message::InputUnsigned16(
+                    } else if let Ok(parsed) = value.parse::<u8>() {
+                        Message::InputUnsigned8(
                             my_index_clone.clone(),
                             Some(parsed),
                             input_data_clone.clone(),
                         )
                     } else {
-                        Message::InvalidInputUnsigned16
+                        Message::InvalidInputUnsigned8
                     }
                 })
         });
         let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
         let value = if let Ok(input_data) = input_data.try_borrow() {
-            if let InputItem::Unsigned16(value) = &*input_data {
+            if let InputItem::Unsigned8(value) = &*input_data {
                 value.into_inner()
             } else {
                 None

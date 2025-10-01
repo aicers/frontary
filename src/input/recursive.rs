@@ -244,14 +244,14 @@ where
                                 item.set(*preset);
                             }
                         }
-                        (InputItem::Unsigned8(item), InputConfig::Unsigned8(config)) => {
+                        (InputItem::Unsigned16(item), InputConfig::Unsigned16(config)) => {
                             if let Some(preset) = &config.preset
                                 && parent_checked
                             {
                                 item.set(*preset);
                             }
                         }
-                        (InputItem::Unsigned16(item), InputConfig::Unsigned16(config)) => {
+                        (InputItem::Unsigned8(item), InputConfig::Unsigned8(config)) => {
                             if let Some(preset) = &config.preset
                                 && parent_checked
                             {
@@ -735,7 +735,7 @@ where
                                 }
                             }
                         }
-                        (InputItem::Unsigned8(value), InputConfig::Unsigned8(config)) => {
+                        (InputItem::Unsigned16(value), InputConfig::Unsigned16(config)) => {
                             if let Some(value) = value.as_ref()
                                 && parent_checked
                             {
@@ -750,7 +750,7 @@ where
                                 }
                             }
                         }
-                        (InputItem::Unsigned16(value), InputConfig::Unsigned16(config)) => {
+                        (InputItem::Unsigned8(value), InputConfig::Unsigned8(config)) => {
                             if let Some(value) = value.as_ref()
                                 && parent_checked
                             {
