@@ -483,6 +483,18 @@ where
         } else {
             String::new()
         };
+        let suffix = if ctx.props().active {
+            String::new()
+        } else if let Some(suffix) = ctx.props().deactive_class_suffix.as_ref() {
+            suffix.as_ref().into()
+        } else {
+            String::new()
+        };
+        let (class, class_text, class_icon) = (
+            format!("mini-select-item-direction{suffix}"),
+            format!("mini-select-item-direction{suffix}"),
+            format!("mini-select-item-direction-icon{suffix}"),
+        );
         let style_width = ctx
             .props()
             .top_width
@@ -499,13 +511,13 @@ where
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
         html! {
-            <div onclick={onclick} class="mini-select-item-direction" style={style}>
+            <div onclick={onclick} class={class} style={style}>
                 <table>
                     <tr>
-                        <td class="mini-select-item-direction">
+                        <td class={class_text}>
                             { value }
                         </td>
-                        <td class="mini-select-item-direction-icon">
+                        <td class={class_icon}>
                         </td>
                     </tr>
                 </table>

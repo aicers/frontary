@@ -62,7 +62,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Fixed direction dropdown disappearing when Network/IP items are deselected.
   The dropdown now remains visible but disabled, displaying the last selected
-  value to maintain UI consistency.
+  direction value to maintain UI consistency.
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
   `InputEscape` follows `InputAdd` in the `WholeList` component.
 - Fixed host network duplicate check logic where `binary_search` would fail to
