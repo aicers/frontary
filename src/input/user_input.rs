@@ -1176,6 +1176,17 @@ where
                         {validation}
                     />
                     { self.view_required_msg(ctx, &my_index) }
+                    {
+                        if self.unique_msg.contains(&my_index) {
+                            html! {
+                                <div class="input-contents-item-alert-message">
+                                    { text!(txt, ctx.props().language, EXISTING_MSG)}
+                                </div>
+                            }
+                        } else {
+                            html! {}
+                        }
+                    }
                 </div>
             }
         } else {

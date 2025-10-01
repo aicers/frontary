@@ -74,6 +74,7 @@ pub struct HostNetworkGroupConfig {
     pub width: Option<u32>,
     pub theme: Option<Theme>,
     pub length: Option<usize>,
+    pub unique: bool,
     pub validation: Option<ValidationFn>,
 }
 
@@ -85,6 +86,7 @@ impl PartialEq for HostNetworkGroupConfig {
             && self.width == other.width
             && self.theme == other.theme
             && self.length == other.length
+            && self.unique == other.unique
     }
 }
 

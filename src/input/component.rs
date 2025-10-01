@@ -640,9 +640,12 @@ where
             }
             Message::InputHostNetworkGroup(id, input_data) => {
                 self.input_host_network_group(&id, &input_data);
+                self.unique_msg.remove(&id);
+                self.decide_unique_all(ctx);
             }
             Message::UserInputHostNetworkGroup(id) => {
                 self.remove_required_msg(&id, false);
+                self.unique_msg.remove(&id);
             }
             Message::InputMultipleSelect(id, input_data, list) => {
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
@@ -1221,6 +1224,72 @@ where
                         {
                             different = false;
                             break;
+                        }
+                    }
+                }
+                if !different {
+                    self.unique_msg.insert(BigUint::from(index));
+                    unique.push(true);
+                }
+            }
+            if let InputConfig::HostNetworkGroup(conf) = &(**t)
+                && let Some(data) = ctx.props().input_data.get(index)
+                && let Ok(input) = data.try_borrow()
+                && conf.unique
+            {
+                let mut different = true;
+                if let Some(data) = ctx.props().data.as_ref() {
+                    for (key, item) in data.iter() {
+                        if id.as_ref().is_none_or(|id| id != key)
+                            && let Some(other) = item.columns.get(index)
+                            && let (
+                                Column::HostNetworkGroup(other_value),
+                                InputItem::HostNetworkGroup(value),
+                            ) = (other, &(*input))
+                        {
+                            // Categorize once to avoid rescanning the host network group.
+                            let mut host_entries: HashSet<&str> = HashSet::new();
+                            let mut network_entries: HashSet<&str> = HashSet::new();
+                            let mut range_entries: HashSet<&str> = HashSet::new();
+
+                            for entry in &other_value.host_network_group {
+                                if let Some(parsed) = crate::parse_host_network(entry) {
+                                    match parsed {
+                                        crate::HostNetwork::Host(_) => {
+                                            host_entries.insert(entry.as_str());
+                                        }
+                                        crate::HostNetwork::Network(_) => {
+                                            network_entries.insert(entry.as_str());
+                                        }
+                                        crate::HostNetwork::Range(_) => {
+                                            range_entries.insert(entry.as_str());
+                                        }
+                                    }
+                                }
+                            }
+
+                            let hosts_match = value.hosts.len() == host_entries.len()
+                                && value
+                                    .hosts
+                                    .iter()
+                                    .all(|h| host_entries.contains(h.as_str()));
+
+                            let networks_match = value.networks.len() == network_entries.len()
+                                && value
+                                    .networks
+                                    .iter()
+                                    .all(|n| network_entries.contains(n.as_str()));
+
+                            let ranges_match = value.ranges.len() == range_entries.len()
+                                && value.ranges.iter().all(|r| {
+                                    let range = r.to_string();
+                                    range_entries.contains(range.as_str())
+                                });
+
+                            if hosts_match && networks_match && ranges_match {
+                                different = false;
+                                break;
+                            }
                         }
                     }
                 }
