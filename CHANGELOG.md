@@ -2,15 +2,13 @@
 
 This file documents recent notable changes to this project. The format of this
 file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
-this project adheres to [Semantic
-Versioning](https://semver.org/spec/v2.0.0.html).
+this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.13.0] - 2025-10-01
 
 ### Added
 
-- Added visible sort options for dropdowns via `visible_sort_options` in
-  `WholeList`.
+- Added visible sort options for dropdowns via `visible_sort_options` in `WholeList`.
 - Prevent multiple pagination requests before previous one completes.
 - Added "Close All" button for notifications to allow users to dismiss all
   notifications at once when there are multiple notifications present.
@@ -385,7 +383,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial release.
 
-[Unreleased]: https://github.com/aicers/frontary/compare/0.12.0...main
+[0.13.0]: https://github.com/aicers/frontary/compare/0.12.0...0.13.0
 [0.12.0]: https://github.com/aicers/frontary/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/aicers/frontary/compare/0.10.1...0.11.0
 [0.10.1]: https://github.com/aicers/frontary/compare/0.10.0...0.10.1
