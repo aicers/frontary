@@ -233,6 +233,7 @@ where
         };
 
         let class = if self.required_msg.contains(&my_index)
+            || self.unique_msg.contains(&my_index)
             || self.verification.get(&my_index)
                 == Some(&Verification::Invalid(InvalidMessage::InvalidDomain))
         {
@@ -272,10 +273,24 @@ where
                     oninput={oninput}
                 />
                 { Self::view_explanation_msg(ctx)}
+                <div class="input-text-message">
+                    { self.view_required_msg(ctx, &my_index) }
+                </div>
+                {
+                    if self.unique_msg.contains(&my_index) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                                { text!(txt, ctx.props().language, EXISTING_MSG)}
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
                 {
                     if self.verification.get(&my_index) == Some(&Verification::Invalid(InvalidMessage::InvalidDomain)) {
                         html! {
-                            <div class="input-error-msg">
+                            <div class="input-contents-item-alert-message">
                                 { text!(txt, ctx.props().language, "Invalid domain name") }
                             </div>
                         }
