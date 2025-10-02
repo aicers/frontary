@@ -16,10 +16,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added max length validation for `PasswordConfig`.
 - Added validations for `HostNetworkGroupConfig`.
 - Added `Column::DomainName` variant to `WholeList`.
-- Added `ItemKind` enum to distinguish selected items, allowing previously registered
-  only actions to also apply to custom selected items.
+- Added `ItemKind` enum to distinguish selected items, allowing previously
+  registered only actions to also apply to custom selected items.
 - Added `unique` flag to `DomainNameConfig` to enable client-side duplicate
   domain name detection.
+- Added `unique` flag to `HostNetworkGroupConfig` to enable client-side
+  duplicate host/network/range combination detection.
 
 ### Changed
 
