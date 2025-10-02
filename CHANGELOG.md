@@ -38,6 +38,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Switched the modal to incremental loading and optimized the CSS (`modal-messages`,
   `modal-message-item`) to resolve slowdowns and layout issues when displaying
   long content.
+- Rewrote JavaScript-based `custom-select.js` functionality in Rust using WASM
+  bindings for better consistency and maintainability. The click-outside
+  detection feature is now available as a fully developed Rust API through the
+  `listen_click_outside` function.
 
 ### Fixed
 
