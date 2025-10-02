@@ -41,6 +41,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- Fixed tag dropdown visibility by removing conflicting `display: flex`
+  declaration that overrode the hidden state, ensuring dropdowns start hidden
+  and respond correctly to toggle logic.
 - Fixed a bug where callbacks for `AddSecond` and `DeleteSecond` fail after
   `InputEscape` follows `InputAdd` in the `WholeList` component.
 - Fixed host network duplicate check logic where `binary_search` would fail to
@@ -56,7 +59,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   `line_class` and `delete_cell_class` now support both one-row and multi-row
   group layouts more flexibly.
 - Fixed on/off icon paths to work with theme-based asset directories.
-- Fixed overflow in `searchable-select-list-down` CSS to remove horizontal scrollbar.
+- Fixed overflow in `searchable-select-list-down` CSS to remove horizontal
+  scrollbar.
 - Fixed mini select styling for `pumpkin` feature by moving some inline colors
   to CSS, enabling proper dark/light mode integration.
 - Fixed an issue where `Add` mode was incorrectly detected as `Edit` mode if

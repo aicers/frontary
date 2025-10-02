@@ -2340,7 +2340,6 @@ div.tag-group-input-select {
     max-height: 300px;
     padding-top: 5px;
     padding-bottom: 5px;
-    display: flex;
     flex-direction: column;
     border-radius: 8px;
     background-color: var(--Dark-70);
