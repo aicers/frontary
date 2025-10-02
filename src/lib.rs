@@ -86,9 +86,9 @@ pub use crate::input::{
     Model as Input, NicConfig, NicItem, PasswordConfig, PasswordItem, PercentageConfig,
     PercentageItem, RadioConfig, RadioItem, SelectMultipleConfig, SelectMultipleItem,
     SelectSingleConfig, SelectSingleItem, Tag, TagConfig, TagItem, TextConfig, TextItem,
-    Unsigned8Config, Unsigned8Item, Unsigned32Config, Unsigned32Item, Value as ComparisonValue,
-    ValueKind, VecSelectConfig, VecSelectItem, gen_default_items_from_confs, invalid_password,
-    view_asterisk,
+    Unsigned8Config, Unsigned8Item, Unsigned16Config, Unsigned16Item, Unsigned32Config,
+    Unsigned32Item, Value as ComparisonValue, ValueKind, VecSelectConfig, VecSelectItem,
+    gen_default_items_from_confs, invalid_password, view_asterisk,
 };
 pub use crate::ip_range_input::Model as IpRangeInput;
 pub use crate::language::Language;
@@ -97,7 +97,7 @@ pub use crate::list::{
     FileColumn, Float64Column, GroupColumn, HostNetworkGroupColumn, Kind, ListItem, MessageType,
     ModalDisplay, NicColumn, PercentageColumn, RadioColumn, SelectMultipleColumn,
     SelectSingleColumn, SortColumn, SortListKind, TagColumn, TextColumn, Unsigned8Column,
-    Unsigned32Column, VecSelectColumn, WholeList,
+    Unsigned16Column, Unsigned32Column, VecSelectColumn, WholeList,
 };
 pub use crate::modal::{
     AlignButton as ModalAlign, Model as Modal, MsgType as ModalType, TextStyle as ModalTextStyle,

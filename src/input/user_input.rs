@@ -576,6 +576,146 @@ where
 
     #[allow(clippy::too_many_lines)]
     #[allow(clippy::too_many_arguments)]
+    pub(super) fn view_unsigned_16(
+        &self,
+        ctx: &Context<Self>,
+        ess: &InputEssential,
+        min: u16,
+        max: u16,
+        width: Option<u32>,
+        input_data: &Rc<RefCell<InputItem>>,
+        base_index: Option<&BigUint>,
+        layer_index: usize,
+        autofocus: bool,
+        group: bool,
+    ) -> Html {
+        let my_index = cal_index(base_index, layer_index);
+        let my_index_clone = my_index.clone();
+        let txt = ctx.props().txt.txt.clone();
+        let input_data_clone = input_data.clone();
+        let oninput = ctx.link().callback(move |e: InputEvent| {
+            e.target()
+                .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())
+                .map_or(Message::InputError, |input| {
+                    let value = input.value();
+                    if value.is_empty() {
+                        Message::InputUnsigned16(
+                            my_index_clone.clone(),
+                            None,
+                            input_data_clone.clone(),
+                        )
+                    } else if let Ok(parsed) = value.parse::<u16>() {
+                        Message::InputUnsigned16(
+                            my_index_clone.clone(),
+                            Some(parsed),
+                            input_data_clone.clone(),
+                        )
+                    } else {
+                        Message::InvalidInputUnsigned16
+                    }
+                })
+        });
+        let placeholder = text!(txt, ctx.props().language, ess.notice).to_string();
+        let value = if let Ok(input_data) = input_data.try_borrow() {
+            if let InputItem::Unsigned16(value) = &*input_data {
+                value.into_inner()
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        let class = if self.required_msg.contains(&my_index) {
+            "input-number-alert"
+        } else {
+            "input-number"
+        };
+        let class_item = if group {
+            "input-item-group"
+        } else {
+            "input-item"
+        };
+        let style = format!(
+            "width: {};",
+            width.map_or("100%".to_string(), |w| format!("{w}px"))
+        );
+
+        html! {
+            <div class={class_item}>
+                if cfg!(feature = "debug") {
+                    { format!("({}:{}={})", base_index.map_or_else(String::new, ToString::to_string), layer_index, my_index.clone()) }
+                }
+                {
+                    if group {
+                        html! {}
+                    } else {
+                        html! {
+                            <div class="input-contents-item-title">
+                                { text!(txt, ctx.props().language, ess.title()) }{ view_asterisk(ess.required) }
+                            </div>
+                        }
+                    }
+                }
+                <div class="input-contents-item-input">
+                {
+                    if let Some(value) = value {
+                        html! {
+                            <input type="number" class={class} style={style}
+                                value={value.to_string()}
+                                placeholder={placeholder}
+                                autofocus={autofocus}
+                                oninput={oninput}
+                                min={min.to_string()}
+                                max={max.to_string()}
+                            />
+                        }
+                    } else {
+                        html! {
+                            <input type="number" class={class} style={style}
+                                // HIGHLIGHT: This must be set to empty string. If not, the previous
+                                // input shows here when another item in the group is added.
+                                value={String::new()}
+                                placeholder={placeholder}
+                                autofocus={autofocus}
+                                oninput={oninput}
+                                min={min.to_string()}
+                                max={max.to_string()}
+                            />
+                        }
+                    }
+                }
+                </div>
+                <div class="input-text-message">
+                    { self.view_required_msg(ctx, &my_index) }
+                </div>
+                {
+                    if self.unique_msg.contains(&my_index) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                                { text!(txt, ctx.props().language, EXISTING_MSG) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+                {
+                    if let Some(Verification::Invalid(InvalidMessage::InvalidInput)) = self.verification.get(&my_index) {
+                        html! {
+                            <div class="input-contents-item-alert-message">
+                               { text!(txt, ctx.props().language, INVALID_MSG) }
+                            </div>
+                        }
+                    } else {
+                        html! {}
+                    }
+                }
+            </div>
+        }
+    }
+
+    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn view_unsigned_8(
         &self,
         ctx: &Context<Self>,
@@ -710,6 +850,8 @@ where
                         html! {}
                     }
                 }
+                <div class="input-contents-item-space">
+                </div>
             </div>
         }
     }

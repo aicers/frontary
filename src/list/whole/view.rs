@@ -764,8 +764,9 @@ where
                     </div>
                 }
             }
-            Column::Unsigned32(_)
-            | Column::Unsigned8(_)
+            Column::Unsigned8(_)
+            | Column::Unsigned16(_)
+            | Column::Unsigned32(_)
             | Column::Float64(_)
             | Column::Percentage(_)
             | Column::Comparison(_) => html! { col.to_string() },
@@ -824,8 +825,9 @@ where
                                                 | Column::HostNetworkGroup(..)
                                                 | Column::SelectSingle(..)
                                                 | Column::SelectMultiple(..)
-                                                | Column::Unsigned32(..)
                                                 | Column::Unsigned8(..)
+                                                | Column::Unsigned16(..)
+                                                | Column::Unsigned32(..)
                                                 | Column::Float64(..)
                                                 | Column::Percentage(..)
                                                 | Column::Comparison(..)
