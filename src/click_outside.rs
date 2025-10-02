@@ -384,6 +384,13 @@ fn close_custom_select_complex(event: &MouseEvent, document: &Document) {
             return;
         }
 
+        // Skip if the event target was already removed from the DOM.
+        if let Some(body) = document.body()
+            && !body.contains(Some(element))
+        {
+            return;
+        }
+
         // Check if click is inside any complex select
         let elements = document.get_elements_by_class_name("complex-select");
         for i in 0..elements.length() {
