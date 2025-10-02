@@ -728,13 +728,27 @@ impl Model {
                                     ))))
                                 },
                                 |predefined| {
-                                    predefined.get(item.id()).map_or(
-                                        Rc::new(RefCell::new(None)),
+                                    predefined.get(item.id()).map_or_else(
+                                        || {
+                                            // Preserve previous value or use default when item is unchecked
+                                            self.direction_items.get(item.id()).map_or_else(
+                                                || {
+                                                    Rc::new(RefCell::new(Some(
+                                                        SelectionExtraInfo::Network(
+                                                            EndpointKind::Both,
+                                                        ),
+                                                    )))
+                                                },
+                                                Rc::clone,
+                                            )
+                                        },
                                         |d| {
                                             if let Ok(d) = d.try_borrow() {
                                                 Rc::new(RefCell::new(*d))
                                             } else {
-                                                Rc::new(RefCell::new(None))
+                                                Rc::new(RefCell::new(Some(
+                                                    SelectionExtraInfo::Network(EndpointKind::Both),
+                                                )))
                                             }
                                         },
                                     )
