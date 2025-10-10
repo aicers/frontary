@@ -132,6 +132,9 @@ where
     #[prop_or(None)]
     pub check_status_second_cache: Option<CheckStatus>,
 
+    #[prop_or(None)]
+    pub display_second_info: Option<Rc<DisplayInfo>>,
+
     // for add/edit/delete
     pub input_ids: Rc<RefCell<Vec<String>>>, // Vec for deleting multiple items
     #[prop_or(Rc::new(RefCell::new(None)))]
@@ -416,13 +419,7 @@ where
             }
             Message::ClickSort(index) => {
                 self.checked.clear();
-
-                let current_sort = match ctx.props().kind {
-                    Kind::Flat => self.sort,
-                    Kind::LayeredFirst => self.sort_second_layer,
-                    Kind::LayeredSecond => return false, // unreachable
-                };
-                let next_sort = current_sort.map_or(
+                let next_sort = self.sort.map_or(
                     Some(SortColumn {
                         index,
                         status: SortStatus::Ascending,
@@ -441,19 +438,9 @@ where
                         Some(SortColumn { index, status })
                     },
                 );
-                match ctx.props().kind {
-                    Kind::Flat => {
-                        self.sort = next_sort;
-                        self.set_sort_list_kind(ctx);
-                        self.sort_keys(ctx);
-                    }
-                    Kind::LayeredFirst => {
-                        self.sort_second_layer = next_sort;
-                        ctx.link().send_message(Message::ResetCheckSecond);
-                        return false;
-                    }
-                    Kind::LayeredSecond => return false, // unreachable
-                }
+                self.sort = next_sort;
+                self.set_sort_list_kind(ctx);
+                self.sort_keys(ctx);
             }
             Message::ClickButton(modal) => {
                 self.modal = modal;
@@ -903,6 +890,7 @@ where
             }
             Kind::LayeredSecond => html! {
                 <>
+                    { self.view_head(ctx) }
                     { self.view_list(ctx) }
                     { self.view_pages(ctx, false) }
                     {
