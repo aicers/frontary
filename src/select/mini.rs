@@ -219,6 +219,20 @@ where
     U: Clone + Component + PartialEq,
     <U as Component>::Message: Clone + PartialEq,
 {
+    fn value_to_text(ctx: &Context<Self>, value: &T) -> Option<String> {
+        let txt = ctx.props().txt.txt.clone();
+        ctx.props()
+            .candidate_values
+            .iter()
+            .enumerate()
+            .find(|(_, candidate)| *candidate == value)
+            .and_then(|(index, _)| ctx.props().list.get(index))
+            .map(|view_string| match view_string {
+                ViewString::Key(key) => text!(txt, ctx.props().language, key).to_string(),
+                ViewString::Raw(raw) => raw.clone(),
+            })
+    }
+
     #[allow(clippy::too_many_lines)]
     fn view_list(ctx: &Context<Self>, value: &str, theme: Option<Theme>) -> Html {
         let list = ctx.props().list.clone();
@@ -447,9 +461,14 @@ where
         );
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
+        let style = if ctx.props().active {
+            String::new()
+        } else {
+            "pointer-events: none; opacity: 0.5;".to_string()
+        };
 
         html! {
-            <div onclick={onclick} class={class}>
+            <div onclick={onclick} class={class} style={style}>
                 <div class={class_icon}>
                 </div>
                 <div class={class_text}>
@@ -460,29 +479,28 @@ where
     }
 
     fn view_direction_item(ctx: &Context<Self>) -> Html {
-        let txt = ctx.props().txt.txt.clone();
-        let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
-            selected.map_or_else(String::new, |value| {
-                ctx.props()
-                    .candidate_values
-                    .iter()
-                    .enumerate()
-                    .find(|(_, v)| *v == &value)
-                    .map_or_else(String::new, |(index, _)| {
-                        ctx.props()
-                            .list
-                            .get(index)
-                            .map_or_else(String::new, |v| match v {
-                                ViewString::Key(key) => {
-                                    text!(txt, ctx.props().language, key).to_string()
-                                }
-                                ViewString::Raw(txt) => txt.clone(),
-                            })
-                    })
-            })
-        } else {
-            String::new()
-        };
+        let selected_text = ctx
+            .props()
+            .selected_value
+            .try_borrow()
+            .ok()
+            .and_then(|selected| {
+                selected
+                    .as_ref()
+                    .and_then(|value| Self::value_to_text(ctx, value))
+            });
+        let mut value = selected_text.unwrap_or_default();
+        if value.is_empty() && !ctx.props().active {
+            if let Some(default_value) = ctx.props().default_value
+                && let Some(default_text) = Self::value_to_text(ctx, &default_value)
+            {
+                value = default_text;
+            } else if let Some(fallback) = ctx.props().candidate_values.first()
+                && let Some(fallback_text) = Self::value_to_text(ctx, fallback)
+            {
+                value = fallback_text;
+            }
+        }
         let suffix = if ctx.props().active {
             String::new()
         } else if let Some(suffix) = ctx.props().deactive_class_suffix.as_ref() {
@@ -499,7 +517,7 @@ where
             .props()
             .top_width
             .map_or_else(String::new, |w| format!("width: {w}px;"));
-        let style = if cfg!(feature = "pumpkin") {
+        let mut style = if cfg!(feature = "pumpkin") {
             style_width.to_string()
         } else {
             format!(
@@ -508,6 +526,12 @@ where
                 &ctx.props().top_bg_color
             )
         };
+        if !ctx.props().active {
+            if !style.is_empty() && !style.trim_end().ends_with(';') {
+                style.push(';');
+            }
+            style.push_str(" pointer-events: none; opacity: 0.5;");
+        }
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
         html! {

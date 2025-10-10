@@ -534,7 +534,6 @@ impl Model {
                 language={ctx.props().language}
                 parent_message={parent_message}
                 active={active}
-                deactive_class_suffix={Some("-deactive".to_string())}
                 id={id.to_string()}
                 list={direction_list}
                 candidate_values={value_candidates}
@@ -717,7 +716,6 @@ impl Model {
                 language={ctx.props().language}
                 parent_message={Message::SetDirectionItem(ItemKind::Registered)}
                 active={checked}
-                deactive_class_suffix={Some("-deactive".to_string())}
                 id={format!("assign-item-direction-{}", id.clone())}
                 list={Rc::clone(&src_dst_list)}
                 candidate_values={Rc::clone(&value_candidates)}
@@ -881,18 +879,22 @@ impl Model {
                                                 ("#F6F6F6", 70, 28)
                                             };
                                             let theme = ctx.props().theme;
+                                            let selected_value_cache =
+                                                value.try_borrow().ok().and_then(|x| *x);
                                             if cfg!(feature = "pumpkin") {
                                                 let theme = ctx.props().theme;
-                                                let checked = if let Ok(v) = value.try_borrow() {
-                                                    match *v {
-                                                        Some(SelectionExtraInfo::Network(EndpointKind::Both)) => CheckStatus::Checked,
-                                                        Some(
-                                                            SelectionExtraInfo::Network(_)
-                                                                | SelectionExtraInfo::Basic,
-                                                        ) => CheckStatus::Indeterminate,
-                                                        None => CheckStatus::Unchecked,
-                                                    }
-                                                } else { CheckStatus::Unchecked };
+                                                let checked = match selected_value_cache {
+                                                    Some(SelectionExtraInfo::Network(EndpointKind::Both)) => CheckStatus::Checked,
+                                                    Some(
+                                                        SelectionExtraInfo::Network(_)
+                                                            | SelectionExtraInfo::Basic,
+                                                    ) => CheckStatus::Indeterminate,
+                                                    None => CheckStatus::Unchecked,
+                                                };
+                                                let active = matches!(
+                                                    checked,
+                                                    CheckStatus::Checked | CheckStatus::Indeterminate
+                                                );
                                                 let onclick_custom = |k: String| {
                                                     ctx.link().callback(move |_| {
                                                         Message::ClickItem(
@@ -914,38 +916,30 @@ impl Model {
                                                             </div>
                                                         </div>
                                                         <div class="complex-select-pop-input-list-direction">
-                                                            {
-                                                                if let Ok(v) = value.try_borrow()
-                                                                    && v.is_some()
-                                                                {
-                                                                    html! {
-                                                                        <SelectMini::<SelectionExtraInfo, Self>
-                                                                            txt={ctx.props().txt.clone()}
-                                                                            language={ctx.props().language}
-                                                                            parent_message={Message::Render}
-                                                                            id={format!("assign-input-direction-{}", key.clone())}
-                                                                        list={src_dst_list}
-                                                                        candidate_values={value_candidates}
-                                                                        default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
-                                                                        selected_value={value.clone()}
-                                                                        selected_value_cache={value.try_borrow().ok().and_then(|x| *x)}
-                                                                        align_left={false}
-                                                                        {list_top}
-                                                                        top_width={Some(top_width)}
-                                                                        list_min_width={Some(70)}
-                                                                        kind={SelectMiniKind::DirectionItem}
-                                                                        {top_bg_color}
-                                                                    />
-                                                                }
-                                                            } else {
-                                                                html! {}
-                                                            }
-                                                        }
+                                                            <SelectMini::<SelectionExtraInfo, Self>
+                                                                txt={ctx.props().txt.clone()}
+                                                                language={ctx.props().language}
+                                                                parent_message={Message::Render}
+                                                                active={active}
+                                                                id={format!("assign-input-direction-{}", key.clone())}
+                                                                list={src_dst_list}
+                                                                candidate_values={value_candidates}
+                                                                default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
+                                                                selected_value={value.clone()}
+                                                                selected_value_cache={selected_value_cache}
+                                                                align_left={false}
+                                                                {list_top}
+                                                                top_width={Some(top_width)}
+                                                                list_min_width={Some(70)}
+                                                                kind={SelectMiniKind::DirectionItem}
+                                                                {top_bg_color}
+                                                            />
                                                         </div>
                                                     </div>
                                                 }
                                             }
                                             else {
+                                                let active = selected_value_cache.is_some();
                                                 html! {
                                                     <>
                                                         <tr>
@@ -961,12 +955,13 @@ impl Model {
                                                                     txt={ctx.props().txt.clone()}
                                                                     language={ctx.props().language}
                                                                     parent_message={Message::Render}
+                                                                    active={active}
                                                                     id={format!("assign-input-direction-{}", key.clone())}
                                                                     list={src_dst_list}
                                                                     candidate_values={value_candidates}
                                                                     default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
                                                                     selected_value={value.clone()}
-                                                                    selected_value_cache={value.try_borrow().ok().and_then(|x| *x)}
+                                                                    selected_value_cache={selected_value_cache}
                                                                     align_left={false}
                                                                     {list_top}
                                                                     top_width={Some(top_width)}
