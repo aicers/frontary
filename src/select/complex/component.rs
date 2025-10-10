@@ -730,17 +730,9 @@ impl Model {
                                 |predefined| {
                                     predefined.get(item.id()).map_or_else(
                                         || {
-                                            // Preserve previous value or use default when item is unchecked
-                                            self.direction_items.get(item.id()).map_or_else(
-                                                || {
-                                                    Rc::new(RefCell::new(Some(
-                                                        SelectionExtraInfo::Network(
-                                                            EndpointKind::Both,
-                                                        ),
-                                                    )))
-                                                },
-                                                Rc::clone,
-                                            )
+                                            // Item is unchecked: store None to keep it unchecked
+                                            // while preserving the dropdown UI
+                                            Rc::new(RefCell::new(None))
                                         },
                                         |d| {
                                             if let Ok(d) = d.try_borrow() {
