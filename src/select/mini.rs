@@ -220,7 +220,7 @@ where
     <U as Component>::Message: Clone + PartialEq,
 {
     fn value_to_text(ctx: &Context<Self>, value: &T) -> Option<String> {
-        let txt = ctx.props().txt.txt.clone();
+        let txt = &ctx.props().txt.txt;
         ctx.props()
             .candidate_values
             .iter()
