@@ -2109,8 +2109,6 @@ div.tag-group-input-select {
     max-height: 300px;
     padding-top: 2px;
     padding-bottom: 2px;
-    display: flex;
-    flex-direction: column;
     background-color: #FFFFFF;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
     z-index: 399;
