@@ -17,12 +17,15 @@ jobs:
         with:
           components: clippy, rustfmt
       - uses: actions/checkout@v5
+      - uses: biomejs/setup-biome@v2
       - name: Check formatting
         run: cargo fmt -- --check --config group_imports=StdExternalCrate
       - name: Clippy
         run: cargo clippy --tests -- -D warnings
       - name: markdownlint
         uses: articulate/actions-markdownlint@v1
+      - name: Biome check
+        run: biome ci
 
   test:
     runs-on: ${{ matrix.os }}
