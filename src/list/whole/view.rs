@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
 
-use htmlescape::decode_html;
 use itertools::Itertools;
 use json_gettext::get_text;
-use yew::{Component, Context, Html, classes, html, virtual_dom::AttrValue};
+use yew::classes;
+use yew::{Component, Context, Html, html, virtual_dom::AttrValue};
 
 use super::{
     DEFAULT_NUM_PAGES,
     component::{Message, Model},
 };
 use crate::{
-    CheckStatus, Checkbox, InputConfig, MoreAction, NBSP, Pages, SelectMini, SelectMiniKind, Sort,
+    CheckStatus, Checkbox, InputConfig, MoreAction, Pages, SelectMini, SelectMiniKind, Sort,
     SortStatus, Theme, ViewString, WholeList,
     list::{ColWidths, Column, DataType, Kind, ListItem, ModalDisplay},
     text,
@@ -26,7 +26,6 @@ where
     #[allow(clippy::too_many_lines)]
     pub(super) fn view_head(&self, ctx: &Context<Self>) -> Html {
         let onclick_all = ctx.link().callback(|_| Message::CheckAll);
-        let onclick_all_second = ctx.link().callback(|_| Message::CheckAllSecond);
         let check_status = self.check_status(ctx);
         let mut colspan = 0;
         let rowspan = ctx.props().display_info.widths.len().to_string();
@@ -35,31 +34,41 @@ where
         html! {
             <>
                 <tr class="list-whole-head">
-                    <td class="list-whole-head-check" rowspan={rowspan.clone()}>
-                        <div onclick={onclick_all}>
-                            <Checkbox
-                                status={check_status}
-                                {theme}
-                            />
-                        </div>
-                    </td>
                     {
-                        if ctx.props().kind == Kind::LayeredFirst {
-                            let check_status_second = self.check_status_second.try_borrow().map_or(CheckStatus::Unchecked, |s| *s);
-                            colspan += 1;
-
-                            html! {
-                                <td class="list-whole-head-check">
-                                    <div onclick={onclick_all_second}>
-                                        <Checkbox
-                                            status={check_status_second}
-                                            {theme}
-                                        />
-                                    </div>
-                                </td>
+                        match ctx.props().kind {
+                            Kind::LayeredFirst => {
+                                html! {
+                                    <>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}>
+                                            <div onclick={onclick_all.clone()}>
+                                                <Checkbox status={check_status} {theme} />
+                                            </div>
+                                        </td>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
+                                    </>
+                                }
                             }
-                        } else {
-                            html! {}
+                            Kind::LayeredSecond => {
+                                html! {
+                                    <>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}>
+                                            <div onclick={onclick_all.clone()}>
+                                                <Checkbox status={check_status} {theme} />
+                                            </div>
+                                        </td>
+                                    </>
+                                }
+                            }
+                            Kind::Flat => {
+                                html! {
+                                    <td class="list-whole-head-check" rowspan={rowspan.clone()}>
+                                        <div onclick={onclick_all}>
+                                            <Checkbox status={check_status} {theme} />
+                                        </div>
+                                    </td>
+                                }
+                            }
                         }
                     }
                     {
@@ -68,8 +77,18 @@ where
                                 colspan += ws.len();
                             }
 
+                            if !self.expand_list.is_empty() {
+                                colspan = ctx.props().display_second_info.as_ref().map_or(colspan, |info| info.titles.len());
+                            }
+
                             html! {
-                                self.view_head_row(ctx, 0, widths)
+                                if self.expand_list.is_empty() {
+                                    { self.view_head_row(ctx, 0, widths) }
+                                } else {
+                                    <td colspan={colspan.to_string()} class="list-whole-head">
+                                        { self.view_head_row(ctx, 0, widths) }
+                                    </td>
+                                }
                             }
                         } else {
                             html! {}
@@ -148,6 +167,11 @@ where
                     };
                     let style_inner = format!("width: 100%; height: {}px", ctx.props().display_info.height);
                     let onclick_sort = |index: usize| ctx.link().callback(move |_| Message::ClickSort(index));
+                    let sort_status = self.sort.map_or(SortStatus::Unsorted, |s| if s.index == index {
+                        s.status
+                    } else {
+                        SortStatus::Unsorted
+                    });
 
                     html! {
                         <td class={classes!("list-whole-head-title", class_border)} style={style} onclick={onclick_sort(index)}>
@@ -157,28 +181,12 @@ where
                                         { text!(txt, ctx.props().language, *title) }
                                     </td>
                                     {
-                                        if ctx.props().kind == Kind::LayeredFirst && !self.expand_list.is_empty()
-                                            || ctx.props().kind == Kind::Flat || ctx.props().kind == Kind::LayeredSecond {
-                                            let sort_status = if ctx.props().kind == Kind::LayeredFirst {
-                                                self.sort_second_layer
-                                            } else {
-                                                self.sort
-                                            };
-                                            let sort_status = sort_status.map_or(SortStatus::Unsorted, |s| if s.index == index {
-                                                s.status
-                                            } else {
-                                                SortStatus::Unsorted
-                                            });
-
-                                            html! {
-                                                <td class="list-whole-head-title-inner-sort">
-                                                    <div class="list-whole-head-title-sort">
-                                                        <Sort status={sort_status} />
-                                                    </div>
-                                                </td>
-                                            }
-                                        } else {
-                                            html! {}
+                                        html! {
+                                            <td class="list-whole-head-title-inner-sort">
+                                                <div class="list-whole-head-title-sort">
+                                                    <Sort status={sort_status} />
+                                                </div>
+                                            </td>
                                         }
                                     }
                                 </tr>
@@ -222,7 +230,12 @@ where
                                 match ctx.props().kind {
                                     Kind::LayeredFirst => {
                                         if ctx.props().data_type == Some(DataType::Customer) {
-                                            let cols = ctx.props().display_info.titles.len().to_string();
+                                            let mut cols = ctx.props().display_info.titles.len();
+                                            if !self.expand_list.is_empty() {
+                                                cols = ctx.props().display_second_info.as_ref().map_or(cols, |info| info.titles.len());
+                                            }
+
+
                                             let file_name = if self.expand_list.contains(key) {
                                                 "collapse-list"
                                             } else {
@@ -241,47 +254,47 @@ where
                                             } else {
                                                 28
                                             };
-                                            html! {
-                                                <tr class="list-whole-first-layer">
-                                                    <td class="list-whole-list-first-check">
-                                                        <div onclick={onclick_item(key.clone())}>
-                                                            <Checkbox
-                                                                status={check_status}
-                                                                {theme}
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td class="list-whole-list-first-expand">
-                                                        <div class="list-whole-list-first-expand" style={style} onclick={onclick_expandible(key.clone())}>
-                                                        </div>
-                                                    </td>
-                                                    <td colspan={cols} class="list-whole-list-first-layer">
-                                                        { item.columns.first().map_or_else(|| html! {}, |n| Self::view_column(ctx, index, n)) }
-                                                        { decode_html(NBSP.repeat(3).as_str()).expect("safely-selected character") }
-                                                        <span class="list-whole-list-first-layer-light">
-                                                            { item.columns.get(1).map_or_else(|| html! {}, |d| Self::view_column(ctx, index, d)) }
-                                                        </span>
-                                                    </td>
-                                                    <td class="list-whole-list-first-layer-more-action">
-                                                        <div class="list-whole-list-flat-more-action">
-                                                            <SelectMini::<MoreAction, Self>
-                                                                txt={ctx.props().txt.clone()}
-                                                                language={ctx.props().language}
-                                                                parent_message={Message::DoMoreAction(key.clone())}
-                                                                id={format!("more-action-alpha-{key}")}
-                                                                active={true}
-                                                                list={Rc::clone(&more_action_list)}
-                                                                candidate_values={Rc::clone(&value_candidates)}
-                                                                selected_value={Rc::clone(&self.more_action)}
-                                                                selected_value_cache={self.more_action.try_borrow().ok().and_then(|x| *x)}
-                                                                align_left={false}
-                                                                list_top={list_top}
-                                                                kind={SelectMiniKind::MoreAction}
-                                                                {theme}
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                            if let Some(display_info_first) = ctx.props().display_info.widths.first() {
+                                                html! {
+                                                    <tr class="list-whole-first-layer">
+                                                        <td class="list-whole-list-first-check">
+                                                            <div onclick={onclick_item(key.clone())}>
+                                                                <Checkbox
+                                                                    status={check_status}
+                                                                    {theme}
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                        <td class="list-whole-list-first-expand">
+                                                            <div class="list-whole-list-first-expand" style={style} onclick={onclick_expandible(key.clone())}>
+                                                            </div>
+                                                        </td>
+                                                        <td colspan={cols.to_string()} class="list-whole-list-first-layer-wrapper">
+                                                            {self.view_column_row(ctx, item.columns.as_ref(), 0, display_info_first)}
+                                                        </td>
+                                                        <td class="list-whole-list-first-layer-more-action">
+                                                            <div class="list-whole-list-flat-more-action">
+                                                                <SelectMini::<MoreAction, Self>
+                                                                    txt={ctx.props().txt.clone()}
+                                                                    language={ctx.props().language}
+                                                                    parent_message={Message::DoMoreAction(key.clone())}
+                                                                    id={format!("more-action-alpha-{key}")}
+                                                                    active={true}
+                                                                    list={Rc::clone(&more_action_list)}
+                                                                    candidate_values={Rc::clone(&value_candidates)}
+                                                                    selected_value={Rc::clone(&self.more_action)}
+                                                                    selected_value_cache={self.more_action.try_borrow().ok().and_then(|x| *x)}
+                                                                    align_left={false}
+                                                                    list_top={list_top}
+                                                                    kind={SelectMiniKind::MoreAction}
+                                                                    {theme}
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            } else {
+                                                html! {}
                                             }
                                         } else {
                                             html! {}
@@ -329,7 +342,7 @@ where
                                                             }
 
                                                             html! {
-                                                                self.view_column_row(ctx, item.columns.as_ref(), 0, widths, ctx.props().display_info.widths.len() > 1)
+                                                                { self.view_column_row(ctx, item.columns.as_ref(), 0, widths) }
                                                             }
                                                         } else {
                                                             html! {}
@@ -380,7 +393,7 @@ where
                                                                                 <div class="list-whole-column-next-lines">
                                                                                     <table style={style}>
                                                                                         <tr style={height}>
-                                                                                            { self.view_column_row(ctx, item.columns.as_ref(), first, cols, true) }
+                                                                                            { self.view_column_row(ctx, item.columns.as_ref(), first, cols) }
                                                                                         </tr>
                                                                                     </table>
                                                                                 </div>
@@ -446,8 +459,8 @@ where
                                                     kind={Kind::LayeredSecond}
                                                     data_type={ctx.props().data_type}
                                                     data={Rc::clone(&data)}
-                                                    display_info={Rc::clone(&ctx.props().display_info)}
-                                                    sort={self.sort_second_layer}
+                                                    display_info={Rc::clone(ctx.props().display_second_info.as_ref().unwrap_or(&ctx.props().display_info))}
+                                                    sort={self.sort}
                                                     pages_info={Rc::clone(pages_info)}
                                                     check_status_second={Rc::clone(&self.check_status_second)}
                                                     check_status_second_cache={Some(*check_status_second)}
@@ -534,27 +547,38 @@ where
         columns: &[Column],
         start: usize,
         widths: &ColWidths,
-        border: bool,
     ) -> Html {
         let varied_width = Self::varied_width(ctx, widths);
-
+        let base_class = if ctx.props().kind == Kind::LayeredFirst {
+            "list-whole-list-first-layer"
+        } else {
+            "list-whole-list-flat"
+        };
         html! {
             for (0..widths.len()).map(|i| {
                 let index = start + i;
                 if let Some(col) = columns.get(index) {
-                    let class_border = if start == 0 {
-                        "list-whole-column-next-lines-first"
-                    } else if i > 0 {
-                        "list-whole-column-next-lines"
+                    let class = if ctx.props().kind == Kind::LayeredSecond || ctx.props().kind == Kind::Flat {
+                        if start == 0 {
+                            "list-whole-column-next-lines-first"
+                        } else if i > 0 {
+                            "list-whole-column-next-lines"
+                        } else {
+                            ""
+                        }
                     } else {
                         ""
                     };
-                    let style = Self::style_width_height(ctx, widths, i, varied_width);
+                    let style = if cfg!(feature = "pumpkin") {
+                        format!("width: {}px;", ctx.props().display_info.width_full)
+                    } else {
+                        Self::style_width_height(ctx, widths, i, varied_width)
+                    };
                     let onclick_close = {
                         ctx.link().callback(move |_| Message::CloseModal)
                     };
                     html! {
-                        <td class={classes!("list-whole-list-flat", if border { class_border } else { "" })} style={style}>
+                        <td class={classes!(base_class, class)} style={style}>
                             { Self::view_column(ctx, index, col) }
                             {
                                 if let Some(modal) = &self.modal {

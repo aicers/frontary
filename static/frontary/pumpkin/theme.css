@@ -1275,7 +1275,7 @@ td.list-whole-head-title:hover {
 }
 
 td.list-whole-head-title-inner-text {
-  height: 30px;
+  height: 48px;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
@@ -1351,6 +1351,13 @@ td.list-whole-list-first-layer {
   line-height: 22px;
   font-weight: 400;
   color: var(--Text-Primary);
+  text-align: center;
+  vertical-align: middle;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+td.list-whole-list-first-layer-wrapper {
   box-shadow: 0px -1px 0px 0px rgba(95, 104, 118, 0.24) inset;
 }
 
