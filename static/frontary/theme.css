@@ -768,6 +768,19 @@ div.mini-select-top-direction:hover {
   cursor: pointer;
 }
 
+div.mini-select-top-direction.is-disabled {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+}
+
+div.mini-select-top-direction.is-disabled:hover {
+  cursor: default;
+}
+
+div.mini-select-top-direction-text.is-disabled {
+  color: var(--Dark-50);
+}
+
 div.mini-select-top-direction-text {
   float: right;
   margin-left: 4px;
@@ -873,6 +886,16 @@ div.mini-select-item-direction {
 
 div.mini-select-item-direction:hover {
   cursor: pointer;
+}
+
+div.mini-select-item-direction.is-disabled {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+  cursor: default;
+}
+
+td.mini-select-item-direction.is-disabled {
+  color: var(--Dark-50);
 }
 
 td.mini-select-item-direction {

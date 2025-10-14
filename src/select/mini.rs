@@ -454,21 +454,27 @@ where
         } else {
             String::new()
         };
-        let (class, class_text, class_icon) = (
-            format!("mini-select-top-direction{suffix}"),
-            format!("mini-select-top-direction-text{suffix}"),
-            format!("mini-select-top-direction-icon{suffix}"),
-        );
+        let class_base = format!("mini-select-top-direction{suffix}");
+        let class_text_base = format!("mini-select-top-direction-text{suffix}");
+        let class_icon_base = format!("mini-select-top-direction-icon{suffix}");
+        let (class, class_text, class_icon) = if ctx.props().active {
+            (
+                classes!(class_base),
+                classes!(class_text_base),
+                classes!(class_icon_base),
+            )
+        } else {
+            (
+                classes!(class_base, "is-disabled"),
+                classes!(class_text_base, "is-disabled"),
+                classes!(class_icon_base, "is-disabled"),
+            )
+        };
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
-        let style = if ctx.props().active {
-            String::new()
-        } else {
-            "pointer-events: none; opacity: 0.5;".to_string()
-        };
 
         html! {
-            <div onclick={onclick} class={class} style={style}>
+            <div onclick={onclick} class={class}>
                 <div class={class_icon}>
                 </div>
                 <div class={class_text}>
@@ -479,45 +485,32 @@ where
     }
 
     fn view_direction_item(ctx: &Context<Self>) -> Html {
-        let selected_text = ctx
+        let selected_value = ctx
             .props()
             .selected_value
             .try_borrow()
             .ok()
-            .and_then(|selected| {
-                selected
-                    .as_ref()
-                    .and_then(|value| Self::value_to_text(ctx, value))
-            });
-        let mut value = selected_text.unwrap_or_default();
-        if value.is_empty() && !ctx.props().active {
-            if let Some(default_value) = ctx.props().default_value
-                && let Some(default_text) = Self::value_to_text(ctx, &default_value)
-            {
-                value = default_text;
-            } else if let Some(fallback) = ctx.props().candidate_values.first()
-                && let Some(fallback_text) = Self::value_to_text(ctx, fallback)
-            {
-                value = fallback_text;
-            }
-        }
-        let suffix = if ctx.props().active {
-            String::new()
-        } else if let Some(suffix) = ctx.props().deactive_class_suffix.as_ref() {
-            suffix.as_ref().into()
+            .and_then(|selected| selected.as_ref().copied());
+        let default_value = if ctx.props().active {
+            None
         } else {
-            String::new()
+            ctx.props().default_value
         };
-        let (class, class_text, class_icon) = (
-            format!("mini-select-item-direction{suffix}"),
-            format!("mini-select-item-direction{suffix}"),
-            format!("mini-select-item-direction-icon{suffix}"),
-        );
+        let first_candidate = if ctx.props().active {
+            None
+        } else {
+            ctx.props().candidate_values.first().copied()
+        };
+        let value = [selected_value, default_value, first_candidate]
+            .into_iter()
+            .flatten()
+            .find_map(|candidate| Self::value_to_text(ctx, &candidate))
+            .unwrap_or_default();
         let style_width = ctx
             .props()
             .top_width
             .map_or_else(String::new, |w| format!("width: {w}px;"));
-        let mut style = if cfg!(feature = "pumpkin") {
+        let style = if cfg!(feature = "pumpkin") {
             style_width.to_string()
         } else {
             format!(
@@ -526,22 +519,16 @@ where
                 &ctx.props().top_bg_color
             )
         };
-        if !ctx.props().active {
-            if !style.is_empty() && !style.trim_end().ends_with(';') {
-                style.push(';');
-            }
-            style.push_str(" pointer-events: none; opacity: 0.5;");
-        }
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
         html! {
-            <div onclick={onclick} class={class} style={style}>
+            <div onclick={onclick} class="mini-select-item-direction" style={style}>
                 <table>
                     <tr>
-                        <td class={class_text}>
+                        <td class="mini-select-item-direction-text">
                             { value }
                         </td>
-                        <td class={class_icon}>
+                        <td class="mini-select-item-direction-icon">
                         </td>
                     </tr>
                 </table>
