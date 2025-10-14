@@ -586,10 +586,8 @@ impl Model {
             html! {
                 <div class="complex-select-pop-list-item">
                     <div class="complex-select-pop-list-item-checkbox">
-                        <div class="complex-select-pop-list-item-checkbox-icon">
-                            <div onclick={onclick_item(key)}>
-                                <Checkbox status={checked} {theme} />
-                            </div>
+                        <div onclick={onclick_item(key)}>
+                            <Checkbox status={checked} {theme} />
                         </div>
                         <div class="complex-select-pop-list-item-checkbox-text">
                             {
@@ -908,10 +906,8 @@ impl Model {
                                                 html! {
                                                     <div class="complex-select-pop-input-list-items">
                                                         <div class="complex-select-pop-input-list-component">
-                                                            <div class="complex-select-pop-list-checkbox-icon">
-                                                                <div onclick={onclick_custom(key.clone())}>
-                                                                    <Checkbox status={checked} {theme} />
-                                                                </div>
+                                                            <div onclick={onclick_custom(key.clone())}>
+                                                                <Checkbox status={checked} {theme} />
                                                             </div>
                                                             <div class="complex-select-pop-input-list-text">
                                                                 { key }

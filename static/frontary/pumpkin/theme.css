@@ -71,9 +71,9 @@ input[type="password"] {
 }
 
 div.basic-checkbox {
-  width: 40px;
-  height: 40px;
-  background-size: 40px 40px;
+  width: 48px;
+  height: 48px;
+  background-size: 48px 48px;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -596,11 +596,6 @@ div.complex-select-pop-list-select-all-checkbox {
   gap: 4px;
 }
 
-div.complex-select-pop-list-select-all-checkbox-icon {
-  width: 40px;
-  height: 40px;
-}
-
 div.complex-select-pop-list-select-all-text {
   font-size: 16px;
   line-height: 24px;
@@ -634,11 +629,6 @@ div.complex-select-pop-list-item {
 div.complex-select-pop-list-item-checkbox {
   display: flex;
   align-items: center;
-}
-
-div.complex-select-pop-list-item-checkbox-icon {
-  width: 40px;
-  height: 40px;
 }
 
 div.complex-select-pop-list-item-checkbox-text {
