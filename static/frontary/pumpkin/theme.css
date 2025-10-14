@@ -3098,13 +3098,13 @@ div.modal-contents {
   border-radius: 8px;
   display: inline-flex;
   flex-direction: column;
+  gap: 24px;
 }
 
 div.modal-icon-close {
   display: flex;
   align-items: center;
   align-self: stretch;
-  margin-bottom: 24px;
 }
 
 div.modal-title-header {
