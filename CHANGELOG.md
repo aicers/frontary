@@ -6,6 +6,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- Added `Unsigned16` to `Column`, `InputConfig`, and `InputItem`.
+
 ### Fixed
 
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
