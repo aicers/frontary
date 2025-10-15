@@ -640,9 +640,12 @@ where
             }
             Message::InputHostNetworkGroup(id, input_data) => {
                 self.input_host_network_group(&id, &input_data);
+                self.unique_msg.remove(&id);
+                self.decide_unique_all(ctx);
             }
             Message::UserInputHostNetworkGroup(id) => {
                 self.remove_required_msg(&id, false);
+                self.unique_msg.remove(&id);
             }
             Message::InputMultipleSelect(id, input_data, list) => {
                 if let Some(buffer) = self.select_searchable_buffer.get(&id) {
@@ -1168,69 +1171,158 @@ where
         self.verification_nic.remove(&(id, 2));
     }
 
+    fn text_has_duplicate(ctx: &Context<Self>, index: usize, id: Option<&str>) -> bool {
+        let Some(data) = ctx.props().input_data.get(index) else {
+            return false;
+        };
+        let Ok(input) = data.try_borrow() else {
+            return false;
+        };
+        let InputItem::Text(value) = &*input else {
+            return false;
+        };
+
+        if let Some(existing) = ctx.props().data.as_ref() {
+            for (key, item) in existing.iter() {
+                if id.is_none_or(|current| current != key)
+                    && let Some(other) = item.columns.get(index)
+                    && let Column::Text(other_value) = other
+                    && let ViewString::Raw(other_text) = &other_value.text
+                    && value == other_text
+                {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
+
+    fn domain_has_duplicate(ctx: &Context<Self>, index: usize, id: Option<&str>) -> bool {
+        let Some(data) = ctx.props().input_data.get(index) else {
+            return false;
+        };
+        let Ok(input) = data.try_borrow() else {
+            return false;
+        };
+        let InputItem::DomainName(value) = &*input else {
+            return false;
+        };
+
+        if let Some(existing) = ctx.props().data.as_ref() {
+            for (key, item) in existing.iter() {
+                if id.is_none_or(|current| current != key)
+                    && let Some(other) = item.columns.get(index)
+                    && let Column::DomainName(other_value) = other
+                    && value == &other_value.domain
+                {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
+
+    fn host_network_group_has_duplicate(
+        ctx: &Context<Self>,
+        index: usize,
+        id: Option<&str>,
+    ) -> bool {
+        let Some(data) = ctx.props().input_data.get(index) else {
+            return false;
+        };
+        let Ok(input) = data.try_borrow() else {
+            return false;
+        };
+        let InputItem::HostNetworkGroup(value) = &*input else {
+            return false;
+        };
+
+        if let Some(existing) = ctx.props().data.as_ref() {
+            for (key, item) in existing.iter() {
+                if id.is_none_or(|current| current != key)
+                    && let Some(other) = item.columns.get(index)
+                    && let Column::HostNetworkGroup(other_value) = other
+                {
+                    let mut host_entries: HashSet<&str> = HashSet::new();
+                    let mut network_entries: HashSet<&str> = HashSet::new();
+                    let mut range_entries: HashSet<&str> = HashSet::new();
+
+                    for entry in &other_value.host_network_group {
+                        if let Some(parsed) = crate::parse_host_network(entry) {
+                            match parsed {
+                                crate::HostNetwork::Host(_) => {
+                                    host_entries.insert(entry.as_str());
+                                }
+                                crate::HostNetwork::Network(_) => {
+                                    network_entries.insert(entry.as_str());
+                                }
+                                crate::HostNetwork::Range(_) => {
+                                    range_entries.insert(entry.as_str());
+                                }
+                            }
+                        }
+                    }
+
+                    let hosts_match = value.hosts.len() == host_entries.len()
+                        && value
+                            .hosts
+                            .iter()
+                            .all(|h| host_entries.contains(h.as_str()));
+
+                    let networks_match = value.networks.len() == network_entries.len()
+                        && value
+                            .networks
+                            .iter()
+                            .all(|n| network_entries.contains(n.as_str()));
+
+                    let ranges_match = value.ranges.len() == range_entries.len()
+                        && value.ranges.iter().all(|r| {
+                            let range = r.to_string();
+                            range_entries.contains(range.as_str())
+                        });
+
+                    if hosts_match && networks_match && ranges_match {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        false
+    }
+
     fn decide_unique_all(&mut self, ctx: &Context<Self>) -> bool {
         // no need to check Checkbox's children because Checkbox and its children don't need to be unique
-        let mut unique = Vec::<bool>::new();
+        let mut has_duplicate = false;
         let id = ctx.props().input_second_id.as_ref().map_or_else(
             || ctx.props().input_id.as_deref(),
             |id| match id {
                 InputSecondId::Add => None,
-                InputSecondId::Edit(i) => Some(i),
+                InputSecondId::Edit(i) => Some(i.as_str()),
             },
         );
 
-        for (index, t) in ctx.props().input_conf.iter().enumerate() {
-            if let InputConfig::Text(conf) = &(**t)
-                && let Some(data) = ctx.props().input_data.get(index)
-                && let Ok(input) = data.try_borrow()
-                && conf.unique
-            {
-                let mut different = true;
-                if let Some(data) = ctx.props().data.as_ref() {
-                    for (key, item) in data.iter() {
-                        if id.as_ref().is_none_or(|id| id != key)
-                            && let Some(other) = item.columns.get(index)
-                            && let (Column::Text(other_value), InputItem::Text(value)) =
-                                (other, &(*input))
-                            && let ViewString::Raw(other_value) = &other_value.text
-                            && value == other_value
-                        {
-                            different = false;
-                            break;
-                        }
-                    }
+        for (index, config) in ctx.props().input_conf.iter().enumerate() {
+            let duplicate = match &**config {
+                InputConfig::Text(conf) if conf.unique => Self::text_has_duplicate(ctx, index, id),
+                InputConfig::DomainName(conf) if conf.unique => {
+                    Self::domain_has_duplicate(ctx, index, id)
                 }
-                if !different {
-                    self.unique_msg.insert(BigUint::from(index));
-                    unique.push(true);
+                InputConfig::HostNetworkGroup(conf) if conf.unique => {
+                    Self::host_network_group_has_duplicate(ctx, index, id)
                 }
-            }
-            if let InputConfig::DomainName(conf) = &(**t)
-                && let Some(data) = ctx.props().input_data.get(index)
-                && let Ok(input) = data.try_borrow()
-                && conf.unique
-            {
-                let mut different = true;
-                if let Some(data) = ctx.props().data.as_ref() {
-                    for (key, item) in data.iter() {
-                        if id.as_ref().is_none_or(|id| id != key)
-                            && let Some(other) = item.columns.get(index)
-                            && let (Column::DomainName(other_value), InputItem::DomainName(value)) =
-                                (other, &(*input))
-                            && value == &other_value.domain
-                        {
-                            different = false;
-                            break;
-                        }
-                    }
-                }
-                if !different {
-                    self.unique_msg.insert(BigUint::from(index));
-                    unique.push(true);
-                }
+                _ => false,
+            };
+
+            if duplicate {
+                self.unique_msg.insert(BigUint::from(index));
+                has_duplicate = true;
             }
         }
-        !unique.is_empty()
+
+        has_duplicate
     }
 
     fn radio_buffer_after_checkbox(&mut self, data_id: &BigUint, item: &Rc<RefCell<InputItem>>) {
