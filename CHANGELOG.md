@@ -11,6 +11,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Added `Unsigned16` to `Column`, `InputConfig`, and `InputItem`.
 - Added `unique` flag to `HostNetworkGroupConfig` to enable client-side
   duplicate host/network/range combination detection.
+- Added optional `description` prop to `WholeList` component that displays
+  beneath the title for `Kind::Flat` lists.
 
 ### Fixed
 
