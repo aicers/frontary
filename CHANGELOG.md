@@ -18,6 +18,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
 
+### Changed
+
+- Refactored `pumpkin/theme.css` to use new color variables and updated CSS values
+  for consistent theming across light and dark modes.
+
 ## [0.13.0] - 2025-10-01
 
 ### Added
