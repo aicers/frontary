@@ -110,6 +110,8 @@ where
     pub title: &'static str,
     #[prop_or(None)]
     pub title_second: Option<&'static str>,
+    #[prop_or(None)]
+    pub description: Option<&'static str>,
     pub kind: Kind,
     #[prop_or(None)]
     pub data_type: Option<DataType>, // None means default
@@ -818,6 +820,21 @@ where
                         <div class="list-title">
                             { text!(txt, ctx.props().language, &ctx.props().title) }
                         </div>
+                        {
+                            if ctx.props().kind == Kind::Flat {
+                                if let Some(description) = ctx.props().description {
+                                    html! {
+                                        <div class="list-description">
+                                            { text!(txt, ctx.props().language, description) }
+                                        </div>
+                                    }
+                                } else {
+                                    html! {}
+                                }
+                            } else {
+                                html! {}
+                            }
+                        }
                         <div class="list-add" onclick={onclick_add}>
                             <img src={add_img} class="list-add" />
                             { text!(txt, ctx.props().language, "Add") }
