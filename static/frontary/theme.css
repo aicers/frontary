@@ -1046,8 +1046,6 @@ div.list-add:hover {
 }
 
 img.list-add {
-  width: 24px;
-  height: 24px;
   margin-right: 4px;
 }
 
@@ -1339,8 +1337,6 @@ td.list-whole-delete-checked-close {
 }
 
 img.list-whole-delete-trash-white {
-  width: 24px;
-  height: 24px;
   display: inline-block;
 }
 
