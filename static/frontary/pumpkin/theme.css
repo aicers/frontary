@@ -1016,6 +1016,24 @@ html.light
   cursor: pointer;
 }
 
+div.mini-select-top-direction.is-disabled {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+  cursor: default;
+}
+
+div.mini-select-top-direction-text.is-disabled {
+  color: var(--Dark-50);
+}
+
+div.mini-select-top-direction-icon.is-disabled {
+  background-image: url("/frontary/pumpkin/traffic-direction-dim.svg");
+}
+
+html.light div.mini-select-top-direction-icon.is-disabled {
+  background-image: url("/frontary/pumpkin/light/traffic-direction-dim.svg");
+}
+
 div.mini-select-basic {
   float: right;
   width: 100%;
@@ -1110,6 +1128,16 @@ td.mini-select-item-direction {
   font-weight: 400;
   padding-right: 4px;
   white-space: nowrap;
+}
+
+div.mini-select-item-direction.is-disabled {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+  cursor: default;
+}
+
+td.mini-select-item-direction.is-disabled {
+  color: var(--Dark-50);
 }
 
 div.mini-select-list-sort-recently-icon {

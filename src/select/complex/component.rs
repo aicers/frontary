@@ -728,13 +728,19 @@ impl Model {
                                     ))))
                                 },
                                 |predefined| {
-                                    predefined.get(item.id()).map_or(
-                                        Rc::new(RefCell::new(None)),
+                                    predefined.get(item.id()).map_or_else(
+                                        || {
+                                            // Item is unchecked: store None to keep it unchecked
+                                            // while preserving the dropdown UI
+                                            Rc::new(RefCell::new(None))
+                                        },
                                         |d| {
                                             if let Ok(d) = d.try_borrow() {
                                                 Rc::new(RefCell::new(*d))
                                             } else {
-                                                Rc::new(RefCell::new(None))
+                                                Rc::new(RefCell::new(Some(
+                                                    SelectionExtraInfo::Network(EndpointKind::Both),
+                                                )))
                                             }
                                         },
                                     )

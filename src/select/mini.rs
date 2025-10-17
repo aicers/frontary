@@ -219,6 +219,20 @@ where
     U: Clone + Component + PartialEq,
     <U as Component>::Message: Clone + PartialEq,
 {
+    fn value_to_text(ctx: &Context<Self>, value: &T) -> Option<String> {
+        let txt = &ctx.props().txt.txt;
+        ctx.props()
+            .candidate_values
+            .iter()
+            .enumerate()
+            .find(|(_, candidate)| *candidate == value)
+            .and_then(|(index, _)| ctx.props().list.get(index))
+            .map(|view_string| match view_string {
+                ViewString::Key(key) => text!(txt, ctx.props().language, key).to_string(),
+                ViewString::Raw(raw) => raw.clone(),
+            })
+    }
+
     #[allow(clippy::too_many_lines)]
     fn view_list(ctx: &Context<Self>, value: &str, theme: Option<Theme>) -> Html {
         let list = ctx.props().list.clone();
@@ -440,11 +454,22 @@ where
         } else {
             String::new()
         };
-        let (class, class_text, class_icon) = (
-            format!("mini-select-top-direction{suffix}"),
-            format!("mini-select-top-direction-text{suffix}"),
-            format!("mini-select-top-direction-icon{suffix}"),
-        );
+        let class_base = format!("mini-select-top-direction{suffix}");
+        let class_text_base = format!("mini-select-top-direction-text{suffix}");
+        let class_icon_base = format!("mini-select-top-direction-icon{suffix}");
+        let (class, class_text, class_icon) = if ctx.props().active {
+            (
+                classes!(class_base),
+                classes!(class_text_base),
+                classes!(class_icon_base),
+            )
+        } else {
+            (
+                classes!(class_base, "is-disabled"),
+                classes!(class_text_base, "is-disabled"),
+                classes!(class_icon_base, "is-disabled"),
+            )
+        };
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
@@ -460,29 +485,27 @@ where
     }
 
     fn view_direction_item(ctx: &Context<Self>) -> Html {
-        let txt = ctx.props().txt.txt.clone();
-        let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
-            selected.map_or_else(String::new, |value| {
-                ctx.props()
-                    .candidate_values
-                    .iter()
-                    .enumerate()
-                    .find(|(_, v)| *v == &value)
-                    .map_or_else(String::new, |(index, _)| {
-                        ctx.props()
-                            .list
-                            .get(index)
-                            .map_or_else(String::new, |v| match v {
-                                ViewString::Key(key) => {
-                                    text!(txt, ctx.props().language, key).to_string()
-                                }
-                                ViewString::Raw(txt) => txt.clone(),
-                            })
-                    })
-            })
+        let selected_value = ctx
+            .props()
+            .selected_value
+            .try_borrow()
+            .ok()
+            .and_then(|selected| selected.as_ref().copied());
+        let default_value = if ctx.props().active {
+            None
         } else {
-            String::new()
+            ctx.props().default_value
         };
+        let first_candidate = if ctx.props().active {
+            None
+        } else {
+            ctx.props().candidate_values.first().copied()
+        };
+        let value = [selected_value, default_value, first_candidate]
+            .into_iter()
+            .flatten()
+            .find_map(|candidate| Self::value_to_text(ctx, &candidate))
+            .unwrap_or_default();
         let style_width = ctx
             .props()
             .top_width
@@ -502,7 +525,7 @@ where
             <div onclick={onclick} class="mini-select-item-direction" style={style}>
                 <table>
                     <tr>
-                        <td class="mini-select-item-direction">
+                        <td class="mini-select-item-direction-text">
                             { value }
                         </td>
                         <td class="mini-select-item-direction-icon">
