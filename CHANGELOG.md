@@ -20,8 +20,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 
-- Refactored `pumpkin/theme.css` to use new color variables and updated CSS values
-  for consistent theming across light and dark modes.
+- Removed redundant CSS sizing for SVG icons (`img.list-add` and
+  `img.list-whole-delete-trash-white`) that specify the same dimensions as
+  their inherent SVG sizes, avoiding confusion and reducing redundancy.
+- Refactored `pumpkin/theme.css` to use new color variables and updated CSS
+  values for consistent theming across light and dark modes.
 
 ## [0.13.0] - 2025-10-01
 
