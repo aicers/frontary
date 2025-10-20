@@ -454,22 +454,14 @@ where
         } else {
             String::new()
         };
+        let disabled = !ctx.props().active;
         let class_base = format!("mini-select-top-direction{suffix}");
         let class_text_base = format!("mini-select-top-direction-text{suffix}");
         let class_icon_base = format!("mini-select-top-direction-icon{suffix}");
-        let (class, class_text, class_icon) = if ctx.props().active {
-            (
-                classes!(class_base),
-                classes!(class_text_base),
-                classes!(class_icon_base),
-            )
-        } else {
-            (
-                classes!(class_base, "is-disabled"),
-                classes!(class_text_base, "is-disabled"),
-                classes!(class_icon_base, "is-disabled"),
-            )
-        };
+
+        let class = classes!(&class_base, disabled.then_some("is-disabled"));
+        let class_text = classes!(&class_text_base, disabled.then_some("is-disabled"));
+        let class_icon = classes!(&class_icon_base, disabled.then_some("is-disabled"));
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
