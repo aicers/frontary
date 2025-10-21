@@ -73,7 +73,6 @@ input[type="password"] {
 div.basic-checkbox {
   width: 48px;
   height: 48px;
-  background-size: 48px 48px;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -166,7 +165,6 @@ input[type="text"].searchable-select-input-empty-alert {
   line-height: 24px;
   border-radius: 8px;
   background-color: var(--select-bg);
-  background-size: 32px 32px;
   background-position: right 8px top 4px;
   background-repeat: no-repeat;
 }
@@ -350,7 +348,6 @@ input[type="text"].complex-select-input {
   border-radius: 8px;
   background-color: var(--control-bg);
   background-image: url("/frontary/pumpkin/complex-select-pop.svg");
-  background-size: 32px 32px;
   background-position: right 8px top 3px;
   background-repeat: no-repeat;
   border: none;
@@ -365,7 +362,6 @@ input[type="text"].complex-select-input-empty-alert {
   line-height: 24px;
   border-radius: 8px;
   background-color: var(--control-bg);
-  background-size: 32px 32px;
   background-position: right 8px top 3px;
   background-repeat: no-repeat;
 }
@@ -430,7 +426,6 @@ div.complex-select-pop-head-close-icon {
   width: 40px;
   height: 40px;
   background-image: url("/frontary/pumpkin/modal-close.svg");
-  background-size: 40px 40px;
   background-repeat: no-repeat;
 }
 
@@ -706,7 +701,6 @@ div.complex-select-pop-input-input-plus {
   width: 40px;
   height: 40px;
   background-image: url("/frontary/pumpkin/plus-for-add.svg");
-  background-size: 24px 24px;
   background-position: center;
   background-repeat: no-repeat;
   padding: 8px;
@@ -1114,7 +1108,6 @@ div.mini-select-list-sort-recently-icon {
   width: 40px;
   height: 40px;
   background-image: url("/frontary/pumpkin/list-sort-recently.svg");
-  background-size: 24px 24px;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 8px;
@@ -1138,7 +1131,6 @@ div.mini-select-list-sort-recently-text-icon {
   width: 24px;
   height: 24px;
   background-image: url("/frontary/pumpkin/list-sort-recently.svg");
-  background-size: 24px 24px;
   background-repeat: no-repeat;
   margin-right: 4px;
 }
@@ -1174,7 +1166,6 @@ div.mini-select-on-off-action {
   width: 32px;
   height: 32px;
   background-image: url("/frontary/pumpkin/more-action-dots.svg");
-  background-size: 32px 32px;
   background-repeat: no-repeat;
 }
 
@@ -1730,7 +1721,6 @@ td.input-close-x {
   width: 40px;
   height: 40px;
   background-image: url("/frontary/pumpkin/input-close.svg");
-  background-size: 40px 40px;
   background-repeat: no-repeat;
   background-position: 0px 0px;
 }
@@ -2735,7 +2725,6 @@ div.input-trash-can-delete {
   height: 40px;
   display: inline-block;
   background-image: url("/frontary/pumpkin/trash-can.svg");
-  background-size: 24px 24px;
   background-position: center;
   background-repeat: no-repeat;
   background-color: var(--btn-icon-bg);
