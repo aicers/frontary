@@ -415,7 +415,6 @@ div.complex-select-pop-head-text {
   display: flex;
   align-items: center;
   width: 100%;
-  background-color: var(--Dark-80);
   vertical-align: middle;
   font-size: 18px;
   line-height: 24px;
@@ -425,7 +424,6 @@ div.complex-select-pop-head-text {
 div.complex-select-pop-head-close {
   height: 40px;
   width: 40px;
-  background-color: var(--Dark-80);
 }
 
 div.complex-select-pop-head-close-icon {
