@@ -955,6 +955,8 @@ div.mini-select-top-direction-deactive {
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
+  pointer-events: none;
+  cursor: default;
 }
 
 div.mini-select-top-direction-text {
@@ -1014,24 +1016,6 @@ html.light
   background-position: center;
   background-repeat: no-repeat;
   cursor: pointer;
-}
-
-div.mini-select-top-direction.is-disabled {
-  background-color: var(--Transparent-Light-Grey);
-  pointer-events: none;
-  cursor: default;
-}
-
-div.mini-select-top-direction-text.is-disabled {
-  color: var(--Dark-50);
-}
-
-div.mini-select-top-direction-icon.is-disabled {
-  background-image: url("/frontary/pumpkin/traffic-direction-dim.svg");
-}
-
-html.light div.mini-select-top-direction-icon.is-disabled {
-  background-image: url("/frontary/pumpkin/light/traffic-direction-dim.svg");
 }
 
 div.mini-select-basic {
@@ -1117,7 +1101,7 @@ div.mini-select-item-direction:hover {
   cursor: pointer;
 }
 
-td.mini-select-item-direction {
+td.mini-select-item-direction-text {
   width: 42px;
   height: 24px;
   vertical-align: middle;
@@ -1130,13 +1114,13 @@ td.mini-select-item-direction {
   white-space: nowrap;
 }
 
-div.mini-select-item-direction.is-disabled {
+div.mini-select-item-direction-deactive {
   background-color: var(--Transparent-Light-Grey);
   pointer-events: none;
   cursor: default;
 }
 
-td.mini-select-item-direction.is-disabled {
+td.mini-select-item-direction-text-deactive {
   color: var(--Dark-50);
 }
 

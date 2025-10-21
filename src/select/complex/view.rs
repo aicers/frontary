@@ -534,6 +534,7 @@ impl Model {
                 language={ctx.props().language}
                 parent_message={parent_message}
                 active={active}
+                deactive_class_suffix={Some("-deactive".to_string())}
                 id={id.to_string()}
                 list={direction_list}
                 candidate_values={value_candidates}
@@ -719,6 +720,7 @@ impl Model {
                 id={format!("assign-item-direction-{}", id.clone())}
                 list={Rc::clone(&src_dst_list)}
                 candidate_values={Rc::clone(&value_candidates)}
+                default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
                 selected_value={Rc::clone(selected)}
                 selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
                 align_left={false}

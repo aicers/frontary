@@ -760,25 +760,14 @@ div.mini-select-top-direction-deactive {
   font-size: 13px;
   color: #cbcbcb;
   background-color: #f7f7f7;
+  pointer-events: none;
+  cursor: default;
 }
 
 div.mini-select-top-direction:hover {
   color: #4d4d4d;
   background-color: #ebe9eb;
   cursor: pointer;
-}
-
-div.mini-select-top-direction.is-disabled {
-  background-color: var(--Transparent-Light-Grey);
-  pointer-events: none;
-}
-
-div.mini-select-top-direction.is-disabled:hover {
-  cursor: default;
-}
-
-div.mini-select-top-direction-text.is-disabled {
-  color: var(--Dark-50);
 }
 
 div.mini-select-top-direction-text {
@@ -791,6 +780,7 @@ div.mini-select-top-direction-text-deactive {
   float: right;
   margin-left: 4px;
   margin-right: 4px;
+  color: #cbcbcb;
 }
 
 div.mini-select-top-direction-icon {
@@ -888,22 +878,22 @@ div.mini-select-item-direction:hover {
   cursor: pointer;
 }
 
-div.mini-select-item-direction.is-disabled {
-  background-color: var(--Transparent-Light-Grey);
-  pointer-events: none;
-  cursor: default;
-}
-
-td.mini-select-item-direction.is-disabled {
-  color: var(--Dark-50);
-}
-
-td.mini-select-item-direction {
+td.mini-select-item-direction-text {
   width: 40px;
   height: 28px;
   padding-left: 2px;
   vertical-align: middle;
   text-align: center;
+}
+
+div.mini-select-item-direction-deactive {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+  cursor: default;
+}
+
+td.mini-select-item-direction-text-deactive {
+  color: #cbcbcb;
 }
 
 td.mini-select-item-direction-icon {

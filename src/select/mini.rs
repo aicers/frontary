@@ -447,21 +447,19 @@ where
     }
 
     fn view_direction_all(ctx: &Context<Self>) -> Html {
-        let suffix = if ctx.props().active {
-            String::new()
-        } else if let Some(suffix) = ctx.props().deactive_class_suffix.as_ref() {
-            suffix.as_ref().into()
+        let suffix: &str = if ctx.props().active {
+            ""
         } else {
-            String::new()
+            ctx.props()
+                .deactive_class_suffix
+                .as_deref()
+                .unwrap_or("-deactive")
         };
-        let disabled = !ctx.props().active;
-        let class_base = format!("mini-select-top-direction{suffix}");
-        let class_text_base = format!("mini-select-top-direction-text{suffix}");
-        let class_icon_base = format!("mini-select-top-direction-icon{suffix}");
-
-        let class = classes!(&class_base, disabled.then_some("is-disabled"));
-        let class_text = classes!(&class_text_base, disabled.then_some("is-disabled"));
-        let class_icon = classes!(&class_icon_base, disabled.then_some("is-disabled"));
+        let (class, class_text, class_icon) = (
+            format!("mini-select-top-direction{suffix}"),
+            format!("mini-select-top-direction-text{suffix}"),
+            format!("mini-select-top-direction-icon{suffix}"),
+        );
         let txt = ctx.props().txt.txt.clone();
         let onclick = ctx.link().callback(|_| Message::ClickTop);
 
@@ -477,27 +475,16 @@ where
     }
 
     fn view_direction_item(ctx: &Context<Self>) -> Html {
-        let selected_value = ctx
-            .props()
-            .selected_value
-            .try_borrow()
-            .ok()
-            .and_then(|selected| selected.as_ref().copied());
-        let default_value = if ctx.props().active {
-            None
+        let default_value = ctx.props().default_value;
+        let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
+            selected
+                .as_ref()
+                .and_then(|value| Self::value_to_text(ctx, value))
+                .or_else(|| default_value.and_then(|value| Self::value_to_text(ctx, &value)))
         } else {
-            ctx.props().default_value
-        };
-        let first_candidate = if ctx.props().active {
-            None
-        } else {
-            ctx.props().candidate_values.first().copied()
-        };
-        let value = [selected_value, default_value, first_candidate]
-            .into_iter()
-            .flatten()
-            .find_map(|candidate| Self::value_to_text(ctx, &candidate))
-            .unwrap_or_default();
+            default_value.and_then(|value| Self::value_to_text(ctx, &value))
+        }
+        .unwrap_or_default();
         let style_width = ctx
             .props()
             .top_width
@@ -512,12 +499,21 @@ where
             )
         };
         let onclick = ctx.link().callback(|_| Message::ClickTop);
+        let disabled = !ctx.props().active;
+        let item_class = classes!(
+            "mini-select-item-direction",
+            disabled.then_some("mini-select-item-direction-deactive"),
+        );
+        let text_class = classes!(
+            "mini-select-item-direction-text",
+            disabled.then_some("mini-select-item-direction-text-deactive"),
+        );
 
         html! {
-            <div onclick={onclick} class="mini-select-item-direction" style={style}>
+            <div onclick={onclick} class={item_class} style={style}>
                 <table>
                     <tr>
-                        <td class="mini-select-item-direction-text">
+                        <td class={text_class}>
                             { value }
                         </td>
                         <td class="mini-select-item-direction-icon">
