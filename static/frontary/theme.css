@@ -1010,17 +1010,6 @@ div.list-title {
   line-height: 22px;
 }
 
-div.list-description {
-  float: left;
-  clear: left;
-  color: #666666;
-  font-size: 13px;
-  font-weight: normal;
-  margin-top: -16px;
-  margin-bottom: 20px;
-  line-height: 18px;
-}
-
 div.list-sort-recently {
   float: right;
   height: 36px;

@@ -1195,15 +1195,34 @@ div.list-title {
   line-height: 22px;
 }
 
+div.list-title-with-description {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
 div.list-description {
-  float: left;
-  clear: left;
-  color: var(--Text-Secondary);
-  font-size: 13px;
-  font-weight: normal;
-  margin-top: -16px;
-  margin-bottom: 20px;
-  line-height: 18px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+div.list-title-description {
+  display: flex;
+  flex-direction: column;
+}
+
+div.list-wrapper-description {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+div.list-sort-recently-description {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 div.list-sort-recently {
@@ -1222,6 +1241,27 @@ div.list-table {
 
 table.list-table {
   overflow-y: visible;
+}
+
+div.list-add-description {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--btn-primary-fg);
+  background-color: var(--btn-primary-bg);
+  border-radius: 8px;
+  padding: 8px 24px;
+  margin-left: 16px;
+}
+
+div.list-add-description:hover {
+  box-shadow: var(--btn-primary-shadow-hover);
+  outline: 2px solid var(--btn-primary-outline-hover);
+  cursor: pointer;
 }
 
 div.list-add {

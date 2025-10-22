@@ -813,98 +813,141 @@ where
             "png"
         };
         let add_img = Theme::path(&theme, &format!("list-add.{ext}"));
-        match ctx.props().kind {
-            Kind::LayeredFirst | Kind::Flat => {
-                html! {
-                    <>
-                        <div class="list-title">
+        let render_title = || -> Html {
+            html! {
+                <>
+                    <div class="list-title">
+                        { text!(txt, ctx.props().language, &ctx.props().title) }
+                    </div>
+                    <div class="list-add" onclick={onclick_add.clone()}>
+                        <img src={add_img.clone()} class="list-add" />
+                        { text!(txt, ctx.props().language, "Add") }
+                    </div>
+                    <div class="list-sort-recently">
+                        <SelectMini::<SortListKind, Self>
+                            txt={ctx.props().txt.clone()}
+                            language={ctx.props().language}
+                            parent_message={Message::SortList}
+                            id={"sort-list".to_string()}
+                            active={true}
+                            list={Rc::clone(&sort_list_kind_list)}
+                            candidate_values={Rc::clone(&value_candidates)}
+                            selected_value={Rc::clone(&self.sort_list_kind)}
+                            selected_value_cache={self.sort_list_kind.try_borrow().ok().and_then(|k| *k)}
+                            align_left={false}
+                            {list_top}
+                            kind={SelectMiniKind::SortList}
+                            {theme}
+                        />
+                    </div>
+                </>
+            }
+        };
+        let render_title_with_description = |description: &'static str| -> Html {
+            html! {
+                <div class="list-wrapper-description">
+                    <div class="list-title-description">
+                        <div class="list-title-with-description">
                             { text!(txt, ctx.props().language, &ctx.props().title) }
                         </div>
-                        {
-                            if ctx.props().kind == Kind::Flat {
-                                if let Some(description) = ctx.props().description {
-                                    html! {
-                                        <div class="list-description">
-                                            { text!(txt, ctx.props().language, description) }
-                                        </div>
-                                    }
-                                } else {
-                                    html! {}
-                                }
-                            } else {
-                                html! {}
-                            }
-                        }
-                        <div class="list-add" onclick={onclick_add}>
-                            <img src={add_img} class="list-add" />
-                            { text!(txt, ctx.props().language, "Add") }
+                        <div class="list-description">
+                            { text!(txt, ctx.props().language, description) }
                         </div>
-                        <div class="list-sort-recently">
-                            <SelectMini::<SortListKind, Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                parent_message={Message::SortList}
-                                id={"sort-list".to_string()}
-                                active={true}
-                                list={Rc::clone(&sort_list_kind_list)}
-                                candidate_values={Rc::clone(&value_candidates)}
-                                selected_value={Rc::clone(&self.sort_list_kind)}
-                                selected_value_cache={self.sort_list_kind.try_borrow().ok().and_then(|k| *k)}
-                                align_left={false}
-                                {list_top}
-                                kind={SelectMiniKind::SortList}
-                                {theme}
-                            />
-                        </div>
-                        <div class="list-table">
-                            <table class="list-table">
-                                { self.view_head(ctx) }
-                                { self.view_list(ctx) }
-                                { self.view_pages(ctx, true) }
-                            </table>
-                        </div>
-
-                        {
-                            if self.view_input_status == ViewInputStatus::None {
-                                html! {}
-                            } else {
-                                let (msg, title) = match self.view_input_status {
-                                    ViewInputStatus::Add => (Message::Add, ctx.props().input_add_title),
-                                    ViewInputStatus::Edit => (Message::Edit, ctx.props().input_edit_title),
-                                    ViewInputStatus::None => unreachable!(),
-                                };
-                                let messages = if ctx.props().data_type == Some(DataType::Network) {
-                                    let mut messages: HashMap<MessageType, Message> = HashMap::new();
-                                    messages.insert(MessageType::AddTag, Message::ExtraMessage(MessageType::AddTag));
-                                    messages.insert(MessageType::EditTag, Message::ExtraMessage(MessageType::EditTag));
-                                    messages.insert(MessageType::DeleteTag, Message::ExtraMessage(MessageType::DeleteTag));
-                                    Some(messages)
-                                } else {
-                                    None
-                                };
-                                let tag = ctx.props().input_data_tag.clone();
-                                html! {
-                                    <Input<Self>
-                                        txt={ctx.props().txt.clone()}
-                                        language={ctx.props().language}
-                                        data={Some(Rc::clone(&ctx.props().data))}
-                                        title={title}
-                                        width={ctx.props().input_width}
-                                        height={ctx.props().input_height}
-                                        input_conf={ctx.props().input_conf.clone()}
-                                        input_id={input_id}
-                                        input_data={ctx.props().input_data.clone()}
-                                        input_data_tag={tag}
-                                        action_message={msg}
-                                        escape_message={Message::InputEscape}
-                                        extra_messages={messages}
-                                    />
-                                }
-                            }
-                        }
-                    </>
-                }
+                    </div>
+                    <div class="list-sort-recently-description">
+                        <SelectMini::<SortListKind, Self>
+                            txt={ctx.props().txt.clone()}
+                            language={ctx.props().language}
+                            parent_message={Message::SortList}
+                            id={"sort-list".to_string()}
+                            active={true}
+                            list={Rc::clone(&sort_list_kind_list)}
+                            candidate_values={Rc::clone(&value_candidates)}
+                            selected_value={Rc::clone(&self.sort_list_kind)}
+                            selected_value_cache={self.sort_list_kind.try_borrow().ok().and_then(|k| *k)}
+                            align_left={false}
+                            {list_top}
+                            kind={SelectMiniKind::SortList}
+                            {theme}
+                        />
+                    </div>
+                    <div class="list-add-description" onclick={onclick_add.clone()}>
+                        <img src={add_img.clone()} class="list-add" />
+                        { text!(txt, ctx.props().language, "Add") }
+                    </div>
+                </div>
             }
+        };
+        let render_body = || -> Html {
+            html! {
+                <>
+                    <div class="list-table">
+                        <table class="list-table">
+                            { self.view_head(ctx) }
+                            { self.view_list(ctx) }
+                            { self.view_pages(ctx, true) }
+                        </table>
+                    </div>
+                    {
+                        if self.view_input_status == ViewInputStatus::None {
+                            html! {}
+                        } else {
+                            let (msg, title) = match self.view_input_status {
+                                ViewInputStatus::Add => (Message::Add, ctx.props().input_add_title),
+                                ViewInputStatus::Edit => (Message::Edit, ctx.props().input_edit_title),
+                                ViewInputStatus::None => unreachable!(),
+                            };
+                            let messages = if ctx.props().data_type == Some(DataType::Network) {
+                                let mut messages: HashMap<MessageType, Message> = HashMap::new();
+                                messages.insert(MessageType::AddTag, Message::ExtraMessage(MessageType::AddTag));
+                                messages.insert(MessageType::EditTag, Message::ExtraMessage(MessageType::EditTag));
+                                messages.insert(MessageType::DeleteTag, Message::ExtraMessage(MessageType::DeleteTag));
+                                Some(messages)
+                            } else {
+                                None
+                            };
+                            let tag = ctx.props().input_data_tag.clone();
+                            html! {
+                                <Input<Self>
+                                    txt={ctx.props().txt.clone()}
+                                    language={ctx.props().language}
+                                    data={Some(Rc::clone(&ctx.props().data))}
+                                    title={title}
+                                    width={ctx.props().input_width}
+                                    height={ctx.props().input_height}
+                                    input_conf={ctx.props().input_conf.clone()}
+                                    input_id={input_id.clone()}
+                                    input_data={ctx.props().input_data.clone()}
+                                    input_data_tag={tag}
+                                    action_message={msg}
+                                    escape_message={Message::InputEscape}
+                                    extra_messages={messages}
+                                />
+                            }
+                        }
+                    }
+                </>
+            }
+        };
+        match ctx.props().kind {
+            Kind::Flat => html! {
+                <>
+                    {
+                        if let Some(description) = ctx.props().description {
+                            render_title_with_description(description)
+                        } else {
+                            render_title()
+                        }
+                    }
+                    { render_body() }
+                </>
+            },
+            Kind::LayeredFirst => html! {
+                <>
+                    { render_title() }
+                    { render_body() }
+                </>
+            },
             Kind::LayeredSecond => html! {
                 <>
                     { self.view_head(ctx) }
