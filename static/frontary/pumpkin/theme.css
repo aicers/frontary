@@ -1371,6 +1371,33 @@ td.list-whole-list-layered-second {
   box-shadow: var(--table-cell-shadow-inset);
 }
 
+td.list-whole-highlight-left {
+  position: relative;
+}
+
+td.list-whole-highlight-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: #2d8cff;
+}
+
+td.list-whole-second-empty {
+  padding: 16px 24px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--Text-Secondary);
+  text-align: left;
+  box-shadow: var(--table-cell-shadow-inset);
+}
+
+td.list-whole-list-second-placeholder {
+  pointer-events: none;
+}
+
 td.list-whole-list-flat-check {
   width: 30px;
   height: 30px;
@@ -3392,4 +3419,9 @@ div:nth-of-type(1) > .admin-node-config-button {
 
 div:nth-of-type(2) > .admin-node-config-button {
   margin-bottom: 0;
+}
+
+/* Placeholder for second-layer last column */
+td.list-whole-list-second-last-placeholder {
+  pointer-events: none;
 }
