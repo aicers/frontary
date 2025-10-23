@@ -195,7 +195,7 @@ impl Model {
                                                             "{} {}",
                                                             style_width_input,
                                                             if self.input_wrong_msg.is_some() {
-                                                                "border-radius: 8px; border: 2px solid var(--Red-60);"
+                                                                "border-radius: 8px; border: 2px solid var(--red-60);"
                                                             } else {
                                                                 ""
                                                             }

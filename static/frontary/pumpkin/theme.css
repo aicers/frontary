@@ -97,7 +97,7 @@ div.radio-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
@@ -170,7 +170,7 @@ input[type="text"].searchable-select-input-empty-alert {
 }
 
 input[type="text"].searchable-select-input {
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="text"].searchable-select-input-empty {
@@ -239,7 +239,7 @@ input[type="text"].searchable-select-search {
   border-radius: 8px;
   background: var(--control-bg);
   padding-left: 48px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="text"].searchable-select-search::placeholder {
@@ -263,7 +263,7 @@ td.searchable-select-list-item {
   height: auto;
   font-size: 16px;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 tr.searchable-select-list-item-single {
@@ -278,7 +278,7 @@ td.searchable-select-list-item-single-selected {
   width: 100%;
   height: 48px;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-weight: 400;
   line-height: 24px;
   background: var(--menu-item-bg-selected);
@@ -289,7 +289,7 @@ td.searchable-select-list-item-single {
   width: 100%;
   padding: 8px 12px;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-weight: 400;
   line-height: 24px;
   height: 48px;
@@ -344,7 +344,7 @@ input[type="text"].complex-select-input {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   border-radius: 8px;
   background-color: var(--control-bg);
   background-image: url("/frontary/pumpkin/complex-select-pop.svg");
@@ -414,7 +414,7 @@ div.complex-select-pop-head-text {
   vertical-align: middle;
   font-size: 18px;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 div.complex-select-pop-head-close {
@@ -470,7 +470,7 @@ div.complex-select-pop-list-head {
   width: 100%;
   font-size: 16px;
   font-weight: 500;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   line-height: 24px;
   display: flex;
   align-items: flex-start;
@@ -481,7 +481,7 @@ div.complex-select-pop-list-head {
 div.complex-select-pop-head-1st {
   font-size: 16px;
   font-weight: 500;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   line-height: 24px;
   flex: 1 0 0;
 }
@@ -512,7 +512,7 @@ div.complex-select-pop-head-2nd-icon {
 }
 
 div.complex-select-pop-subtext {
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 20px;
 }
@@ -552,7 +552,7 @@ div.complex-select-pop-input-head-bottom {
   font-size: 14px;
   font-weight: 500;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 div.complex-select-pop-list {
@@ -592,7 +592,7 @@ div.complex-select-pop-list-select-all-checkbox {
 div.complex-select-pop-list-select-all-text {
   font-size: 16px;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 div.complex-select-pop-list-divider {
@@ -632,14 +632,14 @@ div.complex-select-pop-list-item-checkbox-text {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 div.complex-select-pop-list-networks {
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
 }
 
 input[type="text"].complex-select-search {
@@ -653,7 +653,7 @@ input[type="text"].complex-select-search {
   background-size: 32px 32px;
   background-position: right 8px top 4px;
   background-repeat: no-repeat;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 html.light input[type="text"].complex-select-search {
@@ -740,7 +740,7 @@ div.complex-select-pop-input-input-head {
   font-size: 16px;
   line-height: 24px;
   font-weight: 500;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="text"].complex-select-pop-input {
@@ -753,7 +753,7 @@ input[type="text"].complex-select-pop-input {
   background-color: var(--control-bg);
   border: none;
   border-radius: 8px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   box-sizing: border-box;
 }
 
@@ -812,7 +812,7 @@ div.complex-select-pop-input-list-text {
   justify-content: center;
   align-items: flex-start;
   flex: 1 0 0;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   line-height: 24px;
 }
@@ -875,7 +875,7 @@ td.mini-select-list-down-item {
   padding: 10px 12px;
   vertical-align: middle;
   white-space: nowrap;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
   font-weight: 400;
   font-size: 16px;
   line-height: 20px;
@@ -888,7 +888,7 @@ td.mini-select-list-down-item-selected {
   vertical-align: middle;
   white-space: nowrap;
   background-color: var(--menu-item-bg-selected);
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 400;
   line-height: 20px;
@@ -904,7 +904,7 @@ td.mini-select-list-down-item-left {
 
 td.mini-select-list-down-item:hover {
   background-color: var(--menu-item-bg-hover);
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   cursor: pointer;
 }
 
@@ -952,7 +952,7 @@ div.mini-select-top-direction-deactive {
 div.mini-select-top-direction-text {
   font-size: 16px;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 div.mini-select-top-direction:hover div.mini-select-top-direction-text {
@@ -1043,7 +1043,7 @@ div.mini-select-basic-square {
 
 div.mini-select-basic-value {
   display: flex;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
@@ -1098,7 +1098,7 @@ td.mini-select-item-direction {
   text-align: left;
   font-size: 16px;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-weight: 400;
   padding-right: 4px;
   white-space: nowrap;
@@ -1143,7 +1143,7 @@ div.mini-select-list-sort-recently-text-text {
   white-space: nowrap;
   font-weight: 400;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   padding-right: 6px;
   display: flex;
   justify-content: center;
@@ -1187,7 +1187,7 @@ html.light div.mini-select-on-off-action:hover {
 
 div.list-title {
   float: left;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: bold;
   margin-top: 14px;
@@ -1254,7 +1254,7 @@ td.list-whole-head-check {
 td.list-whole-head-title {
   height: 30px;
   font-size: 14px;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
   text-align: center;
   vertical-align: middle;
   font-weight: 500;
@@ -1341,7 +1341,7 @@ td.list-whole-list-first-layer {
   font-size: 14px;
   line-height: 22px;
   font-weight: 400;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   text-align: center;
   vertical-align: middle;
   word-break: keep-all;
@@ -1372,7 +1372,7 @@ td.list-whole-list-flat-check {
 td.list-whole-list-flat {
   font-size: 14px;
   font-weight: 400;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   text-align: center;
   vertical-align: middle;
   padding: 12px 16px;
@@ -1498,7 +1498,7 @@ div.list-whole-delete-checked-close:hover {
 td.list-whole-delete-checked-trash {
   width: 48px;
   height: 24px;
-  border-right: 1px solid var(--Dark-30);
+  border-right: 1px solid var(--dark-30);
 }
 
 td.list-whole-delete-checked-close {
@@ -1537,7 +1537,7 @@ div.list-whole-tag-item {
   /* HIGHLIGHT
     if border-radius is greater than max(width, height),
     it makes half size of min(width, height) */
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   border-radius: 48px;
   background: var(--tag-bg);
   display: flex;
@@ -1613,7 +1613,7 @@ th.list-whole-group-heading {
   height: 30px;
   background-color: var(--table-header-bg);
   font-size: 11px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-weight: 400;
 }
 
@@ -1642,7 +1642,7 @@ div.page-unselected {
   padding-right: 9px;
   padding-left: 9px;
   padding-top: 5px;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
 }
 
 div.page-selected {
@@ -1651,7 +1651,7 @@ div.page-selected {
   padding-right: 9px;
   padding-left: 9px;
   padding-top: 5px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 14px;
   background-color: var(--pagination-item-bg-selected);
   border-radius: 15px;
@@ -1711,7 +1711,7 @@ table.input-head {
 }
 
 td.input-title {
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
@@ -1758,7 +1758,7 @@ div.input-contents-item-title {
   width: 100%;
   font-weight: 500;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   line-height: 24px;
   margin-bottom: 4px;
 }
@@ -1768,7 +1768,7 @@ div.input-contents-text-item-title {
   width: 100%;
   font-weight: 500;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   line-height: 24px;
 }
 
@@ -1776,7 +1776,7 @@ div.input-contents-item-title-no-margin {
   width: 100%;
   font-weight: 500;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   line-height: 24px;
 }
 
@@ -1797,7 +1797,7 @@ input[type="text"].frontary-input-text {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="text"].frontary-input-text:disabled {
@@ -1813,7 +1813,7 @@ input[type="text"].frontary-input-text-alert {
   height: 40px;
   width: 100%;
   padding: 8px 12px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   outline: none;
   font-size: 16px;
   font-weight: 400;
@@ -1857,13 +1857,13 @@ div.input-password-notice {
   font-size: 11px;
   display: flex;
   align-items: center;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
   margin-bottom: 20px;
   padding-top: 4px;
 }
 
 div.input-reenter-password-title {
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
@@ -1891,7 +1891,7 @@ input[type="password"].input-password {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="password"].input-password::placeholder {
@@ -1902,7 +1902,7 @@ input[type="password"].input-password-alert {
   height: 40px;
   width: 100%;
   padding: 8px 12px;
-  color: var(--Dark-20);
+  color: var(--dark-20);
   outline: none;
   font-size: 16px;
   font-weight: 400;
@@ -1927,7 +1927,7 @@ input[type="number"].input-number {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="number"].input-number::placeholder {
@@ -1964,7 +1964,7 @@ input[type="number"].input-number-comparison {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="number"].input-number-comparison::placeholder {
@@ -1976,7 +1976,7 @@ input[type="number"].input-number-comparison-alert {
   width: 100%;
   max-width: 125px;
   padding: 8px 12px;
-  color: var(--Dark-20);
+  color: var(--dark-20);
   outline: none;
   font-size: 16px;
   font-weight: 400;
@@ -2060,7 +2060,7 @@ div.input-radio-title {
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 div.input-radio-radio {
@@ -2075,7 +2075,7 @@ div.input-radio-notice {
   line-height: 16px;
   display: flex;
   align-items: center;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
 }
 
 div.input-radio-message {
@@ -2109,7 +2109,7 @@ div.input-select-vector-vec-required {
 }
 
 div.input-contents-item-general-title {
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
@@ -2125,7 +2125,7 @@ div.input-host-network-group-required {
   height: 40px;
   width: 100%;
   padding: 8px 12px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   outline: none;
   font-size: 16px;
   font-weight: 400;
@@ -2159,7 +2159,7 @@ div.host-network-group-input-item {
   font-size: 14px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   border-radius: 48px;
   text-align: center;
   margin-bottom: 2px;
@@ -2188,7 +2188,7 @@ input[type="text"].host-network-group-input-input-input {
   display: flex;
   flex-direction: row;
   align-items: center;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="text"].host-network-group-input-input-input::placeholder {
@@ -2212,7 +2212,7 @@ div.host-network-group-input-input-notice {
   font-size: 11px;
   display: flex;
   align-items: center;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
   padding-top: 4px;
 }
 
@@ -2220,7 +2220,7 @@ div.simple-input-input-notice {
   width: 100%;
   display: flex;
   align-items: center;
-  color: var(--Dark-10);
+  color: var(--dark-10);
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
@@ -2280,7 +2280,7 @@ div.tag-group-input-item {
     it makes half size of min(width, height) */
   border-radius: 8px;
   background-color: var(--tag-bg);
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   text-align: left;
   font-size: 14px;
   font-weight: 400;
@@ -2308,7 +2308,7 @@ input[type="text"].tag-group-input-input-input {
   display: flex;
   flex-direction: row;
   align-items: center;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 input[type="text"].tag-group-input-input-input::placeholder {
@@ -2372,7 +2372,7 @@ div.tag-group-input-select-item {
     if border-radius is greater than max(width, height),
     it makes half size of min(width, height) */
   border-radius: 8px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   text-align: left;
   font-size: 14px;
   font-weight: 400;
@@ -2394,7 +2394,7 @@ div.tag-group-input-select-item-edit {
   padding-left: 8px;
   padding-right: 8px;
   font-size: 11px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   height: 32px;
   border-radius: 48px;
   background-color: var(--popover-chip-bg);
@@ -2455,7 +2455,7 @@ input[type="text"].tag-select-edit-tag {
   width: 100%;
   background: transparent;
   border: 0px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 400;
   line-height: 24px;
@@ -2534,7 +2534,7 @@ div.input-checkbox-me-title {
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -2614,34 +2614,34 @@ div.input-file {
 input.input-file-file-name {
   width: 100%;
   height: 40px;
-  background-color: var(--Transparent-Mid-Grey);
+  background-color: var(--transparent-mid-grey);
   border-radius: 8px;
   border: none;
   font-size: 16px;
   font-weight: 400;
   line-height: 24px;
   padding: 12px 24px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
 }
 
 label.input-file-choose-file {
   width: 150px;
   height: 40px;
   border-radius: 8px;
-  border: 2px solid var(--Transparent-Dark-Grey);
+  border: 2px solid var(--transparent-dark-grey);
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--Blue-40);
+  color: var(--blue-40);
   font-weight: 500;
 }
 
 label.input-file-choose-file:hover {
   cursor: pointer;
   border-radius: 8px;
-  border: 2px solid var(--Blue-40);
-  background-color: var(--Dark-80);
+  border: 2px solid var(--blue-40);
+  background-color: var(--dark-80);
 }
 
 div.input-group {
@@ -2670,7 +2670,7 @@ table.input-group.compact {
 
 th.input-group-heading {
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-weight: 500;
   text-align: left;
 }
@@ -2850,7 +2850,7 @@ div.input-group-item-outer {
   align-items: center;
   flex-direction: column;
   gap: 4px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
@@ -2907,7 +2907,7 @@ div.input-comparison-value {
   justify-content: space-between;
   font-size: 16px;
   font-weight: 400;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   margin-left: 12px;
 }
 
@@ -2967,7 +2967,7 @@ td.notification-contents {
 }
 
 div.clumit-notification {
-  color: var(--Dark-70);
+  color: var(--dark-70);
   text-align: center;
   font-size: 14px;
   font-weight: 500;
@@ -3110,7 +3110,7 @@ div.modal-title-header {
   width: 100%;
   display: flex;
   align-items: flex-end;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
@@ -3167,7 +3167,7 @@ div.modal-message-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   min-height: 20px;
   height: auto;
   flex-shrink: 0;
@@ -3266,7 +3266,7 @@ td.tab-menu-selected {
   font-weight: 500;
   line-height: 24px;
   font-size: 16px;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   position: relative;
   overflow: hidden;
 }
@@ -3282,7 +3282,7 @@ div.selected-background {
   top: 0;
   left: 0;
   z-index: 0;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   height: 48px;
   margin-bottom: 12px;
 }
@@ -3306,7 +3306,7 @@ td.tab-menu-unselected {
   vertical-align: middle;
   font-weight: 500;
   font-size: 16px;
-  color: var(--Text-Secondary);
+  color: var(--text-secondary);
   padding: 8px 16px;
 }
 
@@ -3356,7 +3356,7 @@ div.cell-modal-wrapper {
 
 div.cell-modal-header {
   flex: 1 0 0;
-  color: var(--Text-Primary);
+  color: var(--text-primary);
   font-size: 18px;
   font-weight: 500;
   line-height: 24px;
