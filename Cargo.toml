@@ -13,7 +13,7 @@ test = []
 
 [dependencies]
 anyhow = "1"
-bincode = "1"
+bincode = { version = "2", features = ["serde"] }
 data-encoding = "2"
 gloo-events = "0.2"
 gloo-file = "0.3"

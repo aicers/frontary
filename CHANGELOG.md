@@ -22,6 +22,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Refactored `pumpkin/theme.css` to use new color variables and updated CSS
   values for consistent theming across light and dark modes.
+- Bump bincode crate to 2.0 and modified the related code.
 
 ## [0.13.0] - 2025-10-01
 
