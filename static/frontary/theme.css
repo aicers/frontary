@@ -887,7 +887,7 @@ td.mini-select-item-direction-text {
 }
 
 div.mini-select-item-direction-deactive {
-  background-color: var(--Transparent-Light-Grey);
+  background-color: var(--transparent-light-grey);
   pointer-events: none;
   cursor: default;
 }
