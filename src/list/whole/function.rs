@@ -28,6 +28,14 @@ where
     }
 
     pub(super) fn item_range(&self, ctx: &Context<Self>) -> (usize, usize) {
+        if ctx.props().kind == Kind::LayeredSecond {
+            // Second layer shows the entire dataset at once, so bypass pagination.
+            let len = self.sorted_keys.len();
+            if len == 0 {
+                return (1, 0);
+            }
+            return (1, len);
+        }
         if let Ok(info) = ctx.props().pages_info.try_borrow() {
             let num = if ctx.props().kind == Kind::LayeredSecond {
                 ctx.props().num_per_page_second
@@ -344,6 +352,7 @@ where
 
     pub(super) fn set_first_layer_input_id(&mut self, ctx: &Context<Self>) {
         let (start, end) = self.item_range(ctx);
+        let mut assigned = false;
         if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
             *id = Vec::new();
         }
@@ -353,7 +362,14 @@ where
                 && let Ok(mut id) = ctx.props().input_ids.try_borrow_mut()
             {
                 *id = vec![key.clone()];
+                assigned = true;
             }
+        }
+        if !assigned
+            && let Some(key) = self.expand_list.iter().next()
+            && let Ok(mut id) = ctx.props().input_ids.try_borrow_mut()
+        {
+            *id = vec![key.clone()];
         }
     }
 }

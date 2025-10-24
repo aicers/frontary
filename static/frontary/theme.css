@@ -1215,6 +1215,25 @@ td.list-whole-list-first-layer-wrapper {
   border-right: 1px solid #eeeeee;
 }
 
+td.list-whole-second-empty {
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 20px;
+  color: #707070;
+  text-align: left;
+  border-bottom: 1px solid #eeeeee;
+}
+
+td.list-whole-list-second-placeholder {
+  pointer-events: none;
+}
+
+td.list-whole-list-layered-second,
+td.list-whole-list-second-placeholder,
+td.list-whole-list-second-last-placeholder {
+  border-bottom: 1px solid #eeeeee;
+}
+
 span.list-whole-list-first-layer-light {
   color: #707070;
 }
@@ -3086,4 +3105,9 @@ div.cell-modal-body {
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
+}
+
+/* Placeholder for second-layer last column */
+td.list-whole-list-second-last-placeholder {
+  pointer-events: none;
 }

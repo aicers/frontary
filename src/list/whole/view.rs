@@ -31,6 +31,11 @@ where
         let rowspan = ctx.props().display_info.widths.len().to_string();
         let theme = ctx.props().theme;
 
+        let highlight_class = if cfg!(feature = "pumpkin") {
+            "list-whole-highlight-left"
+        } else {
+            ""
+        };
         html! {
             <>
                 <tr class="list-whole-head">
@@ -39,24 +44,24 @@ where
                             Kind::LayeredFirst => {
                                 html! {
                                     <>
+                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
                                         <td class="list-whole-head-check" rowspan={rowspan.clone()}>
                                             <div onclick={onclick_all.clone()}>
                                                 <Checkbox status={check_status} {theme} />
                                             </div>
                                         </td>
-                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
                                     </>
                                 }
                             }
                             Kind::LayeredSecond => {
+                                let indent_classes = classes!(
+                                    "list-whole-head-check",
+                                    highlight_class
+                                );
                                 html! {
                                     <>
+                                        <td class={indent_classes} rowspan={rowspan.clone()}></td>
                                         <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
-                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}>
-                                            <div onclick={onclick_all.clone()}>
-                                                <Checkbox status={check_status} {theme} />
-                                            </div>
-                                        </td>
                                     </>
                                 }
                             }
@@ -98,7 +103,7 @@ where
                     </td>
                 </tr>
                 {
-                    if ctx.props().display_info.widths.len() > 1 {
+                    if ctx.props().display_info.widths.len() > 1 && !(ctx.props().kind == Kind::LayeredSecond && self.sorted_keys.is_empty()) {
                         let mut sum_cols: usize = 0;
 
                         html! {
@@ -204,6 +209,37 @@ where
     pub(super) fn view_list(&self, ctx: &Context<Self>) -> Html {
         let (start, end) = self.item_range(ctx);
         let theme = ctx.props().theme;
+        let txt = ctx.props().txt.txt.clone();
+        let highlight_class = if cfg!(feature = "pumpkin") {
+            "list-whole-highlight-left"
+        } else {
+            ""
+        };
+        if ctx.props().kind == Kind::LayeredSecond && self.sorted_keys.is_empty() {
+            let cols = ctx
+                .props()
+                .display_second_info
+                .as_ref()
+                .map_or(ctx.props().display_info.titles.len(), |info| {
+                    info.titles.len()
+                });
+            let message = if ctx.props().data_type == Some(DataType::Customer) {
+                text!(txt, ctx.props().language, "No network added.")
+            } else {
+                get_text!(txt, ctx.props().language.tag(), "No item added.")
+                    .map_or_else(|| "No item added.".to_string(), |t| t.to_string())
+            };
+            return html! {
+                <tr class="list-whole-second-empty-row">
+                    <td class={classes!("list-whole-list-layered-second", highlight_class)}></td>
+                    <td class="list-whole-list-flat-check list-whole-list-second-placeholder"></td>
+                    <td colspan={cols.to_string()} class="list-whole-second-empty">
+                        { message }
+                    </td>
+                    <td class="list-whole-list-second-page-last-column"></td>
+                </tr>
+            };
+        }
 
         html! {
             for (start..=end).map(|index| {
@@ -229,18 +265,18 @@ where
                             {
                                 match ctx.props().kind {
                                     Kind::LayeredFirst => {
-                                        if ctx.props().data_type == Some(DataType::Customer) {
-                                            let mut cols = ctx.props().display_info.titles.len();
-                                            if !self.expand_list.is_empty() {
-                                                cols = ctx.props().display_second_info.as_ref().map_or(cols, |info| info.titles.len());
-                                            }
+                                            if ctx.props().data_type == Some(DataType::Customer) {
+                                                let mut cols = ctx.props().display_info.titles.len();
+                                                if !self.expand_list.is_empty() {
+                                                    cols = ctx.props().display_second_info.as_ref().map_or(cols, |info| info.titles.len());
+                                                }
+                                                let is_expanded = self.expand_list.contains(key);
 
-
-                                            let file_name = if self.expand_list.contains(key) {
-                                                "collapse-list"
-                                            } else {
-                                                "expand-list"
-                                            };
+                                                let file_name = if is_expanded {
+                                                    "collapse-list"
+                                                } else {
+                                                    "expand-list"
+                                                };
                                             let ext = if cfg!(feature = "pumpkin") {
                                                 "svg"
                                             } else {
@@ -257,16 +293,19 @@ where
                                             if let Some(display_info_first) = ctx.props().display_info.widths.first() {
                                                 html! {
                                                     <tr class="list-whole-first-layer">
+                                                        <td class={classes!(
+                                                            "list-whole-list-first-expand",
+                                                            if is_expanded { highlight_class } else { "" }
+                                                        )}>
+                                                            <div class="list-whole-list-first-expand" style={style} onclick={onclick_expandible(key.clone())}>
+                                                            </div>
+                                                        </td>
                                                         <td class="list-whole-list-first-check">
                                                             <div onclick={onclick_item(key.clone())}>
                                                                 <Checkbox
                                                                     status={check_status}
                                                                     {theme}
                                                                 />
-                                                            </div>
-                                                        </td>
-                                                        <td class="list-whole-list-first-expand">
-                                                            <div class="list-whole-list-first-expand" style={style} onclick={onclick_expandible(key.clone())}>
                                                             </div>
                                                         </td>
                                                         <td colspan={cols.to_string()} class="list-whole-list-first-layer-wrapper">
@@ -321,20 +360,33 @@ where
                                                     {
                                                         if ctx.props().kind == Kind::LayeredSecond {
                                                             html! {
-                                                                <td class="list-whole-list-layered-second"></td>
+                                                                <td class={classes!(
+                                                                    "list-whole-list-layered-second",
+                                                                    highlight_class
+                                                                )}></td>
                                                             }
                                                         } else {
                                                             html! {}
                                                         }
                                                     }
-                                                    <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
-                                                        <div onclick={onclick_item(key.clone())}>
-                                                            <Checkbox
-                                                                status={check_status}
-                                                                {theme}
-                                                            />
-                                                        </div>
-                                                    </td>
+                                                    {
+                                                        if ctx.props().kind == Kind::LayeredSecond {
+                                                            html! {
+                                                                <td class="list-whole-list-flat-check list-whole-list-second-placeholder"></td>
+                                                            }
+                                                        } else {
+                                                            html! {
+                                                                <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
+                                                                    <div onclick={onclick_item(key.clone())}>
+                                                                        <Checkbox
+                                                                            status={check_status}
+                                                                            {theme}
+                                                                        />
+                                                                    </div>
+                                                                </td>
+                                                            }
+                                                        }
+                                                    }
                                                     {
                                                         if let Some(widths) = ctx.props().display_info.widths.first() {
                                                             if let ColWidths::Pixel(ws) = widths {
@@ -612,8 +664,19 @@ where
     }
 
     pub(super) fn view_pages(&self, ctx: &Context<Self>, out_table: bool) -> Html {
-        let cols = ctx.props().display_info.titles.len();
+        let primary_cols = ctx.props().display_info.titles.len();
+        let secondary_cols = ctx
+            .props()
+            .display_second_info
+            .as_ref()
+            .map_or(0, |info| info.titles.len());
+        let base_cols = std::cmp::max(primary_cols, secondary_cols);
         let txt = ctx.props().txt.txt.clone();
+        let highlight_class = if cfg!(feature = "pumpkin") {
+            "list-whole-highlight-left"
+        } else {
+            ""
+        };
 
         if out_table {
             let msg = format!(
@@ -629,7 +692,7 @@ where
 
             html! {
                 <tr>
-                    <td colspan={(cols + 3).to_string()} class="list-whole-list-pages">
+                    <td colspan={(base_cols + 3).to_string()} class="list-whole-list-pages">
                         <div class="list-whole-list-pages-inner">
                             <Pages::<Self>
                                 txt={ctx.props().txt.clone()}
@@ -660,41 +723,18 @@ where
                 }
                 _ => unreachable!(),
             };
-
             let onclick_add_second = ctx.link().callback(|_| Message::InputAdd);
-            let msg = format!(
-                "{}{} {} {}{}",
-                self.checked.len(),
-                text!(txt, ctx.props().language, "(items of)"),
-                text!(txt, ctx.props().language, "chosen"),
-                text!(
-                    txt,
-                    ctx.props().language,
-                    ctx.props().title_second.unwrap_or("item")
-                )
-                .to_string()
-                .to_lowercase(),
-                text!(txt, ctx.props().language, "(s)"),
-            );
-
             html! {
                 <tr class="list-whloe-list-pages-outer">
-                    <td class="list-whole-list-second-page-checkbox"></td>
-                    <td class="list-whole-list-second-page-caret-down"></td>
-                    <td colspan={cols.to_string()} class="list-whole-list-second-pages">
+                    <td class={classes!(
+                        "list-whole-list-second-page-checkbox",
+                        highlight_class
+                    )}></td>
+                    <td colspan={(base_cols + 1).to_string()} class="list-whole-list-second-pages">
                         <div class="list-whole-list-pages-inner">
-                            <Pages::<Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                parent_message={Message::MovePage}
-                                pages_info={Rc::clone(&ctx.props().pages_info)}
-                                pages_info_cache={self.pages_info}
-                                num_pages={DEFAULT_NUM_PAGES}
-                            />
-                            <div class="list-whole-list-second-add" onclick={onclick_add_second}>
+                                                            <div class="list-whole-list-second-add" onclick={onclick_add_second}>
                                 { add_text }
                             </div>
-                            { self.view_delete_checked(ctx, msg) }
                         </div>
                     </td>
                     <td class="list-whole-list-second-page-last-column"></td>
