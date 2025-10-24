@@ -947,6 +947,8 @@ div.mini-select-top-direction-deactive {
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
+  pointer-events: none;
+  cursor: default;
 }
 
 div.mini-select-top-direction-text {
@@ -1091,7 +1093,7 @@ div.mini-select-item-direction:hover {
   cursor: pointer;
 }
 
-td.mini-select-item-direction {
+td.mini-select-item-direction-text {
   width: 42px;
   height: 24px;
   vertical-align: middle;
@@ -1102,6 +1104,16 @@ td.mini-select-item-direction {
   font-weight: 400;
   padding-right: 4px;
   white-space: nowrap;
+}
+
+div.mini-select-item-direction-deactive {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+  cursor: default;
+}
+
+td.mini-select-item-direction-text-deactive {
+  color: var(--Dark-50);
 }
 
 div.mini-select-list-sort-recently-icon {
@@ -3432,4 +3444,22 @@ div:nth-of-type(1) > .admin-node-config-button {
 
 div:nth-of-type(2) > .admin-node-config-button {
   margin-bottom: 0;
+}
+
+td.list-whole-highlight-left {
+  position: relative;
+}
+
+td.list-whole-highlight-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: #2d8cff;
+}
+
+div.list-whole-list-empty {
+  color: var(--fg-muted, #8E97A5);
 }

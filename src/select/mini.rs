@@ -219,6 +219,20 @@ where
     U: Clone + Component + PartialEq,
     <U as Component>::Message: Clone + PartialEq,
 {
+    fn value_to_text(ctx: &Context<Self>, value: &T) -> Option<String> {
+        let txt = &ctx.props().txt.txt;
+        ctx.props()
+            .candidate_values
+            .iter()
+            .enumerate()
+            .find(|(_, candidate)| *candidate == value)
+            .and_then(|(index, _)| ctx.props().list.get(index))
+            .map(|view_string| match view_string {
+                ViewString::Key(key) => text!(txt, ctx.props().language, key).to_string(),
+                ViewString::Raw(raw) => raw.clone(),
+            })
+    }
+
     #[allow(clippy::too_many_lines)]
     fn view_list(ctx: &Context<Self>, value: &str, theme: Option<Theme>) -> Html {
         let list = ctx.props().list.clone();
@@ -433,12 +447,13 @@ where
     }
 
     fn view_direction_all(ctx: &Context<Self>) -> Html {
-        let suffix = if ctx.props().active {
-            String::new()
-        } else if let Some(suffix) = ctx.props().deactive_class_suffix.as_ref() {
-            suffix.as_ref().into()
+        let suffix: &str = if ctx.props().active {
+            ""
         } else {
-            String::new()
+            ctx.props()
+                .deactive_class_suffix
+                .as_deref()
+                .unwrap_or("-deactive")
         };
         let (class, class_text, class_icon) = (
             format!("mini-select-top-direction{suffix}"),
@@ -460,29 +475,16 @@ where
     }
 
     fn view_direction_item(ctx: &Context<Self>) -> Html {
-        let txt = ctx.props().txt.txt.clone();
+        let default_value = ctx.props().default_value;
         let value = if let Ok(selected) = ctx.props().selected_value.try_borrow() {
-            selected.map_or_else(String::new, |value| {
-                ctx.props()
-                    .candidate_values
-                    .iter()
-                    .enumerate()
-                    .find(|(_, v)| *v == &value)
-                    .map_or_else(String::new, |(index, _)| {
-                        ctx.props()
-                            .list
-                            .get(index)
-                            .map_or_else(String::new, |v| match v {
-                                ViewString::Key(key) => {
-                                    text!(txt, ctx.props().language, key).to_string()
-                                }
-                                ViewString::Raw(txt) => txt.clone(),
-                            })
-                    })
-            })
+            selected
+                .as_ref()
+                .and_then(|value| Self::value_to_text(ctx, value))
+                .or_else(|| default_value.and_then(|value| Self::value_to_text(ctx, &value)))
         } else {
-            String::new()
-        };
+            default_value.and_then(|value| Self::value_to_text(ctx, &value))
+        }
+        .unwrap_or_default();
         let style_width = ctx
             .props()
             .top_width
@@ -497,12 +499,21 @@ where
             )
         };
         let onclick = ctx.link().callback(|_| Message::ClickTop);
+        let disabled = !ctx.props().active;
+        let item_class = classes!(
+            "mini-select-item-direction",
+            disabled.then_some("mini-select-item-direction-deactive"),
+        );
+        let text_class = classes!(
+            "mini-select-item-direction-text",
+            disabled.then_some("mini-select-item-direction-text-deactive"),
+        );
 
         html! {
-            <div onclick={onclick} class="mini-select-item-direction" style={style}>
+            <div onclick={onclick} class={item_class} style={style}>
                 <table>
                     <tr>
-                        <td class="mini-select-item-direction">
+                        <td class={text_class}>
                             { value }
                         </td>
                         <td class="mini-select-item-direction-icon">

@@ -760,6 +760,8 @@ div.mini-select-top-direction-deactive {
   font-size: 13px;
   color: #cbcbcb;
   background-color: #f7f7f7;
+  pointer-events: none;
+  cursor: default;
 }
 
 div.mini-select-top-direction:hover {
@@ -778,6 +780,7 @@ div.mini-select-top-direction-text-deactive {
   float: right;
   margin-left: 4px;
   margin-right: 4px;
+  color: #cbcbcb;
 }
 
 div.mini-select-top-direction-icon {
@@ -875,12 +878,22 @@ div.mini-select-item-direction:hover {
   cursor: pointer;
 }
 
-td.mini-select-item-direction {
+td.mini-select-item-direction-text {
   width: 40px;
   height: 28px;
   padding-left: 2px;
   vertical-align: middle;
   text-align: center;
+}
+
+div.mini-select-item-direction-deactive {
+  background-color: var(--Transparent-Light-Grey);
+  pointer-events: none;
+  cursor: default;
+}
+
+td.mini-select-item-direction-text-deactive {
+  color: #cbcbcb;
 }
 
 td.mini-select-item-direction-icon {
@@ -3073,4 +3086,9 @@ div.cell-modal-body {
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
+}
+
+td.list-whole-highlight {
+  width: 2px;
+  background-color: #2d8cff;
 }

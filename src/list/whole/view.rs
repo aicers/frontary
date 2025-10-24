@@ -30,6 +30,11 @@ where
         let mut colspan = 0;
         let rowspan = ctx.props().display_info.widths.len().to_string();
         let theme = ctx.props().theme;
+        let line = if cfg!(feature = "pumpkin") {
+            "list-whole-highlight-left"
+        } else {
+            ""
+        };
 
         html! {
             <>
@@ -51,11 +56,12 @@ where
                             Kind::LayeredSecond => {
                                 html! {
                                     <>
-                                        <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
+                                        // <td class="list-whole-head-check" rowspan={rowspan.clone()}></td>
+                                        <td class={classes!("list-whole-head-check", line)} rowspan={rowspan.clone()}></td>
                                         <td class="list-whole-head-check" rowspan={rowspan.clone()}>
-                                            <div onclick={onclick_all.clone()}>
-                                                <Checkbox status={check_status} {theme} />
-                                            </div>
+                                            // <div onclick={onclick_all.clone()}>
+                                            //     <Checkbox status={check_status} {theme} />
+                                            // </div>
                                         </td>
                                     </>
                                 }
@@ -254,10 +260,15 @@ where
                                             } else {
                                                 28
                                             };
+                                            let line = if self.expand_list.contains(key) && cfg!(feature = "pumpkin") {
+                                                "list-whole-highlight-left"
+                                            } else {
+                                                ""
+                                            };
                                             if let Some(display_info_first) = ctx.props().display_info.widths.first() {
                                                 html! {
                                                     <tr class="list-whole-first-layer">
-                                                        <td class="list-whole-list-first-check">
+                                                        <td class={classes!("list-whole-list-first-check", line)}>
                                                             <div onclick={onclick_item(key.clone())}>
                                                                 <Checkbox
                                                                     status={check_status}
@@ -314,6 +325,11 @@ where
                                         } else {
                                             28
                                         };
+                                        let line = if cfg!(feature = "pumpkin") {
+                                            "list-whole-highlight-left"
+                                        } else {
+                                            ""
+                                        };
 
                                         html! {
                                             <>
@@ -321,20 +337,32 @@ where
                                                     {
                                                         if ctx.props().kind == Kind::LayeredSecond {
                                                             html! {
-                                                                <td class="list-whole-list-layered-second"></td>
+                                                                <>
+                                                                    <td class={classes!("list-whole-list-layered-second", line)}></td>
+                                                                    <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}></td>
+                                                                </>
                                                             }
                                                         } else {
-                                                            html! {}
+                                                            html! {
+                                                                <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
+                                                                    <div onclick={onclick_item(key.clone())}>
+                                                                        <Checkbox
+                                                                            status={check_status}
+                                                                            {theme}
+                                                                        />
+                                                                    </div>
+                                                                </td>
+                                                            }
                                                         }
                                                     }
-                                                    <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
-                                                        <div onclick={onclick_item(key.clone())}>
-                                                            <Checkbox
-                                                                status={check_status}
-                                                                {theme}
-                                                            />
-                                                        </div>
-                                                    </td>
+                                                    // <td class="list-whole-list-flat-check" rowspan={rowspan.clone()}>
+                                                    //     <div onclick={onclick_item(key.clone())}>
+                                                    //         <Checkbox
+                                                    //             status={check_status}
+                                                    //             {theme}
+                                                    //         />
+                                                    //     </div>
+                                                    // </td>
                                                     {
                                                         if let Some(widths) = ctx.props().display_info.widths.first() {
                                                             if let ColWidths::Pixel(ws) = widths {
@@ -611,6 +639,7 @@ where
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     pub(super) fn view_pages(&self, ctx: &Context<Self>, out_table: bool) -> Html {
         let cols = ctx.props().display_info.titles.len();
         let txt = ctx.props().txt.txt.clone();
@@ -676,29 +705,50 @@ where
                 .to_lowercase(),
                 text!(txt, ctx.props().language, "(s)"),
             );
+            let line = if cfg!(feature = "pumpkin") {
+                "list-whole-highlight-left"
+            } else {
+                ""
+            };
+            let show_pages =
+                ctx.props().kind != Kind::LayeredSecond || !self.sorted_keys.is_empty();
+            // let empty_message =
+            //     text!(txt, ctx.props().language, "No network added.").to_string();
 
             html! {
-                <tr class="list-whloe-list-pages-outer">
-                    <td class="list-whole-list-second-page-checkbox"></td>
-                    <td class="list-whole-list-second-page-caret-down"></td>
-                    <td colspan={cols.to_string()} class="list-whole-list-second-pages">
-                        <div class="list-whole-list-pages-inner">
-                            <Pages::<Self>
-                                txt={ctx.props().txt.clone()}
-                                language={ctx.props().language}
-                                parent_message={Message::MovePage}
-                                pages_info={Rc::clone(&ctx.props().pages_info)}
-                                pages_info_cache={self.pages_info}
-                                num_pages={DEFAULT_NUM_PAGES}
-                            />
-                            <div class="list-whole-list-second-add" onclick={onclick_add_second}>
-                                { add_text }
+                    <tr class="list-whloe-list-pages-outer">
+                        <td class={classes!("list-whole-list-second-page-checkbox",line)}></td>
+                        <td class="list-whole-list-second-page-caret-down"></td>
+                        <td colspan={cols.to_string()} class="list-whole-list-second-pages">
+                            <div class="list-whole-list-pages-inner">
+                                {
+                                    if show_pages {
+                                        html! {
+                                            <Pages::<Self>
+                                                txt={ctx.props().txt.clone()}
+                                                language={ctx.props().language}
+                                                parent_message={Message::MovePage}
+                                                pages_info={Rc::clone(&ctx.props().pages_info)}
+                                                pages_info_cache={self.pages_info}
+                                                num_pages={DEFAULT_NUM_PAGES}
+                                            />
+                                        }
+                                    } else {
+                                        html! {
+                                            <div class="list-whole-list-empty">
+                                                { "No network added" }
+                                            </div>
+                                        }
+                                    }
+                                }
+                                <div class="list-whole-list-second-add" onclick={onclick_add_second}>
+                                    { add_text }
+                                </div>
+                                { self.view_delete_checked(ctx, msg) }
                             </div>
-                            { self.view_delete_checked(ctx, msg) }
-                        </div>
-                    </td>
-                    <td class="list-whole-list-second-page-last-column"></td>
-                </tr>
+                        </td>
+                        <td class="list-whole-list-second-page-last-column"></td>
+                    </tr>
             }
         }
     }
