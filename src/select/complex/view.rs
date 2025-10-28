@@ -558,11 +558,10 @@ impl Model {
                     .map_or(CheckStatus::Unchecked, |extra| {
                         if let Ok(extra) = extra.try_borrow() {
                             match *extra {
-                                Some(SelectionExtraInfo::Network(EndpointKind::Both)) => {
-                                    CheckStatus::Checked
-                                }
+                                Some(
+                                    SelectionExtraInfo::Network(_) | SelectionExtraInfo::Basic,
+                                ) => CheckStatus::Checked,
                                 None => CheckStatus::Unchecked,
-                                _ => CheckStatus::Indeterminate,
                             }
                         } else {
                             CheckStatus::Unchecked
@@ -711,6 +710,14 @@ impl Model {
         let top_width = if cfg!(feature = "pumpkin") { 94 } else { 70 };
         let theme = ctx.props().theme;
         if let Some(selected) = self.direction_items.get(id) {
+            let selected_value_cache = selected.try_borrow().ok().and_then(|v| *v).or_else(|| {
+                self.last_direction
+                    .get(id)
+                    .copied()
+                    .map(SelectionExtraInfo::Network)
+            });
+            let default =
+                selected_value_cache.unwrap_or(SelectionExtraInfo::Network(EndpointKind::Both));
             html! {
             <SelectMini::<SelectionExtraInfo, Self>
                 txt={ctx.props().txt.clone()}
@@ -720,9 +727,9 @@ impl Model {
                 id={format!("assign-item-direction-{}", id.clone())}
                 list={Rc::clone(&src_dst_list)}
                 candidate_values={Rc::clone(&value_candidates)}
-                default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
+                default_value={Some(default)}
                 selected_value={Rc::clone(selected)}
-                selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
+                selected_value_cache={selected_value_cache}
                 align_left={false}
                 list_top={28}
                 {top_width}
@@ -802,7 +809,7 @@ impl Model {
 
                     } else {
                         <div class="complex-select-pop-input-list">
-                            { Self::view_input_list(ctx) }
+                            { self.view_input_list(ctx) }
                         </div>
                     }
                 </>
@@ -836,7 +843,7 @@ impl Model {
                         }
                     </div>
                     <div class="complex-select-pop-input-list" style={style_pop_input_list}>
-                        { Self::view_input_list(ctx) }
+                        { self.view_input_list(ctx) }
                     </div>
                 </div>
             }
@@ -844,7 +851,7 @@ impl Model {
     }
 
     #[allow(clippy::too_many_lines)]
-    fn view_input_list(ctx: &Context<Self>) -> Html {
+    fn view_input_list(&self, ctx: &Context<Self>) -> Html {
         if let Ok(custom) = ctx.props().selected.custom.try_borrow_mut() {
             let mut keys = custom.keys().collect::<Vec<&String>>();
             keys.sort_unstable();
@@ -881,22 +888,16 @@ impl Model {
                                                 ("#F6F6F6", 70, 28)
                                             };
                                             let theme = ctx.props().theme;
-                                            let selected_value_cache =
-                                                value.try_borrow().ok().and_then(|x| *x);
+                                            let current = value.try_borrow().ok().and_then(|x| *x);
+                                            let selected_value_cache = current.or_else(|| { self.last_direction.get(key).copied().map(SelectionExtraInfo::Network) });
+                                            let default_value = selected_value_cache.or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
                                             if cfg!(feature = "pumpkin") {
                                                 let theme = ctx.props().theme;
-                                                let checked = match selected_value_cache {
-                                                    Some(SelectionExtraInfo::Network(EndpointKind::Both)) => CheckStatus::Checked,
-                                                    Some(
-                                                        SelectionExtraInfo::Network(_)
-                                                            | SelectionExtraInfo::Basic,
-                                                    ) => CheckStatus::Indeterminate,
+                                                let checked = match current {
+                                                    Some(SelectionExtraInfo::Network(_) | SelectionExtraInfo::Basic) => CheckStatus::Checked,
                                                     None => CheckStatus::Unchecked,
                                                 };
-                                                let active = matches!(
-                                                    checked,
-                                                    CheckStatus::Checked | CheckStatus::Indeterminate
-                                                );
+                                                let active = checked == CheckStatus::Checked;
                                                 let onclick_custom = |k: String| {
                                                     ctx.link().callback(move |_| {
                                                         Message::ClickItem(
@@ -926,7 +927,7 @@ impl Model {
                                                                 id={format!("assign-input-direction-{}", key.clone())}
                                                                 list={src_dst_list}
                                                                 candidate_values={value_candidates}
-                                                                default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
+                                                                default_value={default_value}
                                                                 selected_value={value.clone()}
                                                                 selected_value_cache={selected_value_cache}
                                                                 align_left={false}
@@ -941,7 +942,7 @@ impl Model {
                                                 }
                                             }
                                             else {
-                                                let active = selected_value_cache.is_some();
+                                                let active = current.is_some();
                                                 html! {
                                                     <>
                                                         <tr>

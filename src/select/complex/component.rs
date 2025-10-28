@@ -36,6 +36,7 @@ pub struct Model {
     pub(super) input_wrong_msg: Option<&'static str>,
     pub(super) direction: Rc<RefCell<Option<EndpointKind>>>, // for Network/IP
     pub(super) direction_items: HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>,
+    pub(super) last_direction: HashMap<String, EndpointKind>,
 
     pub(super) view_list: bool,
     pub(super) view_input: bool,
@@ -99,6 +100,7 @@ impl Component for Model {
             view_input: false,
             direction: Rc::new(RefCell::new(None)),
             direction_items: HashMap::new(),
+            last_direction: HashMap::new(),
         };
         s.buffer_direction_items(ctx);
 
@@ -185,7 +187,7 @@ impl Component for Model {
                         ctx.props().list.try_borrow(),
                     ) {
                         if let Some(predefined) = sel.as_mut() {
-                            match predefined.entry(key) {
+                            match predefined.entry(key.clone()) {
                                 Vacant(entry) => {
                                     let extra = match ctx.props().kind {
                                         Kind::NetworkIp => {
@@ -197,25 +199,24 @@ impl Component for Model {
                                 }
                                 Occupied(entry) => match ctx.props().kind {
                                     Kind::NetworkIp => {
-                                        let remove =
-                                            if let Ok(mut extra) = entry.get().try_borrow_mut() {
-                                                if *extra
-                                                    == Some(SelectionExtraInfo::Network(
-                                                        EndpointKind::Both,
-                                                    ))
-                                                {
-                                                    true
-                                                } else {
-                                                    *extra = Some(SelectionExtraInfo::Network(
-                                                        EndpointKind::Both,
-                                                    ));
-                                                    false
+                                        if let Ok(mut extra) = entry.get().try_borrow_mut() {
+                                            match *extra {
+                                                Some(SelectionExtraInfo::Network(dir)) => {
+                                                    self.last_direction.insert(key.clone(), dir);
+                                                    *extra = None;
                                                 }
-                                            } else {
-                                                false
-                                            };
-                                        if remove {
-                                            entry.remove_entry();
+                                                Some(SelectionExtraInfo::Basic) => {
+                                                    *extra = None;
+                                                }
+                                                None => {
+                                                    let dir = self
+                                                        .last_direction
+                                                        .get(&key)
+                                                        .copied()
+                                                        .unwrap_or(EndpointKind::Both);
+                                                    *extra = Some(SelectionExtraInfo::Network(dir));
+                                                }
+                                            }
                                         }
                                     }
                                     Kind::Basic => {
@@ -253,11 +254,20 @@ impl Component for Model {
                         && let Ok(mut value) = value.try_borrow_mut()
                     {
                         match *value {
-                            Some(SelectionExtraInfo::Network(EndpointKind::Both)) => {
+                            Some(SelectionExtraInfo::Network(dir)) => {
+                                self.last_direction.insert(key.clone(), dir);
                                 *value = None;
                             }
-                            _ => {
-                                *value = Some(SelectionExtraInfo::Network(EndpointKind::Both));
+                            Some(SelectionExtraInfo::Basic) => {
+                                *value = None;
+                            }
+                            None => {
+                                let dir = self
+                                    .last_direction
+                                    .get(&key)
+                                    .copied()
+                                    .unwrap_or(EndpointKind::Both);
+                                *value = Some(SelectionExtraInfo::Network(dir));
                             }
                         }
                     }
