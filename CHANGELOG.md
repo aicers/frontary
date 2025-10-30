@@ -13,6 +13,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   duplicate host/network/range combination detection.
 - Added optional `description` prop to `WholeList` component that displays
   beneath the title for `Kind::Flat` lists.
+- Added `listen_click_outside` API to enable click-outside detection for custom
+  areas, allowing users to close UI components when clicking outside of them.
 
 ### Fixed
 
@@ -48,8 +50,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   registered only actions to also apply to custom selected items.
 - Added `unique` flag to `DomainNameConfig` to enable client-side duplicate
   domain name detection.
-- Added `listen_click_outside` API to enable click-outside detection for custom
-  areas, allowing users to close UI components when clicking outside of them.
 
 ### Changed
 
