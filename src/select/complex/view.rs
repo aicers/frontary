@@ -594,7 +594,7 @@ impl Model {
                                 if let Some(networks)=item.networks() {
                                         html! {
                                             <>
-                                                { item.value().to_string() } <br/>
+                                                { item.value().clone() } <br/>
                                                 <div class="complex-select-pop-list-networks">
                                                 {
                                                     for networks.hosts.iter().map(|host| html! {
@@ -644,7 +644,7 @@ impl Model {
                             if let Some(networks)=item.networks() {
                                     html! {
                                         <>
-                                            { item.value().to_string() } <br/>
+                                            { item.value().clone() } <br/>
                                             <div class="complex-select-pop-list-networks">
                                             {
                                                 for networks.hosts.iter().map(|host| html! {
@@ -1049,7 +1049,7 @@ impl Model {
         } else {
             text!(txt, ctx.props().language, "Network/IP Details")
         }
-        .to_string();
+        .clone();
         let oninput_input = ctx.link().callback(|e: InputEvent| {
             e.target()
                 .and_then(|t| t.dyn_into::<HtmlInputElement>().ok())

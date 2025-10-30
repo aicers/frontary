@@ -1338,7 +1338,7 @@ fn validate_extensions(extensions: &[String]) -> Vec<String> {
         .filter_map(|ext| {
             if !ext.contains(' ') && ext.chars().all(|c| c.is_alphanumeric() || c == '.') {
                 Some(if ext.starts_with('.') {
-                    ext.to_string()
+                    ext.clone()
                 } else {
                     format!(".{ext}")
                 })
