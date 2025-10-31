@@ -41,6 +41,7 @@
 //! - [`static_files`] - Static asset management
 
 mod checkbox;
+mod click_outside;
 mod input;
 mod ip_range_input;
 pub mod language;
@@ -73,10 +74,13 @@ use json_gettext::{JSONGetText, get_text};
 use num_traits::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::JsCast;
-use wasm_bindgen::prelude::wasm_bindgen;
 use yew::Properties;
 
 pub use crate::checkbox::{CheckStatus, Model as Checkbox};
+pub use crate::click_outside::{
+    ClickOutsideHandle, listen_click_outside, toggle_visibility, toggle_visibility_complex,
+    visible_tag_select,
+};
 pub use crate::input::{
     CheckboxChildrenConfig, CheckboxConfig, CheckboxItem, ChildrenPosition, Comparison,
     ComparisonConfig, ComparisonItem, ComparisonKind, DomainNameConfig, DomainNameItem,
@@ -846,13 +850,6 @@ impl PartialEq for Texts {
 impl Eq for Texts {}
 
 const NBSP: &str = "&nbsp;";
-
-#[wasm_bindgen(module = "/static/frontary/custom-select.js")]
-extern "C" {
-    fn toggle_visibility(id: &str);
-    fn toggle_visibility_complex(id: &str);
-    fn visible_tag_select(id: &str);
-}
 
 fn window_inner_height() -> u32 {
     web_sys::window()
