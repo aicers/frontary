@@ -433,20 +433,15 @@ pub fn shorten_text(item_org: &str, width: u32, font: &str, margin: u32) -> Stri
 ///
 /// Used in network-related components to indicate whether an endpoint
 /// represents the source, destination, or both directions of network traffic.
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Deserialize, Serialize, Default)]
 pub enum EndpointKind {
     /// Traffic originating from this endpoint
     Source,
     /// Traffic destined for this endpoint
     Destination,
     /// Traffic in both directions (source and destination)
+    #[default]
     Both,
-}
-
-impl Default for EndpointKind {
-    fn default() -> Self {
-        Self::Both
-    }
 }
 
 /// Additional information associated with a selection.

@@ -490,7 +490,7 @@ where
             .top_width
             .map_or_else(String::new, |w| format!("width: {w}px;"));
         let style = if cfg!(feature = "pumpkin") {
-            style_width.to_string()
+            style_width.clone()
         } else {
             format!(
                 "{} background-color: {};",
