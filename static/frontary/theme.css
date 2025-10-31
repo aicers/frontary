@@ -1215,6 +1215,62 @@ td.list-whole-list-first-layer-wrapper {
   border-right: 1px solid #eeeeee;
 }
 
+td.list-whole-second-empty {
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  text-align: center;
+  vertical-align: middle;
+}
+
+td.list-whole-second-empty .list-whole-second-empty-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+td.list-whole-second-empty .list-whole-second-empty-message {
+  display: inline-flex;
+  align-items: center;
+}
+
+td.list-whole-second-empty
+  .list-whole-second-empty-row
+  .list-whole-list-second-add {
+  margin-left: auto;
+}
+
+td.list-whole-second-empty-action {
+  text-align: right;
+  vertical-align: middle;
+  box-shadow: var(--table-cell-shadow-inset);
+}
+
+td.list-whole-list-second-placeholder {
+  pointer-events: none;
+}
+
+td.list-whole-list-layered-second,
+td.list-whole-list-second-placeholder,
+td.list-whole-list-second-last-placeholder {
+  border-bottom: 1px solid #eeeeee;
+}
+
+td.list-whole-highlight-left {
+  position: relative;
+}
+
+td.list-whole-highlight-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: var(--fg-accent);
+}
+
 span.list-whole-list-first-layer-light {
   color: #707070;
 }
@@ -1264,7 +1320,6 @@ td.list-whole-list-second-pages {
 }
 
 div.list-whole-list-second-add {
-  float: right;
   width: 110px;
   height: 30px;
   display: flex;
@@ -1286,6 +1341,14 @@ div.list-whole-list-second-add:hover {
 
 div.list-whole-list-pages-inner {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+td.list-whole-list-second-pages > .list-whole-list-pages-inner {
+  justify-content: space-between;
 }
 
 span.list-whole-list-multiple-sep {
@@ -1483,7 +1546,6 @@ div.page-outer {
 
 div.page-number {
   display: inline-block;
-  height: 26px;
   margin-bottom: 2px;
 }
 
@@ -3086,4 +3148,9 @@ div.cell-modal-body {
   overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
+}
+
+/* Placeholder for second-layer last column */
+td.list-whole-list-second-last-placeholder {
+  pointer-events: none;
 }
