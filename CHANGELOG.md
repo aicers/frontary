@@ -13,6 +13,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   duplicate host/network/range combination detection.
 - Added optional `description` prop to `WholeList` component that displays
   beneath the title for `Kind::Flat` lists.
+- Added `listen_click_outside` API to enable click-outside detection for custom
+  areas, allowing users to close UI components when clicking outside of them.
 
 ### Fixed
 
@@ -25,6 +27,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Refactored `pumpkin/theme.css` to use new color variables and updated CSS
   values for consistent theming across light and dark modes.
 - Bump bincode crate to 2.0 and modified the related code.
+
+### Removed
+
+- Removed the `wasm_bindgen` bindings for `toggle_visibility`, `toggle_visibility_complex`,
+  and `visible_tag_select`; these helpers are now exposed directly from the Rust
+  API in `frontary::click_outside`.
 
 ## [0.13.0] - 2025-10-01
 

@@ -7,7 +7,8 @@ use web_sys::{Event, HtmlElement};
 use yew::virtual_dom::AttrValue;
 use yew::{Component, Context, Html, NodeRef, Properties, classes, html};
 
-use crate::{Texts, Theme, ViewString, language::Language, text, toggle_visibility};
+use crate::click_outside::toggle_visibility;
+use crate::{Texts, Theme, ViewString, language::Language, text};
 
 pub struct Model<T, U> {
     click_listener: Option<EventListener>,
@@ -136,7 +137,7 @@ where
         let parent_msg = match msg {
             Message::ClickTop => {
                 if ctx.props().active {
-                    toggle_visibility(&ctx.props().id);
+                    let _ = toggle_visibility(&ctx.props().id);
                     ctx.props().parent_message.clone()
                 } else {
                     return false;
@@ -146,7 +147,7 @@ where
                 if let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut() {
                     *selected = ctx.props().candidate_values.get(index).copied();
                 }
-                toggle_visibility(&ctx.props().id);
+                let _ = toggle_visibility(&ctx.props().id);
                 ctx.props().parent_message.clone()
             }
             Message::ListenClick => {
