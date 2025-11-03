@@ -14,6 +14,7 @@ mod user_input_select;
 use core::panic;
 use std::{cell::RefCell, collections::HashSet, fmt, net::IpAddr, rc::Rc, sync::LazyLock};
 
+use bincode::Options;
 pub use component::{InputSecondId, Model};
 pub use config::{
     CheckboxChildrenConfig, CheckboxConfig, ChildrenPosition, ComparisonConfig, DomainNameConfig,
@@ -219,41 +220,13 @@ impl Value {
     #[must_use]
     pub fn serialize(&self) -> Option<Vec<u8>> {
         match self {
-            Self::String(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
-            Self::Integer(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
-            Self::UInteger(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
-            Self::Vector(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
-            Self::Float(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
-            Self::IpAddr(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
-            Self::Bool(Some(v)) => bincode::serde::encode_to_vec(
-                v,
-                bincode::config::legacy().with_variable_int_encoding(),
-            )
-            .ok(),
+            Self::String(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Integer(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::UInteger(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Vector(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Float(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::IpAddr(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
+            Self::Bool(Some(v)) => bincode::DefaultOptions::new().serialize(v).ok(),
             _ => None,
         }
     }
