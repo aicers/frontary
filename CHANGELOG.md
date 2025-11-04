@@ -18,6 +18,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- Fixed direction dropdown requiring double-click for registered IP items by
+  excluding `mini-select` components from the global mousedown event handler
+  that was preventing default click behavior.
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
