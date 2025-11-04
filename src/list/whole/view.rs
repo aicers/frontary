@@ -886,17 +886,7 @@ where
                             "-"
                         }
                     } else {
-                        html! {
-                            {
-                                for elem.display.iter().map(|display| {
-                                    html! {
-                                        <div>
-                                            { display }
-                                        </div>
-                                    }
-                                })
-                            }
-                        }
+                        Self::to_unchecked_html_no_modal(&elem.display)
                     }
                 } else {
                     Self::to_unchecked_html(ctx, &elem.display, &elem.modal)
@@ -955,6 +945,19 @@ where
                     </table>
                 </div>
             }
+        }
+    }
+
+    fn to_unchecked_html_no_modal(display: &[String]) -> Html {
+        html! {
+            for display.iter().map(|d| {
+                let v_node = Html::from_html_unchecked(AttrValue::from_str(d).expect("AttrValue never returns Err."));
+                html! {
+                    <div>
+                        { v_node }
+                    </div>
+                }
+            })
         }
     }
 
