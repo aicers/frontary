@@ -21,12 +21,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
-- Fixed incorrect intermediate “Both” state when toggling SRC/DST checkbox selections
+- Fixed incorrect intermediate "Both" state when toggling SRC/DST checkbox selections
   in `complex-select`.
 - Fixed `SelectMini` so that changing the direction dropdown for a custom IP no
   longer inadvertently checks other custom-IP rows.
 - Fixed `WholeList` pagination cache so recalculated page info persists after
   data updates instead of reverting to stale page numbers.
+- Fixed direction (SRC/DST/Both) selection in `complex-select` to update properly
+  with a single click when editing registered IPs.
 
 ### Changed
 
