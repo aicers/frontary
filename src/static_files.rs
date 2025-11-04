@@ -200,6 +200,13 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             include_bytes!("../static/frontary/pumpkin/light/delete-trash.svg");
         rtn.push(("light/delete-trash.svg", delete_trash_light));
 
+        let delete_trash_alt = include_bytes!("../static/frontary/pumpkin/delete-trash-alt.svg");
+        rtn.push(("delete-trash-alt.svg", delete_trash_alt));
+
+        let delete_trash_alt_light =
+            include_bytes!("../static/frontary/pumpkin/light/delete-trash-alt.svg");
+        rtn.push(("light/delete-trash-alt.svg", delete_trash_alt_light));
+
         let delete_x = include_bytes!("../static/frontary/pumpkin/delete-x.svg");
         rtn.push(("delete-x.svg", delete_x));
 

@@ -301,7 +301,7 @@ where
                                                 let ext = if cfg!(feature = "pumpkin") { "svg" } else { "png" };
                                                 let icon = match key.as_ref() {
                                                     "Edit" => Theme::path(&theme, &format!("edit.{ext}")),
-                                                    "Delete" => Theme::path(&theme, &format!("delete-trash.{ext}")),
+                                                    "Delete" => Theme::path(&theme, &format!("delete-trash-alt.{ext}")),
                                                     _ => String::new(),
                                                 };
                                                 html! {
