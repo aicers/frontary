@@ -3017,7 +3017,7 @@ table.notification {
   margin-top: 5px;
   margin-bottom: 5px;
   background-clip: padding-box;
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 8px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.35);
 }
 
