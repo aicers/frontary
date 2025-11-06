@@ -1314,6 +1314,12 @@ td.list-whole-head-check {
   box-shadow: var(--table-cell-shadow-inset);
 }
 
+td.list-whole-head-expand {
+  width: 30px;
+  padding-left: 0;
+  box-shadow: var(--table-cell-shadow-inset);
+}
+
 td.list-whole-head-title {
   height: 30px;
   font-size: 14px;
@@ -1425,6 +1431,25 @@ td.list-whole-list-layered-second {
   box-shadow: var(--table-cell-shadow-inset);
 }
 
+td.list-whole-highlight-left {
+  position: relative;
+}
+
+td.list-whole-highlight-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: var(--fg-accent);
+}
+
+td.list-whole-list-second-placeholder {
+  pointer-events: none;
+  box-shadow: var(--table-cell-shadow-inset);
+}
+
 td.list-whole-list-flat-check {
   width: 30px;
   height: 30px;
@@ -1442,6 +1467,12 @@ td.list-whole-list-flat {
   box-shadow: var(--table-cell-shadow-inset);
   word-break: keep-all;
   overflow-wrap: break-word;
+}
+
+td.list-whole-list-second-action-cell {
+  vertical-align: middle;
+  text-align: right;
+  box-shadow: var(--table-cell-shadow-inset);
 }
 
 td.list-whole-list-flat-more-action {
@@ -1473,9 +1504,9 @@ td.list-whole-list-second-page-caret-down {
 }
 
 td.list-whole-list-second-pages {
-  height: 43px;
   vertical-align: middle;
-  padding: 8px;
+  min-height: 60px;
+  padding: 16px 20px;
   box-shadow: var(--table-cell-shadow-inset);
 }
 
@@ -1508,6 +1539,53 @@ div.list-whole-list-second-add:hover {
 
 div.list-whole-list-pages-inner {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+td.list-whole-list-second-pages > .list-whole-list-pages-inner {
+  justify-content: space-between;
+}
+
+div.list-whole-list-pages-inner > .list-whole-list-second-action {
+  margin-left: auto;
+}
+
+div.list-whole-list-second-action {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  padding-left: 20px;
+  width: 100%;
+}
+
+div.list-whole-list-second-pages-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  justify-content: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  flex-grow: 1;
+  text-align: center;
+}
+
+td.list-whole-list-second-action-cell .list-whole-list-second-add {
+  margin-left: auto;
+}
+
+span.list-whole-second-empty-message {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--text-secondary);
 }
 
 div.list-whole-delete-checked {
@@ -1695,7 +1773,6 @@ div.page-outer {
 
 div.page-number {
   display: inline-block;
-  height: 26px;
   margin-bottom: 2px;
 }
 
@@ -3444,4 +3521,9 @@ div:nth-of-type(1) > .admin-node-config-button {
 
 div:nth-of-type(2) > .admin-node-config-button {
   margin-bottom: 0;
+}
+
+/* Placeholder for second-layer last column */
+td.list-whole-list-second-last-placeholder {
+  pointer-events: none;
 }
