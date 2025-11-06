@@ -24,6 +24,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 
+- Changed `Column::CheckBox` to use `from_html_unchecked` if `modal` is empty
+  but `display` isn't to avoid using plain text and use DOM elements.
 - Refactored `pumpkin/theme.css` to use new color variables and updated CSS
   values for consistent theming across light and dark modes.
 
