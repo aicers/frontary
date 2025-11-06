@@ -18,6 +18,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- Fixed pagination display to correctly update page count when deleting items
+  causes total pages to decrease, ensuring the pagination control shows the
+  accurate number of pages.
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.

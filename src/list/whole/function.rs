@@ -95,7 +95,8 @@ where
                         std::cmp::min(self.pages_info.map_or(info.current, |p| p.current), total);
                     let start =
                         std::cmp::min(self.pages_info.map_or(info.start, |p| p.start), total);
-                    let end = total.clamp(1, self.pages_info.map_or(info.end, |p| p.end));
+                    // Calculate end based on start, total, and num_pages
+                    let end = std::cmp::min(start + ctx.props().num_pages - 1, total);
 
                     *info = PagesInfo {
                         current,
