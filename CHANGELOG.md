@@ -25,6 +25,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   in `complex-select`.
 - Fixed `SelectMini` so that changing the direction dropdown for a custom IP no
   longer inadvertently checks other custom-IP rows.
+- Fixed `WholeList` pagination cache so recalculated page info persists after
+  data updates instead of reverting to stale page numbers.
 
 ### Changed
 
