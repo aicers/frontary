@@ -363,18 +363,12 @@ where
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Message::ClickExpandible(key) => {
-                if self.expand_list.contains(&key) {
-                    self.expand_list.remove(&key);
+                if self.expand_list.remove(&key) {
                     if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
                         *id = Vec::new();
                     }
                 } else {
-                    let (start, end) = self.item_range(ctx);
-                    for index in start..=end {
-                        if let Some(key) = self.sorted_keys.get(index - 1) {
-                            self.expand_list.remove(key);
-                        }
-                    }
+                    self.expand_list.clear();
                     self.expand_list.insert(key.clone());
                     if let Ok(mut id) = ctx.props().input_ids.try_borrow_mut() {
                         *id = vec![key];
@@ -383,6 +377,9 @@ where
                 self.checked.clear();
                 if let Ok(mut second) = self.check_status_second.try_borrow_mut() {
                     *second = CheckStatus::Unchecked;
+                }
+                if ctx.props().kind == Kind::LayeredFirst {
+                    self.set_first_layer_input_id(ctx);
                 }
             }
             Message::SortList => {
@@ -675,6 +672,7 @@ where
                             return false;
                         }
                         Some(MoreAction::Edit) => {
+                            let key_for_second = key.clone();
                             if let Some(current) = ctx.props().data.get(&key) {
                                 match ctx.props().kind {
                                     Kind::LayeredSecond => {
@@ -707,13 +705,13 @@ where
                                                     index += 1;
                                                 }
                                             }
-                                            *id = vec![key.clone()];
+                                            *id = vec![key];
                                         }
                                     }
                                 }
                             }
                             if let Ok(mut second) = ctx.props().input_second_keys.try_borrow_mut() {
-                                *second = Some(vec![key]);
+                                *second = Some(vec![key_for_second]);
                             }
                             *action = None;
                             self.view_input_status = ViewInputStatus::Edit;
