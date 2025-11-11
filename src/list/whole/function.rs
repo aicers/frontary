@@ -105,6 +105,7 @@ where
                     };
                 }
             }
+            self.pages_info = Some(*info);
         }
     }
 
