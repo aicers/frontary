@@ -845,7 +845,7 @@ impl Model {
 
     #[allow(clippy::too_many_lines)]
     fn view_input_list(ctx: &Context<Self>) -> Html {
-        if let Ok(custom) = ctx.props().selected.custom.try_borrow_mut() {
+        if let Ok(custom) = ctx.props().selected.custom.try_borrow() {
             let mut keys = custom.keys().collect::<Vec<&String>>();
             keys.sort_unstable();
             if keys.is_empty() {

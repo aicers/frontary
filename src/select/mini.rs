@@ -111,7 +111,13 @@ where
             click_count: 0,
             phantom: PhantomData,
         };
-        if let Some(value) = ctx.props().default_value
+        // Only apply default value if the component is active, or if it's not a
+        // DirectionItem. For DirectionItem kind with active=false, the item is
+        // intentionally unchecked and should remain None.
+        let should_apply_default =
+            ctx.props().active || !matches!(ctx.props().kind, Kind::DirectionItem);
+        if should_apply_default
+            && let Some(value) = ctx.props().default_value
             && let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut()
             && selected.is_none()
         {
