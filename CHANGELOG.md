@@ -21,8 +21,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
-- Fixed backspace behavior in IP input field to allow normal character
-  deletion at cursor position instead of clearing the entire input.
 
 ### Changed
 
