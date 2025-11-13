@@ -283,22 +283,10 @@ fn add_listen_mousedown_complex(document: &Document) {
         opts
     };
 
-    let document_clone = document.clone();
     let handler = Closure::wrap(Box::new(move |event: MouseEvent| {
         if let Some(element) = event.target().and_then(|t| t.dyn_into::<Element>().ok())
             && element.tag_name() != "INPUT"
         {
-            // Check if the click is inside a mini-select component
-            let mini_selects = document_clone.get_elements_by_class_name("mini-select");
-            for i in 0..mini_selects.length() {
-                if let Some(mini_select_elem) = mini_selects.item(i)
-                    && mini_select_elem.contains(Some(&element))
-                {
-                    // Don't prevent/stop events inside mini-select components
-                    return;
-                }
-            }
-
             event.stop_propagation();
             event.prevent_default();
         }
