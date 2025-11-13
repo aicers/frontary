@@ -714,48 +714,59 @@ impl Model {
     }
 
     fn buffer_direction_items(&mut self, ctx: &Context<Self>) {
-        self.direction_items = if let (Ok(predefined), Ok(list)) = (
+        if let (Ok(predefined), Ok(list)) = (
             ctx.props().selected.predefined.try_borrow(),
             ctx.props().list.try_borrow(),
         ) {
             if ctx.props().kind == Kind::NetworkIp {
-                list.iter()
-                    .map(|item| {
-                        (item.id().clone(), {
-                            predefined.as_ref().map_or_else(
+                // Create a new map that will replace direction_items
+                let mut new_direction_items = HashMap::new();
+
+                for item in list.iter() {
+                    let item_id = item.id().clone();
+
+                    // Determine the new value based on predefined state
+                    let new_val = predefined.as_ref().map_or_else(
+                        || Some(SelectionExtraInfo::Network(EndpointKind::Both)),
+                        |predefined| {
+                            predefined.get(&item_id).map_or_else(
                                 || {
-                                    Rc::new(RefCell::new(Some(SelectionExtraInfo::Network(
-                                        EndpointKind::Both,
-                                    ))))
+                                    // Item is unchecked: store None to keep it unchecked
+                                    // while preserving the dropdown UI
+                                    None
                                 },
-                                |predefined| {
-                                    predefined.get(item.id()).map_or_else(
-                                        || {
-                                            // Item is unchecked: store None to keep it unchecked
-                                            // while preserving the dropdown UI
-                                            Rc::new(RefCell::new(None))
-                                        },
-                                        |d| {
-                                            if let Ok(d) = d.try_borrow() {
-                                                Rc::new(RefCell::new(*d))
-                                            } else {
-                                                Rc::new(RefCell::new(Some(
-                                                    SelectionExtraInfo::Network(EndpointKind::Both),
-                                                )))
-                                            }
-                                        },
-                                    )
+                                |d| {
+                                    if let Ok(d) = d.try_borrow() {
+                                        *d
+                                    } else {
+                                        Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                                    }
                                 },
                             )
-                        })
-                    })
-                    .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>()
+                        },
+                    );
+
+                    // Try to reuse the existing Rc if it exists
+                    if let Some(existing_rc) = self.direction_items.remove(&item_id) {
+                        // Update the value inside the existing Rc instead of creating a new one
+                        if let Ok(mut val) = existing_rc.try_borrow_mut() {
+                            *val = new_val;
+                        }
+                        // Reuse the existing Rc
+                        new_direction_items.insert(item_id, existing_rc);
+                    } else {
+                        // Create a new Rc only if one doesn't exist
+                        new_direction_items.insert(item_id, Rc::new(RefCell::new(new_val)));
+                    }
+                }
+
+                self.direction_items = new_direction_items;
             } else {
-                HashMap::new()
+                self.direction_items = HashMap::new();
             }
         } else {
-            HashMap::new()
-        };
+            self.direction_items = HashMap::new();
+        }
     }
 
     fn load_direction_items(&mut self, ctx: &Context<Self>) {
