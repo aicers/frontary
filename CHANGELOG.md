@@ -23,6 +23,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   and respond correctly to toggle logic.
 - Fixed incorrect intermediate “Both” state when toggling SRC/DST checkbox selections
   in `complex-select`.
+- Fixed `SelectMini` so that changing the direction dropdown for a custom IP no
+  longer inadvertently checks other custom-IP rows.
 
 ### Changed
 
