@@ -16,6 +16,8 @@ use crate::{
     Texts, Theme, language::Language, text, validate_host_network,
 };
 
+const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
+
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Kind {
     Basic,
@@ -73,6 +75,7 @@ pub struct Props {
     pub top_width: u32,
     #[prop_or(DEFAULT_POP_WIDTH)]
     pub pop_width: u32,
+    #[prop_or(DEFAULT_FONT.into())]
     pub font: AttrValue,
     pub list: Rc<RefCell<Vec<NetworkItem>>>,
     pub selected: Rc<ComplexSelection>,
