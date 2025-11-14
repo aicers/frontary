@@ -14,6 +14,9 @@ use crate::{
     CheckStatus, Checkbox, Item, Texts, Theme, language::Language, shorten_text, text, text_width,
 };
 
+#[cfg(feature = "pumpkin")]
+const DEFAULT_FONT: &str = "";
+#[cfg(not(feature = "pumpkin"))]
 const DEFAULT_FONT: &str = "13px 'Spoqa Han Sans Neo'";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
