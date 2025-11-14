@@ -18,6 +18,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- Fixed direction dropdown state mirroring between "Registered" and "Custom"
+  sections by introducing separate state variables for each section, ensuring
+  that changing the direction in one section does not visually affect the
+  other section.
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.

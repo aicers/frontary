@@ -491,7 +491,7 @@ impl Model {
     }
 
     fn view_direction(&self, ctx: &Context<Self>, origin: ItemKind) -> Html {
-        let (parent_message, id, active) = match origin {
+        let (parent_message, id, active, selected_direction, selected_cache) = match origin {
             ItemKind::Registered => {
                 let check_status = if self.search_result.is_some() {
                     self.check_status(ctx, true)
@@ -502,7 +502,13 @@ impl Model {
                     check_status,
                     CheckStatus::Checked | CheckStatus::Indeterminate
                 );
-                (Message::SetDirection, "assign-direction", active)
+                (
+                    Message::SetDirection,
+                    "assign-direction",
+                    active,
+                    self.direction.clone(),
+                    self.direction.try_borrow().ok().and_then(|x| *x),
+                )
             }
             ItemKind::Custom => {
                 let check_status = Self::check_custom_status(ctx);
@@ -514,6 +520,8 @@ impl Model {
                     Message::SetDirectionItem(ItemKind::Custom),
                     "assign-direction-custom",
                     active,
+                    self.direction_custom.clone(),
+                    self.direction_custom.try_borrow().ok().and_then(|x| *x),
                 )
             }
         };
@@ -538,8 +546,8 @@ impl Model {
                 id={id.to_string()}
                 list={direction_list}
                 candidate_values={value_candidates}
-                selected_value={self.direction.clone()}
-                selected_value_cache={self.direction.try_borrow().ok().and_then(|x| *x)}
+                selected_value={selected_direction}
+                selected_value_cache={selected_cache}
                 align_left={false}
                 list_top={40}
                 kind={SelectMiniKind::DirectionAll}
