@@ -180,7 +180,7 @@ input[type="text"].searchable-select-input-empty-alert {
   padding-left: 10px;
   padding-right: 27px;
   font-size: 13px;
-  color: var(--alert-text-color);
+  color: #757575;
   background-color: #ffe9e9;
   border: 2px solid var(--alert-text-color);
   border-radius: 3px;
@@ -1890,12 +1890,6 @@ div.input-radio-message {
 
 div.input-select-searchable {
   margin-bottom: 24px;
-}
-
-div.input-select-searchable-required {
-  width: fit-content;
-  border: 2px solid var(--alert-text-color);
-  border-radius: 3px;
 }
 
 div.input-select-vector {

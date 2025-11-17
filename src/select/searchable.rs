@@ -76,6 +76,8 @@ where
     pub default_all: bool,
     #[prop_or(DEFAULT_SIZED_VALUE)]
     pub sized_value: bool,
+    #[prop_or(false)]
+    pub is_required: bool,
 
     #[prop_or(None)]
     pub parent_message: Option<T::Message>,
@@ -296,10 +298,10 @@ where
                 text!(txt, ctx.props().language, "None").to_string()
             } else if let Some(selected) = selected.as_ref() {
                 if selected.is_empty() {
-                    if ctx.props().allow_empty {
-                        class_input = "searchable-select-input-empty";
-                    } else {
+                    if ctx.props().is_required {
                         class_input = "searchable-select-input-empty-alert";
+                    } else {
+                        class_input = "searchable-select-input-empty";
                     }
                     text!(txt, ctx.props().language, &ctx.props().empty_msg).to_string()
                 } else {
