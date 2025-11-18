@@ -430,12 +430,20 @@ where
             })
         });
         let onkeydown = ctx.link().batch_callback(move |e: KeyboardEvent| {
-            (e.key() == "Backspace" || e.key() == "Tab").then(|| {
+            if e.key() == "Backspace" {
+                let input: HtmlInputElement = e.target_unchecked_into();
+                let value = input.value();
+                // Only clear the input and send message if the input is already empty
+                // This allows normal backspace behavior when there's text
+                value.is_empty().then(|| Message::TabBackspace(e.key()))
+            } else if e.key() == "Tab" {
                 let input: HtmlInputElement = e.target_unchecked_into();
                 let value = input.value();
                 input.set_value("");
-                Message::TabBackspace(value)
-            })
+                Some(Message::TabBackspace(value))
+            } else {
+                None
+            }
         });
 
         html! {
