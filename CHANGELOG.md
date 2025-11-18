@@ -21,6 +21,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
+- Fixed incorrect intermediate “Both” state when toggling SRC/DST checkbox selections
+  in `complex-select`.
 
 ### Changed
 
