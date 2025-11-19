@@ -111,7 +111,8 @@ where
             click_count: 0,
             phantom: PhantomData,
         };
-        if let Some(value) = ctx.props().default_value
+        if ctx.props().active
+            && let Some(value) = ctx.props().default_value
             && let Ok(mut selected) = ctx.props().selected_value.try_borrow_mut()
             && selected.is_none()
         {
