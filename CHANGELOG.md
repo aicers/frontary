@@ -32,6 +32,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   but `display` isn't to avoid using plain text and use DOM elements.
 - Refactored `pumpkin/theme.css` to use new color variables and updated CSS
   values for consistent theming across light and dark modes.
+- Changed the click behavior so items are only clickable when the title and content
+  are present, preventing the modal from opening with empty values.
 
 ### Removed
 

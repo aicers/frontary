@@ -964,16 +964,33 @@ where
     fn to_unchecked_html(ctx: &Context<Self>, display: &[String], modal: &[ModalDisplay]) -> Html {
         html! {
             for display.iter().enumerate().map(|(index, d)| {
-                let modal_data = modal.get(index).map(|modal| (modal.title.clone(), modal.content.clone()));
-                let onclick_button = {
-                    ctx.link()
-                        .callback(move |_| Message::ClickButton(modal_data.clone()))
-                };
-                let v_node = Html::from_html_unchecked(AttrValue::from_str(d).expect("AttrValue never returns Err."));
-                html! {
-                    <div onclick={onclick_button.clone()}>
-                        { v_node }
-                    </div>
+                let modal_data = modal.get(index).and_then(|modal| {
+                    if modal.title.is_empty() || modal.content.is_empty() {
+                        None
+                    } else {
+                        Some((modal.title.clone(), modal.content.clone()))
+                    }
+                });
+
+                let v_node = Html::from_html_unchecked(
+                    AttrValue::from_str(d).expect("AttrValue never returns Err.")
+                );
+
+                if let Some(modal_data) = modal_data {
+                    let onclick = ctx.link().callback(move |_| {
+                        Message::ClickButton(Some(modal_data.clone()))
+                    });
+                    html! {
+                        <div onclick={onclick}>
+                            { v_node }
+                        </div>
+                    }
+                } else {
+                    html! {
+                        <div>
+                            { v_node }
+                        </div>
+                    }
                 }
             })
         }
