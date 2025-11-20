@@ -20,6 +20,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 
+- Fixed deselected Network/IP items reverting to `Both` direction after
+  navigation. Direction choices (SRC/DST/Both) are now persisted in
+  `ComplexSelection.direction_cache`, so deselected items retain their
+  configured direction when reopening the selector.
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
