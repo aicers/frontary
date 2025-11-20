@@ -263,11 +263,19 @@ impl Component for Model {
                     {
                         match *value {
                             Some(SelectionExtraInfo::Network(_)) => {
+                                // Item being unchecked: persist its direction to cache
                                 self.direction_items
                                     .insert(key.clone(), Rc::new(RefCell::new(*value)));
+                                if let Some(direction) = *value
+                                    && let Ok(mut cache) =
+                                        ctx.props().selected.direction_cache.try_borrow_mut()
+                                {
+                                    cache.insert(key.clone(), direction);
+                                }
                                 *value = None;
                             }
                             _ => {
+                                // Item being checked: restore from cache or direction_items
                                 *value = self
                                     .direction_items
                                     .get(&key)
@@ -407,17 +415,28 @@ impl Component for Model {
                         if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                             match status {
                                 CheckStatus::Checked => {
+                                    // Unchecking all custom items: persist directions to cache
                                     for (k, v) in &mut *custom {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_some()
                                         {
                                             self.direction_items
                                                 .insert(k.clone(), Rc::new(RefCell::new(*vv)));
+                                            if let Some(direction) = *vv
+                                                && let Ok(mut cache) = ctx
+                                                    .props()
+                                                    .selected
+                                                    .direction_cache
+                                                    .try_borrow_mut()
+                                            {
+                                                cache.insert(k.clone(), direction);
+                                            }
                                             *vv = None;
                                         }
                                     }
                                 }
                                 CheckStatus::Unchecked | CheckStatus::Indeterminate => {
+                                    // Checking custom items: restore from cache or direction_items
                                     for (k, v) in custom.iter_mut() {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_none()
@@ -674,6 +693,7 @@ impl Model {
             if let (Some(search), Ok(list)) =
                 (self.search_result.as_ref(), ctx.props().list.try_borrow())
             {
+                // Update direction for visible/searched items
                 for &index in search {
                     if let Some(item) = list.get(index)
                         && item.networks().is_some()
@@ -684,15 +704,30 @@ impl Model {
                             && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
                         {
                             *value = Some(SelectionExtraInfo::Network(*direction));
+                            // Persist to direction_cache
+                            if let Ok(mut cache) =
+                                ctx.props().selected.direction_cache.try_borrow_mut()
+                            {
+                                cache.insert(
+                                    item.id().clone(),
+                                    SelectionExtraInfo::Network(*direction),
+                                );
+                            }
                         }
                     }
                 }
             } else {
-                for value in self.direction_items.values() {
+                // Update direction for all items
+                for (key, value) in &self.direction_items {
                     if let Ok(mut value) = value.try_borrow_mut()
                         && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
                     {
                         *value = Some(SelectionExtraInfo::Network(*direction));
+                        // Persist to direction_cache
+                        if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut()
+                        {
+                            cache.insert(key.clone(), SelectionExtraInfo::Network(*direction));
+                        }
                     }
                 }
             }
@@ -740,11 +775,15 @@ impl Model {
             && let Some(direction) = direction.as_ref()
             && let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
         {
-            for v in custom.values_mut() {
+            for (key, v) in custom.iter_mut() {
                 if let Ok(mut vv) = v.try_borrow_mut()
                     && vv.is_some()
                 {
                     *vv = Some(SelectionExtraInfo::Network(*direction));
+                    // Persist to direction_cache
+                    if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut() {
+                        cache.insert(key.clone(), SelectionExtraInfo::Network(*direction));
+                    }
                 }
             }
         }
@@ -762,22 +801,43 @@ impl Model {
             self.direction_items.clear();
             return;
         };
+
         let mut current_ids = HashSet::new();
         for item in list.iter() {
             let id = item.id();
             current_ids.insert(id);
 
-            let direction = predefined
-                .as_ref()
-                .and_then(|map| map.get(id))
-                .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
-                .or_else(|| {
-                    self.direction_items
-                        .get(id)
-                        .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
-                })
-                .unwrap_or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
+            // Determine the direction to use for this item
+            let direction = if let Some(predefined_map) = predefined.as_ref() {
+                if let Some(selected_rc) = predefined_map.get(id) {
+                    // Item is selected: use the direction from predefined selection
+                    selected_rc.try_borrow().ok().and_then(|v| *v)
+                } else {
+                    // Item is deselected: restore from direction_cache, then fall back to existing direction_items, then default
+                    if let Ok(cache) = ctx.props().selected.direction_cache.try_borrow()
+                        && let Some(cached_direction) = cache.get(id)
+                    {
+                        Some(*cached_direction)
+                    } else if let Some(existing) = self.direction_items.get(id) {
+                        existing.try_borrow().ok().and_then(|v| *v)
+                    } else {
+                        Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                    }
+                }
+            } else {
+                // All items selected (predefined is None): restore from cache or existing
+                if let Ok(cache) = ctx.props().selected.direction_cache.try_borrow()
+                    && let Some(cached_direction) = cache.get(id)
+                {
+                    Some(*cached_direction)
+                } else if let Some(existing) = self.direction_items.get(id) {
+                    existing.try_borrow().ok().and_then(|v| *v)
+                } else {
+                    Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                }
+            };
 
+            // Update or insert the direction in direction_items
             match self.direction_items.entry(id.clone()) {
                 Occupied(mut entry) => {
                     if let Ok(mut value) = entry.get().try_borrow_mut() {
@@ -791,8 +851,15 @@ impl Model {
                 }
             }
         }
+
+        // Clean up stale entries: retain only items that exist in current list
         self.direction_items
             .retain(|id, _| current_ids.contains(id));
+
+        // Clean up stale cache entries to avoid memory bloat
+        if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut() {
+            cache.retain(|id, _| current_ids.contains(id));
+        }
     }
 
     fn load_direction_items(&mut self, ctx: &Context<Self>) {
@@ -805,7 +872,16 @@ impl Model {
                     self.direction_items
                         .get(k)
                         .and_then(|rc| rc.try_borrow().ok())
-                        .map(|b| (k.clone(), Rc::new(RefCell::new(*b))))
+                        .map(|b| {
+                            // Persist direction to cache when loading
+                            if let Some(direction) = *b
+                                && let Ok(mut cache) =
+                                    ctx.props().selected.direction_cache.try_borrow_mut()
+                            {
+                                cache.insert(k.clone(), direction);
+                            }
+                            (k.clone(), Rc::new(RefCell::new(*b)))
+                        })
                         .or_else(|| Some((k.clone(), Rc::clone(v))))
                 })
                 .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>();
