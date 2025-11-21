@@ -742,60 +742,48 @@ impl Model {
     }
 
     fn buffer_direction_items(&mut self, ctx: &Context<Self>) {
-        self.direction_items = if let (Ok(predefined), Ok(list)) = (
+        if ctx.props().kind != Kind::NetworkIp {
+            self.direction_items.clear();
+            return;
+        }
+        let (Ok(predefined), Ok(list)) = (
             ctx.props().selected.predefined.try_borrow(),
             ctx.props().list.try_borrow(),
-        ) {
-            if ctx.props().kind == Kind::NetworkIp {
-                list.iter()
-                    .map(|item| {
-                        (item.id().clone(), {
-                            predefined.as_ref().map_or_else(
-                                || {
-                                    if let Some(existing) = self.direction_items.get(item.id()) {
-                                        Rc::clone(existing)
-                                    } else {
-                                        Rc::new(RefCell::new(Some(SelectionExtraInfo::Network(
-                                            EndpointKind::Both,
-                                        ))))
-                                    }
-                                },
-                                |predefined| {
-                                    predefined.get(item.id()).map_or_else(
-                                        || {
-                                            // Item is unchecked: reuse existing direction if available,
-                                            // otherwise default to "Both" to preserve dropdown UI state.
-                                            if let Some(existing) =
-                                                self.direction_items.get(item.id())
-                                            {
-                                                Rc::clone(existing)
-                                            } else {
-                                                Rc::new(RefCell::new(Some(
-                                                    SelectionExtraInfo::Network(EndpointKind::Both),
-                                                )))
-                                            }
-                                        },
-                                        |d| {
-                                            if let Ok(d) = d.try_borrow() {
-                                                Rc::new(RefCell::new(*d))
-                                            } else {
-                                                Rc::new(RefCell::new(Some(
-                                                    SelectionExtraInfo::Network(EndpointKind::Both),
-                                                )))
-                                            }
-                                        },
-                                    )
-                                },
-                            )
-                        })
-                    })
-                    .collect::<HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>>()
-            } else {
-                HashMap::new()
-            }
-        } else {
-            HashMap::new()
+        ) else {
+            self.direction_items.clear();
+            return;
         };
+        let mut current_ids = HashSet::new();
+        for item in list.iter() {
+            let id = item.id();
+            current_ids.insert(id);
+
+            let direction = predefined
+                .as_ref()
+                .and_then(|map| map.get(id))
+                .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
+                .or_else(|| {
+                    self.direction_items
+                        .get(id)
+                        .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
+                })
+                .unwrap_or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
+
+            match self.direction_items.entry(id.clone()) {
+                Occupied(mut entry) => {
+                    if let Ok(mut value) = entry.get().try_borrow_mut() {
+                        *value = direction;
+                    } else {
+                        *entry.get_mut() = Rc::new(RefCell::new(direction));
+                    }
+                }
+                Vacant(entry) => {
+                    entry.insert(Rc::new(RefCell::new(direction)));
+                }
+            }
+        }
+        self.direction_items
+            .retain(|id, _| current_ids.contains(id));
     }
 
     fn load_direction_items(&mut self, ctx: &Context<Self>) {
