@@ -529,6 +529,11 @@ impl Model {
             EndpointKind::Destination,
         ]);
         let theme = ctx.props().theme;
+        let selected_value = match origin {
+            ItemKind::Registered => &self.directions.registered,
+            ItemKind::Custom => &self.directions.custom,
+        };
+        let selected_value_cache = selected_value.try_borrow().ok().and_then(|x| *x);
         html! {
             <SelectMini::<EndpointKind, Self>
                 txt={ctx.props().txt.clone()}
@@ -539,8 +544,8 @@ impl Model {
                 id={id.to_string()}
                 list={direction_list}
                 candidate_values={value_candidates}
-                selected_value={self.direction.clone()}
-                selected_value_cache={self.direction.try_borrow().ok().and_then(|x| *x)}
+                {selected_value}
+                {selected_value_cache}
                 align_left={false}
                 list_top={40}
                 kind={SelectMiniKind::DirectionAll}

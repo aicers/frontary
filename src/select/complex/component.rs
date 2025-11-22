@@ -33,6 +33,12 @@ pub enum ItemKind {
     Custom,
 }
 
+#[derive(Clone, Eq, PartialEq)]
+pub struct Directions {
+    pub(super) registered: Rc<RefCell<Option<EndpointKind>>>,
+    pub(super) custom: Rc<RefCell<Option<EndpointKind>>>,
+}
+
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, PartialEq, Eq)]
 pub struct Model {
@@ -40,7 +46,7 @@ pub struct Model {
     pub(super) search_text: String,
     pub(super) input_text: String,
     pub(super) input_wrong_msg: Option<&'static str>,
-    pub(super) direction: Rc<RefCell<Option<EndpointKind>>>, // for Network/IP
+    pub(super) directions: Directions,
     pub(super) direction_items: HashMap<String, Rc<RefCell<Option<SelectionExtraInfo>>>>,
 
     pub(super) view_list: bool,
@@ -104,7 +110,10 @@ impl Component for Model {
             input_wrong_msg: None,
             view_list: false,
             view_input: false,
-            direction: Rc::new(RefCell::new(None)),
+            directions: Directions {
+                registered: Rc::new(RefCell::new(None)),
+                custom: Rc::new(RefCell::new(None)),
+            },
             direction_items: HashMap::new(),
         };
         s.buffer_direction_items(ctx);
@@ -659,7 +668,7 @@ impl Model {
         if ctx.props().kind != Kind::NetworkIp {
             return;
         }
-        if let Ok(direction) = self.direction.try_borrow()
+        if let Ok(direction) = self.directions.registered.try_borrow()
             && let Some(direction) = direction.as_ref()
         {
             if let (Some(search), Ok(list)) =
@@ -727,7 +736,7 @@ impl Model {
         if ctx.props().kind != Kind::NetworkIp {
             return;
         }
-        if let Ok(direction) = self.direction.try_borrow()
+        if let Ok(direction) = self.directions.custom.try_borrow()
             && let Some(direction) = direction.as_ref()
             && let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
         {
