@@ -68,11 +68,7 @@ where
             ctx.props().width - PADDING_SUM
         };
         let class_item = if group { "" } else { "input-select-searchable" };
-        let class = if self.required_msg.contains(&my_index) {
-            "input-select-searchable-required"
-        } else {
-            ""
-        };
+        let show_error = self.required_msg.contains(&my_index);
         if let Some(selected) = self.select_searchable_buffer.get(&my_index) {
             html! {
                 <div class={class_item}>
@@ -87,7 +83,6 @@ where
                             }
                         }
                     }
-                    <div {class}>
                     {
                         if multiple {
                             html! {
@@ -105,6 +100,7 @@ where
                                     selected={Rc::clone(selected)}
                                     allow_empty={!ess.required}
                                     parent_message={Some(Message::InputMultipleSelect(my_index.clone(), input_data.clone(), Rc::clone(&list_clone)))}
+                                    is_required={show_error}
                                     {theme}
                                 />
                             }
@@ -129,7 +125,6 @@ where
                             }
                         }
                     }
-                    </div>
                     { self.view_required_msg(ctx, &my_index) }
                 </div>
             }
