@@ -27,7 +27,7 @@ jobs:
       - name: markdownlint
         uses: articulate/actions-markdownlint@v1
       - name: Biome check
-        run: biome ci
+        run: biome ci --error-on-warnings
 
   test:
     runs-on: ${{ matrix.os }}
