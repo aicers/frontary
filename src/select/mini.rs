@@ -281,17 +281,14 @@ where
                 <table class="mini-select-list-down-table">
                     {
                         for list.iter().enumerate().map(|(index, item)|{
-                        let class_select = match item {
-                            ViewString::Key(key) => if key == value {
-                                "mini-select-list-down-item-selected"
-                            } else {
-                                "mini-select-list-down-item"
-                            },
-                            ViewString::Raw(txt) => if txt == value {
-                                "mini-select-list-down-item-selected"
-                            } else {
-                                "mini-select-list-down-item"
-                            },
+                        let item_text = match item {
+                            ViewString::Key(key) => text!(txt, ctx.props().language, key),
+                            ViewString::Raw(raw) => raw.clone(),
+                        };
+                        let class_select = if item_text == value {
+                            "mini-select-list-down-item-selected"
+                        } else {
+                            "mini-select-list-down-item"
                         };
                         html! {
                             <tr>
