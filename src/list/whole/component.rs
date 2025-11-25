@@ -168,6 +168,8 @@ where
     pub messages: HashMap<MessageType, T::Message>,
     #[prop_or(None)]
     pub theme: Option<Theme>,
+    #[prop_or(Rc::new(RefCell::new(None)))]
+    pub selected_sort_kind: Rc<RefCell<Option<SortListKind>>>,
 }
 
 impl<T> Component for Model<T>
@@ -218,18 +220,20 @@ where
         if self.data_cache.len() < ctx.props().data.len() {
             // if an item is added, only sort by latest if LatestFirst is available
             self.initiate_pages_info(ctx); // go to the first page
-            if ctx
-                .props()
-                .visible_sort_options
-                .contains(&SortListKind::LatestFirst)
-            {
-                self.sort = None; // This will trigger LatestFirst in sort_keys
-            } else {
-                // When LatestFirst is hidden, default to deterministic column 0 Ascending
-                self.sort = Some(SortColumn {
-                    index: 0,
-                    status: SortStatus::Ascending,
-                });
+            if self.sort.is_none() {
+                if ctx
+                    .props()
+                    .visible_sort_options
+                    .contains(&SortListKind::LatestFirst)
+                {
+                    self.sort = None; // This will trigger LatestFirst in sort_keys
+                } else {
+                    // When LatestFirst is hidden, default to deterministic column 0 Ascending
+                    self.sort = Some(SortColumn {
+                        index: 0,
+                        status: SortStatus::Ascending,
+                    });
+                }
             }
             self.set_sort_list_kind(ctx);
         }
@@ -384,6 +388,11 @@ where
             }
             Message::SortList => {
                 let sort = if let Ok(sort_input) = self.sort_list_kind.try_borrow() {
+                    if let Some(kind) = *sort_input
+                        && let Ok(mut sort_kind) = ctx.props().selected_sort_kind.try_borrow_mut()
+                    {
+                        *sort_kind = Some(kind);
+                    }
                     match *sort_input {
                         Some(SortListKind::LatestFirst) => {
                             self.sort = None;
