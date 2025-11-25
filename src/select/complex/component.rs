@@ -201,30 +201,52 @@ impl Component for Model {
                         ctx.props().list.try_borrow(),
                     ) {
                         if let Some(predefined) = sel.as_mut() {
-                            match predefined.entry(key) {
+                            match predefined.entry(key.clone()) {
                                 Vacant(entry) => {
-                                    let extra = match ctx.props().kind {
-                                        Kind::NetworkIp => {
+                                    // Item being selected: use direction_items or default (NOT cache)
+                                    let extra = if ctx.props().kind == Kind::NetworkIp {
+                                        if let Some(existing) =
+                                            self.direction_items.get(entry.key())
+                                        {
+                                            existing.try_borrow().ok().and_then(|v| *v)
+                                        } else {
                                             Some(SelectionExtraInfo::Network(EndpointKind::Both))
                                         }
-                                        Kind::Basic => None,
-                                    };
-                                    if let Some(existing) = self.direction_items.get(entry.key()) {
-                                        entry.insert(Rc::clone(existing));
                                     } else {
-                                        entry.insert(Rc::new(RefCell::new(extra)));
+                                        None
+                                    };
+                                    entry.insert(Rc::new(RefCell::new(extra)));
+
+                                    // Remove from cache on selection (cache is for deselected items only)
+                                    if ctx.props().kind == Kind::NetworkIp
+                                        && let Ok(mut cache) =
+                                            ctx.props().selected.direction_cache.try_borrow_mut()
+                                    {
+                                        cache.remove(&key);
                                     }
                                 }
-                                Occupied(entry) => match ctx.props().kind {
-                                    Kind::NetworkIp => {
-                                        if entry.get().try_borrow_mut().is_ok() {
+                                Occupied(entry) => {
+                                    // Item being deselected: save to cache
+                                    if ctx.props().kind == Kind::NetworkIp
+                                        && let Ok(direction) = entry.get().try_borrow()
+                                        && let Some(dir) = *direction
+                                        && let Ok(mut cache) =
+                                            ctx.props().selected.direction_cache.try_borrow_mut()
+                                    {
+                                        cache.insert(key.clone(), dir);
+                                    }
+
+                                    match ctx.props().kind {
+                                        Kind::NetworkIp => {
+                                            if entry.get().try_borrow_mut().is_ok() {
+                                                entry.remove_entry();
+                                            }
+                                        }
+                                        Kind::Basic => {
                                             entry.remove_entry();
                                         }
                                     }
-                                    Kind::Basic => {
-                                        entry.remove_entry();
-                                    }
-                                },
+                                }
                             }
                         } else {
                             let mut s =
@@ -246,6 +268,17 @@ impl Component for Model {
                             }
                             s.remove(&key);
                             *sel = Some(s);
+
+                            // When switching from "all selected" to partial, save the deselected item to cache
+                            if ctx.props().kind == Kind::NetworkIp
+                                && let Some(dir_rc) = self.direction_items.get(&key)
+                                && let Ok(dir) = dir_rc.try_borrow()
+                                && let Some(direction) = *dir
+                                && let Ok(mut cache) =
+                                    ctx.props().selected.direction_cache.try_borrow_mut()
+                            {
+                                cache.insert(key.clone(), direction);
+                            }
                         }
                     }
                     if self.check_status(ctx, false) == CheckStatus::Checked
@@ -261,19 +294,29 @@ impl Component for Model {
                         && let Some(value) = custom.get(&key)
                         && let Ok(mut value) = value.try_borrow_mut()
                     {
-                        match *value {
-                            Some(SelectionExtraInfo::Network(_)) => {
-                                self.direction_items
-                                    .insert(key.clone(), Rc::new(RefCell::new(*value)));
-                                *value = None;
+                        if let Some(SelectionExtraInfo::Network(_)) = *value {
+                            // Item being deselected: save direction to cache
+                            if let Some(direction) = *value
+                                && let Ok(mut cache) =
+                                    ctx.props().selected.direction_cache.try_borrow_mut()
+                            {
+                                cache.insert(key.clone(), direction);
                             }
-                            _ => {
-                                *value = self
-                                    .direction_items
-                                    .get(&key)
-                                    .and_then(|existing| existing.try_borrow().ok())
-                                    .and_then(|opt| *opt)
-                                    .or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
+                            *value = None;
+                        } else {
+                            // Item being selected: use direction_items or default (NOT cache)
+                            *value = self
+                                .direction_items
+                                .get(&key)
+                                .and_then(|existing| existing.try_borrow().ok())
+                                .and_then(|opt| *opt)
+                                .or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
+
+                            // Remove from cache on selection (cache is for deselected items only)
+                            if let Ok(mut cache) =
+                                ctx.props().selected.direction_cache.try_borrow_mut()
+                            {
+                                cache.remove(&key);
                             }
                         }
                     }
@@ -336,33 +379,62 @@ impl Component for Model {
                             if let Some(predefined) = sel.as_mut() {
                                 match check_status {
                                     CheckStatus::Checked => {
+                                        // Deselecting items: save directions to cache
                                         for &index in search {
                                             if let Some(item) = list.get(index)
                                                 && item.networks().is_some()
                                             {
+                                                if ctx.props().kind == Kind::NetworkIp
+                                                    && let Some(dir_rc) = predefined.get(item.id())
+                                                    && let Ok(dir) = dir_rc.try_borrow()
+                                                    && let Some(direction) = *dir
+                                                    && let Ok(mut cache) = ctx
+                                                        .props()
+                                                        .selected
+                                                        .direction_cache
+                                                        .try_borrow_mut()
+                                                {
+                                                    cache.insert(item.id().clone(), direction);
+                                                }
                                                 predefined.remove(item.id());
                                             }
                                         }
                                     }
                                     CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                                        let extra = match ctx.props().kind {
-                                            Kind::NetworkIp => Some(SelectionExtraInfo::Network(
-                                                EndpointKind::Both,
-                                            )),
-                                            Kind::Basic => None,
-                                        };
+                                        // Selecting items: restore from cache and remove from cache
                                         for &index in search {
                                             if let Some(item) = list.get(index)
                                                 && item.networks().is_some()
                                             {
                                                 let id = item.id().clone();
-                                                if let Some(existing) =
-                                                    self.direction_items.get(&id)
-                                                {
-                                                    predefined.insert(id, Rc::clone(existing));
+                                                // Use direction_items or default (NOT cache)
+                                                let extra = if ctx.props().kind == Kind::NetworkIp {
+                                                    if let Some(existing) =
+                                                        self.direction_items.get(&id)
+                                                    {
+                                                        existing.try_borrow().ok().and_then(|v| *v)
+                                                    } else {
+                                                        Some(SelectionExtraInfo::Network(
+                                                            EndpointKind::Both,
+                                                        ))
+                                                    }
                                                 } else {
-                                                    predefined
-                                                        .insert(id, Rc::new(RefCell::new(extra)));
+                                                    None
+                                                };
+                                                predefined.insert(
+                                                    id.clone(),
+                                                    Rc::new(RefCell::new(extra)),
+                                                );
+
+                                                // Remove from cache on selection (cache is for deselected items only)
+                                                if ctx.props().kind == Kind::NetworkIp
+                                                    && let Ok(mut cache) = ctx
+                                                        .props()
+                                                        .selected
+                                                        .direction_cache
+                                                        .try_borrow_mut()
+                                                {
+                                                    cache.remove(&id);
                                                 }
                                             }
                                         }
@@ -382,7 +454,21 @@ impl Component for Model {
                                 }
                                 for &index in search {
                                     if let Some(item) = list.get(index) {
-                                        s.remove(item.id());
+                                        let id = item.id();
+                                        // Deselecting items when switching from "all": save to cache
+                                        if ctx.props().kind == Kind::NetworkIp
+                                            && let Some(dir_rc) = self.direction_items.get(id)
+                                            && let Ok(dir) = dir_rc.try_borrow()
+                                            && let Some(direction) = *dir
+                                            && let Ok(mut cache) = ctx
+                                                .props()
+                                                .selected
+                                                .direction_cache
+                                                .try_borrow_mut()
+                                        {
+                                            cache.insert(id.clone(), direction);
+                                        }
+                                        s.remove(id);
                                     }
                                 }
                                 *sel = Some(s);
@@ -407,17 +493,26 @@ impl Component for Model {
                         if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                             match status {
                                 CheckStatus::Checked => {
+                                    // Deselecting all custom items: save directions to cache
                                     for (k, v) in &mut *custom {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_some()
                                         {
-                                            self.direction_items
-                                                .insert(k.clone(), Rc::new(RefCell::new(*vv)));
+                                            if let Some(direction) = *vv
+                                                && let Ok(mut cache) = ctx
+                                                    .props()
+                                                    .selected
+                                                    .direction_cache
+                                                    .try_borrow_mut()
+                                            {
+                                                cache.insert(k.clone(), direction);
+                                            }
                                             *vv = None;
                                         }
                                     }
                                 }
                                 CheckStatus::Unchecked | CheckStatus::Indeterminate => {
+                                    // Selecting custom items: use direction_items or default (NOT cache)
                                     for (k, v) in custom.iter_mut() {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_none()
@@ -430,6 +525,16 @@ impl Component for Model {
                                                 *vv = Some(SelectionExtraInfo::Network(
                                                     EndpointKind::Both,
                                                 ));
+                                            }
+
+                                            // Remove from cache on selection (cache is for deselected items only)
+                                            if let Ok(mut cache) = ctx
+                                                .props()
+                                                .selected
+                                                .direction_cache
+                                                .try_borrow_mut()
+                                            {
+                                                cache.remove(k);
                                             }
                                         }
                                     }
@@ -674,6 +779,7 @@ impl Model {
             if let (Some(search), Ok(list)) =
                 (self.search_result.as_ref(), ctx.props().list.try_borrow())
             {
+                // Update direction for visible/searched items
                 for &index in search {
                     if let Some(item) = list.get(index)
                         && item.networks().is_some()
@@ -684,15 +790,41 @@ impl Model {
                             && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
                         {
                             *value = Some(SelectionExtraInfo::Network(*direction));
+
+                            // Only persist to cache if item is deselected
+                            if let Ok(predefined) = ctx.props().selected.predefined.try_borrow()
+                                && predefined
+                                    .as_ref()
+                                    .is_some_and(|map| !map.contains_key(item.id()))
+                                && let Ok(mut cache) =
+                                    ctx.props().selected.direction_cache.try_borrow_mut()
+                            {
+                                cache.insert(
+                                    item.id().clone(),
+                                    SelectionExtraInfo::Network(*direction),
+                                );
+                            }
                         }
                     }
                 }
             } else {
-                for value in self.direction_items.values() {
+                // Update direction for all items
+                for (key, value) in &self.direction_items {
                     if let Ok(mut value) = value.try_borrow_mut()
                         && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
                     {
                         *value = Some(SelectionExtraInfo::Network(*direction));
+
+                        // Only persist to cache if item is deselected
+                        if let Ok(predefined) = ctx.props().selected.predefined.try_borrow()
+                            && predefined
+                                .as_ref()
+                                .is_some_and(|map| !map.contains_key(key))
+                            && let Ok(mut cache) =
+                                ctx.props().selected.direction_cache.try_borrow_mut()
+                        {
+                            cache.insert(key.clone(), SelectionExtraInfo::Network(*direction));
+                        }
                     }
                 }
             }
@@ -740,11 +872,18 @@ impl Model {
             && let Some(direction) = direction.as_ref()
             && let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
         {
-            for v in custom.values_mut() {
-                if let Ok(mut vv) = v.try_borrow_mut()
-                    && vv.is_some()
-                {
-                    *vv = Some(SelectionExtraInfo::Network(*direction));
+            for (key, v) in custom.iter_mut() {
+                if let Ok(mut vv) = v.try_borrow_mut() {
+                    if vv.is_some() {
+                        // Item is selected: update its direction directly (don't persist to cache)
+                        *vv = Some(SelectionExtraInfo::Network(*direction));
+                    } else {
+                        // Item is deselected: update cache only
+                        if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut()
+                        {
+                            cache.insert(key.clone(), SelectionExtraInfo::Network(*direction));
+                        }
+                    }
                 }
             }
         }
@@ -762,22 +901,48 @@ impl Model {
             self.direction_items.clear();
             return;
         };
+
+        // If all items are selected (predefined is None), clear the cache
+        // since the cache is only for deselected items
+        if predefined.is_none()
+            && let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut()
+        {
+            cache.clear();
+        }
+
         let mut current_ids = HashSet::new();
         for item in list.iter() {
             let id = item.id();
             current_ids.insert(id);
 
-            let direction = predefined
-                .as_ref()
-                .and_then(|map| map.get(id))
-                .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
-                .or_else(|| {
-                    self.direction_items
-                        .get(id)
-                        .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
-                })
-                .unwrap_or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
+            // Determine the direction to use for this item
+            let direction = if let Some(predefined_map) = predefined.as_ref() {
+                if let Some(selected_rc) = predefined_map.get(id) {
+                    // Item is selected: use the direction from predefined selection
+                    selected_rc.try_borrow().ok().and_then(|v| *v)
+                } else {
+                    // Item is deselected: restore from direction_cache, then fall back to existing direction_items, then default
+                    if let Ok(cache) = ctx.props().selected.direction_cache.try_borrow()
+                        && let Some(cached_direction) = cache.get(id)
+                    {
+                        Some(*cached_direction)
+                    } else if let Some(existing) = self.direction_items.get(id) {
+                        existing.try_borrow().ok().and_then(|v| *v)
+                    } else {
+                        Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                    }
+                }
+            } else {
+                // All items selected (predefined is None): use existing direction_items or default
+                // Do NOT read from cache since cache is only for deselected items
+                if let Some(existing) = self.direction_items.get(id) {
+                    existing.try_borrow().ok().and_then(|v| *v)
+                } else {
+                    Some(SelectionExtraInfo::Network(EndpointKind::Both))
+                }
+            };
 
+            // Update or insert the direction in direction_items
             match self.direction_items.entry(id.clone()) {
                 Occupied(mut entry) => {
                     if let Ok(mut value) = entry.get().try_borrow_mut() {
@@ -791,14 +956,23 @@ impl Model {
                 }
             }
         }
+
+        // Clean up stale entries: retain only items that exist in current list
         self.direction_items
             .retain(|id, _| current_ids.contains(id));
+
+        // Clean up stale cache entries to avoid memory bloat
+        if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut() {
+            cache.retain(|id, _| current_ids.contains(id));
+        }
     }
 
     fn load_direction_items(&mut self, ctx: &Context<Self>) {
         if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
             && let Some(current) = predefined.as_ref()
         {
+            // Update selected items with new directions from direction_items
+            // Don't persist to cache since these are selected items
             let s = current
                 .iter()
                 .filter_map(|(k, v)| {
