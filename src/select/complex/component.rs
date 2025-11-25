@@ -203,14 +203,9 @@ impl Component for Model {
                         if let Some(predefined) = sel.as_mut() {
                             match predefined.entry(key.clone()) {
                                 Vacant(entry) => {
-                                    // Item being selected: restore from cache and remove from cache
+                                    // Item being selected: use direction_items or default (NOT cache)
                                     let extra = if ctx.props().kind == Kind::NetworkIp {
-                                        if let Ok(cache) =
-                                            ctx.props().selected.direction_cache.try_borrow()
-                                            && let Some(cached_dir) = cache.get(&key)
-                                        {
-                                            Some(*cached_dir)
-                                        } else if let Some(existing) =
+                                        if let Some(existing) =
                                             self.direction_items.get(entry.key())
                                         {
                                             existing.try_borrow().ok().and_then(|v| *v)
@@ -222,7 +217,7 @@ impl Component for Model {
                                     };
                                     entry.insert(Rc::new(RefCell::new(extra)));
 
-                                    // Remove from cache on selection (deselect-only strategy)
+                                    // Remove from cache on selection (cache is for deselected items only)
                                     if ctx.props().kind == Kind::NetworkIp
                                         && let Ok(mut cache) =
                                             ctx.props().selected.direction_cache.try_borrow_mut()
@@ -309,21 +304,15 @@ impl Component for Model {
                             }
                             *value = None;
                         } else {
-                            // Item being selected: restore from cache and remove from cache
-                            if let Ok(cache) = ctx.props().selected.direction_cache.try_borrow()
-                                && let Some(cached_dir) = cache.get(&key)
-                            {
-                                *value = Some(*cached_dir);
-                            } else {
-                                *value = self
-                                    .direction_items
-                                    .get(&key)
-                                    .and_then(|existing| existing.try_borrow().ok())
-                                    .and_then(|opt| *opt)
-                                    .or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
-                            }
+                            // Item being selected: use direction_items or default (NOT cache)
+                            *value = self
+                                .direction_items
+                                .get(&key)
+                                .and_then(|existing| existing.try_borrow().ok())
+                                .and_then(|opt| *opt)
+                                .or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
 
-                            // Remove from cache on selection (deselect-only strategy)
+                            // Remove from cache on selection (cache is for deselected items only)
                             if let Ok(mut cache) =
                                 ctx.props().selected.direction_cache.try_borrow_mut()
                             {
@@ -418,16 +407,9 @@ impl Component for Model {
                                                 && item.networks().is_some()
                                             {
                                                 let id = item.id().clone();
+                                                // Use direction_items or default (NOT cache)
                                                 let extra = if ctx.props().kind == Kind::NetworkIp {
-                                                    if let Ok(cache) = ctx
-                                                        .props()
-                                                        .selected
-                                                        .direction_cache
-                                                        .try_borrow()
-                                                        && let Some(cached_dir) = cache.get(&id)
-                                                    {
-                                                        Some(*cached_dir)
-                                                    } else if let Some(existing) =
+                                                    if let Some(existing) =
                                                         self.direction_items.get(&id)
                                                     {
                                                         existing.try_borrow().ok().and_then(|v| *v)
@@ -444,7 +426,7 @@ impl Component for Model {
                                                     Rc::new(RefCell::new(extra)),
                                                 );
 
-                                                // Remove from cache on selection
+                                                // Remove from cache on selection (cache is for deselected items only)
                                                 if ctx.props().kind == Kind::NetworkIp
                                                     && let Ok(mut cache) = ctx
                                                         .props()
@@ -530,19 +512,12 @@ impl Component for Model {
                                     }
                                 }
                                 CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                                    // Selecting custom items: restore from cache and remove from cache
+                                    // Selecting custom items: use direction_items or default (NOT cache)
                                     for (k, v) in custom.iter_mut() {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_none()
                                         {
-                                            if let Ok(cache) =
-                                                ctx.props().selected.direction_cache.try_borrow()
-                                                && let Some(cached_dir) = cache.get(k)
-                                            {
-                                                *vv = Some(*cached_dir);
-                                            } else if let Some(existing) =
-                                                self.direction_items.get(k)
-                                            {
+                                            if let Some(existing) = self.direction_items.get(k) {
                                                 if let Ok(existing) = existing.try_borrow() {
                                                     *vv = *existing;
                                                 }
@@ -552,7 +527,7 @@ impl Component for Model {
                                                 ));
                                             }
 
-                                            // Remove from cache on selection
+                                            // Remove from cache on selection (cache is for deselected items only)
                                             if let Ok(mut cache) = ctx
                                                 .props()
                                                 .selected
@@ -927,6 +902,14 @@ impl Model {
             return;
         };
 
+        // If all items are selected (predefined is None), clear the cache
+        // since the cache is only for deselected items
+        if predefined.is_none()
+            && let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut()
+        {
+            cache.clear();
+        }
+
         let mut current_ids = HashSet::new();
         for item in list.iter() {
             let id = item.id();
@@ -950,12 +933,9 @@ impl Model {
                     }
                 }
             } else {
-                // All items selected (predefined is None): restore from cache or existing
-                if let Ok(cache) = ctx.props().selected.direction_cache.try_borrow()
-                    && let Some(cached_direction) = cache.get(id)
-                {
-                    Some(*cached_direction)
-                } else if let Some(existing) = self.direction_items.get(id) {
+                // All items selected (predefined is None): use existing direction_items or default
+                // Do NOT read from cache since cache is only for deselected items
+                if let Some(existing) = self.direction_items.get(id) {
                     existing.try_borrow().ok().and_then(|v| *v)
                 } else {
                     Some(SelectionExtraInfo::Network(EndpointKind::Both))

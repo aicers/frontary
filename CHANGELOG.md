@@ -15,6 +15,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   beneath the title for `Kind::Flat` lists.
 - Added `listen_click_outside` API to enable click-outside detection for custom
   areas, allowing users to close UI components when clicking outside of them.
+- Added `direction_cache` field to `ComplexSelection` to persistently store
+  direction choices for deselected Network/IP items across component remounts.
 
 ### Fixed
 
