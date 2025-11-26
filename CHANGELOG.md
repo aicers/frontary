@@ -15,6 +15,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   beneath the title for `Kind::Flat` lists.
 - Added `listen_click_outside` API to enable click-outside detection for custom
   areas, allowing users to close UI components when clicking outside of them.
+- Added `selected_sort` prop to `WholeList` to persist sort selection.
 
 ### Fixed
 
