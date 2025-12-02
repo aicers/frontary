@@ -888,6 +888,7 @@ where
         let render_body = || -> Html {
             html! {
                 <>
+                    { self.view_action_bar(ctx) }
                     <div class="list-table">
                         <table class="list-table">
                             { self.view_head(ctx) }

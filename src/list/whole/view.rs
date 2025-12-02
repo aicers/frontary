@@ -640,19 +640,13 @@ where
         } else {
             ""
         };
+        let delete_checked_msg = if cfg!(feature = "pumpkin") {
+            None
+        } else {
+            self.selection_message(ctx)
+        };
 
         if out_table {
-            let msg = format!(
-                "{}{} {} {}{}",
-                self.checked.len(),
-                text!(txt, ctx.props().language, "(items of)"),
-                text!(txt, ctx.props().language, "chosen"),
-                text!(txt, ctx.props().language, &ctx.props().title)
-                    .to_string()
-                    .to_lowercase(),
-                text!(txt, ctx.props().language, "(s)"),
-            );
-
             html! {
                 <tr>
                     <td colspan={(cols + 3).to_string()} class="list-whole-list-pages">
@@ -665,7 +659,13 @@ where
                                 pages_info_cache={self.pages_info}
                                 num_pages={DEFAULT_NUM_PAGES}
                             />
-                            { self.view_delete_checked(ctx, msg) }
+                            {
+                                if let Some(msg) = delete_checked_msg.clone() {
+                                    self.view_delete_checked(ctx, msg)
+                                } else {
+                                    html! {}
+                                }
+                            }
                         </div>
                     </td>
                 </tr>
@@ -783,6 +783,50 @@ where
                     </tr>
                 }
             }
+        }
+    }
+
+    fn selection_message(&self, ctx: &Context<Self>) -> Option<String> {
+        if self.check_status(ctx) == CheckStatus::Unchecked {
+            return None;
+        }
+
+        let txt = ctx.props().txt.txt.clone();
+        if cfg!(feature = "pumpkin") {
+            Some(format!(
+                "{} {}",
+                self.checked.len(),
+                text!(txt, ctx.props().language, "selected")
+            ))
+        } else {
+            Some(format!(
+                "{}{} {} {}{}",
+                self.checked.len(),
+                text!(txt, ctx.props().language, "(items of)"),
+                text!(txt, ctx.props().language, "chosen"),
+                text!(txt, ctx.props().language, &ctx.props().title)
+                    .to_string()
+                    .to_lowercase(),
+                text!(txt, ctx.props().language, "(s)"),
+            ))
+        }
+    }
+
+    pub(super) fn view_action_bar(&self, ctx: &Context<Self>) -> Html {
+        if !cfg!(feature = "pumpkin")
+            || !matches!(ctx.props().kind, Kind::Flat | Kind::LayeredFirst)
+        {
+            return html! {};
+        }
+
+        let Some(msg) = self.selection_message(ctx) else {
+            return html! {};
+        };
+
+        html! {
+            <div class="list-whole-action-bar">
+                { self.view_delete_checked(ctx, msg) }
+            </div>
         }
     }
 
@@ -1002,11 +1046,43 @@ where
         let delete_img = Theme::path(&theme, delete_img_file);
         let close_img = Theme::path(&theme, &format!("close-white.{ext}"));
         if self.check_status(ctx) == CheckStatus::Unchecked {
-            html! {}
-        } else {
-            let onclick_delete = ctx.link().callback(|_| Message::DeleteChecked);
-            let onclick_cancel = ctx.link().callback(|_| Message::CancelChecked);
+            return html! {};
+        }
 
+        let onclick_delete = ctx.link().callback(|_| Message::DeleteChecked);
+        let onclick_cancel = ctx.link().callback(|_| Message::CancelChecked);
+
+        if cfg!(feature = "pumpkin") {
+            let txt = ctx.props().txt.txt.clone();
+            let delete_label = text!(txt, ctx.props().language, "Delete");
+            let cancel_label = text!(txt, ctx.props().language, "Cancel");
+
+            html! {
+                <div class="list-whole-delete-checked">
+                    <button
+                        type="button"
+                        class="list-whole-delete-checked-icon list-whole-delete-checked-close"
+                        aria-label={cancel_label}
+                        onclick={onclick_cancel}
+                    >
+                        <img src={close_img} class="list-whole-close-white" />
+                    </button>
+                    <div class="list-whole-delete-checked-content">
+                        <div class="list-whole-delete-checked-text">
+                            { msg }
+                        </div>
+                        <button
+                            type="button"
+                            class="list-whole-delete-checked-icon list-whole-delete-checked-trash"
+                            aria-label={delete_label}
+                            onclick={onclick_delete}
+                        >
+                            <img src={delete_img} class="list-whole-delete-trash-white" />
+                        </button>
+                    </div>
+                </div>
+            }
+        } else {
             html! {
                 <div class="list-whole-delete-checked">
                     <div class="list-whole-delete-checked-text">
