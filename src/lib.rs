@@ -473,14 +473,14 @@ pub struct ComplexSelection {
     pub predefined: Rc<RefCell<Option<HashMap<String, RefSelectionExtraInfo>>>>,
     /// Custom selections created by the user
     pub custom: Rc<RefCell<HashMap<String, RefSelectionExtraInfo>>>,
-    /// Persistent cache of direction choices for deselected items only.
+    /// Persistent backup of direction choices for deselected items only.
     ///
-    /// This cache preserves the direction (Source/Destination/Both) that users
-    /// configure for network/IP items when those items are deselected. The cache
+    /// This backup preserves the direction (Source/Destination/Both) that users
+    /// configure for network/IP items when those items are deselected. The backup
     /// is used to restore directions after component remount/navigation cycles.
     /// Selected items store their directions in `predefined`/`custom` directly;
-    /// this cache is cleared when all items become selected.
-    pub direction_cache: Rc<RefCell<HashMap<String, SelectionExtraInfo>>>,
+    /// this backup is cleared when all items become selected.
+    pub diselected_direction_backup: Rc<RefCell<HashMap<String, SelectionExtraInfo>>>,
 }
 
 impl ComplexSelection {
