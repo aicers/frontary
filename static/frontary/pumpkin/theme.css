@@ -1093,6 +1093,14 @@ html.light td.mini-select-item-direction-icon {
   background-image: url("/frontary/pumpkin/light/mini-select-list-down.svg");
 }
 
+td.mini-select-item-direction-icon-disabled {
+  background-image: url("/frontary/pumpkin/mini-select-list-down-disabled.svg");
+}
+
+html.light td.mini-select-item-direction-icon-disabled {
+  background-image: url("/frontary/pumpkin/light/mini-select-list-down-disabled.svg");
+}
+
 div.mini-select-item-direction {
   padding: 8px 12px;
   border-radius: 8px;
@@ -1118,13 +1126,13 @@ td.mini-select-item-direction-text {
 }
 
 div.mini-select-item-direction-deactive {
-  background-color: var(--transparent-light-grey);
+  background-color: var(--control-bg-disabled);
   pointer-events: none;
   cursor: default;
 }
 
 td.mini-select-item-direction-text-deactive {
-  color: var(--dark-50);
+  color: var(--control-fg-disabled);
 }
 
 div.mini-select-list-sort-recently-icon {

@@ -507,6 +507,10 @@ where
             "mini-select-item-direction-text",
             disabled.then_some("mini-select-item-direction-text-deactive"),
         );
+        let icon_class = classes!(
+            "mini-select-item-direction-icon",
+            disabled.then_some("mini-select-item-direction-icon-disabled"),
+        );
 
         html! {
             <div onclick={onclick} class={item_class} style={style}>
@@ -515,7 +519,7 @@ where
                         <td class={text_class}>
                             { value }
                         </td>
-                        <td class="mini-select-item-direction-icon">
+                        <td class={icon_class}>
                         </td>
                     </tr>
                 </table>

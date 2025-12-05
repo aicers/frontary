@@ -224,6 +224,20 @@ pub fn static_files() -> Vec<(&'static str, &'static [u8])> {
             mini_select_list_down_light,
         ));
 
+        let mini_select_list_down_disabled =
+            include_bytes!("../static/frontary/pumpkin/mini-select-list-down-disabled.svg");
+        rtn.push((
+            "mini-select-list-down-disabled.svg",
+            mini_select_list_down_disabled,
+        ));
+
+        let mini_select_list_down_disabled_light =
+            include_bytes!("../static/frontary/pumpkin/light/mini-select-list-down-disabled.svg");
+        rtn.push((
+            "light/mini-select-list-down-disabled.svg",
+            mini_select_list_down_disabled_light,
+        ));
+
         let notification_error =
             include_bytes!("../static/frontary/pumpkin/notification-error.svg");
         rtn.push(("notification-error.svg", notification_error));
