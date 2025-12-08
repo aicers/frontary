@@ -1616,7 +1616,7 @@ div.list-whole-delete-checked {
   height: 52px;
   padding-left: 60px;
   padding-right: 60px;
-  background-color: var(--toast-bg);
+  background-color: var(--bulkbar-bg);
   border-radius: 26px;
   display: flex;
   flex-direction: row;
@@ -1628,7 +1628,7 @@ div.list-whole-delete-checked-text {
   margin-right: 24px;
   font-weight: normal;
   font-size: 14px;
-  color: var(--toast-fg);
+  color: var(--bulkbar-fg);
 }
 
 div.list-whole-delete-checked-trash {
@@ -3111,7 +3111,7 @@ table.notification {
 
 td.notification-contents {
   padding: 16px 15px 16px 24px;
-  background-color: var(--toast-bg);
+  background-color: var(--notification-bg);
   border-radius: 8px;
   gap: 10px;
   display: grid;
@@ -3128,7 +3128,7 @@ div.clumit-notification {
 div.clumit-notification-error {
   align-items: center;
   display: flex;
-  color: var(--toast-fg);
+  color: var(--notification-fg);
 }
 
 img.clumit-notification-error {
@@ -3139,7 +3139,7 @@ img.clumit-notification-error {
 
 table.notification-contents-text-table {
   width: 100%;
-  color: var(--toast-fg);
+  color: var(--notification-fg);
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -3179,22 +3179,22 @@ div.notification-contents-done {
 
 div.notification-contents-done-button {
   height: 26px;
-  background-color: var(--toast-action-bg);
+  background-color: var(--notification-action-bg);
   font-weight: 500;
   font-size: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--toast-action-fg);
+  color: var(--notification-action-fg);
   border-radius: 8px;
-  border: 2px solid var(--toast-action-border);
+  border: 2px solid var(--notification-action-border);
   padding: 12px 24px;
 }
 
 div.notification-contents-done-button:hover {
   cursor: pointer;
-  border-color: var(--toast-action-border-hover);
-  color: var(--toast-action-fg);
+  border-color: var(--notification-action-border-hover);
+  color: var(--notification-action-fg);
 }
 
 div.notification-close-all {
@@ -3206,16 +3206,16 @@ div.notification-close-all {
 
 div.notification-close-all-button {
   padding: 8px 16px;
-  background-color: var(--toast-bg);
+  background-color: var(--notification-bg);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 400;
-  color: var(--toast-fg);
+  color: var(--notification-fg);
 }
 
 div.notification-close-all-button:hover {
   cursor: pointer;
-  color: var(--toast-action-fg);
+  color: var(--notification-action-fg);
 }
 
 div.modal-outer {
