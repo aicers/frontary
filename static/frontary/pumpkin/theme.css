@@ -172,12 +172,12 @@ input[type="text"].searchable-select-input-empty-alert {
 input[type="text"].searchable-select-input,
 input[type="text"].searchable-select-input-empty,
 input[type="text"].searchable-select-input-empty-disabled {
-  background-color: var(--select-bg);
+  background-color: var(--control-bg);
 }
 
 input[type="text"].searchable-select-input-empty-alert {
-  background-color: var(--select-bg-danger-soft);
-  border: 2px solid var(--select-border-danger);
+  background-color: var(--control-bg-danger-soft);
+  border: 2px solid var(--control-border-danger);
 }
 
 input[type="text"].searchable-select-input {
@@ -185,7 +185,7 @@ input[type="text"].searchable-select-input {
 }
 
 input[type="text"].searchable-select-input-empty {
-  color: var(--select-fg-placeholder);
+  color: var(--control-fg-placeholder);
 }
 
 input[type="text"].searchable-select-input,
@@ -200,7 +200,7 @@ html.light input[type="text"].searchable-select-input-empty {
 
 input[type="text"].searchable-select-input-empty-disabled {
   background-image: url("/frontary/pumpkin/select-down-disabled.svg");
-  color: var(--select-fg-disabled);
+  color: var(--control-fg-disabled);
 }
 
 html.light input[type="text"].searchable-select-input-empty-disabled {
@@ -209,7 +209,7 @@ html.light input[type="text"].searchable-select-input-empty-disabled {
 
 input[type="text"].searchable-select-input-empty-alert {
   background-image: url("/frontary/pumpkin/select-down-alert.svg");
-  color: var(--select-fg-placeholder);
+  color: var(--control-fg-placeholder);
 }
 
 html.light input[type="text"].searchable-select-input-empty-alert {
@@ -1039,7 +1039,7 @@ div.mini-select-basic:hover {
 
 div.mini-select-basic-basic {
   border-radius: 8px;
-  background: var(--select-bg);
+  background: var(--control-bg);
   display: inline-flex;
   padding: 8px 12px;
   justify-content: center;
@@ -1051,7 +1051,7 @@ div.mini-select-basic-basic {
 div.mini-select-basic-square {
   border-radius: 8px;
   padding: 8px 12px;
-  background-color: var(--select-bg);
+  background-color: var(--control-bg);
 }
 
 div.mini-select-basic-value {
@@ -1105,7 +1105,7 @@ div.mini-select-item-direction {
   padding: 8px 12px;
   border-radius: 8px;
   white-space: nowrap;
-  background-color: var(--select-bg);
+  background-color: var(--control-bg);
 }
 
 div.mini-select-item-direction:hover {
@@ -1142,7 +1142,7 @@ div.mini-select-list-sort-recently-icon {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 8px;
-  background-color: var(--select-bg);
+  background-color: var(--control-bg);
 }
 
 html.light div.mini-select-list-sort-recently-icon {
