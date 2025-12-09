@@ -171,22 +171,14 @@ where
 
                     html! {
                         <td class={classes!("list-whole-head-title", class_border)} style={style} onclick={onclick_sort(index)}>
-                            <table style={style_inner}>
-                                <tr>
-                                    <td class="list-whole-head-title-inner-text">
-                                        { text!(txt, ctx.props().language, *title) }
-                                    </td>
-                                    {
-                                        html! {
-                                            <td class="list-whole-head-title-inner-sort">
-                                                <div class="list-whole-head-title-sort">
-                                                    <Sort status={sort_status} />
-                                                </div>
-                                            </td>
-                                        }
-                                    }
-                                </tr>
-                            </table>
+                            <div style={style_inner} class="list-head-inner">
+                                <span class="list-whole-head-title-inner-text">
+                                    { text!(txt, ctx.props().language, *title) }
+                                </span>
+                                <div class="list-whole-head-title-sort">
+                                    <Sort status={sort_status} />
+                                </div>
+                            </div>
                         </td>
                     }
                 } else {

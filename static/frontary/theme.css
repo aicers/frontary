@@ -1112,13 +1112,20 @@ td.list-whole-head-title:hover {
   cursor: pointer;
 }
 
-td.list-whole-head-title-inner-text {
-  height: 30px;
-  word-break: keep-all;
-  overflow-wrap: break-word;
+div.list-head-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
 }
 
-td.list-whole-head-title-inner-sort {
+span.list-whole-head-title-inner-text {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  width: 100%;
+}
+
+div.list-whole-head-title-inner-sort {
   height: 30px;
   width: 20px;
 }

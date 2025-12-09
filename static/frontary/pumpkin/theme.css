@@ -1340,7 +1340,7 @@ td.list-whole-head-expand {
 }
 
 td.list-whole-head-title {
-  height: 30px;
+  height: 48px;
   font-size: 14px;
   color: var(--text-secondary);
   text-align: center;
@@ -1353,15 +1353,17 @@ td.list-whole-head-title:hover {
   cursor: pointer;
 }
 
-td.list-whole-head-title-inner-text {
-  height: 48px;
-  word-break: keep-all;
-  overflow-wrap: break-word;
+div.list-head-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
 }
 
-td.list-whole-head-title-inner-sort {
-  height: 30px;
-  width: 20px;
+span.list-whole-head-title-inner-text {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-align: left;
 }
 
 div.list-whole-head-title-sort {
@@ -1430,7 +1432,7 @@ td.list-whole-list-first-layer {
   line-height: 22px;
   font-weight: 400;
   color: var(--text-primary);
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -1480,7 +1482,7 @@ td.list-whole-list-flat {
   font-size: 14px;
   font-weight: 400;
   color: var(--text-primary);
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
   padding: 12px 16px;
   box-shadow: var(--table-cell-shadow-inset);
