@@ -30,14 +30,6 @@ impl Theme {
     ///
     /// Returns `Some(Theme)` if a valid theme is stored, `None` if no theme
     /// is saved or if the stored value is invalid.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use frontary::Theme;
-    ///
-    /// Theme::load_from_browser();
-    /// ```
     #[must_use]
     pub fn load_from_browser() -> Option<Theme> {
         if cfg!(feature = "pumpkin") {
@@ -52,14 +44,6 @@ impl Theme {
     /// # Arguments
     ///
     /// * `theme` - The theme to save to browser storage
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use frontary::Theme;
-    ///
-    /// Theme::save_to_browser(Theme::Dark);
-    /// ```
     pub fn save_to_browser(theme: Theme) {
         if cfg!(feature = "pumpkin") {
             let _ = LocalStorage::set(STORAGE_KEY, theme);
