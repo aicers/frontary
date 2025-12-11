@@ -473,6 +473,11 @@ pub struct ComplexSelection {
     pub predefined: Rc<RefCell<Option<HashMap<String, RefSelectionExtraInfo>>>>,
     /// Custom selections created by the user
     pub custom: Rc<RefCell<HashMap<String, RefSelectionExtraInfo>>>,
+    /// Direction cache for all items (selected or not).
+    /// This survives component re-mounts so the last chosen
+    /// direction is remembered per item ID.
+    // pub direction_cache: Rc<RefCell<HashMap<String, EndpointKind>>>,
+    pub direction_cache: Rc<RefCell<HashMap<String, Option<SelectionExtraInfo>>>>,
 }
 
 impl ComplexSelection {

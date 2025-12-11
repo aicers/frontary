@@ -486,13 +486,17 @@ impl Component for Model {
             Message::SetDirection => {
                 self.set_direction(ctx);
                 self.load_direction_items(ctx);
+                // refresh local map and persistent cache
+                self.buffer_direction_items(ctx);
             }
             Message::SetDirectionItem(network_kind) => match network_kind {
                 ItemKind::Registered => {
                     self.load_direction_items(ctx);
+                    self.buffer_direction_items(ctx);
                 }
                 ItemKind::Custom => {
                     self.set_direction_custom(ctx);
+                    self.buffer_direction_items(ctx);
                 }
             },
             Message::Render => {
@@ -671,6 +675,9 @@ impl Model {
         if let Ok(direction) = self.directions.registered.try_borrow()
             && let Some(direction) = direction.as_ref()
         {
+            // Collect which ids we touched
+            let mut updated_ids: Vec<String> = Vec::new();
+
             if let (Some(search), Ok(list)) =
                 (self.search_result.as_ref(), ctx.props().list.try_borrow())
             {
@@ -684,15 +691,28 @@ impl Model {
                             && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
                         {
                             *value = Some(SelectionExtraInfo::Network(*direction));
+                            updated_ids.push(item.id().clone());
                         }
                     }
                 }
             } else {
-                for value in self.direction_items.values() {
+                for (id, value) in &self.direction_items {
                     if let Ok(mut value) = value.try_borrow_mut()
                         && let Some(SelectionExtraInfo::Network(_)) = value.as_ref()
                     {
                         *value = Some(SelectionExtraInfo::Network(*direction));
+                        updated_ids.push(id.clone());
+                    }
+                }
+            }
+
+            // Write updated directions into the persistent cache
+            if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut() {
+                for id in updated_ids {
+                    if let Some(rc) = self.direction_items.get(&id)
+                        && let Ok(v) = rc.try_borrow()
+                    {
+                        cache.insert(id.clone(), *v);
                     }
                 }
             }
@@ -740,11 +760,26 @@ impl Model {
             && let Some(direction) = direction.as_ref()
             && let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut()
         {
-            for v in custom.values_mut() {
+            let mut updated_ids: Vec<String> = Vec::new();
+
+            for (k, v) in custom.iter_mut() {
                 if let Ok(mut vv) = v.try_borrow_mut()
                     && vv.is_some()
                 {
                     *vv = Some(SelectionExtraInfo::Network(*direction));
+                    updated_ids.push(k.clone());
+                }
+            }
+
+            // Persist custom directions as well
+            if let Ok(mut cache) = ctx.props().selected.direction_cache.try_borrow_mut() {
+                for id in updated_ids {
+                    // custom ids live in `selected.custom`, so use that as source
+                    if let Some(rc) = custom.get(&id)
+                        && let Ok(v) = rc.try_borrow()
+                    {
+                        cache.insert(id.clone(), *v);
+                    }
                 }
             }
         }
@@ -755,6 +790,7 @@ impl Model {
             self.direction_items.clear();
             return;
         }
+
         let (Ok(predefined), Ok(list)) = (
             ctx.props().selected.predefined.try_borrow(),
             ctx.props().list.try_borrow(),
@@ -762,20 +798,28 @@ impl Model {
             self.direction_items.clear();
             return;
         };
+
+        // Persistent cache that survives remounts
+        let cache_ref = ctx.props().selected.direction_cache.try_borrow().ok();
+
         let mut current_ids = HashSet::new();
+
         for item in list.iter() {
             let id = item.id();
             current_ids.insert(id);
 
-            let direction = predefined
+            // 1) Prefer cached direction (what the user chose last time)
+            let from_cache = cache_ref.as_ref().and_then(|cache| cache.get(id)).copied();
+
+            // 2) Fall back to whatever is in predefined (currently selected items)
+            let from_predefined = predefined
                 .as_ref()
                 .and_then(|map| map.get(id))
-                .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
-                .or_else(|| {
-                    self.direction_items
-                        .get(id)
-                        .and_then(|rc| rc.try_borrow().ok().map(|v| *v))
-                })
+                .and_then(|rc| rc.try_borrow().ok().map(|v| *v));
+
+            // 3) Last resort: default to Both
+            let direction = from_cache
+                .or(from_predefined)
                 .unwrap_or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
 
             match self.direction_items.entry(id.clone()) {
@@ -791,6 +835,8 @@ impl Model {
                 }
             }
         }
+
+        // Drop directions for items no longer in the list
         self.direction_items
             .retain(|id, _| current_ids.contains(id));
     }
