@@ -480,7 +480,7 @@ pub struct ComplexSelection {
     /// is used to restore directions after component remount/navigation cycles.
     /// Selected items store their directions in `predefined`/`custom` directly;
     /// this backup is cleared when all items become selected.
-    pub diselected_direction_backup: Rc<RefCell<HashMap<String, SelectionExtraInfo>>>,
+    pub deselected_direction_backup: Rc<RefCell<HashMap<String, SelectionExtraInfo>>>,
 }
 
 impl ComplexSelection {

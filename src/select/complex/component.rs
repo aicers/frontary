@@ -222,7 +222,7 @@ impl Component for Model {
                                         && let Ok(mut backup) = ctx
                                             .props()
                                             .selected
-                                            .diselected_direction_backup
+                                            .deselected_direction_backup
                                             .try_borrow_mut()
                                     {
                                         backup.remove(&key);
@@ -236,7 +236,7 @@ impl Component for Model {
                                         && let Ok(mut backup) = ctx
                                             .props()
                                             .selected
-                                            .diselected_direction_backup
+                                            .deselected_direction_backup
                                             .try_borrow_mut()
                                     {
                                         backup.insert(key.clone(), dir);
@@ -283,7 +283,7 @@ impl Component for Model {
                                 && let Ok(mut backup) = ctx
                                     .props()
                                     .selected
-                                    .diselected_direction_backup
+                                    .deselected_direction_backup
                                     .try_borrow_mut()
                             {
                                 backup.insert(key.clone(), direction);
@@ -309,7 +309,7 @@ impl Component for Model {
                                 && let Ok(mut backup) = ctx
                                     .props()
                                     .selected
-                                    .diselected_direction_backup
+                                    .deselected_direction_backup
                                     .try_borrow_mut()
                             {
                                 backup.insert(key.clone(), direction);
@@ -340,7 +340,7 @@ impl Component for Model {
                             if let Ok(mut backup) = ctx
                                 .props()
                                 .selected
-                                .diselected_direction_backup
+                                .deselected_direction_backup
                                 .try_borrow_mut()
                             {
                                 backup.remove(&key);
@@ -355,13 +355,13 @@ impl Component for Model {
                         if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
                         {
                             // Preserve current directions before clearing selections so they can be
-                            // restored from `diselected_direction_backup` after navigation.
+                            // restored from `deselected_direction_backup` after navigation.
                             if ctx.props().kind == Kind::NetworkIp
                                 && let (Ok(list), Ok(mut backup)) = (
                                     ctx.props().list.try_borrow(),
                                     ctx.props()
                                         .selected
-                                        .diselected_direction_backup
+                                        .deselected_direction_backup
                                         .try_borrow_mut(),
                                 )
                             {
@@ -421,7 +421,7 @@ impl Component for Model {
                                     && let Ok(mut backup) = ctx
                                         .props()
                                         .selected
-                                        .diselected_direction_backup
+                                        .deselected_direction_backup
                                         .try_borrow_mut()
                                 {
                                     for id in list.iter().map(NetworkItem::id) {
@@ -461,7 +461,7 @@ impl Component for Model {
                                                     && let Ok(mut backup) = ctx
                                                         .props()
                                                         .selected
-                                                        .diselected_direction_backup
+                                                        .deselected_direction_backup
                                                         .try_borrow_mut()
                                                 {
                                                     backup.insert(item.id().clone(), direction);
@@ -501,7 +501,7 @@ impl Component for Model {
                                                     && let Ok(mut backup) = ctx
                                                         .props()
                                                         .selected
-                                                        .diselected_direction_backup
+                                                        .deselected_direction_backup
                                                         .try_borrow_mut()
                                                 {
                                                     backup.remove(&id);
@@ -533,7 +533,7 @@ impl Component for Model {
                                             && let Ok(mut backup) = ctx
                                                 .props()
                                                 .selected
-                                                .diselected_direction_backup
+                                                .deselected_direction_backup
                                                 .try_borrow_mut()
                                         {
                                             backup.insert(id.clone(), direction);
@@ -572,7 +572,7 @@ impl Component for Model {
                                                 && let Ok(mut backup) = ctx
                                                     .props()
                                                     .selected
-                                                    .diselected_direction_backup
+                                                    .deselected_direction_backup
                                                     .try_borrow_mut()
                                             {
                                                 backup.insert(k.clone(), direction);
@@ -621,7 +621,7 @@ impl Component for Model {
                                             if let Ok(mut backup) = ctx
                                                 .props()
                                                 .selected
-                                                .diselected_direction_backup
+                                                .deselected_direction_backup
                                                 .try_borrow_mut()
                                             {
                                                 backup.remove(k);
@@ -995,7 +995,7 @@ impl Model {
             && let Ok(mut backup) = ctx
                 .props()
                 .selected
-                .diselected_direction_backup
+                .deselected_direction_backup
                 .try_borrow_mut()
         {
             for id in list.iter().map(NetworkItem::id) {
@@ -1014,11 +1014,11 @@ impl Model {
                     // Item is selected: use the direction from predefined selection
                     selected_rc.try_borrow().ok().and_then(|v| *v)
                 } else {
-                    // Item is deselected: restore from diselected_direction_backup, then fall back to existing direction_items, then default
+                    // Item is deselected: restore from deselected_direction_backup, then fall back to existing direction_items, then default
                     if let Ok(backup) = ctx
                         .props()
                         .selected
-                        .diselected_direction_backup
+                        .deselected_direction_backup
                         .try_borrow()
                         && let Some(backed_up_direction) = backup.get(id)
                     {
@@ -1064,7 +1064,7 @@ impl Model {
                 .or_else(|| {
                     ctx.props()
                         .selected
-                        .diselected_direction_backup
+                        .deselected_direction_backup
                         .try_borrow()
                         .ok()
                         .and_then(|backup| backup.get(id).copied())
@@ -1099,7 +1099,7 @@ impl Model {
         if let Ok(mut backup) = ctx
             .props()
             .selected
-            .diselected_direction_backup
+            .deselected_direction_backup
             .try_borrow_mut()
         {
             backup.retain(|id, _| current_ids.contains(id));
