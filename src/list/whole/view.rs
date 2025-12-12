@@ -634,17 +634,6 @@ where
         };
 
         if out_table {
-            let msg = format!(
-                "{}{} {} {}{}",
-                self.checked.len(),
-                text!(txt, ctx.props().language, "(items of)"),
-                text!(txt, ctx.props().language, "chosen"),
-                text!(txt, ctx.props().language, &ctx.props().title)
-                    .to_string()
-                    .to_lowercase(),
-                text!(txt, ctx.props().language, "(s)"),
-            );
-
             html! {
                 <tr>
                     <td colspan={(cols + 3).to_string()} class="list-whole-list-pages">
@@ -657,7 +646,6 @@ where
                                 pages_info_cache={self.pages_info}
                                 num_pages={DEFAULT_NUM_PAGES}
                             />
-                            { self.view_delete_checked(ctx, msg) }
                         </div>
                     </td>
                 </tr>
@@ -775,6 +763,35 @@ where
                     </tr>
                 }
             }
+        }
+    }
+
+    fn action_bar_message(&self, ctx: &Context<Self>) -> Option<String> {
+        if self.check_status(ctx) == CheckStatus::Unchecked {
+            return None;
+        }
+
+        let txt = ctx.props().txt.txt.clone();
+        Some(format!(
+            "{} {}",
+            self.checked.len(),
+            text!(txt, ctx.props().language, "selected")
+        ))
+    }
+
+    pub(super) fn view_action_bar(&self, ctx: &Context<Self>) -> Html {
+        if !matches!(ctx.props().kind, Kind::Flat | Kind::LayeredFirst) {
+            return html! {};
+        }
+
+        let Some(msg) = self.action_bar_message(ctx) else {
+            return html! {};
+        };
+
+        html! {
+            <div class="list-whole-action-bar">
+                { self.view_delete_checked(ctx, msg) }
+            </div>
         }
     }
 
@@ -998,26 +1015,33 @@ where
         } else {
             let onclick_delete = ctx.link().callback(|_| Message::DeleteChecked);
             let onclick_cancel = ctx.link().callback(|_| Message::CancelChecked);
+            let txt = ctx.props().txt.txt.clone();
+            let delete_label = text!(txt, ctx.props().language, "Delete");
+            let cancel_label = text!(txt, ctx.props().language, "Cancel");
 
             html! {
                 <div class="list-whole-delete-checked">
-                    <div class="list-whole-delete-checked-text">
-                        { msg }
+                    <button
+                        type="button"
+                        class="list-whole-delete-checked-icon list-whole-delete-checked-close"
+                        aria-label={cancel_label}
+                        onclick={onclick_cancel}
+                    >
+                        <img src={close_img} class="list-whole-close-white" />
+                    </button>
+                    <div class="list-whole-delete-checked-content">
+                        <div class="list-whole-delete-checked-text">
+                            { msg }
+                        </div>
+                        <button
+                            type="button"
+                            class="list-whole-delete-checked-icon list-whole-delete-checked-trash"
+                            aria-label={delete_label}
+                            onclick={onclick_delete}
+                        >
+                            <img src={delete_img} class="list-whole-delete-trash-white" />
+                        </button>
                     </div>
-                    <table>
-                        <tr>
-                            <td class="list-whole-delete-checked-trash">
-                                <div class="list-whole-delete-checked-trash" onclick={onclick_delete}>
-                                    <img src={delete_img} class="list-whole-delete-trash-white" />
-                                </div>
-                            </td>
-                            <td class="list-whole-delete-checked-close">
-                                <div class="list-whole-delete-checked-close" onclick={onclick_cancel}>
-                                    <img src={close_img} class="list-whole-close-white" />
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
                 </div>
             }
         }
