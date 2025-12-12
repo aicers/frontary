@@ -48,7 +48,7 @@ const DEFAULT_MAX_WIDTH: u32 = 500;
 pub(super) const DEFAULT_SIZED_VALUE: bool = true;
 
 #[allow(clippy::struct_excessive_bools)]
-#[derive(Clone, PartialEq, Properties)]
+#[derive(Clone, Properties)]
 pub struct Props<T>
 where
     T: Clone + Component + PartialEq,
@@ -83,6 +83,37 @@ where
     pub parent_message: Option<T::Message>,
     #[prop_or(None)]
     pub theme: Option<Theme>,
+}
+
+impl<T> PartialEq for Props<T>
+where
+    T: Clone + Component + PartialEq,
+    <T as Component>::Message: Clone + PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        // Use Rc::ptr_eq for `selected` and `list` to detect new handles,
+        // even when their inner values are the same (e.g., both None).
+        // This ensures Yew calls `changed()` when a new tab provides fresh handles.
+        self.txt == other.txt
+            && self.language == other.language
+            && self.id == other.id
+            && self.kind == other.kind
+            && self.title == other.title
+            && self.empty_msg == other.empty_msg
+            && self.top_width == other.top_width
+            && self.max_width == other.max_width
+            && self.max_height == other.max_height
+            && self.align_left == other.align_left
+            && self.font == other.font
+            && Rc::ptr_eq(&self.list, &other.list)
+            && Rc::ptr_eq(&self.selected, &other.selected)
+            && self.allow_empty == other.allow_empty
+            && self.default_all == other.default_all
+            && self.sized_value == other.sized_value
+            && self.is_required == other.is_required
+            && self.parent_message == other.parent_message
+            && self.theme == other.theme
+    }
 }
 
 impl<T> Component for Model<T>
