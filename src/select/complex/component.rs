@@ -203,7 +203,7 @@ impl Component for Model {
                         if let Some(predefined) = sel.as_mut() {
                             match predefined.entry(key.clone()) {
                                 Vacant(entry) => {
-                                    // Item being selected: use direction_items or default (NOT backup)
+                                    // Selecting: use `direction_items` or default
                                     let extra = if ctx.props().kind == Kind::NetworkIp {
                                         if let Some(existing) =
                                             self.direction_items.get(entry.key())
@@ -217,29 +217,29 @@ impl Component for Model {
                                     };
                                     entry.insert(Rc::new(RefCell::new(extra)));
 
-                                    // Remove from backup on selection (backup is for deselected items only)
+                                    // Selecting: drop from `deselected_directions`
                                     if ctx.props().kind == Kind::NetworkIp
-                                        && let Ok(mut backup) = ctx
+                                        && let Ok(mut deselected_directions) = ctx
                                             .props()
                                             .selected
-                                            .deselected_direction_backup
+                                            .deselected_directions
                                             .try_borrow_mut()
                                     {
-                                        backup.remove(&key);
+                                        deselected_directions.remove(&key);
                                     }
                                 }
                                 Occupied(entry) => {
-                                    // Item being deselected: save to backup
+                                    // Deselecting: store the current direction in `deselected_directions`
                                     if ctx.props().kind == Kind::NetworkIp
                                         && let Ok(direction) = entry.get().try_borrow()
                                         && let Some(dir) = *direction
-                                        && let Ok(mut backup) = ctx
+                                        && let Ok(mut deselected_directions) = ctx
                                             .props()
                                             .selected
-                                            .deselected_direction_backup
+                                            .deselected_directions
                                             .try_borrow_mut()
                                     {
-                                        backup.insert(key.clone(), dir);
+                                        deselected_directions.insert(key.clone(), dir);
                                     }
 
                                     match ctx.props().kind {
@@ -275,18 +275,15 @@ impl Component for Model {
                             s.remove(&key);
                             *sel = Some(s);
 
-                            // When switching from "all selected" to partial, save the deselected item to backup
+                            // Switching from all-selected to partial: stash deselected direction
                             if ctx.props().kind == Kind::NetworkIp
                                 && let Some(dir_rc) = self.direction_items.get(&key)
                                 && let Ok(dir) = dir_rc.try_borrow()
                                 && let Some(direction) = *dir
-                                && let Ok(mut backup) = ctx
-                                    .props()
-                                    .selected
-                                    .deselected_direction_backup
-                                    .try_borrow_mut()
+                                && let Ok(mut deselected_directions) =
+                                    ctx.props().selected.deselected_directions.try_borrow_mut()
                             {
-                                backup.insert(key.clone(), direction);
+                                deselected_directions.insert(key.clone(), direction);
                             }
                         }
                     }
@@ -304,17 +301,14 @@ impl Component for Model {
                         && let Ok(mut value) = value.try_borrow_mut()
                     {
                         if let Some(SelectionExtraInfo::Network(_)) = *value {
-                            // Item being deselected: save direction to backup
+                            // Deselection: store direction in `deselected_directions`
                             if let Some(direction) = *value
-                                && let Ok(mut backup) = ctx
-                                    .props()
-                                    .selected
-                                    .deselected_direction_backup
-                                    .try_borrow_mut()
+                                && let Ok(mut deselected_directions) =
+                                    ctx.props().selected.deselected_directions.try_borrow_mut()
                             {
-                                backup.insert(key.clone(), direction);
+                                deselected_directions.insert(key.clone(), direction);
 
-                                // Keep direction_items in sync so the UI retains the saved direction while open
+                                // Keep `direction_items` in sync
                                 match self.direction_items.entry(key.clone()) {
                                     Occupied(entry) => {
                                         if let Ok(mut item_dir) = entry.get().try_borrow_mut() {
@@ -328,7 +322,7 @@ impl Component for Model {
                             }
                             *value = None;
                         } else {
-                            // Item being selected: use direction_items or default (NOT backup)
+                            // Selecting: use `direction_items` or default
                             *value = self
                                 .direction_items
                                 .get(&key)
@@ -336,14 +330,11 @@ impl Component for Model {
                                 .and_then(|opt| *opt)
                                 .or(Some(SelectionExtraInfo::Network(EndpointKind::Both)));
 
-                            // Remove from backup on selection (backup is for deselected items only)
-                            if let Ok(mut backup) = ctx
-                                .props()
-                                .selected
-                                .deselected_direction_backup
-                                .try_borrow_mut()
+                            // Selecting: drop from `deselected_directions`
+                            if let Ok(mut deselected_directions) =
+                                ctx.props().selected.deselected_directions.try_borrow_mut()
                             {
-                                backup.remove(&key);
+                                deselected_directions.remove(&key);
                             }
                         }
                     }
@@ -355,14 +346,11 @@ impl Component for Model {
                         if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
                         {
                             // Preserve current directions before clearing selections so they can be
-                            // restored from `deselected_direction_backup` after navigation.
+                            // restored from `deselected_directions` after navigation.
                             if ctx.props().kind == Kind::NetworkIp
-                                && let (Ok(list), Ok(mut backup)) = (
+                                && let (Ok(list), Ok(mut deselected_directions)) = (
                                     ctx.props().list.try_borrow(),
-                                    ctx.props()
-                                        .selected
-                                        .deselected_direction_backup
-                                        .try_borrow_mut(),
+                                    ctx.props().selected.deselected_directions.try_borrow_mut(),
                                 )
                             {
                                 for item in list.iter().filter(|item| item.networks().is_some()) {
@@ -380,7 +368,7 @@ impl Component for Model {
                                             })
                                         })
                                         .unwrap_or(SelectionExtraInfo::Network(EndpointKind::Both));
-                                    backup.insert(item.id().clone(), direction);
+                                    deselected_directions.insert(item.id().clone(), direction);
                                 }
                             }
 
@@ -416,16 +404,13 @@ impl Component for Model {
                                 }
                                 *predefined = Some(s);
 
-                                // Selecting all registered items: drop their backup entries
+                                // Selecting all registered items: drop their `deselected_directions` entries
                                 if ctx.props().kind == Kind::NetworkIp
-                                    && let Ok(mut backup) = ctx
-                                        .props()
-                                        .selected
-                                        .deselected_direction_backup
-                                        .try_borrow_mut()
+                                    && let Ok(mut deselected_directions) =
+                                        ctx.props().selected.deselected_directions.try_borrow_mut()
                                 {
                                     for id in list.iter().map(NetworkItem::id) {
-                                        backup.remove(id);
+                                        deselected_directions.remove(id);
                                     }
                                 }
                             }
@@ -449,7 +434,7 @@ impl Component for Model {
                             if let Some(predefined) = sel.as_mut() {
                                 match check_status {
                                     CheckStatus::Checked => {
-                                        // Deselecting items: save directions to backup
+                                        // Deselecting items: store directions in `deselected_directions`
                                         for &index in search {
                                             if let Some(item) = list.get(index)
                                                 && item.networks().is_some()
@@ -458,26 +443,27 @@ impl Component for Model {
                                                     && let Some(dir_rc) = predefined.get(item.id())
                                                     && let Ok(dir) = dir_rc.try_borrow()
                                                     && let Some(direction) = *dir
-                                                    && let Ok(mut backup) = ctx
+                                                    && let Ok(mut deselected_directions) = ctx
                                                         .props()
                                                         .selected
-                                                        .deselected_direction_backup
+                                                        .deselected_directions
                                                         .try_borrow_mut()
                                                 {
-                                                    backup.insert(item.id().clone(), direction);
+                                                    deselected_directions
+                                                        .insert(item.id().clone(), direction);
                                                 }
                                                 predefined.remove(item.id());
                                             }
                                         }
                                     }
                                     CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                                        // Selecting items: restore from backup and remove from backup
+                                        // Selecting items: restore from `deselected_directions` then remove entries
                                         for &index in search {
                                             if let Some(item) = list.get(index)
                                                 && item.networks().is_some()
                                             {
                                                 let id = item.id().clone();
-                                                // Use direction_items or default (NOT backup)
+                                                // Use `direction_items` or default
                                                 let extra = if ctx.props().kind == Kind::NetworkIp {
                                                     if let Some(existing) =
                                                         self.direction_items.get(&id)
@@ -496,15 +482,15 @@ impl Component for Model {
                                                     Rc::new(RefCell::new(extra)),
                                                 );
 
-                                                // Remove from backup on selection (backup is for deselected items only)
+                                                // Selection: remove from `deselected_directions`
                                                 if ctx.props().kind == Kind::NetworkIp
-                                                    && let Ok(mut backup) = ctx
+                                                    && let Ok(mut deselected_directions) = ctx
                                                         .props()
                                                         .selected
-                                                        .deselected_direction_backup
+                                                        .deselected_directions
                                                         .try_borrow_mut()
                                                 {
-                                                    backup.remove(&id);
+                                                    deselected_directions.remove(&id);
                                                 }
                                             }
                                         }
@@ -525,18 +511,18 @@ impl Component for Model {
                                 for &index in search {
                                     if let Some(item) = list.get(index) {
                                         let id = item.id();
-                                        // Deselecting items when switching from "all": save to backup
+                                        // Switching from all-selected: stash deselected direction in `deselected_directions`
                                         if ctx.props().kind == Kind::NetworkIp
                                             && let Some(dir_rc) = self.direction_items.get(id)
                                             && let Ok(dir) = dir_rc.try_borrow()
                                             && let Some(direction) = *dir
-                                            && let Ok(mut backup) = ctx
+                                            && let Ok(mut deselected_directions) = ctx
                                                 .props()
                                                 .selected
-                                                .deselected_direction_backup
+                                                .deselected_directions
                                                 .try_borrow_mut()
                                         {
-                                            backup.insert(id.clone(), direction);
+                                            deselected_directions.insert(id.clone(), direction);
                                         }
                                         s.remove(id);
                                     }
@@ -563,21 +549,21 @@ impl Component for Model {
                         if let Ok(mut custom) = ctx.props().selected.custom.try_borrow_mut() {
                             match status {
                                 CheckStatus::Checked => {
-                                    // Deselecting all custom items: save directions to backup
+                                    // Deselecting all custom items: store directions in `deselected_directions`
                                     for (k, v) in &mut *custom {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_some()
                                         {
                                             if let Some(direction) = *vv
-                                                && let Ok(mut backup) = ctx
+                                                && let Ok(mut deselected_directions) = ctx
                                                     .props()
                                                     .selected
-                                                    .deselected_direction_backup
+                                                    .deselected_directions
                                                     .try_borrow_mut()
                                             {
-                                                backup.insert(k.clone(), direction);
+                                                deselected_directions.insert(k.clone(), direction);
 
-                                                // Keep direction_items in sync so the UI retains the saved direction while open
+                                                // Keep `direction_items` in sync
                                                 match self.direction_items.entry(k.clone()) {
                                                     Occupied(mut entry) => {
                                                         if let Ok(mut item_dir) =
@@ -602,7 +588,7 @@ impl Component for Model {
                                     }
                                 }
                                 CheckStatus::Unchecked | CheckStatus::Indeterminate => {
-                                    // Selecting custom items: use direction_items or default (NOT backup)
+                                    // Selecting custom items: use `direction_items` or default
                                     for (k, v) in custom.iter_mut() {
                                         if let Ok(mut vv) = v.try_borrow_mut()
                                             && vv.is_none()
@@ -617,14 +603,14 @@ impl Component for Model {
                                                 ));
                                             }
 
-                                            // Remove from backup on selection (backup is for deselected items only)
-                                            if let Ok(mut backup) = ctx
+                                            // Selection: remove from `deselected_directions`
+                                            if let Ok(mut deselected_directions) = ctx
                                                 .props()
                                                 .selected
-                                                .deselected_direction_backup
+                                                .deselected_directions
                                                 .try_borrow_mut()
                                             {
-                                                backup.remove(k);
+                                                deselected_directions.remove(k);
                                             }
                                         }
                                     }
@@ -956,7 +942,7 @@ impl Model {
                 {
                     // Only update selected items
                     *vv = Some(SelectionExtraInfo::Network(*direction));
-                    // Keep direction_items aligned so deselected views reuse the last selection
+                    // Keep `direction_items` aligned
                     match self.direction_items.entry(key.clone()) {
                         Occupied(entry) => {
                             if let Ok(mut item_dir) = entry.get().try_borrow_mut() {
@@ -989,17 +975,14 @@ impl Model {
             return;
         };
 
-        // If all registered items are selected (predefined is None), drop backup entries
+        // If all registered items are selected (`predefined` is `None`), drop `deselected_directions` entries
         // for those registered ids. Custom (non-listed) entries remain intact.
         if predefined.is_none()
-            && let Ok(mut backup) = ctx
-                .props()
-                .selected
-                .deselected_direction_backup
-                .try_borrow_mut()
+            && let Ok(mut deselected_directions) =
+                ctx.props().selected.deselected_directions.try_borrow_mut()
         {
             for id in list.iter().map(NetworkItem::id) {
-                backup.remove(id);
+                deselected_directions.remove(id);
             }
         }
 
@@ -1011,18 +994,15 @@ impl Model {
             // Determine the direction to use for this item
             let direction = if let Some(predefined_map) = predefined.as_ref() {
                 if let Some(selected_rc) = predefined_map.get(id) {
-                    // Item is selected: use the direction from predefined selection
+                    // Item is selected: use the direction from `predefined_map`
                     selected_rc.try_borrow().ok().and_then(|v| *v)
                 } else {
-                    // Item is deselected: restore from deselected_direction_backup, then fall back to existing direction_items, then default
-                    if let Ok(backup) = ctx
-                        .props()
-                        .selected
-                        .deselected_direction_backup
-                        .try_borrow()
-                        && let Some(backed_up_direction) = backup.get(id)
+                    // Item is deselected: restore from `deselected_directions`, then fall back to existing `direction_items`, then default
+                    if let Ok(deselected_directions) =
+                        ctx.props().selected.deselected_directions.try_borrow()
+                        && let Some(stored_direction) = deselected_directions.get(id)
                     {
-                        Some(*backed_up_direction)
+                        Some(*stored_direction)
                     } else if let Some(existing) = self.direction_items.get(id) {
                         existing.try_borrow().ok().and_then(|v| *v)
                     } else {
@@ -1030,8 +1010,8 @@ impl Model {
                     }
                 }
             } else {
-                // All items selected (predefined is None): use existing direction_items or default
-                // Do NOT read from backup since backup is only for deselected items
+                // All items selected (`predefined` is `None`): use existing `direction_items` or default
+                // Do not read from `deselected_directions`; it only tracks deselected items
                 if let Some(existing) = self.direction_items.get(id) {
                     existing.try_borrow().ok().and_then(|v| *v)
                 } else {
@@ -1039,7 +1019,7 @@ impl Model {
                 }
             };
 
-            // Update or insert the direction in direction_items
+            // Update or insert the direction in `direction_items`
             match self.direction_items.entry(id.clone()) {
                 Occupied(mut entry) => {
                     if let Ok(mut value) = entry.get().try_borrow_mut() {
@@ -1064,10 +1044,10 @@ impl Model {
                 .or_else(|| {
                     ctx.props()
                         .selected
-                        .deselected_direction_backup
+                        .deselected_directions
                         .try_borrow()
                         .ok()
-                        .and_then(|backup| backup.get(id).copied())
+                        .and_then(|deselected_directions| deselected_directions.get(id).copied())
                 })
                 .or_else(|| {
                     self.direction_items
@@ -1095,14 +1075,11 @@ impl Model {
         self.direction_items
             .retain(|id, _| current_ids.contains(id));
 
-        // Clean up stale backup entries to avoid memory bloat
-        if let Ok(mut backup) = ctx
-            .props()
-            .selected
-            .deselected_direction_backup
-            .try_borrow_mut()
+        // Prune stale `deselected_directions` entries to avoid memory bloat
+        if let Ok(mut deselected_directions) =
+            ctx.props().selected.deselected_directions.try_borrow_mut()
         {
-            backup.retain(|id, _| current_ids.contains(id));
+            deselected_directions.retain(|id, _| current_ids.contains(id));
         }
     }
 
@@ -1110,8 +1087,8 @@ impl Model {
         if let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
             && let Some(current) = predefined.as_ref()
         {
-            // Update selected items with new directions from direction_items
-            // Don't persist to backup since these are selected items
+            // Update selected items with new directions from `direction_items`
+            // Don't write to `deselected_directions` since these are selected items
             let s = current
                 .iter()
                 .filter_map(|(k, v)| {

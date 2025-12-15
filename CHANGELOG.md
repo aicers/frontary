@@ -17,9 +17,8 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   areas, allowing users to close UI components when clicking outside of them.
 - Added `selected_sort_kind` prop to `WholeList` to expose the currently selected
   sort option to the caller.
-- Added `deselected_direction_backup` field to `ComplexSelection` to persistently
-  store backup direction choices for deselected Network/IP items across component
-  remounts.
+- Added `deselected_directions` field to `ComplexSelection` to persistently
+  store directions for deselected Network/IP items across component remounts.
 
 ### Fixed
 
