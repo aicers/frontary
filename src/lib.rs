@@ -473,6 +473,8 @@ pub struct ComplexSelection {
     pub predefined: Rc<RefCell<Option<HashMap<String, RefSelectionExtraInfo>>>>,
     /// Custom selections created by the user
     pub custom: Rc<RefCell<HashMap<String, RefSelectionExtraInfo>>>,
+    /// Directions for deselected items only.
+    pub deselected_directions: Rc<RefCell<HashMap<String, SelectionExtraInfo>>>,
 }
 
 impl ComplexSelection {
