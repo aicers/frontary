@@ -724,7 +724,7 @@ impl Model {
                 selected_value={Rc::clone(selected)}
                 selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
                 align_left={false}
-                list_top={28}
+                list_top={43}
                 {top_width}
                 list_min_width={Some(70)}
                 kind={SelectMiniKind::DirectionItem}
