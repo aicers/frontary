@@ -85,7 +85,7 @@ div.radio-outer {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  margin-top: -3px;
+  gap: 16px;
 }
 
 img.radio-separate-img {
