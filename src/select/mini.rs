@@ -248,11 +248,7 @@ where
         } else {
             "right"
         };
-        let list_top = if cfg!(feature = "pumpkin") {
-            43
-        } else {
-            ctx.props().list_top
-        };
+        let list_top = ctx.props().list_top;
         let style = format!(
             "{}: 0px; top: {}px; {}; color: {};",
             align,
