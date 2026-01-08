@@ -314,9 +314,9 @@ where
                                     } else if ctx.props().kind == Kind::OnOffAction {
                                         match item {
                                             ViewString::Key(key) => {
-                                                let icon = if key == "On" {
+                                                let icon = if key == "State On" || key == "Action On" {
                                                     Theme::path(&theme, "on.png")
-                                                } else if key == "Off" {
+                                                } else if key == "State Off" || key == "Action Off" {
                                                     Theme::path(&theme, "off.png")
                                                 } else {
                                                     String::new()
