@@ -1590,7 +1590,8 @@ td.list-whole-group {
 }
 
 div.page-outer {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   height: 30px;
   font-size: 13px;
   font-weight: normal;
@@ -1600,26 +1601,31 @@ div.page-outer {
 }
 
 div.page-number {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 26px;
   margin-bottom: 2px;
+  white-space: nowrap;
 }
 
 div.page-unselected {
-  float: left;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 26px;
-  padding-right: 9px;
-  padding-left: 9px;
-  padding-top: 5px;
+  padding: 0 9px;
+  line-height: 26px;
   color: #959595;
 }
 
 div.page-selected {
-  float: left;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 26px;
-  padding-right: 9px;
-  padding-left: 9px;
-  padding-top: 5px;
+  padding: 0 9px;
+  line-height: 26px;
   color: #686868;
   background-color: #f0ece6;
   border-radius: 15px;
