@@ -534,6 +534,7 @@ impl Model {
             ItemKind::Custom => &self.directions.custom,
         };
         let selected_value_cache = selected_value.try_borrow().ok().and_then(|x| *x);
+        let list_top = if cfg!(feature = "pumpkin") { 30 } else { 24 };
         html! {
             <SelectMini::<EndpointKind, Self>
                 txt={ctx.props().txt.clone()}
@@ -547,7 +548,7 @@ impl Model {
                 {selected_value}
                 {selected_value_cache}
                 align_left={false}
-                list_top={40}
+                {list_top}
                 kind={SelectMiniKind::DirectionAll}
                 {theme}
             />
@@ -709,6 +710,7 @@ impl Model {
             SelectionExtraInfo::Network(EndpointKind::Destination),
         ]);
         let top_width = if cfg!(feature = "pumpkin") { 94 } else { 70 };
+        let list_top = if cfg!(feature = "pumpkin") { 43 } else { 32 };
         let theme = ctx.props().theme;
         if let Some(selected) = self.direction_items.get(id) {
             html! {
@@ -724,7 +726,7 @@ impl Model {
                 selected_value={Rc::clone(selected)}
                 selected_value_cache={selected.try_borrow().ok().and_then(|x| *x)}
                 align_left={false}
-                list_top={43}
+                {list_top}
                 {top_width}
                 list_min_width={Some(70)}
                 kind={SelectMiniKind::DirectionItem}
@@ -876,9 +878,9 @@ impl Model {
                                             ]);
                                             let onclick_del = |key: String| ctx.link().callback(move |_| Message::DeleteInputItem(key.clone()));
                                             let (top_bg_color, top_width, list_top) = if cfg!(feature = "pumpkin") {
-                                                ("rgba(97, 105, 116, 0.24)", 94, 42)
+                                                ("rgba(97, 105, 116, 0.24)", 94, 43)
                                             } else {
-                                                ("#F6F6F6", 70, 28)
+                                                ("#F6F6F6", 70, 32)
                                             };
                                             let theme = ctx.props().theme;
                                             let current = value.try_borrow().ok().and_then(|x| *x);

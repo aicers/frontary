@@ -293,9 +293,14 @@ where
                                         match item {
                                             ViewString::Key(key) => {
                                                 let ext = if cfg!(feature = "pumpkin") { "svg" } else { "png" };
+                                                let delete_icon_name = if cfg!(feature = "pumpkin") {
+                                                    "delete-trash-alt"
+                                                } else {
+                                                    "delete-trash"
+                                                };
                                                 let icon = match key.as_ref() {
                                                     "Edit" => Theme::path(&theme, &format!("edit.{ext}")),
-                                                    "Delete" => Theme::path(&theme, &format!("delete-trash-alt.{ext}")),
+                                                    "Delete" => Theme::path(&theme, &format!("{delete_icon_name}.{ext}")),
                                                     _ => String::new(),
                                                 };
                                                 html! {
