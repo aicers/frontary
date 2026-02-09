@@ -822,13 +822,9 @@ where
         let add_img = Theme::path(&theme, &format!("list-add.{ext}"));
         let render_title = || -> Html {
             html! {
-                <>
+                <div class="list-header">
                     <div class="list-title">
                         { text!(txt, ctx.props().language, &ctx.props().title) }
-                    </div>
-                    <div class="list-add" onclick={onclick_add.clone()}>
-                        <img src={add_img.clone()} class="list-add" />
-                        { text!(txt, ctx.props().language, "Add") }
                     </div>
                     <div class="list-sort-recently">
                         <SelectMini::<SortListKind, Self>
@@ -847,7 +843,11 @@ where
                             {theme}
                         />
                     </div>
-                </>
+                    <div class="list-add" onclick={onclick_add.clone()}>
+                        <img src={add_img.clone()} class="list-add" />
+                        { text!(txt, ctx.props().language, "Add") }
+                    </div>
+                </div>
             }
         };
         let render_title_with_description = |description: &'static str| -> Html {
