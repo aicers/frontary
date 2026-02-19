@@ -1013,6 +1013,11 @@ div.mini-select-on-off-action:hover {
   cursor: pointer;
 }
 
+div.list-header {
+  display: flex;
+  flex-direction: row;
+}
+
 div.list-title {
   float: left;
   color: var(--title-text-color);
@@ -1021,6 +1026,7 @@ div.list-title {
   margin-top: 14px;
   margin-bottom: 20px;
   line-height: 22px;
+  margin-right: auto;
 }
 
 div.list-sort-recently {
