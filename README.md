@@ -4,7 +4,7 @@ Yew-based reusable HTML components for AICE
 
 ## License
 
-Copyright 2022-2025 ClumL Inc.
+Copyright 2022-2026 ClumL Inc.
 
 Licensed under [Apache License, Version 2.0][apache-license] (the "License");
 you may not use this crate except in compliance with the License.
