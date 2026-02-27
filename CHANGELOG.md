@@ -4,6 +4,13 @@ This file documents recent notable changes to this project. The format of this
 file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Renamed direction labels `SRC`/`DST` to `ORIG`/`RESP` in the `complex-select`
+  network/IP direction dropdown.
+
 ## [0.15.1] - 2026-02-19
 
 ### Fixed
@@ -36,14 +43,14 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed tag dropdown visibility by removing conflicting `display: flex`
   declaration that overrode the hidden state, ensuring dropdowns start hidden
   and respond correctly to toggle logic.
-- Fixed incorrect intermediate "Both" state when toggling SRC/DST checkbox selections
-  in `complex-select`.
+- Fixed incorrect intermediate "Both" state when toggling ORIG/RESP checkbox
+  selections in `complex-select`.
 - Fixed `SelectMini` so that changing the direction dropdown for a custom IP no
   longer inadvertently checks other custom-IP rows.
 - Fixed `WholeList` pagination cache so recalculated page info persists after
   data updates instead of reverting to stale page numbers.
-- Fixed direction (SRC/DST/Both) selection in `complex-select` to update properly
-  with a single click when editing registered IPs.
+- Fixed direction (ORIG/RESP/Both) selection in `complex-select` to update
+  properly with a single click when editing registered IPs.
 - Fixed inconsistent error-state background styling in `SelectSearchable` components.
 
 ### Changed
@@ -453,6 +460,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Initial release.
 
+[Unreleased]: https://github.com/aicers/frontary/compare/0.15.1...main
 [0.15.1]: https://github.com/aicers/frontary/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/aicers/frontary/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/aicers/frontary/compare/0.13.0...0.14.0
