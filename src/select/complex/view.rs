@@ -701,8 +701,8 @@ impl Model {
     ) -> Html {
         let src_dst_list = Rc::new(vec![
             ViewString::Key("Both (Directions)".to_string()),
-            ViewString::Key("SRC".to_string()),
-            ViewString::Key("DST".to_string()),
+            ViewString::Key("ORIG".to_string()),
+            ViewString::Key("RESP".to_string()),
         ]);
         let value_candidates = Rc::new(vec![
             SelectionExtraInfo::Network(EndpointKind::Both),
@@ -868,8 +868,8 @@ impl Model {
                                             };
                                             let src_dst_list = Rc::new(vec![
                                                 ViewString::Key("Both (Directions)".to_string()),
-                                                ViewString::Key("SRC".to_string()),
-                                                ViewString::Key("DST".to_string()),
+                                                ViewString::Key("ORIG".to_string()),
+                                                ViewString::Key("RESP".to_string()),
                                             ]);
                                             let value_candidates = Rc::new(vec![
                                                 SelectionExtraInfo::Network(EndpointKind::Both),
