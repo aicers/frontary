@@ -4,6 +4,14 @@ This file documents recent notable changes to this project. The format of this
 file is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed Network/IP filter showing `(0)` instead of the correct
+  count when all registered items are individually selected under
+  the `pumpkin` feature.
+
 ## [0.15.1] - 2026-02-19
 
 ### Fixed
@@ -453,6 +461,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Initial release.
 
+[Unreleased]: https://github.com/aicers/frontary/compare/0.15.1...main
 [0.15.1]: https://github.com/aicers/frontary/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/aicers/frontary/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/aicers/frontary/compare/0.13.0...0.14.0

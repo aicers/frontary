@@ -287,7 +287,11 @@ impl Component for Model {
                             }
                         }
                     }
-                    if self.check_status(ctx, false) == CheckStatus::Checked
+                    // For non-pumpkin, normalize all-individually-selected
+                    // to None (meaning "all selected"). For pumpkin, keep
+                    // Some(full_map) so the view can count selected items.
+                    if !cfg!(feature = "pumpkin")
+                        && self.check_status(ctx, false) == CheckStatus::Checked
                         && let Ok(mut predefined) = ctx.props().selected.predefined.try_borrow_mut()
                     {
                         *predefined = None;
