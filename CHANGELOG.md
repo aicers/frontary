@@ -11,6 +11,12 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Renamed direction labels `SRC`/`DST` to `ORIG`/`RESP` in the `complex-select`
   network/IP direction dropdown.
 
+### Fixed
+
+- Fixed Network/IP filter showing `(0)` instead of the correct
+  count when all registered items are individually selected under
+  the `pumpkin` feature.
+
 ## [0.15.1] - 2026-02-19
 
 ### Fixed
