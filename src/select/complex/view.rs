@@ -699,7 +699,7 @@ impl Model {
         id: &String,
         checked: bool,
     ) -> Html {
-        let src_dst_list = Rc::new(vec![
+        let orig_resp_list = Rc::new(vec![
             ViewString::Key("Both (Directions)".to_string()),
             ViewString::Key("ORIG".to_string()),
             ViewString::Key("RESP".to_string()),
@@ -720,7 +720,7 @@ impl Model {
                 parent_message={Message::SetDirectionItem(ItemKind::Registered)}
                 active={checked}
                 id={format!("assign-item-direction-{}", id.clone())}
-                list={Rc::clone(&src_dst_list)}
+                list={Rc::clone(&orig_resp_list)}
                 candidate_values={Rc::clone(&value_candidates)}
                 default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
                 selected_value={Rc::clone(selected)}
@@ -866,7 +866,7 @@ impl Model {
                                             } else {
                                                 format!("float: left; width: {}px;", ctx.props().pop_width - 150)
                                             };
-                                            let src_dst_list = Rc::new(vec![
+                                            let orig_resp_list = Rc::new(vec![
                                                 ViewString::Key("Both (Directions)".to_string()),
                                                 ViewString::Key("ORIG".to_string()),
                                                 ViewString::Key("RESP".to_string()),
@@ -926,7 +926,7 @@ impl Model {
                                                                 parent_message={Message::Render}
                                                                 active={active}
                                                                 id={format!("assign-input-direction-{}", key.clone())}
-                                                                list={src_dst_list}
+                                                                list={orig_resp_list}
                                                                 candidate_values={value_candidates}
                                                                 default_value={default_value}
                                                                 selected_value={value.clone()}
@@ -961,7 +961,7 @@ impl Model {
                                                                     parent_message={Message::Render}
                                                                     active={active}
                                                                     id={format!("assign-input-direction-{}", key.clone())}
-                                                                    list={src_dst_list}
+                                                                    list={orig_resp_list}
                                                                     candidate_values={value_candidates}
                                                                     default_value={Some(SelectionExtraInfo::Network(EndpointKind::Both))}
                                                                     selected_value={value.clone()}
