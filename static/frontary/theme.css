@@ -1409,7 +1409,7 @@ span.list-whole-second-empty-message {
   width: 100%;
   font-size: 13px;
   line-height: 20px;
-  color: var(--text-secondary);
+  color: var(--fg-secondary);
 }
 
 span.list-whole-list-multiple-sep {
