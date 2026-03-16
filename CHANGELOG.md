@@ -57,7 +57,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   data updates instead of reverting to stale page numbers.
 - Fixed direction (SRC/DST/Both) selection in `complex-select` to update properly
   with a single click when editing registered IPs.
-- Fixed inconsistent error-state background styling in `SelectSearchable` components.
+- Fixed inconsistent error-state background styling in `SelectSearchable`
+  components.
+- Fixed `SelectComplex` (pumpkin) label logic to show selected count for
+  custom-only selections when the predefined list is empty, instead of always
+  showing `All`.
 
 ### Changed
 

@@ -710,7 +710,16 @@ impl Component for Model {
             if let Ok(list) = ctx.props().list.try_borrow() {
                 if list.is_empty() {
                     class_input = "complex-select-input";
-                    text!(txt, ctx.props().language, "All").to_string()
+                    let selected_len = Self::selected_len(ctx);
+                    if selected_len == 0 {
+                        text!(txt, ctx.props().language, "All").to_string()
+                    } else {
+                        format!(
+                            "({}) {}",
+                            selected_len,
+                            text!(txt, ctx.props().language, "Selected Filters"),
+                        )
+                    }
                 } else {
                     let (list_selected, custom_selected) = ctx.props().selected.len();
                     if list_selected.unwrap_or_default() == 0 && custom_selected == 0 {
