@@ -25,7 +25,7 @@ jobs:
       - name: Clippy
         run: cargo clippy --tests -- -D warnings
       - name: markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v18
+        uses: DavidAnson/markdownlint-cli2-action@v23
       - name: Biome check
         run: biome ci --error-on-warnings
 
