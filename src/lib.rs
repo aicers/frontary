@@ -493,8 +493,7 @@ impl ComplexSelection {
             let is_selected = |value: &RefSelectionExtraInfo| {
                 value
                     .try_borrow()
-                    .map(|selection| selection.is_some())
-                    .unwrap_or(false)
+                    .is_ok_and(|selection| selection.is_some())
             };
             let custom_selected = custom.values().filter(|value| is_selected(value)).count();
             let predefined_selected = (*predefined)

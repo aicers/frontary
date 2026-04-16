@@ -222,11 +222,9 @@ where
                         }
                     }
                 }
-                "Tab" => {
-                    if !self.input.is_empty() {
-                        ctx.link()
-                            .send_message(Message::InputHostNetwork("Tab".to_string()));
-                    }
+                "Tab" if !self.input.is_empty() => {
+                    ctx.link()
+                        .send_message(Message::InputHostNetwork("Tab".to_string()));
                 }
                 _ => (),
             },

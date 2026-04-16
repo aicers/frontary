@@ -238,7 +238,7 @@ impl fmt::Display for Value {
             Self::String(Some(v)) => write!(f, "{v}"),
             Self::Integer(Some(v)) => write!(f, "{v}"),
             Self::UInteger(Some(v)) => write!(f, "{v}"),
-            Self::Vector(Some(v)) => write!(f, "{v:?}",),
+            Self::Vector(Some(v)) => write!(f, "{v:?}"),
             Self::Float(Some(v)) => write!(f, "{v}"),
             Self::IpAddr(Some(v)) => write!(f, "{v}"),
             Self::Bool(Some(v)) => write!(f, "{v}"),
