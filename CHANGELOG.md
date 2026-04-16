@@ -16,6 +16,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed Network/IP filter showing `(0)` instead of the correct
   count when all registered items are individually selected under
   the `pumpkin` feature.
+- Fixed `SelectComplex` (pumpkin) label logic to show selected count for
+  custom-only selections when the predefined list is empty, instead of always
+  showing `All`.
 
 ## [0.15.1] - 2026-02-19
 
@@ -59,9 +62,6 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   with a single click when editing registered IPs.
 - Fixed inconsistent error-state background styling in `SelectSearchable`
   components.
-- Fixed `SelectComplex` (pumpkin) label logic to show selected count for
-  custom-only selections when the predefined list is empty, instead of always
-  showing `All`.
 
 ### Changed
 
