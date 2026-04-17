@@ -413,7 +413,7 @@ where
             if cfg!(feature = "pumpkin") {
                 format!("{style_width} {style_height}")
             } else {
-                format!("{style_width} {style_height} background-color: #FFFFFF;",)
+                format!("{style_width} {style_height} background-color: #FFFFFF;")
             }
         };
         let (outer_sub_class, icon_sub_class) = if ctx.props().kind == Kind::Round {
