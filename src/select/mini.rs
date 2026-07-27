@@ -253,7 +253,7 @@ where
             "{}: 0px; top: {}px; {}; color: {};",
             align,
             list_top,
-            &style_width,
+            style_width,
             ctx.props().list_text_color,
         );
         let class = if ctx.props().kind == Kind::MoreActionNoImage {
@@ -397,15 +397,15 @@ where
                     "{} {} color: {};",
                     style_width,
                     style_height,
-                    &ctx.props().value_text_color,
+                    ctx.props().value_text_color,
                 )
             } else {
                 format!(
                     "{} {} background-color: {}; color: {};",
                     style_width,
                     style_height,
-                    &ctx.props().top_bg_color,
-                    &ctx.props().value_text_color,
+                    ctx.props().top_bg_color,
+                    ctx.props().value_text_color,
                 )
             }
         } else {
@@ -495,7 +495,7 @@ where
             format!(
                 "{} background-color: {};",
                 style_width,
-                &ctx.props().top_bg_color
+                ctx.props().top_bg_color
             )
         };
         let onclick = ctx.link().callback(|_| Message::ClickTop);

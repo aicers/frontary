@@ -800,13 +800,13 @@ where
                         "{} ({})",
                         get_text!(txt, ctx.props().language.tag(), "A ➝ Z")
                             .map_or("A ➝ Z".to_string(), |t| t.to_string()),
-                        &sort_column
+                        sort_column
                     )),
                     SortListKind::Descending => ViewString::Raw(format!(
                         "{} ({})",
                         get_text!(txt, ctx.props().language.tag(), "Z ➝ A")
                             .map_or("Z ➝ A".to_string(), |t| t.to_string()),
-                        &sort_column
+                        sort_column
                     )),
                 })
                 .collect::<Vec<_>>(),
