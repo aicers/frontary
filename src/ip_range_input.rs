@@ -1,5 +1,6 @@
 use std::{cell::RefCell, net::Ipv4Addr, rc::Rc, str::FromStr};
 
+use ipnet::Ipv4Net;
 use json_gettext::get_text;
 use wasm_bindgen::JsCast;
 use web_sys::HtmlInputElement;
@@ -154,10 +155,25 @@ fn check_input(input: &str) -> Option<IpRange> {
                 None
             }
         })
-    } else {
-        Ipv4Addr::from_str(input.trim()).ok().map(|ip| IpRange {
+    } else if let Ok(ip) = Ipv4Addr::from_str(input.trim()) {
+        Some(IpRange {
             start: ip.to_string(),
             end: String::new(),
+        })
+    } else {
+        Ipv4Net::from_str(input.trim()).ok().map(|network| {
+            let start = network.network();
+            let end = network.broadcast();
+            let end = if start == end {
+                String::new()
+            } else {
+                end.to_string()
+            };
+
+            IpRange {
+                start: start.to_string(),
+                end,
+            }
         })
     }
 }
