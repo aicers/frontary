@@ -762,8 +762,7 @@ impl Model {
                 .selected
                 .custom
                 .try_borrow()
-                .map(|custom| custom.keys().cloned().collect::<Vec<String>>())
-                .unwrap_or_default();
+                .map_or_default(|custom| custom.keys().cloned().collect::<Vec<String>>());
 
             let custom_is_empty = custom_keys.is_empty();
 

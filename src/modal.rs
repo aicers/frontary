@@ -177,8 +177,7 @@ where
                 ctx.props().width,
                 ctx.props()
                     .height
-                    .map(|h| format!(" height: {h}px;"))
-                    .unwrap_or_default()
+                    .map_or_default(|h| format!(" height: {h}px;"))
             )
         } else if matches!(ctx.props().kind, MsgType::TextOnly) {
             format!(
@@ -186,8 +185,7 @@ where
                 ctx.props().width,
                 ctx.props()
                     .height
-                    .map(|h| format!(" height: {h}px;"))
-                    .unwrap_or_default()
+                    .map_or_default(|h| format!(" height: {h}px;"))
             )
         } else {
             format!(
